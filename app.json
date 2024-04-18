@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "rahapay-mobile-app",
+    "name": "RahaPay",
     "slug": "rahapay-mobile-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,7 +8,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#5136C1"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
