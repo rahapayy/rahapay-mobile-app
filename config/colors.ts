@@ -21,7 +21,7 @@ const COLORS = {
   red700: "#991C1C",
   red800: "#731515",
   red900: "#731515",
-  // Black
+  //  Black
   black50: "#E9E9E9",
   black100: "#DDDDDD",
   black200: "#B9B9B9",
@@ -43,4 +43,6 @@ const COLORS = {
   violet700: "#312074",
   violet800: "#241857",
   violet900: "#1C1344",
+  //  White
+  white: "#FFFFFF",
 };
