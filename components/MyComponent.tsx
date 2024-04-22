@@ -2,6 +2,7 @@ import React from "react";
 import { View } from "react-native";
 import { makeStyles, Text, Button, useThemeMode } from "@rneui/themed";
 import { Card } from "@rneui/base";
+import SwipeButton from "./SwipeButton";
 
 export default function App() {
   const styles = useStyles();
@@ -13,16 +14,7 @@ export default function App() {
 
   return (
     <>
-      <View style={styles.container}>
-        <Text h3>Start Using RNE </Text>
-        <Text style={styles.text}>
-          Open up App.tsx to start working on your app!
-        </Text>
-        <Button onPress={handleOnPress}>Switch Theme</Button>
-      </View>
-      <View className="flex-1 items-center justify-center bg-white">
-        <Text>Hello</Text>
-      </View>
+      {/* <SwipeButton /> */}
     </>
   );
 }
