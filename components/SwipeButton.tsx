@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   centeredView: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "500",
     color: "#333",
-    fontFamily: "Outfit-SemiBold",
+    fontFamily: "Outfit-Regular",
   },
   loadingAnimation: {
     width: 100,

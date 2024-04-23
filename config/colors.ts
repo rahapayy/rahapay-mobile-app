@@ -46,3 +46,5 @@ const COLORS = {
   //  White
   white: "#FFFFFF",
 };
+
+export default COLORS;

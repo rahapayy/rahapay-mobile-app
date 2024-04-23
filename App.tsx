@@ -5,6 +5,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import Onboarding from "./components/onboarding/Onboarding";
+import { StatusBar } from "react-native";
 
 const theme = createTheme({
   lightColors: {},
@@ -37,7 +39,8 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <SwipeButton />
+        <StatusBar barStyle={"default"} />
+        <Onboarding />
       </GestureHandlerRootView>
     </ThemeProvider>
   );
