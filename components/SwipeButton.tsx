@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -88,8 +88,8 @@ const SwipeButton = () => {
                     autoPlay
                     loop
                     style={{
-                        width: 40,
-                        height: 40,
+                      width: 40,
+                      height: 40,
                     }}
                   />
                 </Animated.View>
@@ -120,7 +120,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   centeredView: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -149,13 +148,14 @@ const styles = StyleSheet.create({
     height: 60,
     justifyContent: "center",
     alignItems: "center",
-    left: 10, // Position it at the start of the sliderBackground
+    left: 0, // Position it at the start of the sliderBackground
     zIndex: 0,
   },
   slideText: {
     fontSize: 20,
     fontWeight: "500",
     color: "#333",
+    fontFamily: "Outfit-SemiBold",
   },
   loadingAnimation: {
     width: 100,
