@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-const Button = () => {
+const ResetPasswordScreen = () => {
   return (
     <View>
-      <Text>Button</Text>
+      <Text>ResetPasswordScreen</Text>
     </View>
   );
 };
 
-export default Button;
+export default ResetPasswordScreen;
 
 const styles = StyleSheet.create({});

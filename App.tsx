@@ -1,12 +1,11 @@
 import React, { useCallback } from "react";
 import { createTheme, ThemeProvider } from "@rneui/themed";
-import SwipeButton from "./components/SwipeButton";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import Onboarding from "./components/onboarding/Onboarding";
 import { StatusBar } from "react-native";
+import Router from "./router/Router";
 
 const theme = createTheme({
   lightColors: {},
@@ -40,7 +39,7 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <StatusBar barStyle={"default"} />
-        <Onboarding />
+        <Router />
       </GestureHandlerRootView>
     </ThemeProvider>
   );
