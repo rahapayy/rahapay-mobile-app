@@ -1,4 +1,5 @@
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -10,12 +11,15 @@ import {
   View,
 } from "react-native";
 import React, { useState } from "react";
-import { AddCircle, ArrowLeft, EyeSlash } from "iconsax-react-native";
+import { AddCircle, ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-const CreateAccountScreen = () => {
+const CreateAccountScreen: React.FC<{
+  navigation: NativeStackNavigationProp<any, "">;
+}> = ({ navigation }) => {
   const [showBalance, setShowBalance] = useState(true);
 
   const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
@@ -23,7 +27,9 @@ const CreateAccountScreen = () => {
     <SafeAreaView>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="p-4">
-          <ArrowLeft color="#000" />
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <ArrowLeft color="#000" />
+          </TouchableOpacity>
 
           <View className="mt-4">
             <Text style={styles.headText}>Create an Account</Text>
@@ -56,7 +62,11 @@ const CreateAccountScreen = () => {
             <View className="mt-4">
               <Text style={styles.label}>Phone Number</Text>
               <View style={styles.inputContainer}>
-                <AddCircle />
+                <Image
+                  source={require("../../../assets/images/flag-for-nigeria.png")}
+                  alt=""
+                  className="w-6 h-6"
+                />
                 <View>
                   <Text style={styles.numberText}> +234 </Text>
                 </View>
@@ -70,7 +80,7 @@ const CreateAccountScreen = () => {
               </View>
             </View>
             <View className="mt-4">
-              <Text style={styles.label}>Password</Text>
+              <Text style={styles.label}>Create Password</Text>
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
@@ -78,11 +88,22 @@ const CreateAccountScreen = () => {
                   placeholderTextColor="#BABFC3"
                   keyboardType="numeric"
                 />
-                <TouchableOpacity>
-                  <EyeSlash />
+                <TouchableOpacity onPress={toggleBalanceVisibility}>
+                  {showBalance ? (
+                    <Eye color="#000" size={20} />
+                  ) : (
+                    <EyeSlash color="#000" size={20} />
+                  )}
                 </TouchableOpacity>
               </View>
             </View>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate("VerifyEmailScreen")}
+              style={styles.proceedButton}
+            >
+              <Text style={styles.proceedButtonText}>Proceed</Text>
+            </TouchableOpacity>
           </KeyboardAvoidingView>
         </View>
       </ScrollView>
@@ -135,5 +156,19 @@ const styles = StyleSheet.create({
   },
   numberText: {
     fontFamily: "Outfit-Regular",
+  },
+  proceedButton: {
+    backgroundColor: COLORS.violet400,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: SPACING * 4,
+  },
+  proceedButtonText: {
+    fontFamily: "Outfit-Regular",
+    color: "#fff",
+    fontSize: RFValue(16),
   },
 });
