@@ -55,7 +55,7 @@ const AuthRoute = () => {
           />
         </>
       )}
-      {/* <Stack.Screen
+      <Stack.Screen
         name="WelcomeScreen"
         component={WelcomeScreen}
         options={{
@@ -86,7 +86,7 @@ const AuthRoute = () => {
         name="CreateNewPasswordScreen"
         component={CreateNewPasswordScreen}
         options={{ headerShown: false }}
-      /> */}
+      />
     </Stack.Navigator>
   );
 };
