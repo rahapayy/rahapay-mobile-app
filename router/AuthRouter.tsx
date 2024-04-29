@@ -10,6 +10,7 @@ import VerifyEmailScreen from "../screens/Auth/CreateAccount/VerifyEmailScreen";
 import ResetPasswordScreen from "../screens/Auth/ForgotPassword/ResetPasswordScreen";
 import EnterCodeScreen from "../screens/Auth/ForgotPassword/EnterCodeScreen";
 import CreateNewPasswordScreen from "../screens/Auth/ForgotPassword/CreateNewPasswordScreen";
+import LoginScreen from "../screens/Auth/Login/LoginScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -85,6 +86,11 @@ const AuthRoute = () => {
       <Stack.Screen
         name="CreateNewPasswordScreen"
         component={CreateNewPasswordScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="LoginScreen"
+        component={LoginScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

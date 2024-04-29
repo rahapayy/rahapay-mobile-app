@@ -11,15 +11,18 @@ import LottieView from "lottie-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
 import SPACING from "../config/SPACING";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 const { height: screenHeight } = Dimensions.get("window");
 
-const WelcomeScreen = () => {
+const WelcomeScreen: React.FC<{
+  navigation: NativeStackNavigationProp<any, "">;
+}> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.animationContainer}>
         <LottieView
-          source={require("../assets/animation/welcome.json")}
+          source={require("../assets/animation/welcome-1.json")}
           autoPlay
           loop
           style={styles.welcomeAnimation}
@@ -34,11 +37,16 @@ const WelcomeScreen = () => {
         </Text>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.createAccountButton}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("CreateAccountScreen")}
+          style={styles.createAccountButton}
+        >
           <Text style={styles.createAccountText}>Create an Account</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.loginButton}>
+        <TouchableOpacity 
+          onPress={() => navigation.navigate("LoginScreen")}
+          style={styles.loginButton}>
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
       </View>
@@ -77,7 +85,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     paddingHorizontal: SPACING,
-    marginBottom: SPACING
+    marginBottom: SPACING,
   },
   createAccountButton: {
     paddingVertical: SPACING * 1.8,
