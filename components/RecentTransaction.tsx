@@ -89,7 +89,7 @@ export default RecentTransaction;
 const styles = StyleSheet.create({
   rtText: {
     fontFamily: "Outfit-SemiBold",
-    fontSize: RFValue(18),
+    fontSize: RFValue(16),
   },
   viewmoreText: {
     fontFamily: "Outfit-Regular",
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   transactionItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 30,
+    marginBottom: 5,
     marginTop: 10,
   },
   transactionImage: {

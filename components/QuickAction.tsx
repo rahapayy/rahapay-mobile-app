@@ -11,40 +11,56 @@ import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
 
 const QuickAction = () => {
-  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const { width: screenWidth } = useWindowDimensions();
 
-  const height = screenWidth;
+  // Calculate an appropriate card size based on the screen width, ensuring a minimum width
+  const cardWidth = Math.max((screenWidth - 60) / 4, 80); // Minimum width set to 80
+  const cardHeight = cardWidth * 1.1; // Maintain a fixed aspect ratio
+
+  // Updated style for card text to prevent wrapping
+  const cardTextStyle = {
+    ...styles.cardText,
+    width: cardWidth - 36, // take into account paddingHorizontal
+  };
   return (
     <View className="p-4">
       <Text style={styles.quickAction}>Quick Action</Text>
       <View className="flex-row items-center justify-between mt-4">
         {/* Cards */}
         <TouchableOpacity
-          style={[styles.card, { width: (screenWidth - 60) / 4 }]}
+          style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
           <Wifi color={COLORS.violet400} />
-          <Text style={styles.cardText}>Airtime</Text>
+          <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
+            Airtime
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.card, { width: (screenWidth - 60) / 4 }]}
+          style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
           <Wifi color={COLORS.violet400} />
-          <Text style={styles.cardText}>Data</Text>
+          <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
+            Data
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.card, { width: (screenWidth - 60) / 4 }]}
+          style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
           <Wifi color={COLORS.violet400} />
-          <Text style={styles.cardText}>TV</Text>
+          <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
+            TV
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.card, { width: (screenWidth - 60) / 4 }]}
+          style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
           <Wifi color={COLORS.violet400} />
-          <Text style={styles.cardText}>Electicity</Text>
+          <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
+            Electicity
+          </Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity className="w-full bg-white p-4 justify-center items-center mt-4 rounded-xl">
+      <TouchableOpacity className="w-full bg-white p-4 justify-center items-center mt-4 rounded-2xl">
         <Text style={styles.moreText}>More</Text>
       </TouchableOpacity>
     </View>
@@ -56,7 +72,7 @@ export default QuickAction;
 const styles = StyleSheet.create({
   quickAction: {
     fontFamily: "Outfit-SemiBold",
-    fontSize: RFValue(18),
+    fontSize: RFValue(16),
   },
   card: {
     backgroundColor: COLORS.white,
@@ -65,10 +81,10 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 18,
     paddingVertical: 15,
-    borderRadius: 10,
+    borderRadius: 20,
   },
   cardText: {
-    fontSize: RFValue(10),
+    fontSize: RFValue(12),
     fontFamily: "Outfit-Regular",
   },
   moreText: {
