@@ -13,19 +13,18 @@ import React, { useState } from "react";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
 import Card from "../components/Card";
+import { Wifi } from "iconsax-react-native";
+import QuickAction from "../components/QuickAction";
 
 const HomeScreen = () => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
-  
-  const height = screenWidth ;
+  const height = screenWidth;
 
   return (
     <>
       <Card />
-      <SafeAreaView>
-
-      </SafeAreaView>
+      <QuickAction />
     </>
   );
 };
@@ -33,48 +32,21 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  backgroundImage: {
-    borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 15,
-    overflow: "hidden",
-  },
-  fundWalletButton: {
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
-    paddingVertical: 14,
-    borderRadius: 10,
-    flexDirection: "row",
-  },
-  fundWalletText: {
-    fontFamily: "Outfit-Regular",
-    color: COLORS.violet400,
-    marginLeft: 4,
-    fontSize: RFValue(16),
-  },
-  greetingTextContainer: {
-    marginLeft: 8,
-  },
-  greetingText: {
+  quickAction: {
     fontFamily: "Outfit-SemiBold",
-    color: "#fff",
     fontSize: RFValue(18),
   },
-  greetingSubText: {
-    fontFamily: "Outfit-Regular",
-    color: "#fff",
-    fontSize: RFValue(14),
+  card: {
+    backgroundColor: COLORS.white,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: 18,
+    paddingVertical: 15,
+    borderRadius: 10,
   },
-  availableBalanceText: {
+  cardText: {
+    fontSize: RFValue(10),
     fontFamily: "Outfit-Regular",
-    color: "#fff",
-    marginLeft: 4,
-    fontSize: RFValue(14),
-  },
-  balanceValue: {
-    fontFamily: "Outfit-SemiBold",
-    color: "#fff",
-    fontSize: RFValue(28),
   },
 });
