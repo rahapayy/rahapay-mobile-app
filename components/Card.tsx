@@ -39,6 +39,14 @@ const Card = () => {
       source={require("../assets/images/bg.png")}
       style={[styles.backgroundImage, { height: bgHeight }]}
     >
+      {/* <Image
+        source={require("../assets/images/layer.png")}
+        style={{
+          position: "absolute",
+          width: 500,
+          height: 500,
+        }}
+      /> */}
       <SafeAreaView style={{ flex: 1 }}>
         <View className="p-6">
           <View className="flex-row items-center justify-between">
@@ -101,6 +109,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
     overflow: "hidden",
+    backgroundColor: COLORS.violet400,
   },
   fundWalletButton: {
     backgroundColor: "#fff",

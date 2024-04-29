@@ -15,6 +15,7 @@ import COLORS from "../config/colors";
 import Card from "../components/Card";
 import { Wifi } from "iconsax-react-native";
 import QuickAction from "../components/QuickAction";
+import RecentTransaction from "../components/RecentTransaction";
 
 const HomeScreen = () => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -25,6 +26,7 @@ const HomeScreen = () => {
     <>
       <Card />
       <QuickAction />
+      <RecentTransaction />
     </>
   );
 };
