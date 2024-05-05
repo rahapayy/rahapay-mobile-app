@@ -1,14 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import React from "react";
 
 const EnterCodeScreen = () => {
   return (
-    <View>
+    <SafeAreaView>
       <Text>EnterCodeScreen</Text>
-    </View>
-  )
-}
+    </SafeAreaView>
+  );
+};
 
-export default EnterCodeScreen
+export default EnterCodeScreen;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});
