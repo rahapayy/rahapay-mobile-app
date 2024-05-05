@@ -1,11 +1,11 @@
-import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import React from "react";
 
 const CreateNewPasswordScreen = () => {
   return (
-    <View>
+    <SafeAreaView>
       <Text>CreateNewPasswordScreen</Text>
-    </View>
+    </SafeAreaView>
   );
 };
 
