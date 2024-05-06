@@ -84,9 +84,8 @@ const CreateAccountScreen: React.FC<{
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                  placeholder="8038929383"
+                  placeholder="Password"
                   placeholderTextColor="#BABFC3"
-                  keyboardType="numeric"
                 />
                 <TouchableOpacity onPress={toggleBalanceVisibility}>
                   {showBalance ? (
@@ -116,12 +115,12 @@ export default CreateAccountScreen;
 const styles = StyleSheet.create({
   headText: {
     fontFamily: "Outfit-Medium",
-    fontSize: RFValue(20),
+    fontSize: RFValue(24),
     marginBottom: 10,
   },
   subText: {
     fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
+    fontSize: RFValue(16),
   },
   textInput: {
     borderWidth: 1,
@@ -132,6 +131,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: "Outfit-Regular",
     marginBottom: 10,
+    fontSize: RFValue(14),
   },
   vertical: {
     backgroundColor: COLORS.black100,
