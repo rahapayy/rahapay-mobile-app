@@ -92,7 +92,7 @@ const VerifyEmailScreen: React.FC<{
             </View>
           </View>
 
-          <Button title={"Verify Account"} />
+          <Button title={"Verify Account"} className="mt-4" />
         </View>
       </ScrollView>
     </SafeAreaView>
