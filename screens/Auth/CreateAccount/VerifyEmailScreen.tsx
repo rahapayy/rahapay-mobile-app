@@ -43,6 +43,11 @@ const VerifyEmailScreen: React.FC<{
       }
     }
   };
+
+  const handleButtonClick = () => {
+    navigation.navigate("CreateTransactionPinScreen");
+  };
+
   return (
     <SafeAreaView>
       <ScrollView>
@@ -71,7 +76,7 @@ const VerifyEmailScreen: React.FC<{
                     boxIsFocused[index] && styles.inputBoxFocused,
                   ]}
                   keyboardType="numeric"
-                  value={value}
+                  value={value ? "*" : ""}
                   onChangeText={(text) => handleInput(text, index)}
                   onFocus={() =>
                     setBoxIsFocused((prevState) => [
@@ -92,7 +97,19 @@ const VerifyEmailScreen: React.FC<{
             </View>
           </View>
 
-          <Button title={"Verify Account"} className="mt-4" />
+          <Button
+            title={"Verify Account"}
+            onPress={handleButtonClick}
+            className="mt-4"
+          />
+
+          <View className=" justify-center items-center mt-6">
+            <Text style={styles.otpText}>Didn’t receive an OTP?</Text>
+
+            <View style={styles.countdownContainer}>
+              <Text style={styles.countdownText}>Resend OTP (59s)</Text>
+            </View>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -145,4 +162,16 @@ const styles = StyleSheet.create({
     borderColor: COLORS.violet400,
     borderWidth: 1,
   },
+  otpText: {
+    fontSize: RFValue(14),
+    fontFamily: "Outfit-Regular",
+  },
+  countdownContainer: {
+    marginTop: SPACING * 2,
+    backgroundColor: COLORS.violet200,
+    paddingVertical: SPACING * 2,
+    paddingHorizontal: SPACING * 2,
+    borderRadius: 4,
+  },
+  countdownText: {},
 });
