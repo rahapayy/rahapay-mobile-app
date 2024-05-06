@@ -24,6 +24,10 @@ const CreateAccountScreen: React.FC<{
   const [showBalance, setShowBalance] = useState(true);
 
   const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
+
+  const handleButtonClick = () => {
+    navigation.navigate("VerifyEmailScreen");
+  };
   return (
     <SafeAreaView>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -106,7 +110,7 @@ const CreateAccountScreen: React.FC<{
             </TouchableOpacity> */}
             <Button
               title={"Proceed"}
-              onPress={() => navigation.navigate("VerifyEmailScreen")}
+              onPress={handleButtonClick}
               style={styles.proceedButton}
             />
           </KeyboardAvoidingView>
