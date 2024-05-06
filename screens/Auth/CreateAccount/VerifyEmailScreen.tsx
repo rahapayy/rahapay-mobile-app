@@ -13,6 +13,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../config/SPACING";
 import COLORS from "../../../config/colors";
+import Button from "../../../components/Button";
 
 const VerifyEmailScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -28,10 +29,17 @@ const VerifyEmailScreen: React.FC<{
       const newBoxes = [...boxes];
       newBoxes[index] = text;
       setBoxes(newBoxes);
+
+      // Check if all input boxes are cleared
+      const allBoxesCleared = newBoxes.every((box) => box === "");
+
       if (text === "" && index > 0) {
         boxRefs.current[index - 1]?.focus();
-      } else if (index < 4) {
+      } else if (index < 4 && !allBoxesCleared) {
         boxRefs.current[index + 1]?.focus();
+      } else if (allBoxesCleared) {
+        // If all boxes are cleared, focus on the first box
+        boxRefs.current[0]?.focus();
       }
     }
   };
@@ -83,6 +91,8 @@ const VerifyEmailScreen: React.FC<{
               ))}
             </View>
           </View>
+
+          <Button title={"Verify Account"} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -133,6 +143,6 @@ const styles = StyleSheet.create({
   },
   inputBoxFocused: {
     borderColor: COLORS.violet400,
-    borderWidth: 2,
+    borderWidth: 1,
   },
 });

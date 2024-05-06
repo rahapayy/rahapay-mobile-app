@@ -1,14 +1,45 @@
-import { StyleSheet, Text, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableOpacityProps,
+} from "react-native";
 import React from "react";
+import COLORS from "../config/colors";
+import { RFValue } from "react-native-responsive-fontsize";
+import SPACING from "../config/SPACING";
 
-const Button = () => {
+interface ButtonProps extends TouchableOpacityProps {
+  title: string;
+}
+
+const Button: React.FC<ButtonProps> = ({ title, onPress, style, ...rest }) => {
   return (
-    <View>
-      <Text>Button</Text>
-    </View>
+    <TouchableOpacity
+      style={[styles.button, style]}
+      onPress={onPress}
+      {...rest}
+    >
+      <Text style={styles.buttonText}>{title}</Text>
+    </TouchableOpacity>
   );
 };
 
 export default Button;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  button: {
+    backgroundColor: COLORS.violet400,
+    paddingVertical: SPACING * 1.5,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: RFValue(16),
+    fontWeight: "bold",
+    fontFamily: "Outfit-Regular",
+  },
+});
