@@ -1,5 +1,4 @@
 import {
-  Image,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
