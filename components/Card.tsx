@@ -1,27 +1,11 @@
-import {
-  ImageBackground,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
-} from "react-native";
 import React, { useState } from "react";
-import { Image } from "react-native";
-import {
-  AddCircle,
-  Eye,
-  EyeSlash,
-  Notification,
-  WalletAdd1,
-} from "iconsax-react-native";
+import { ImageBackground, SafeAreaView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View, Image } from "react-native";
+import { AddCircle, Eye, EyeSlash, Notification, WalletAdd1 } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
 
 const Card = () => {
-  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const { width: screenWidth } = useWindowDimensions();
 
   // Calculate a fixed aspect ratio for the background image (e.g., 16:9)
   const aspectRatio = 12 / 9;
@@ -29,38 +13,24 @@ const Card = () => {
 
   const [showBalance, setShowBalance] = useState(true);
 
-  const toggleBalanceVisibility = React.useCallback(
-    () => setShowBalance((prev) => !prev),
-    []
-  );
+  const toggleBalanceVisibility = () => setShowBalance(prev => !prev);
 
   return (
     <ImageBackground
       source={require("../assets/images/bg.png")}
       style={[styles.backgroundImage, { height: bgHeight }]}
     >
-      {/* <Image
-        source={require("../assets/images/layer.png")}
-        style={{
-          position: "absolute",
-          width: 500,
-          height: 500,
-        }}
-      /> */}
       <SafeAreaView style={{ flex: 1 }}>
-        <View className="p-6">
-          <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center">
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <View style={styles.headerContent}>
               <Image
                 source={require("../assets/images/avatar.png")}
-                alt=""
-                style={{ width: 50, height: 50 }}
+                style={styles.avatar}
               />
-              <View style={styles.greetingTextContainer}>
+              <View>
                 <Text style={styles.greetingText}>Hello, Akinola</Text>
-                <Text style={styles.greetingSubText}>
-                  Let's make some bills payment!
-                </Text>
+                <Text style={styles.greetingSubText}>Let's make some bills payment!</Text>
               </View>
             </View>
             <TouchableOpacity>
@@ -68,28 +38,18 @@ const Card = () => {
             </TouchableOpacity>
           </View>
 
-          <View className="flex-row items-center justify-between mt-6">
-            <View className="flex-row items-center">
+          <View style={styles.balanceContainer}>
+            <View style={styles.balanceContent}>
               <WalletAdd1 color="#fff" size={20} />
               <Text style={styles.availableBalanceText}>Available Balance</Text>
             </View>
-            {showBalance ? (
-              <TouchableOpacity onPress={toggleBalanceVisibility}>
-                <Eye color="#fff" size={20} style={{ marginLeft: 10 }} />
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity onPress={toggleBalanceVisibility}>
-                <EyeSlash color="#fff" size={20} style={{ marginLeft: 10 }} />
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity onPress={toggleBalanceVisibility}>
+              {showBalance ? <Eye color="#fff" size={20} style={styles.eyeIcon} /> : <EyeSlash color="#fff" size={20} style={styles.eyeIcon} />}
+            </TouchableOpacity>
           </View>
 
-          <View className="mt-4">
-            {showBalance ? (
-              <Text style={styles.balanceValue}>₦ 120,000.00</Text>
-            ) : (
-              <Text style={styles.balanceValue}>*******</Text>
-            )}
+          <View style={styles.balanceValueContainer}>
+            <Text style={styles.balanceValue}>{showBalance ? "₦ 120,000.00" : "*******"}</Text>
           </View>
 
           <TouchableOpacity style={styles.fundWalletButton}>
@@ -111,23 +71,25 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     backgroundColor: COLORS.violet400,
   },
-  fundWalletButton: {
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
-    paddingVertical: 14,
-    borderRadius: 10,
+  container: {
+    paddingHorizontal: 16,
+    paddingTop: 24,
+    flex: 1,
+  },
+  header: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
   },
-  fundWalletText: {
-    fontFamily: "Outfit-Regular",
-    color: COLORS.violet400,
-    marginLeft: 4,
-    fontSize: RFValue(16),
+  headerContent: {
+    flexDirection: "row",
+    alignItems: "center",
   },
-  greetingTextContainer: {
-    marginLeft: 8,
+  avatar: {
+    width: 50,
+    height: 50,
+    marginRight: 8,
   },
   greetingText: {
     fontFamily: "Outfit-SemiBold",
@@ -139,15 +101,45 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: RFValue(14),
   },
+  balanceContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  balanceContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   availableBalanceText: {
     fontFamily: "Outfit-Regular",
     color: "#fff",
     marginLeft: 4,
     fontSize: RFValue(14),
   },
+  eyeIcon: {
+    marginLeft: 10,
+  },
+  balanceValueContainer: {
+    marginBottom: 20,
+  },
   balanceValue: {
     fontFamily: "Outfit-SemiBold",
     color: "#fff",
     fontSize: RFValue(28),
+  },
+  fundWalletButton: {
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 14,
+    borderRadius: 10,
+    flexDirection: "row",
+  },
+  fundWalletText: {
+    fontFamily: "Outfit-Regular",
+    color: COLORS.violet400,
+    marginLeft: 4,
+    fontSize: RFValue(16),
   },
 });

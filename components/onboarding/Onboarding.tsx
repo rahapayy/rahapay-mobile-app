@@ -27,7 +27,7 @@ const Onboarding: React.FC<{
       slidesRef.current.scrollToIndex({ index: currentIndex + 1 });
     } else {
       await setItem("onboarded", "1");
-      navigation.navigate("HomeScreen");
+      navigation.navigate("WelcomeScreen");
     }
   };
 
