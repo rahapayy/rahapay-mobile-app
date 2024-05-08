@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import React, { useState } from "react";
-import { AddCircle, ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
+import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
