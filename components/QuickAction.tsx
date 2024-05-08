@@ -9,8 +9,11 @@ import React from "react";
 import { Wifi } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-const QuickAction = () => {
+const QuickAction: React.FC<{
+  navigation: NativeStackNavigationProp<any, "">;
+}> = ({ navigation }) => {
   const { width: screenWidth } = useWindowDimensions();
 
   // Calculate an appropriate card size based on the screen width, ensuring a minimum width
@@ -21,6 +24,10 @@ const QuickAction = () => {
   const cardTextStyle = {
     ...styles.cardText,
     width: cardWidth - 36, // take into account paddingHorizontal
+  };
+
+  const handleButtonClick = () => {
+    navigation.navigate("Services");
   };
   return (
     <View className="p-4">
@@ -60,7 +67,10 @@ const QuickAction = () => {
           </Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity className="w-full bg-white p-4 justify-center items-center mt-4 rounded-2xl">
+      <TouchableOpacity
+        onPress={handleButtonClick}
+        className="w-full bg-white p-4 justify-center items-center mt-4 rounded-2xl"
+      >
         <Text style={styles.moreText}>More</Text>
       </TouchableOpacity>
     </View>
