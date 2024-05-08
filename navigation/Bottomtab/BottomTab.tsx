@@ -17,9 +17,9 @@ import CardsScreen from "../../screens/CardsScreen";
 const Tab = createBottomTabNavigator();
 
 const customColors = {
-  tabBarBackground: "#fff", 
-  activeTintColor: "#5136C1", 
-  inactiveTintColor: "#8E9AAF", 
+  tabBarBackground: "#fff",
+  activeTintColor: "#5136C1",
+  inactiveTintColor: "#8E9AAF",
 };
 
 const BottomTab = () => {
