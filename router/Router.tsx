@@ -30,7 +30,7 @@ const Router = () => {
     return (
       <View
         style={{
-          backgroundColor: "#fff", 
+          backgroundColor: "#fff",
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
@@ -52,12 +52,12 @@ const Router = () => {
             options={{ headerShown: false }}
           />
         ) : ( */}
-          <Stack.Screen
-            name="AuthRoute"
-            component={AuthRoute}
-            options={{ headerShown: false }}
-          />
-         {/* )}  */}
+        <Stack.Screen
+          name="AuthRoute"
+          component={AuthRoute}
+          options={{ headerShown: false }}
+        />
+        {/* )}  */}
       </Stack.Navigator>
     </NavigationContainer>
   );

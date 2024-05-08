@@ -12,6 +12,7 @@ import EnterCodeScreen from "../screens/Auth/ForgotPassword/EnterCodeScreen";
 import CreateNewPasswordScreen from "../screens/Auth/ForgotPassword/CreateNewPasswordScreen";
 import LoginScreen from "../screens/Auth/Login/LoginScreen";
 import CreateTransactionPinScreen from "../screens/Auth/CreateAccount/CreateTransactionPinScreen";
+import ConfirmPinScreen from "../screens/Auth/CreateAccount/ConfirmPinScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -97,6 +98,11 @@ const AuthRoute = () => {
       <Stack.Screen
         name="CreateTransactionPinScreen"
         component={CreateTransactionPinScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ConfirmPinScreen"
+        component={ConfirmPinScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

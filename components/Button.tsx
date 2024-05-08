@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: RFValue(16),
-    fontWeight: "bold",
     fontFamily: "Outfit-Regular",
   },
 });
