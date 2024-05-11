@@ -26,7 +26,7 @@ const LoginScreen: React.FC<{
   const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
 
   const handleLogin = () => {
-    navigation.navigate("");
+    navigation.navigate("HomeScreen");
   };
 
   const handleButtonClick = () => {
