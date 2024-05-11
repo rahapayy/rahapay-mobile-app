@@ -22,7 +22,7 @@ const AppStack = () => {
           headerShown: false,
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="ServicesScreen"
         component={ServicesScreen}
         options={{ headerShown: false }}
@@ -42,7 +42,7 @@ const AppStack = () => {
         name="ProfileScreen"
         component={ProfileScreen}
         options={{ headerShown: false }}
-      />
+      /> */}
       <Stack.Screen
         name="AirtimeScreen"
         component={AirtimeScreen}

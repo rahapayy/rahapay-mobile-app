@@ -6,6 +6,7 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "react-native";
 import Router from "./router/Router";
+import TestStack from "./router/TestStack";
 
 const theme = createTheme({
   lightColors: {},
@@ -39,7 +40,8 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <StatusBar barStyle={"default"} />
-        <Router />
+        {/* <Router /> */}
+        <TestStack />
       </GestureHandlerRootView>
     </ThemeProvider>
   );
