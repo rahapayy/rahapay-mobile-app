@@ -7,7 +7,7 @@ const ProfileScreen = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
         <View className="p-6">
-          <Text style={styles.headText}>Services</Text>
+          <Text style={styles.headText}>Profile</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
