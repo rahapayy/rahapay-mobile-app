@@ -40,8 +40,8 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <StatusBar barStyle={"default"} />
-        {/* <Router /> */}
-        <TestStack />
+        <Router />
+        {/* <TestStack /> */}
       </GestureHandlerRootView>
     </ThemeProvider>
   );
