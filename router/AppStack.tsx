@@ -22,27 +22,6 @@ const AppStack = () => {
           headerShown: false,
         }}
       />
-      {/* <Stack.Screen
-        name="ServicesScreen"
-        component={ServicesScreen}
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="WalletScreen"
-        component={WalletScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="CardsScreen"
-        component={CardsScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ProfileScreen"
-        component={ProfileScreen}
-        options={{ headerShown: false }}
-      /> */}
       <Stack.Screen
         name="AirtimeScreen"
         component={AirtimeScreen}
