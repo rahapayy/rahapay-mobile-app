@@ -10,6 +10,7 @@ import DataScreen from "../screens/Services/DataScreen";
 import ElectricityScreen from "../screens/Services/ElectricityScreen";
 import TransferToUser from "../screens/Services/TransferToUser";
 import TvSubscriptionScreen from "../screens/Services/TvSubscriptionScreen";
+import TransactionHistoryScreen from "../screens/TransactionHistoryScreen";
 
 const Stack = createNativeStackNavigator();
 const AppStack = () => {
@@ -22,27 +23,6 @@ const AppStack = () => {
           headerShown: false,
         }}
       />
-      {/* <Stack.Screen
-        name="ServicesScreen"
-        component={ServicesScreen}
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="WalletScreen"
-        component={WalletScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="CardsScreen"
-        component={CardsScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ProfileScreen"
-        component={ProfileScreen}
-        options={{ headerShown: false }}
-      /> */}
       <Stack.Screen
         name="AirtimeScreen"
         component={AirtimeScreen}
@@ -68,8 +48,12 @@ const AppStack = () => {
         component={TvSubscriptionScreen}
         options={{ headerShown: false }}
       />
-      {/* <Stack.Screen name="" component={} options={{ headerShown: false }} />
-      <Stack.Screen name="" component={} options={{ headerShown: false }} /> */}
+      <Stack.Screen
+        name="TransactionHistoryScreen"
+        component={TransactionHistoryScreen}
+        options={{ headerShown: false }}
+      />
+      {/* <Stack.Screen name="" component={} options={{ headerShown: false }} /> */}
     </Stack.Navigator>
   );
 };

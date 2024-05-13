@@ -1,14 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import React from "react";
 
 const ElectricityScreen = () => {
   return (
-    <View>
+    <SafeAreaView>
       <Text>ElectricityScreen</Text>
-    </View>
-  )
-}
+    </SafeAreaView>
+  );
+};
 
-export default ElectricityScreen
+export default ElectricityScreen;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

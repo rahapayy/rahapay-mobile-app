@@ -1,14 +1,14 @@
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-const TransferToUser = () => {
+const TransactionHistoryScreen = () => {
   return (
     <SafeAreaView>
-      <Text>TransferToUser</Text>
+      <Text>TransactionHistoryScreen</Text>
     </SafeAreaView>
   );
 };
 
-export default TransferToUser;
+export default TransactionHistoryScreen;
 
 const styles = StyleSheet.create({});

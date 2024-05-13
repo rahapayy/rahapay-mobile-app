@@ -1,10 +1,28 @@
 import React, { useState } from "react";
-import { ImageBackground, SafeAreaView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View, Image } from "react-native";
-import { AddCircle, Eye, EyeSlash, Notification, WalletAdd1 } from "iconsax-react-native";
+import {
+  ImageBackground,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+  Image,
+} from "react-native";
+import {
+  AddCircle,
+  Eye,
+  EyeSlash,
+  Notification,
+  WalletAdd1,
+} from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-const Card = () => {
+const Card: React.FC<{
+  navigation: NativeStackNavigationProp<any, "">;
+}> = ({ navigation }) => {
   const { width: screenWidth } = useWindowDimensions();
 
   // Calculate a fixed aspect ratio for the background image (e.g., 16:9)
@@ -13,7 +31,7 @@ const Card = () => {
 
   const [showBalance, setShowBalance] = useState(true);
 
-  const toggleBalanceVisibility = () => setShowBalance(prev => !prev);
+  const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
 
   return (
     <ImageBackground
@@ -30,10 +48,14 @@ const Card = () => {
               />
               <View>
                 <Text style={styles.greetingText}>Hello, Akinola</Text>
-                <Text style={styles.greetingSubText}>Let's make some bills payment!</Text>
+                <Text style={styles.greetingSubText}>
+                  Let's make some bills payment!
+                </Text>
               </View>
             </View>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("TransactionHistoryScreen")}
+            >
               <Notification color="#fff" />
             </TouchableOpacity>
           </View>
@@ -44,12 +66,18 @@ const Card = () => {
               <Text style={styles.availableBalanceText}>Available Balance</Text>
             </View>
             <TouchableOpacity onPress={toggleBalanceVisibility}>
-              {showBalance ? <Eye color="#fff" size={20} style={styles.eyeIcon} /> : <EyeSlash color="#fff" size={20} style={styles.eyeIcon} />}
+              {showBalance ? (
+                <Eye color="#fff" size={20} style={styles.eyeIcon} />
+              ) : (
+                <EyeSlash color="#fff" size={20} style={styles.eyeIcon} />
+              )}
             </TouchableOpacity>
           </View>
 
           <View style={styles.balanceValueContainer}>
-            <Text style={styles.balanceValue}>{showBalance ? "₦ 120,000.00" : "*******"}</Text>
+            <Text style={styles.balanceValue}>
+              {showBalance ? "₦ 120,000.00" : "*******"}
+            </Text>
           </View>
 
           <TouchableOpacity style={styles.fundWalletButton}>

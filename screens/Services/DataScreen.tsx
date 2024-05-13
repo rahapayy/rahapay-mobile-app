@@ -1,14 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import React from "react";
 
 const DataScreen = () => {
   return (
-    <View>
+    <SafeAreaView>
       <Text>DataScreen</Text>
-    </View>
-  )
-}
+    </SafeAreaView>
+  );
+};
 
-export default DataScreen
+export default DataScreen;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});
