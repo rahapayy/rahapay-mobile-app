@@ -16,6 +16,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import Button from "../../../components/Button";
 
 const CreateAccountScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -23,6 +24,10 @@ const CreateAccountScreen: React.FC<{
   const [showBalance, setShowBalance] = useState(true);
 
   const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
+
+  const handleButtonClick = () => {
+    navigation.navigate("VerifyEmailScreen");
+  };
   return (
     <SafeAreaView>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -97,12 +102,17 @@ const CreateAccountScreen: React.FC<{
               </View>
             </View>
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => navigation.navigate("VerifyEmailScreen")}
               style={styles.proceedButton}
             >
               <Text style={styles.proceedButtonText}>Proceed</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+            <Button
+              title={"Proceed"}
+              onPress={handleButtonClick}
+              style={styles.proceedButton}
+            />
           </KeyboardAvoidingView>
         </View>
       </ScrollView>
@@ -158,12 +168,6 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
   },
   proceedButton: {
-    backgroundColor: COLORS.violet400,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
     marginTop: SPACING * 4,
   },
   proceedButtonText: {

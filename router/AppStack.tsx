@@ -1,15 +1,13 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import BottomTab from "../navigation/Bottomtab/BottomTab";
-import ServicesScreen from "../screens/ServicesScreen";
-import WalletScreen from "../screens/WalletScreen";
-import CardsScreen from "../screens/CardsScreen";
-import ProfileScreen from "../screens/ProfileScreen";
 import AirtimeScreen from "../screens/Services/AirtimeScreen";
 import DataScreen from "../screens/Services/DataScreen";
 import ElectricityScreen from "../screens/Services/ElectricityScreen";
 import TransferToUser from "../screens/Services/TransferToUser";
 import TvSubscriptionScreen from "../screens/Services/TvSubscriptionScreen";
+import TransactionHistoryScreen from "../screens/TransactionHistoryScreen";
+import TransactionSummaryScreen from "../screens/TransactionSummaryScreen";
 
 const Stack = createNativeStackNavigator();
 const AppStack = () => {
@@ -21,27 +19,6 @@ const AppStack = () => {
         options={{
           headerShown: false,
         }}
-      />
-      <Stack.Screen
-        name="ServicesScreen"
-        component={ServicesScreen}
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="WalletScreen"
-        component={WalletScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="CardsScreen"
-        component={CardsScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ProfileScreen"
-        component={ProfileScreen}
-        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="AirtimeScreen"
@@ -68,8 +45,16 @@ const AppStack = () => {
         component={TvSubscriptionScreen}
         options={{ headerShown: false }}
       />
-      {/* <Stack.Screen name="" component={} options={{ headerShown: false }} />
-      <Stack.Screen name="" component={} options={{ headerShown: false }} /> */}
+      <Stack.Screen
+        name="TransactionHistoryScreen"
+        component={TransactionHistoryScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TransactionSummaryScreen"
+        component={TransactionSummaryScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };

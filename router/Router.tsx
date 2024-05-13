@@ -30,7 +30,7 @@ const Router = () => {
     return (
       <View
         style={{
-          backgroundColor: "#fff", 
+          backgroundColor: "#fff",
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
@@ -45,19 +45,19 @@ const Router = () => {
     <NavigationContainer>
       <Stack.Navigator>
         {/* This conditional will determine which stack to display based on `isAuthenticated` */}
-        {/* {isAuthenticated ? (
+        {isAuthenticated ? (
           <Stack.Screen
             name="AppStack"
             component={AppStack}
             options={{ headerShown: false }}
           />
-        ) : ( */}
-          <Stack.Screen
-            name="AuthRoute"
-            component={AuthRoute}
-            options={{ headerShown: false }}
-          />
-         {/* )}  */}
+        ) : (
+        <Stack.Screen
+          name="AuthRoute"
+          component={AuthRoute}
+          options={{ headerShown: false }}
+        />
+        )} 
       </Stack.Navigator>
     </NavigationContainer>
   );

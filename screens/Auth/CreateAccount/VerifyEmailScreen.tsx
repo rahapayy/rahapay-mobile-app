@@ -13,6 +13,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../config/SPACING";
 import COLORS from "../../../config/colors";
+import Button from "../../../components/Button";
 
 const VerifyEmailScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -28,13 +29,25 @@ const VerifyEmailScreen: React.FC<{
       const newBoxes = [...boxes];
       newBoxes[index] = text;
       setBoxes(newBoxes);
+
+      // Check if all input boxes are cleared
+      const allBoxesCleared = newBoxes.every((box) => box === "");
+
       if (text === "" && index > 0) {
         boxRefs.current[index - 1]?.focus();
-      } else if (index < 4) {
+      } else if (index < 4 && !allBoxesCleared) {
         boxRefs.current[index + 1]?.focus();
+      } else if (allBoxesCleared) {
+        // If all boxes are cleared, focus on the first box
+        boxRefs.current[0]?.focus();
       }
     }
   };
+
+  const handleButtonClick = () => {
+    navigation.navigate("CreateTransactionPinScreen");
+  };
+
   return (
     <SafeAreaView>
       <ScrollView>
@@ -63,7 +76,7 @@ const VerifyEmailScreen: React.FC<{
                     boxIsFocused[index] && styles.inputBoxFocused,
                   ]}
                   keyboardType="numeric"
-                  value={value}
+                  value={value ? "*" : ""}
                   onChangeText={(text) => handleInput(text, index)}
                   onFocus={() =>
                     setBoxIsFocused((prevState) => [
@@ -81,6 +94,20 @@ const VerifyEmailScreen: React.FC<{
                   }
                 />
               ))}
+            </View>
+          </View>
+
+          <Button
+            title={"Verify Account"}
+            onPress={handleButtonClick}
+            className="mt-4"
+          />
+
+          <View className=" justify-center items-center mt-6">
+            <Text style={styles.otpText}>Didn’t receive an OTP?</Text>
+
+            <View style={styles.countdownContainer}>
+              <Text style={styles.countdownText}>Resend OTP (59s)</Text>
             </View>
           </View>
         </View>
@@ -133,6 +160,18 @@ const styles = StyleSheet.create({
   },
   inputBoxFocused: {
     borderColor: COLORS.violet400,
-    borderWidth: 2,
+    borderWidth: 1,
   },
+  otpText: {
+    fontSize: RFValue(14),
+    fontFamily: "Outfit-Regular",
+  },
+  countdownContainer: {
+    marginTop: SPACING * 2,
+    backgroundColor: COLORS.violet200,
+    paddingVertical: SPACING * 2,
+    paddingHorizontal: SPACING * 2,
+    borderRadius: 4,
+  },
+  countdownText: {},
 });

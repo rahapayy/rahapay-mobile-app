@@ -1,4 +1,5 @@
 import {
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -9,8 +10,15 @@ import React from "react";
 import { Wifi } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import Airtime from "../assets/svg/smartphone-rotate-angle_svgrepo.com.svg";
+import Tv from "../assets/svg/tv_svgrepo.com.svg";
+import Electricity from "../assets/svg/electricity_svgrepo.com.svg";
+import Data from "../assets/svg/signal_svgrepo.com.svg";
 
-const QuickAction = () => {
+const QuickAction: React.FC<{
+  navigation: NativeStackNavigationProp<any, "">;
+}> = ({ navigation }) => {
   const { width: screenWidth } = useWindowDimensions();
 
   // Calculate an appropriate card size based on the screen width, ensuring a minimum width
@@ -22,45 +30,56 @@ const QuickAction = () => {
     ...styles.cardText,
     width: cardWidth - 36, // take into account paddingHorizontal
   };
+
+  const handleButtonClick = () => {
+    navigation.navigate("Services");
+  };
   return (
     <View className="p-4">
       <Text style={styles.quickAction}>Quick Action</Text>
       <View className="flex-row items-center justify-between mt-4">
         {/* Cards */}
         <TouchableOpacity
+          onPress={() => navigation.navigate("AirtimeScreen")}
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
-          <Wifi color={COLORS.violet400} />
+          <Airtime />
           <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
             Airtime
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => navigation.navigate("DataScreen")}
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
-          <Wifi color={COLORS.violet400} />
+          <Data />
           <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
             Data
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => navigation.navigate("TvSubscriptionScreen")}
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
-          <Wifi color={COLORS.violet400} />
+          <Tv />
           <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
             TV
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => navigation.navigate("ElectricityScreen")}
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
-          <Wifi color={COLORS.violet400} />
+          <Electricity />
           <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
             Electicity
           </Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity className="w-full bg-white p-4 justify-center items-center mt-4 rounded-2xl">
+      <TouchableOpacity
+        onPress={handleButtonClick}
+        className="w-full bg-white p-4 justify-center items-center mt-4 rounded-2xl"
+      >
         <Text style={styles.moreText}>More</Text>
       </TouchableOpacity>
     </View>

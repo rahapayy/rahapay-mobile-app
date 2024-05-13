@@ -1,5 +1,7 @@
 import {
   Image,
+  Platform,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -7,28 +9,39 @@ import {
   View,
 } from "react-native";
 import React, { useState } from "react";
-import { RFValue } from "react-native-responsive-fontsize";
-import LottieView from "lottie-react-native";
+import { ArrowLeft, DocumentText, Filter } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import SPACING from "../config/SPACING";
+import COLORS from "../config/colors";
+import FONT_SIZE from "../config/font-size";
+import LottieView from "lottie-react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
-const RecentTransaction: React.FC<{
+const TransactionHistoryScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [hasTransaction, setHasTransaction] = useState(true);
 
   return (
-    <View className="p-4">
-      <View className="flex-row items-center justify-between">
-        <Text style={styles.rtText}>Recent Transactions</Text>
-        <TouchableOpacity>
-          <Text style={styles.viewmoreText}>View More</Text>
-        </TouchableOpacity>
-      </View>
-
+    <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.leftIcon}
+          >
+            <ArrowLeft color={"#000"} size={24} />
+          </TouchableOpacity>
+          <Text style={[styles.headerText]}>Transaction History</Text>
+          <TouchableOpacity>
+            <DocumentText color={"#000"} />
+          </TouchableOpacity>
+        </View>
+
         {hasTransaction ? (
           // Render transactions
-          <View>
+          <View className="px-4">
+            <Text style={styles.date}>Today</Text>
             <TouchableOpacity
               onPress={() => navigation.navigate("TransactionSummaryScreen")}
               style={styles.transactionItem}
@@ -86,35 +99,36 @@ const RecentTransaction: React.FC<{
           </View>
         )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
-export default RecentTransaction;
+export default TransactionHistoryScreen;
 
 const styles = StyleSheet.create({
-  rtText: {
-    fontFamily: "Outfit-SemiBold",
-    fontSize: RFValue(16),
-  },
-  viewmoreText: {
-    fontFamily: "Outfit-Regular",
-    color: "#9BA1A8",
-  },
-  loadingAnimation: {
-    width: 200,
-    height: 200,
-    alignSelf: "center",
-  },
-  notransactionText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
-    textAlign: "center",
-  },
-  noTransactionContainer: {
-    justifyContent: "center",
+  header: {
+    flexDirection: "row",
     alignItems: "center",
-    marginTop: 20,
+    paddingHorizontal: SPACING * 2,
+    paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
+    paddingBottom: SPACING * 3,
+  },
+  leftIcon: {
+    marginRight: SPACING,
+  },
+  headerText: {
+    color: "#000",
+    fontSize: FONT_SIZE.large,
+    fontFamily: "Outfit-Regular",
+    flex: 1,
+  },
+  headerTextDark: {
+    color: COLORS.white,
+  },
+  headTextContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   transactionItem: {
     flexDirection: "row",
@@ -154,5 +168,21 @@ const styles = StyleSheet.create({
   date: {
     fontFamily: "Outfit-Regular",
     color: "#9BA1A8",
+  },
+  loadingAnimation: {
+    width: 200,
+    height: 200,
+    alignSelf: "center",
+  },
+  notransactionText: {
+    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(14),
+    textAlign: "center",
+  },
+  noTransactionContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+    flex: 1,
   },
 });
