@@ -10,7 +10,7 @@ const HomeScreen: React.FC<{
 }> = ({ navigation }) => {
   return (
     <>
-      <Card />
+      <Card navigation={navigation} />
       <QuickAction navigation={navigation} />
       <RecentTransaction />
     </>
