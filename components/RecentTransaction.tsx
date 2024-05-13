@@ -9,8 +9,11 @@ import {
 import React, { useState } from "react";
 import { RFValue } from "react-native-responsive-fontsize";
 import LottieView from "lottie-react-native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-const RecentTransaction = () => {
+const RecentTransaction: React.FC<{
+  navigation: NativeStackNavigationProp<any, "">;
+}> = ({ navigation }) => {
   const [hasTransaction, setHasTransaction] = useState(true);
 
   return (
@@ -26,7 +29,10 @@ const RecentTransaction = () => {
         {hasTransaction ? (
           // Render transactions
           <View>
-            <TouchableOpacity style={styles.transactionItem}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("TransactionSummaryScreen")}
+              style={styles.transactionItem}
+            >
               <Image
                 source={require("../assets/images/airtel.png")}
                 style={styles.transactionImage}
