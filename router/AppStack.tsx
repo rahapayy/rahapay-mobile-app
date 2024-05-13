@@ -10,6 +10,7 @@ import DataScreen from "../screens/Services/DataScreen";
 import ElectricityScreen from "../screens/Services/ElectricityScreen";
 import TransferToUser from "../screens/Services/TransferToUser";
 import TvSubscriptionScreen from "../screens/Services/TvSubscriptionScreen";
+import TransactionHistoryScreen from "../screens/TransactionHistoryScreen";
 
 const Stack = createNativeStackNavigator();
 const AppStack = () => {
@@ -47,8 +48,12 @@ const AppStack = () => {
         component={TvSubscriptionScreen}
         options={{ headerShown: false }}
       />
-      {/* <Stack.Screen name="" component={} options={{ headerShown: false }} />
-      <Stack.Screen name="" component={} options={{ headerShown: false }} /> */}
+      <Stack.Screen
+        name="TransactionHistoryScreen"
+        component={TransactionHistoryScreen}
+        options={{ headerShown: false }}
+      />
+      {/* <Stack.Screen name="" component={} options={{ headerShown: false }} /> */}
     </Stack.Navigator>
   );
 };
