@@ -29,7 +29,7 @@ const ServicesScreen: React.FC<{
             <View className="flex flex-row flex-wrap justify-between">
               <TouchableOpacity
                 onPress={() => navigation.navigate("AirtimeScreen")}
-                className="items-center mb-4 w-1/5" 
+                className="items-center mb-4 w-1/5"
               >
                 <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
                   <Airtime />
@@ -44,7 +44,7 @@ const ServicesScreen: React.FC<{
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => navigation.navigate("DataScreen")}
-                className="items-center mb-4 w-1/5" 
+                className="items-center mb-4 w-1/5"
               >
                 <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
                   <Data />
@@ -59,7 +59,7 @@ const ServicesScreen: React.FC<{
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => navigation.navigate("TvSubscriptionScreen")}
-                className="items-center mb-4 w-1/5" 
+                className="items-center mb-4 w-1/5"
               >
                 <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
                   <Tv />
@@ -74,7 +74,7 @@ const ServicesScreen: React.FC<{
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => navigation.navigate("ElectricityScreen")}
-                className="items-center mb-4 w-1/5" 
+                className="items-center mb-4 w-1/5"
               >
                 <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
                   <Electricity />
