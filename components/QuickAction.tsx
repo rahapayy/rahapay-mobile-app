@@ -1,4 +1,5 @@
 import {
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -10,6 +11,10 @@ import { Wifi } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import Airtime from "../assets/svg/smartphone-rotate-angle_svgrepo.com.svg";
+import Tv from "../assets/svg/tv_svgrepo.com.svg";
+import Electricity from "../assets/svg/electricity_svgrepo.com.svg";
+import Data from "../assets/svg/signal_svgrepo.com.svg";
 
 const QuickAction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -35,33 +40,37 @@ const QuickAction: React.FC<{
       <View className="flex-row items-center justify-between mt-4">
         {/* Cards */}
         <TouchableOpacity
+          onPress={() => navigation.navigate("AirtimeScreen")}
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
-          <Wifi color={COLORS.violet400} />
+          <Airtime />
           <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
             Airtime
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => navigation.navigate("DataScreen")}
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
-          <Wifi color={COLORS.violet400} />
+          <Data />
           <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
             Data
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => navigation.navigate("TvSubscriptionScreen")}
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
-          <Wifi color={COLORS.violet400} />
+          <Tv />
           <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
             TV
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => navigation.navigate("ElectricityScreen")}
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
-          <Wifi color={COLORS.violet400} />
+          <Electricity />
           <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
             Electicity
           </Text>
