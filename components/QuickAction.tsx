@@ -40,6 +40,7 @@ const QuickAction: React.FC<{
       <View className="flex-row items-center justify-between mt-4">
         {/* Cards */}
         <TouchableOpacity
+          onPress={() => navigation.navigate("AirtimeScreen")}
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
           <Airtime />
@@ -48,6 +49,7 @@ const QuickAction: React.FC<{
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => navigation.navigate("DataScreen")}
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
           <Data />
@@ -56,6 +58,7 @@ const QuickAction: React.FC<{
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => navigation.navigate("TvSubscriptionScreen")}
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
           <Tv />
@@ -64,6 +67,7 @@ const QuickAction: React.FC<{
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => navigation.navigate("ElectricityScreen")}
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
           <Electricity />
