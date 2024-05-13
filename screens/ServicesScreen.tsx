@@ -26,42 +26,66 @@ const ServicesScreen: React.FC<{
           <Text style={styles.headText}>Services</Text>
           {/* Card */}
           <View className="w-full bg-white p-6 mt-10 rounded-xl overflow-hidden">
-            <View className="flex-row gap-12 justify-center">
+            <View className="flex flex-row flex-wrap justify-between">
               <TouchableOpacity
                 onPress={() => navigation.navigate("AirtimeScreen")}
-                className="items-center"
+                className="items-center mb-4 w-1/5" 
               >
-                <View className=" bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
                   <Airtime />
                 </View>
-                <Text style={styles.titleText}>Airtime</Text>
+                <Text
+                  style={styles.titleText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Airtime
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => navigation.navigate("DataScreen")}
-                className="items-center"
+                className="items-center mb-4 w-1/5" 
               >
-                <View className=" bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
                   <Data />
                 </View>
-                <Text style={styles.titleText}>Data</Text>
+                <Text
+                  style={styles.titleText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Data
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => navigation.navigate("TvSubscriptionScreen")}
-                className="items-center"
+                className="items-center mb-4 w-1/5" 
               >
-                <View className=" bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
                   <Tv />
                 </View>
-                <Text style={styles.titleText}>TV</Text>
+                <Text
+                  style={styles.titleText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  TV
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => navigation.navigate("ElectricityScreen")}
-                className="items-center"
+                className="items-center mb-4 w-1/5" 
               >
-                <View className=" bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
                   <Electricity />
                 </View>
-                <Text style={styles.titleText}>Electricity</Text>
+                <Text
+                  style={styles.titleText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Electricity
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
