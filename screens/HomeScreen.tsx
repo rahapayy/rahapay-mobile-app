@@ -12,7 +12,7 @@ const HomeScreen: React.FC<{
     <>
       <Card navigation={navigation} />
       <QuickAction navigation={navigation} />
-      <RecentTransaction />
+      <RecentTransaction navigation={navigation} />
     </>
   );
 };
