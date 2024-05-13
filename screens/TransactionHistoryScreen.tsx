@@ -20,7 +20,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 const TransactionHistoryScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [hasTransaction, setHasTransaction] = useState(false);
+  const [hasTransaction, setHasTransaction] = useState(true);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -42,7 +42,10 @@ const TransactionHistoryScreen: React.FC<{
           // Render transactions
           <View className="px-4">
             <Text style={styles.date}>Today</Text>
-            <TouchableOpacity style={styles.transactionItem}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("TransactionSummaryScreen")}
+              style={styles.transactionItem}
+            >
               <Image
                 source={require("../assets/images/airtel.png")}
                 style={styles.transactionImage}
