@@ -29,7 +29,10 @@ const RecentTransaction: React.FC<{
         {hasTransaction ? (
           // Render transactions
           <View>
-            <TouchableOpacity style={styles.transactionItem}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("TransactionSummaryScreen")}
+              style={styles.transactionItem}
+            >
               <Image
                 source={require("../assets/images/airtel.png")}
                 style={styles.transactionImage}
