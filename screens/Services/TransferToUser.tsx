@@ -1,14 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import React from "react";
 
 const TransferToUser = () => {
   return (
-    <View>
+    <SafeAreaView>
       <Text>TransferToUser</Text>
-    </View>
-  )
-}
+    </SafeAreaView>
+  );
+};
 
-export default TransferToUser
+export default TransferToUser;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});
