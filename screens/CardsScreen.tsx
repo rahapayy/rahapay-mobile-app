@@ -32,6 +32,6 @@ const styles = StyleSheet.create({
   comingsoonText: {
     fontFamily: "Outfit-Regular",
     fontSize: FONT_SIZE.medium,
-    // textAlign: "center",
+    textAlign: "center",
   },
 });
