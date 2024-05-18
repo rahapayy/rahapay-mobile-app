@@ -91,7 +91,9 @@ const LoginScreen: React.FC<{
               onPress={() => navigation.navigate("ResetPasswordScreen")}
               className="mt-4"
             >
-              <Text style={styles.forgotPasswordText}     allowFontScaling={false}>Forgot Password?</Text>
+              <Text style={styles.forgotPasswordText} allowFontScaling={false}>
+                Forgot Password?
+              </Text>
             </TouchableOpacity>
 
             <Button
