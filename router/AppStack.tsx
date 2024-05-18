@@ -10,6 +10,13 @@ import TransactionHistoryScreen from "../screens/TransactionHistoryScreen";
 import TransactionSummaryScreen from "../screens/TransactionSummaryScreen";
 import FundWalletScreen from "../screens/FundWalletScreen";
 import NotificationScreen from "../screens/NotificationScreen";
+import AgentAccountVerificationScreen from "../screens/Profile/AgentAccountVerificationScreen";
+import ChangePasswordScreen from "../screens/Profile/ChangePasswordScreen";
+import ChangePinScreen from "../screens/Profile/ChangePinScreen";
+import EnableNotificationScreen from "../screens/Profile/EnableNotificationScreen";
+import HelpAndSupportScreen from "../screens/Profile/HelpAndSupportScreen";
+import PersonalInformationScreen from "../screens/Profile/PersonalInformationScreen";
+import ReferralScreen from "../screens/Profile/ReferralScreen";
 
 const Stack = createNativeStackNavigator();
 const AppStack = () => {
@@ -68,40 +75,39 @@ const AppStack = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-      name="AgentAccountVerification"
-      component={AgentAccountVerification}
-      options={{ headerShown: false }}
-
+        name="AgentAccountVerificationScreen"
+        component={AgentAccountVerificationScreen}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
-      name=""
-      component={}
-      options={{ headerShown: false }}
-
+        name="ChangePasswordScreen"
+        component={ChangePasswordScreen}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
-      name=""
-      component={}
-      options={{ headerShown: false }}
-
+        name="ChangePinScreen"
+        component={ChangePinScreen}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
-      name=""
-      component={}
-      options={{ headerShown: false }}
-
+        name="EnableNotificationScreen"
+        component={EnableNotificationScreen}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
-      name=""
-      component={}
-      options={{ headerShown: false }}
-
+        name="HelpAndSupportScreen"
+        component={HelpAndSupportScreen}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
-      name=""
-      component={}
-      options={{ headerShown: false }}
-
+        name="PersonalInformationScreen"
+        component={PersonalInformationScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ReferralScreen"
+        component={ReferralScreen}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
