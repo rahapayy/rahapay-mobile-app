@@ -83,7 +83,10 @@ const Card: React.FC<{
             </Text>
           </View>
 
-          <TouchableOpacity style={styles.fundWalletButton}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("FundWalletScreen")}
+            style={styles.fundWalletButton}
+          >
             <AddCircle variant="Bold" color="#573CC7" />
             <Text style={styles.fundWalletText} allowFontScaling={false}>
               Fund Wallet
