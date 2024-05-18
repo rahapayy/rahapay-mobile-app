@@ -7,7 +7,9 @@ const WalletScreen = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
         <View className="p-6">
-          <Text style={styles.headText}>Wallet</Text>
+          <Text style={styles.headText} allowFontScaling={false}>
+            Wallet
+          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
