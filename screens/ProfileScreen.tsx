@@ -90,13 +90,19 @@ const ProfileScreen: React.FC<{
             <View className="mt-4">
               <Text style={styles.titleHeadText}>Security</Text>
               <View className="w-full bg-white p-4 rounded-lg mt-4">
-                <TouchableOpacity className="flex-row items-center mb-4">
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("ChangePasswordScreen")}
+                  className="flex-row items-center mb-4"
+                >
                   <Lock variant="Bold" color={COLORS.violet400} size={24} />
                   <Text style={styles.titleText} allowFontScaling={false}>
                     Change Password
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity className="flex-row items-center mb-4">
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("ChangePinScreen")}
+                  className="flex-row items-center mb-4"
+                >
                   <Lock variant="Bold" color={COLORS.violet400} size={24} />
                   <Text style={styles.titleText} allowFontScaling={false}>
                     Change Pin
@@ -119,7 +125,12 @@ const ProfileScreen: React.FC<{
             <View className="mt-4">
               <Text style={styles.titleHeadText}>Security</Text>
               <View className="w-full bg-white p-4 rounded-lg mt-4">
-                <TouchableOpacity className="flex-row items-center mb-4">
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("EnableNotificationScreen")
+                  }
+                  className="flex-row items-center mb-4"
+                >
                   <Notification
                     variant="Bold"
                     color={COLORS.violet400}
@@ -129,7 +140,10 @@ const ProfileScreen: React.FC<{
                     Notification
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity className="flex-row items-center mb-4">
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("HelpAndSupportScreen")}
+                  className="flex-row items-center mb-4"
+                >
                   <Lock variant="Bold" color={COLORS.violet400} size={24} />
                   <Text style={styles.titleText} allowFontScaling={false}>
                     Help & Support
