@@ -67,16 +67,18 @@ const ProfileScreen: React.FC<{
             <Text style={styles.titleHeadText}>Account</Text>
             <View className="w-full bg-white p-4 rounded-lg mt-4">
               <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("PersonalInformationScreen")
-                }
-              className="flex-row items-center mb-4">
+                onPress={() => navigation.navigate("PersonalInformationScreen")}
+                className="flex-row items-center mb-4"
+              >
                 <Profile variant="Bold" color={COLORS.violet400} size={24} />
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Personal Information
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity className="flex-row items-center">
+              <TouchableOpacity
+                onPress={() => navigation.navigate("ReferralScreen")}
+                className="flex-row items-center"
+              >
                 <People variant="Bold" color={COLORS.violet400} size={24} />
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Referrals
