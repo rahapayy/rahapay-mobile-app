@@ -45,7 +45,12 @@ const QuickAction: React.FC<{
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
           <Airtime />
-          <Text style={styles.cardText} allowFontScaling={false}>
+          <Text
+            style={styles.cardText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            allowFontScaling={false}
+          >
             Airtime
           </Text>
         </TouchableOpacity>
@@ -54,7 +59,12 @@ const QuickAction: React.FC<{
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
           <Data />
-          <Text style={styles.cardText} allowFontScaling={false}>
+          <Text
+            style={styles.cardText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            allowFontScaling={false}
+          >
             Data
           </Text>
         </TouchableOpacity>
@@ -63,7 +73,12 @@ const QuickAction: React.FC<{
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
           <Tv />
-          <Text style={styles.cardText} allowFontScaling={false}>
+          <Text
+            style={styles.cardText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            allowFontScaling={false}
+          >
             TV
           </Text>
         </TouchableOpacity>
