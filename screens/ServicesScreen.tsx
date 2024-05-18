@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.small,
+    fontSize: FONT_SIZE.extraSmall,
     marginTop: SPACING,
   },
 });
