@@ -57,8 +57,10 @@ const VerifyEmailScreen: React.FC<{
           </TouchableOpacity>
 
           <View className="mt-4">
-            <Text style={styles.headText}>Verify Email Address</Text>
-            <Text style={styles.subText}>
+            <Text style={styles.headText} allowFontScaling={false}>
+              Verify Email Address
+            </Text>
+            <Text style={styles.subText} allowFontScaling={false}>
               Enter the OTP sent to Johndoe@gmail.com
             </Text>
           </View>
@@ -77,6 +79,7 @@ const VerifyEmailScreen: React.FC<{
                   ]}
                   keyboardType="numeric"
                   value={value ? "*" : ""}
+                  allowFontScaling={false}
                   onChangeText={(text) => handleInput(text, index)}
                   onFocus={() =>
                     setBoxIsFocused((prevState) => [
@@ -104,10 +107,14 @@ const VerifyEmailScreen: React.FC<{
           />
 
           <View className=" justify-center items-center mt-6">
-            <Text style={styles.otpText}>Didn’t receive an OTP?</Text>
+            <Text style={styles.otpText} allowFontScaling={false}>
+              Didn’t receive an OTP?
+            </Text>
 
             <View style={styles.countdownContainer}>
-              <Text style={styles.countdownText}>Resend OTP (59s)</Text>
+              <Text style={styles.countdownText} allowFontScaling={false}>
+                Resend OTP (59s)
+              </Text>
             </View>
           </View>
         </View>
