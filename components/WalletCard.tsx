@@ -10,19 +10,10 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import {
-  AddCircle,
-  CardReceive,
-  CardSend,
-  Eye,
-  EyeSlash,
-  WalletAdd,
-  WalletAdd1,
-} from "iconsax-react-native";
+import { AddCircle, Eye, EyeSlash, WalletAdd1 } from "iconsax-react-native";
 import SPACING from "../config/SPACING";
 import COLOR from "../config/colors";
 import { RFValue } from "react-native-responsive-fontsize";
-import Button from "./Button";
 import COLORS from "../config/colors";
 
 const WalletCard: React.FC<{
@@ -111,16 +102,6 @@ const styles = StyleSheet.create({
   containRow: {
     flexDirection: "row",
     justifyContent: "center",
-  },
-  box: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 5,
-    paddingHorizontal: SPACING * 4,
-    borderRadius: 25,
-    backgroundColor: COLOR.white,
   },
 
   fundWalletButton: {

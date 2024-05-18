@@ -8,6 +8,8 @@ import TransferToUser from "../screens/Services/TransferToUser";
 import TvSubscriptionScreen from "../screens/Services/TvSubscriptionScreen";
 import TransactionHistoryScreen from "../screens/TransactionHistoryScreen";
 import TransactionSummaryScreen from "../screens/TransactionSummaryScreen";
+import FundWalletScreen from "../screens/FundWalletScreen";
+import NotificationScreen from "../screens/NotificationScreen";
 
 const Stack = createNativeStackNavigator();
 const AppStack = () => {
@@ -53,6 +55,16 @@ const AppStack = () => {
       <Stack.Screen
         name="TransactionSummaryScreen"
         component={TransactionSummaryScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="FundWalletScreen"
+        component={FundWalletScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="NotificationScreen"
+        component={NotificationScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

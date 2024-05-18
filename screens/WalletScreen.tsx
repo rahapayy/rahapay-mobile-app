@@ -12,6 +12,7 @@ import { DocumentText, WalletAdd1 } from "iconsax-react-native";
 import COLORS from "../config/colors";
 import WalletCard from "../components/WalletCard";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import RecentTransaction from "../components/RecentTransaction";
 
 const WalletScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -26,11 +27,11 @@ const WalletScreen: React.FC<{
             </Text>
             <DocumentText color="#000" size={24} />
           </View>
-
           {/* Wallet Card */}
-
           <WalletCard navigation={navigation} />
         </View>
+        {/* Recent Transaction */}
+        <RecentTransaction navigation={navigation} />
       </ScrollView>
     </SafeAreaView>
   );
