@@ -7,7 +7,7 @@ import ServicesScreen from "../../screens/ServicesScreen";
 import WalletScreen from "../../screens/WalletScreen";
 import ProfileScreen from "../../screens/ProfileScreen";
 import CardsScreen from "../../screens/CardsScreen";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
 
 const Tab = createBottomTabNavigator();
 
@@ -23,15 +23,18 @@ interface TabBarLabelProps extends TextProps {
 }
 
 const TabBarLabel: React.FC<TabBarLabelProps> = ({ focused, title }) => {
-  const opacity = useSharedValue(focused ? 1 : 0.5);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: withSpring(opacity.value, { damping: 15, stiffness: 90 }),
-  }));
+  const translateY = useSharedValue(focused ? 0 : 10);
+  const opacity = useSharedValue(focused ? 1 : 0);
 
   React.useEffect(() => {
-    opacity.value = focused ? 1 : 0.5;
+    translateY.value = withTiming(focused ? 0 : 10, { duration: 300 });
+    opacity.value = withTiming(focused ? 1 : 0, { duration: 300 });
   }, [focused]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+    opacity: opacity.value,
+  }));
 
   return (
     <Animated.Text
@@ -99,7 +102,8 @@ const BottomTab: React.FC = () => {
           tabBarIcon: ({ focused }) => (
             <AnimatedIcon focused={focused} IconComponent={Home} />
           ),
-          tabBarLabel: ({ focused }) => <TabBarLabel focused={focused} title="Home" />,
+          tabBarLabel: ({ focused }) =>
+            focused ? <TabBarLabel focused={focused} title="Home" /> : null,
           headerShown: false,
         }}
       />
@@ -110,7 +114,8 @@ const BottomTab: React.FC = () => {
           tabBarIcon: ({ focused }) => (
             <AnimatedIcon focused={focused} IconComponent={MoreSquare} />
           ),
-          tabBarLabel: ({ focused }) => <TabBarLabel focused={focused} title="Services" />,
+          tabBarLabel: ({ focused }) =>
+            focused ? <TabBarLabel focused={focused} title="Services" /> : null,
           headerShown: false,
         }}
       />
@@ -121,7 +126,8 @@ const BottomTab: React.FC = () => {
           tabBarIcon: ({ focused }) => (
             <AnimatedIcon focused={focused} IconComponent={WalletAdd1} />
           ),
-          tabBarLabel: ({ focused }) => <TabBarLabel focused={focused} title="Wallet" />,
+          tabBarLabel: ({ focused }) =>
+            focused ? <TabBarLabel focused={focused} title="Wallet" /> : null,
           headerShown: false,
         }}
       />
@@ -132,7 +138,8 @@ const BottomTab: React.FC = () => {
           tabBarIcon: ({ focused }) => (
             <AnimatedIcon focused={focused} IconComponent={Cards} />
           ),
-          tabBarLabel: ({ focused }) => <TabBarLabel focused={focused} title="Cards" />,
+          tabBarLabel: ({ focused }) =>
+            focused ? <TabBarLabel focused={focused} title="Cards" /> : null,
           headerShown: false,
         }}
       />
@@ -143,7 +150,8 @@ const BottomTab: React.FC = () => {
           tabBarIcon: ({ focused }) => (
             <AnimatedIcon focused={focused} IconComponent={Profile} />
           ),
-          tabBarLabel: ({ focused }) => <TabBarLabel focused={focused} title="Profile" />,
+          tabBarLabel: ({ focused }) =>
+            focused ? <TabBarLabel focused={focused} title="Profile" /> : null,
           headerShown: false,
         }}
       />
