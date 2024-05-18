@@ -23,7 +23,9 @@ const ServicesScreen: React.FC<{
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
         <View className="p-6">
-          <Text style={styles.headText}>Services</Text>
+          <Text style={styles.headText} allowFontScaling={false}>
+            Services
+          </Text>
           {/* Card */}
           <View className="w-full bg-white p-6 mt-10 rounded-xl overflow-hidden">
             <View className="flex flex-row flex-wrap justify-between">
@@ -38,6 +40,7 @@ const ServicesScreen: React.FC<{
                   style={styles.titleText}
                   numberOfLines={1}
                   ellipsizeMode="tail"
+                  allowFontScaling={false}
                 >
                   Airtime
                 </Text>
@@ -53,6 +56,7 @@ const ServicesScreen: React.FC<{
                   style={styles.titleText}
                   numberOfLines={1}
                   ellipsizeMode="tail"
+                  allowFontScaling={false}
                 >
                   Data
                 </Text>
@@ -68,6 +72,7 @@ const ServicesScreen: React.FC<{
                   style={styles.titleText}
                   numberOfLines={1}
                   ellipsizeMode="tail"
+                  allowFontScaling={false}
                 >
                   TV
                 </Text>
@@ -83,6 +88,7 @@ const ServicesScreen: React.FC<{
                   style={styles.titleText}
                   numberOfLines={1}
                   ellipsizeMode="tail"
+                  allowFontScaling={false}
                 >
                   Electricity
                 </Text>
