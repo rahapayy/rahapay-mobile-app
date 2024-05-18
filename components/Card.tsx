@@ -5,9 +5,9 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  useWindowDimensions,
   View,
   Image,
+  Dimensions,
 } from "react-native";
 import {
   AddCircle,
@@ -20,15 +20,11 @@ import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
+const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
+
 const Card: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
-
-  const aspectRatio = 12 / 9;
-  const bgHeight = screenWidth / aspectRatio;
-  const minHeight = screenHeight * 0.3; // Set a minimum height
-
   const [showBalance, setShowBalance] = useState(true);
 
   const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
@@ -36,10 +32,7 @@ const Card: React.FC<{
   return (
     <ImageBackground
       source={require("../assets/images/bg.png")}
-      style={[
-        styles.backgroundImage,
-        { height: Math.max(bgHeight, minHeight) },
-      ]}
+      style={styles.backgroundImage}
     >
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container}>
@@ -67,23 +60,23 @@ const Card: React.FC<{
 
           <View style={styles.balanceContainer}>
             <View style={styles.balanceContent}>
-              <WalletAdd1 color="#fff" size={20} />
+              <WalletAdd1 color="#fff" size={24} />
               <Text style={styles.availableBalanceText} allowFontScaling={false}>
                 Available Balance
               </Text>
             </View>
             <TouchableOpacity onPress={toggleBalanceVisibility}>
               {showBalance ? (
-                <Eye color="#fff" size={20} style={styles.eyeIcon} />
+                <Eye color="#fff" size={24} style={styles.eyeIcon} />
               ) : (
-                <EyeSlash color="#fff" size={20} style={styles.eyeIcon} />
+                <EyeSlash color="#fff" size={24} style={styles.eyeIcon} />
               )}
             </TouchableOpacity>
           </View>
 
           <View style={styles.balanceValueContainer}>
             <Text style={styles.balanceValue} allowFontScaling={false}>
-              {showBalance ? "₦ 120,000.00" : "*******"}
+              {showBalance ? "₦120,000.00" : "*******"}
             </Text>
           </View>
 
@@ -107,10 +100,12 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 15,
     overflow: "hidden",
     backgroundColor: COLORS.violet400,
+    height: screenHeight * 0.34, 
+    paddingBottom: 20,
   },
   container: {
     paddingHorizontal: 16,
-    paddingTop: 15,
+    paddingTop: 10,
     flex: 1,
     justifyContent: "space-between",
   },
@@ -118,32 +113,31 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 5,
+    marginBottom: 10,
   },
   headerContent: {
     flexDirection: "row",
     alignItems: "center",
   },
   avatar: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40, 
     marginRight: 8,
   },
   greetingText: {
     fontFamily: "Outfit-SemiBold",
     color: "#fff",
-    fontSize: RFValue(18),
+    fontSize: RFValue(16), 
   },
   greetingSubText: {
     fontFamily: "Outfit-Regular",
     color: "#fff",
-    fontSize: RFValue(14),
+    fontSize: RFValue(12), 
   },
   balanceContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
   },
   balanceContent: {
     flexDirection: "row",
@@ -153,32 +147,31 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: "#fff",
     marginLeft: 4,
-    fontSize: RFValue(14),
+    fontSize: RFValue(14), 
   },
   eyeIcon: {
     marginLeft: 10,
   },
   balanceValueContainer: {
-    marginBottom: 20,
+    // marginBottom: 20,
   },
   balanceValue: {
     fontFamily: "Outfit-SemiBold",
     color: "#fff",
-    fontSize: RFValue(28),
+    fontSize: RFValue(26), 
   },
   fundWalletButton: {
     backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 14,
+    paddingVertical: 12, 
     borderRadius: 10,
     flexDirection: "row",
-    marginBottom: 20, // Ensure there is some margin at the bottom
   },
   fundWalletText: {
     fontFamily: "Outfit-Regular",
     color: COLORS.violet400,
     marginLeft: 4,
-    fontSize: RFValue(16),
+    fontSize: RFValue(14), // Adjusted font size
   },
 });
