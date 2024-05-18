@@ -51,7 +51,9 @@ const ProfileScreen: React.FC<{
           </View>
 
           <TouchableOpacity
-            onPress={() => navigation.navigate("BecomeAnAgentScreen")}
+            onPress={() =>
+              navigation.navigate("AgentAccountVerificationScreen")
+            }
             style={styles.verifyButton}
           >
             <Verify variant="Bold" color="#fff" />
