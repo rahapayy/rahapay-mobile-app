@@ -61,7 +61,7 @@ const WalletCard: React.FC<{
         )}
         <View className="w-full">
           <TouchableOpacity
-            onPress={() => navigation.navigate("VirtualAccountScreen")}
+            onPress={() => navigation.navigate("FundWalletScreen")}
             style={styles.fundWalletButton}
           >
             <AddCircle variant="Bold" color="#573CC7" />

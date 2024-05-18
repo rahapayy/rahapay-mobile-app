@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     color: "#000",
-    fontSize: FONT_SIZE.large,
+    fontSize: FONT_SIZE.medium,
     fontFamily: "Outfit-Regular",
     flex: 1,
   },
