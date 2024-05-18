@@ -21,8 +21,10 @@ const SuccessfulScreen: React.FC<{
           loop
           style={{ width: 300, height: 300 }}
         />
-        <Text style={styles.headText}>Congratutions!</Text>
-        <Text style={styles.subText}>
+        <Text style={styles.headText} allowFontScaling={false}>
+          Congratutions!
+        </Text>
+        <Text style={styles.subText} allowFontScaling={false}>
           Great news! Your RahaPay account has been created successfully.
         </Text>
 
