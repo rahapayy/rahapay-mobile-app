@@ -67,6 +67,42 @@ const AppStack = () => {
         component={NotificationScreen}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+      name="AgentAccountVerification"
+      component={AgentAccountVerification}
+      options={{ headerShown: false }}
+
+      />
+      <Stack.Screen
+      name=""
+      component={}
+      options={{ headerShown: false }}
+
+      />
+      <Stack.Screen
+      name=""
+      component={}
+      options={{ headerShown: false }}
+
+      />
+      <Stack.Screen
+      name=""
+      component={}
+      options={{ headerShown: false }}
+
+      />
+      <Stack.Screen
+      name=""
+      component={}
+      options={{ headerShown: false }}
+
+      />
+      <Stack.Screen
+      name=""
+      component={}
+      options={{ headerShown: false }}
+
+      />
     </Stack.Navigator>
   );
 };

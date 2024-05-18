@@ -17,7 +17,7 @@ import COLORS from "../../config/colors";
 import Airtel from "../assets/svg/airtel.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 
-const AgentAccountVerification: React.FC<{
+const ChangePasswordScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   return (
@@ -41,7 +41,7 @@ const AgentAccountVerification: React.FC<{
   );
 };
 
-export default AgentAccountVerification;
+export default ChangePasswordScreen;
 
 const styles = StyleSheet.create({
   header: {
