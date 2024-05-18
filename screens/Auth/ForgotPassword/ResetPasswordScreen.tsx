@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import React, { useState } from "react";
-import { ArrowLeft,} from "iconsax-react-native";
+import { ArrowLeft } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
@@ -34,8 +34,10 @@ const ResetPasswordScreen: React.FC<{
           </TouchableOpacity>
 
           <View className="mt-4">
-            <Text style={styles.headText}>Reset Password</Text>
-            <Text style={styles.subText}>
+            <Text style={styles.headText} allowFontScaling={false}>
+              Reset Password
+            </Text>
+            <Text style={styles.subText} allowFontScaling={false}>
               Enter your email address to receive code
             </Text>
           </View>
@@ -45,11 +47,14 @@ const ResetPasswordScreen: React.FC<{
             keyboardVerticalOffset={Platform.OS === "ios" ? -50 : 0}
           >
             <View className="mt-10">
-              <Text style={styles.label}>Email Address</Text>
+              <Text style={styles.label} allowFontScaling={false}>
+                Email Address
+              </Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Enter your email address"
                 placeholderTextColor={"#DFDFDF"}
+                allowFontScaling={false}
               />
             </View>
 
