@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   },
   walletContain: {
     paddingHorizontal: SPACING * 2,
-    paddingVertical: SPACING * 1.5,
+    paddingVertical: SPACING,
     backgroundColor: COLORS.violet300,
     borderRadius: 10,
   },
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   virtualText: {
     fontFamily: "Outfit-Regular",
     color: "#fff",
-    fontSize: FONT_SIZE.medium,
+    fontSize: FONT_SIZE.small,
     marginBottom: SPACING,
   },
   bankName: {
@@ -226,11 +226,12 @@ const styles = StyleSheet.create({
   copyText: {
     fontFamily: "Outfit-Regular",
     color: "#fff",
-    fontSize: FONT_SIZE.small,
+    fontSize: RFValue(12),
     marginBottom: 5,
   },
   accountNumberContainer: {
     flexDirection: "row",
+    alignItems: "center",
   },
   accountNumber: {
     fontFamily: "Outfit-Medium",
