@@ -57,8 +57,10 @@ const EnterCodeScreen: React.FC<{
           </TouchableOpacity>
 
           <View className="mt-4">
-            <Text style={styles.headText}>Enter Code</Text>
-            <Text style={styles.subText}>
+            <Text style={styles.headText} allowFontScaling={false}>
+              Enter Code
+            </Text>
+            <Text style={styles.subText} allowFontScaling={false}>
               Enter the code sent to Johndoe@gmail.com
             </Text>
           </View>
@@ -77,6 +79,7 @@ const EnterCodeScreen: React.FC<{
                   ]}
                   keyboardType="numeric"
                   value={value ? "*" : ""}
+                  allowFontScaling={false}
                   onChangeText={(text) => handleInput(text, index)}
                   onFocus={() =>
                     setBoxIsFocused((prevState) => [
