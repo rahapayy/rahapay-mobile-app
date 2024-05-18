@@ -73,8 +73,10 @@ const ConfirmPinScreen: React.FC<{
               className="w-3 h-3"
             />
           </View>
-          <Text style={styles.headText}>Confirm Your Raha PIN</Text>
-          <Text style={styles.subText}>
+          <Text style={styles.headText} allowFontScaling={false}>
+            Confirm Your Raha PIN
+          </Text>
+          <Text style={styles.subText} allowFontScaling={false}>
             Use this pin to process your transactions
           </Text>
         </View>
@@ -92,6 +94,7 @@ const ConfirmPinScreen: React.FC<{
                   boxIsFocused[index] && styles.inputBoxFocused,
                 ]}
                 keyboardType="numeric"
+                allowFontScaling={false}
                 value={value ? "*" : ""}
                 onChangeText={(text) => handleInput(text, index)}
                 onFocus={() =>
