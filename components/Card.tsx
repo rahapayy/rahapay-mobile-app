@@ -23,11 +23,11 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 const Card: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { width: screenWidth } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
-  // Calculate a fixed aspect ratio for the background image (e.g., 16:9)
   const aspectRatio = 12 / 9;
   const bgHeight = screenWidth / aspectRatio;
+  const minHeight = screenHeight * 0.3; // Set a minimum height
 
   const [showBalance, setShowBalance] = useState(true);
 
@@ -36,7 +36,10 @@ const Card: React.FC<{
   return (
     <ImageBackground
       source={require("../assets/images/bg.png")}
-      style={[styles.backgroundImage, { height: bgHeight }]}
+      style={[
+        styles.backgroundImage,
+        { height: Math.max(bgHeight, minHeight) },
+      ]}
     >
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container}>
@@ -47,8 +50,10 @@ const Card: React.FC<{
                 style={styles.avatar}
               />
               <View>
-                <Text style={styles.greetingText}>Hello, Akinola</Text>
-                <Text style={styles.greetingSubText}>
+                <Text style={styles.greetingText} allowFontScaling={false}>
+                  Hello, Akinola
+                </Text>
+                <Text style={styles.greetingSubText} allowFontScaling={false}>
                   Let's make some bills payment!
                 </Text>
               </View>
@@ -63,7 +68,9 @@ const Card: React.FC<{
           <View style={styles.balanceContainer}>
             <View style={styles.balanceContent}>
               <WalletAdd1 color="#fff" size={20} />
-              <Text style={styles.availableBalanceText}>Available Balance</Text>
+              <Text style={styles.availableBalanceText} allowFontScaling={false}>
+                Available Balance
+              </Text>
             </View>
             <TouchableOpacity onPress={toggleBalanceVisibility}>
               {showBalance ? (
@@ -75,14 +82,16 @@ const Card: React.FC<{
           </View>
 
           <View style={styles.balanceValueContainer}>
-            <Text style={styles.balanceValue}>
+            <Text style={styles.balanceValue} allowFontScaling={false}>
               {showBalance ? "₦ 120,000.00" : "*******"}
             </Text>
           </View>
 
           <TouchableOpacity style={styles.fundWalletButton}>
             <AddCircle variant="Bold" color="#573CC7" />
-            <Text style={styles.fundWalletText}>Fund Wallet</Text>
+            <Text style={styles.fundWalletText} allowFontScaling={false}>
+              Fund Wallet
+            </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -101,14 +110,15 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingHorizontal: 16,
-    paddingTop: 24,
+    paddingTop: 15,
     flex: 1,
+    justifyContent: "space-between",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 5,
   },
   headerContent: {
     flexDirection: "row",
@@ -163,6 +173,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 10,
     flexDirection: "row",
+    marginBottom: 20, // Ensure there is some margin at the bottom
   },
   fundWalletText: {
     fontFamily: "Outfit-Regular",
