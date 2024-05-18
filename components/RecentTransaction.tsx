@@ -19,9 +19,13 @@ const RecentTransaction: React.FC<{
   return (
     <View className="p-4">
       <View className="flex-row items-center justify-between">
-        <Text style={styles.rtText}>Recent Transactions</Text>
+        <Text style={styles.rtText} allowFontScaling={false}>
+          Recent Transactions
+        </Text>
         <TouchableOpacity>
-          <Text style={styles.viewmoreText}>View More</Text>
+          <Text style={styles.viewmoreText} allowFontScaling={false}>
+            View More
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -39,14 +43,22 @@ const RecentTransaction: React.FC<{
               />
               <View style={styles.transactionTextContainer}>
                 <View style={styles.transactionTextRow}>
-                  <Text style={styles.item}>Airtel Data Bundle</Text>
-                  <Text style={styles.valueText}>₦ 1,500</Text>
+                  <Text style={styles.item} allowFontScaling={false}>
+                    Airtel Data Bundle
+                  </Text>
+                  <Text style={styles.valueText} allowFontScaling={false}>
+                    ₦ 1,500
+                  </Text>
                 </View>
                 <View style={styles.transactionTextRow}>
-                  <Text style={styles.date}>Mar 06, 2024, 02:12 PM</Text>
+                  <Text style={styles.date} allowFontScaling={false}>
+                    Mar 06, 2024, 02:12 PM
+                  </Text>
                   {/* Transaction status */}
                   <View className="p-2 bg-[#E6F9F1] rounded-2xl">
-                    <Text style={styles.completedText}>Completed</Text>
+                    <Text style={styles.completedText} allowFontScaling={false}>
+                      Completed
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -58,14 +70,22 @@ const RecentTransaction: React.FC<{
               />
               <View style={styles.transactionTextContainer}>
                 <View style={styles.transactionTextRow}>
-                  <Text style={styles.item}>MTN Data Bundle</Text>
-                  <Text style={styles.valueText}>₦ 1,500</Text>
+                  <Text style={styles.item} allowFontScaling={false}>
+                    MTN Data Bundle
+                  </Text>
+                  <Text style={styles.valueText} allowFontScaling={false}>
+                    ₦ 1,500
+                  </Text>
                 </View>
                 <View style={styles.transactionTextRow}>
-                  <Text style={styles.date}>Mar 06, 2024, 02:12 PM</Text>
+                  <Text style={styles.date} allowFontScaling={false}>
+                    Mar 06, 2024, 02:12 PM
+                  </Text>
                   {/* Transaction status */}
                   <View className="p-2 bg-[#FFEAEA] rounded-2xl">
-                    <Text style={styles.failedText}>Failed</Text>
+                    <Text style={styles.failedText} allowFontScaling={false}>
+                      Failed
+                    </Text>
                   </View>
                 </View>
               </View>
