@@ -37,8 +37,10 @@ const CreateAccountScreen: React.FC<{
           </TouchableOpacity>
 
           <View className="mt-4">
-            <Text style={styles.headText}>Create an Account</Text>
-            <Text style={styles.subText}>
+            <Text style={styles.headText} allowFontScaling={false}>
+              Create an Account
+            </Text>
+            <Text style={styles.subText} allowFontScaling={false}>
               Let’s set up your account in minutes
             </Text>
           </View>
@@ -48,24 +50,32 @@ const CreateAccountScreen: React.FC<{
             keyboardVerticalOffset={Platform.OS === "ios" ? -50 : 0}
           >
             <View className="mt-10">
-              <Text style={styles.label}>Full Name</Text>
+              <Text style={styles.label} allowFontScaling={false}>
+                Full Name
+              </Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="First & Last name"
+                allowFontScaling={false}
                 placeholderTextColor={"#DFDFDF"}
               />
             </View>
             <View className="mt-4">
-              <Text style={styles.label}>Email Address</Text>
+              <Text style={styles.label} allowFontScaling={false}>
+                Email Address
+              </Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Example@email.com"
                 placeholderTextColor={"#DFDFDF"}
+                allowFontScaling={false}
               />
             </View>
 
             <View className="mt-4">
-              <Text style={styles.label}>Phone Number</Text>
+              <Text style={styles.label} allowFontScaling={false}>
+                Phone Number
+              </Text>
               <View style={styles.inputContainer}>
                 <Image
                   source={require("../../../assets/images/flag-for-nigeria.png")}
@@ -73,7 +83,10 @@ const CreateAccountScreen: React.FC<{
                   className="w-6 h-6"
                 />
                 <View>
-                  <Text style={styles.numberText}> +234 </Text>
+                  <Text style={styles.numberText} allowFontScaling={false}>
+                    {" "}
+                    +234{" "}
+                  </Text>
                 </View>
                 <View style={styles.vertical} />
                 <TextInput
@@ -81,16 +94,20 @@ const CreateAccountScreen: React.FC<{
                   placeholder="8038929383"
                   placeholderTextColor="#BABFC3"
                   keyboardType="numeric"
+                  allowFontScaling={false}
                 />
               </View>
             </View>
             <View className="mt-4">
-              <Text style={styles.label}>Create Password</Text>
+              <Text style={styles.label} allowFontScaling={false}>
+                Create Password
+              </Text>
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
                   placeholder="Password"
                   placeholderTextColor="#BABFC3"
+                  allowFontScaling={false}
                 />
                 <TouchableOpacity onPress={toggleBalanceVisibility}>
                   {showBalance ? (

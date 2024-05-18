@@ -42,8 +42,10 @@ const LoginScreen: React.FC<{
           </TouchableOpacity>
 
           <View className="mt-4">
-            <Text style={styles.headText}>Log in</Text>
-            <Text style={styles.subText}>
+            <Text style={styles.headText} allowFontScaling={false}>
+              Log in
+            </Text>
+            <Text style={styles.subText} allowFontScaling={false}>
               Welcome back, let’s sign in to your account!
             </Text>
           </View>
@@ -53,21 +55,27 @@ const LoginScreen: React.FC<{
             keyboardVerticalOffset={Platform.OS === "ios" ? -50 : 0}
           >
             <View className="mt-10">
-              <Text style={styles.label}>Email or Phone Number</Text>
+              <Text style={styles.label} allowFontScaling={false}>
+                Email or Phone Number
+              </Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="First & Last name"
                 placeholderTextColor={"#DFDFDF"}
+                allowFontScaling={false}
               />
             </View>
 
             <View className="mt-4">
-              <Text style={styles.label}>Password</Text>
+              <Text style={styles.label} allowFontScaling={false}>
+                Password
+              </Text>
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
                   placeholder="Password"
                   placeholderTextColor="#BABFC3"
+                  allowFontScaling={false}
                 />
                 <TouchableOpacity onPress={toggleBalanceVisibility}>
                   {showBalance ? (
@@ -83,7 +91,9 @@ const LoginScreen: React.FC<{
               onPress={() => navigation.navigate("ResetPasswordScreen")}
               className="mt-4"
             >
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+              <Text style={styles.forgotPasswordText} allowFontScaling={false}>
+                Forgot Password?
+              </Text>
             </TouchableOpacity>
 
             <Button

@@ -38,8 +38,10 @@ const CreateNewPasswordScreen: React.FC<{
           </TouchableOpacity>
 
           <View className="mt-4">
-            <Text style={styles.headText}>Create Password</Text>
-            <Text style={styles.subText}>
+            <Text style={styles.headText} allowFontScaling={false}>
+              Create Password
+            </Text>
+            <Text style={styles.subText} allowFontScaling={false}>
               Enter new password to recover account
             </Text>
           </View>
@@ -49,11 +51,14 @@ const CreateNewPasswordScreen: React.FC<{
             keyboardVerticalOffset={Platform.OS === "ios" ? -50 : 0}
           >
             <View className="mt-4">
-              <Text style={styles.label}>Password</Text>
+              <Text style={styles.label} allowFontScaling={false}>
+                Password
+              </Text>
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
                   placeholder="Password"
+                  allowFontScaling={false}
                   placeholderTextColor="#BABFC3"
                 />
                 <TouchableOpacity onPress={toggleBalanceVisibility}>

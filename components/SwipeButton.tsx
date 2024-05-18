@@ -8,7 +8,6 @@ import {
   Dimensions,
 } from "react-native";
 import { PanGestureHandler, State } from "react-native-gesture-handler";
-import { ArrowRight2 } from "iconsax-react-native";
 import LottieView from "lottie-react-native";
 
 const windowWidth = Dimensions.get("window").width;
@@ -102,7 +101,9 @@ const SwipeButton = () => {
                   },
                 ]}
               >
-                <Text style={styles.slideText}>Slide to Confirm</Text>
+                <Text style={styles.slideText} allowFontScaling={false}>
+                  Slide to Confirm
+                </Text>
               </Animated.View>
             </>
           )}

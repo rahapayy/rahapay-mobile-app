@@ -31,57 +31,89 @@ const TransactionSummaryScreen: React.FC<{
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={[styles.headerText]}>Transaction Summary</Text>
+            <Text style={[styles.headerText]} allowFontScaling={false}>
+              Transaction Summary
+            </Text>
           </View>
 
           <View className="justify-center items-center mt-10">
             <Airtel />
-            <Text style={styles.itemText}>AIRTEL Data Bundle</Text>
+            <Text style={styles.itemText} allowFontScaling={false}>
+              AIRTEL Data Bundle
+            </Text>
           </View>
           <View className="p-4">
             <View style={styles.container}>
-              <Text style={styles.headText}>Transaction summary</Text>
+              <Text style={styles.headText} allowFontScaling={false}>
+                Transaction summary
+              </Text>
               <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText}>Transaction ID</Text>
-                <Text style={styles.descriptionText}>#1234567890</Text>
+                <Text style={styles.titleText} allowFontScaling={false}>
+                  Transaction ID
+                </Text>
+                <Text style={styles.descriptionText} allowFontScaling={false}>
+                  #1234567890
+                </Text>
               </View>
               <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText}>Amount</Text>
-                <Text style={styles.descriptionText}>NGN 1,000.00</Text>
+                <Text style={styles.titleText} allowFontScaling={false}>
+                  Amount
+                </Text>
+                <Text style={styles.descriptionText} allowFontScaling={false}>
+                  NGN 1,000.00
+                </Text>
               </View>
               <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText}>Package</Text>
-                <Text style={styles.descriptionText}>
+                <Text style={styles.titleText} allowFontScaling={false}>
+                  Package
+                </Text>
+                <Text style={styles.descriptionText} allowFontScaling={false}>
                   AIRTEL - 1GB - Monthly
                 </Text>
               </View>
               <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText}>Recipient</Text>
-                <Text style={styles.descriptionText}>+23480123456789</Text>
+                <Text style={styles.titleText} allowFontScaling={false}>
+                  Recipient
+                </Text>
+                <Text style={styles.descriptionText} allowFontScaling={false}>
+                  +23480123456789
+                </Text>
               </View>
               <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText}>Date</Text>
-                <Text style={styles.descriptionText}>
+                <Text style={styles.titleText} allowFontScaling={false}>
+                  Date
+                </Text>
+                <Text style={styles.descriptionText} allowFontScaling={false}>
                   Mar 06, 2024, 02:12 PM
                 </Text>
               </View>
               <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText}>Paying</Text>
-                <Text style={styles.descriptionText}>NGN 1,000.00</Text>
+                <Text style={styles.titleText} allowFontScaling={false}>
+                  Paying
+                </Text>
+                <Text style={styles.descriptionText} allowFontScaling={false}>
+                  NGN 1,000.00
+                </Text>
               </View>
 
               <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText}>Mar 06, 2024, 02:12 PM</Text>
+                <Text style={styles.titleText} allowFontScaling={false}>
+                  Mar 06, 2024, 02:12 PM
+                </Text>
                 {/* Transaction status */}
                 <View className="p-2 bg-[#E6F9F1] rounded-2xl">
-                  <Text style={styles.completedText}>Completed</Text>
+                  <Text style={styles.completedText} allowFontScaling={false}>
+                    Completed
+                  </Text>
                 </View>
               </View>
             </View>
 
             <TouchableOpacity style={styles.button}>
               <DocumentDownload color="#000" />
-              <Text style={styles.buttonText}>Download Receipt</Text>
+              <Text style={styles.buttonText} allowFontScaling={false}>
+                Download Receipt
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -105,7 +137,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     color: "#000",
-    fontSize: FONT_SIZE.large,
+    fontSize: FONT_SIZE.medium,
     fontFamily: "Outfit-Regular",
     flex: 1,
   },

@@ -11,13 +11,13 @@ import {
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, DocumentDownload } from "iconsax-react-native";
-import SPACING from "../../config/SPACING";
-import FONT_SIZE from "../../config/font-size";
-import COLORS from "../../config/colors";
+import SPACING from "../config/SPACING";
+import FONT_SIZE from "../config/font-size";
+import COLORS from "../config/colors";
 import Airtel from "../assets/svg/airtel.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 
-const AirtimeScreen: React.FC<{
+const FundWalletScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   return (
@@ -32,7 +32,7 @@ const AirtimeScreen: React.FC<{
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
             <Text style={[styles.headerText]} allowFontScaling={false}>
-              Airtime Top-up
+              Virtual Funding Accounts
             </Text>
           </View>
         </View>
@@ -41,7 +41,7 @@ const AirtimeScreen: React.FC<{
   );
 };
 
-export default AirtimeScreen;
+export default FundWalletScreen;
 
 const styles = StyleSheet.create({
   header: {

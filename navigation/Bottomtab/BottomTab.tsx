@@ -1,18 +1,13 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text, TextProps } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import {
-  Home,
-  Profile,
-  MoreSquare,
-  WalletAdd1,
-  Cards,
-} from "iconsax-react-native";
+import { Home, Profile, MoreSquare, WalletAdd1, Cards } from "iconsax-react-native";
 import HomeScreen from "../../screens/HomeScreen";
 import ServicesScreen from "../../screens/ServicesScreen";
 import WalletScreen from "../../screens/WalletScreen";
 import ProfileScreen from "../../screens/ProfileScreen";
 import CardsScreen from "../../screens/CardsScreen";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 
 const Tab = createBottomTabNavigator();
 
@@ -22,7 +17,53 @@ const customColors = {
   inactiveTintColor: "#8E9AAF",
 };
 
-const BottomTab = () => {
+interface TabBarLabelProps extends TextProps {
+  focused: boolean;
+  title: string;
+}
+
+const TabBarLabel: React.FC<TabBarLabelProps> = ({ focused, title }) => {
+  return (
+    <Text
+      style={[
+        styles.tabBarLabel,
+        {
+          color: focused
+            ? customColors.activeTintColor
+            : customColors.inactiveTintColor,
+        },
+      ]}
+      numberOfLines={1}
+      ellipsizeMode="tail"
+      allowFontScaling={false}
+    >
+      {title}
+    </Text>
+  );
+};
+
+interface AnimatedIconProps {
+  focused: boolean;
+  children: React.ReactNode;
+}
+
+const AnimatedIcon: React.FC<AnimatedIconProps> = ({ focused, children }) => {
+  const scale = useSharedValue(1);
+
+  if (focused) {
+    scale.value = withSpring(1.2);
+  } else {
+    scale.value = withSpring(1);
+  }
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return <Animated.View style={animatedStyle}>{children}</Animated.View>;
+};
+
+const BottomTab: React.FC = () => {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -39,14 +80,18 @@ const BottomTab = () => {
         },
         tabBarActiveTintColor: customColors.activeTintColor,
         tabBarInactiveTintColor: customColors.inactiveTintColor,
-        tabBarLabelStyle: styles.tabBarLabel,
       }}
     >
       <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarIcon: ({ color }) => <Home size={27} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <AnimatedIcon focused={focused}>
+              <Home size={27} color={color} />
+            </AnimatedIcon>
+          ),
+          tabBarLabel: ({ focused }) => <TabBarLabel focused={focused} title="Home" />,
           headerShown: false,
         }}
       />
@@ -54,7 +99,12 @@ const BottomTab = () => {
         name="Services"
         component={ServicesScreen}
         options={{
-          tabBarIcon: ({ color }) => <MoreSquare size={27} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <AnimatedIcon focused={focused}>
+              <MoreSquare size={27} color={color} />
+            </AnimatedIcon>
+          ),
+          tabBarLabel: ({ focused }) => <TabBarLabel focused={focused} title="Services" />,
           headerShown: false,
         }}
       />
@@ -62,7 +112,12 @@ const BottomTab = () => {
         name="Wallet"
         component={WalletScreen}
         options={{
-          tabBarIcon: ({ color }) => <WalletAdd1 size={27} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <AnimatedIcon focused={focused}>
+              <WalletAdd1 size={27} color={color} />
+            </AnimatedIcon>
+          ),
+          tabBarLabel: ({ focused }) => <TabBarLabel focused={focused} title="Wallet" />,
           headerShown: false,
         }}
       />
@@ -70,7 +125,12 @@ const BottomTab = () => {
         name="Cards"
         component={CardsScreen}
         options={{
-          tabBarIcon: ({ color }) => <Cards size={27} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <AnimatedIcon focused={focused}>
+              <Cards size={27} color={color} />
+            </AnimatedIcon>
+          ),
+          tabBarLabel: ({ focused }) => <TabBarLabel focused={focused} title="Cards" />,
           headerShown: false,
         }}
       />
@@ -78,7 +138,12 @@ const BottomTab = () => {
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarIcon: ({ color }) => <Profile size={27} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <AnimatedIcon focused={focused}>
+              <Profile size={27} color={color} />
+            </AnimatedIcon>
+          ),
+          tabBarLabel: ({ focused }) => <TabBarLabel focused={focused} title="Profile" />,
           headerShown: false,
         }}
       />

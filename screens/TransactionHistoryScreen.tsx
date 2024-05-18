@@ -32,7 +32,9 @@ const TransactionHistoryScreen: React.FC<{
           >
             <ArrowLeft color={"#000"} size={24} />
           </TouchableOpacity>
-          <Text style={[styles.headerText]}>Transaction History</Text>
+          <Text style={[styles.headerText]} allowFontScaling={false}>
+            Transaction History
+          </Text>
           <TouchableOpacity>
             <DocumentText color={"#000"} />
           </TouchableOpacity>
@@ -41,7 +43,9 @@ const TransactionHistoryScreen: React.FC<{
         {hasTransaction ? (
           // Render transactions
           <View className="px-4">
-            <Text style={styles.date}>Today</Text>
+            <Text style={styles.date} allowFontScaling={false}>
+              Today
+            </Text>
             <TouchableOpacity
               onPress={() => navigation.navigate("TransactionSummaryScreen")}
               style={styles.transactionItem}
@@ -52,14 +56,22 @@ const TransactionHistoryScreen: React.FC<{
               />
               <View style={styles.transactionTextContainer}>
                 <View style={styles.transactionTextRow}>
-                  <Text style={styles.item}>Airtel Data Bundle</Text>
-                  <Text style={styles.valueText}>₦ 1,500</Text>
+                  <Text style={styles.item} allowFontScaling={false}>
+                    Airtel Data Bundle
+                  </Text>
+                  <Text style={styles.valueText} allowFontScaling={false}>
+                    ₦ 1,500
+                  </Text>
                 </View>
                 <View style={styles.transactionTextRow}>
-                  <Text style={styles.date}>Mar 06, 2024, 02:12 PM</Text>
+                  <Text style={styles.date} allowFontScaling={false}>
+                    Mar 06, 2024, 02:12 PM
+                  </Text>
                   {/* Transaction status */}
                   <View className="p-2 bg-[#E6F9F1] rounded-2xl">
-                    <Text style={styles.completedText}>Completed</Text>
+                    <Text style={styles.completedText} allowFontScaling={false}>
+                      Completed
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -71,14 +83,22 @@ const TransactionHistoryScreen: React.FC<{
               />
               <View style={styles.transactionTextContainer}>
                 <View style={styles.transactionTextRow}>
-                  <Text style={styles.item}>MTN Data Bundle</Text>
-                  <Text style={styles.valueText}>₦ 1,500</Text>
+                  <Text style={styles.item} allowFontScaling={false}>
+                    MTN Data Bundle
+                  </Text>
+                  <Text style={styles.valueText} allowFontScaling={false}>
+                    ₦ 1,500
+                  </Text>
                 </View>
                 <View style={styles.transactionTextRow}>
-                  <Text style={styles.date}>Mar 06, 2024, 02:12 PM</Text>
+                  <Text style={styles.date} allowFontScaling={false}>
+                    Mar 06, 2024, 02:12 PM
+                  </Text>
                   {/* Transaction status */}
                   <View className="p-2 bg-[#FFEAEA] rounded-2xl">
-                    <Text style={styles.failedText}>Failed</Text>
+                    <Text style={styles.failedText} allowFontScaling={false}>
+                      Failed
+                    </Text>
                   </View>
                 </View>
               </View>

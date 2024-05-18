@@ -30,8 +30,10 @@ const WelcomeScreen: React.FC<{
       </View>
 
       <View style={styles.textContainer}>
-        <Text style={styles.headText}>Welcome to RahaPay!</Text>
-        <Text style={styles.subText}>
+        <Text style={styles.headText} allowFontScaling={false}>
+          Welcome to RahaPay!
+        </Text>
+        <Text style={styles.subText} allowFontScaling={false}>
           Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptas
           temporibus pariatur aut debitis deserunt et?
         </Text>
@@ -41,13 +43,18 @@ const WelcomeScreen: React.FC<{
           onPress={() => navigation.navigate("CreateAccountScreen")}
           style={styles.createAccountButton}
         >
-          <Text style={styles.createAccountText}>Create an Account</Text>
+          <Text style={styles.createAccountText} allowFontScaling={false}>
+            Create an Account
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => navigation.navigate("LoginScreen")}
-          style={styles.loginButton}>
-          <Text style={styles.loginText}>Login</Text>
+          style={styles.loginButton}
+        >
+          <Text style={styles.loginText} allowFontScaling={false}>
+            Login
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

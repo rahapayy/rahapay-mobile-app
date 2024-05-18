@@ -5,9 +5,9 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  useWindowDimensions,
   View,
   Image,
+  Dimensions,
 } from "react-native";
 import {
   AddCircle,
@@ -20,15 +20,11 @@ import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
+const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
+
 const Card: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { width: screenWidth } = useWindowDimensions();
-
-  // Calculate a fixed aspect ratio for the background image (e.g., 16:9)
-  const aspectRatio = 12 / 9;
-  const bgHeight = screenWidth / aspectRatio;
-
   const [showBalance, setShowBalance] = useState(true);
 
   const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
@@ -36,7 +32,7 @@ const Card: React.FC<{
   return (
     <ImageBackground
       source={require("../assets/images/bg.png")}
-      style={[styles.backgroundImage, { height: bgHeight }]}
+      style={styles.backgroundImage}
     >
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container}>
@@ -47,14 +43,16 @@ const Card: React.FC<{
                 style={styles.avatar}
               />
               <View>
-                <Text style={styles.greetingText}>Hello, Akinola</Text>
-                <Text style={styles.greetingSubText}>
+                <Text style={styles.greetingText} allowFontScaling={false}>
+                  Hello, Akinola
+                </Text>
+                <Text style={styles.greetingSubText} allowFontScaling={false}>
                   Let's make some bills payment!
                 </Text>
               </View>
             </View>
             <TouchableOpacity
-              onPress={() => navigation.navigate("TransactionHistoryScreen")}
+              onPress={() => navigation.navigate("NotificationScreen")}
             >
               <Notification color="#fff" />
             </TouchableOpacity>
@@ -62,27 +60,37 @@ const Card: React.FC<{
 
           <View style={styles.balanceContainer}>
             <View style={styles.balanceContent}>
-              <WalletAdd1 color="#fff" size={20} />
-              <Text style={styles.availableBalanceText}>Available Balance</Text>
+              <WalletAdd1 color="#fff" size={24} />
+              <Text
+                style={styles.availableBalanceText}
+                allowFontScaling={false}
+              >
+                Available Balance
+              </Text>
             </View>
             <TouchableOpacity onPress={toggleBalanceVisibility}>
               {showBalance ? (
-                <Eye color="#fff" size={20} style={styles.eyeIcon} />
+                <Eye color="#fff" size={24} style={styles.eyeIcon} />
               ) : (
-                <EyeSlash color="#fff" size={20} style={styles.eyeIcon} />
+                <EyeSlash color="#fff" size={24} style={styles.eyeIcon} />
               )}
             </TouchableOpacity>
           </View>
 
           <View style={styles.balanceValueContainer}>
-            <Text style={styles.balanceValue}>
-              {showBalance ? "₦ 120,000.00" : "*******"}
+            <Text style={styles.balanceValue} allowFontScaling={false}>
+              {showBalance ? "₦120,000.00" : "*******"}
             </Text>
           </View>
 
-          <TouchableOpacity style={styles.fundWalletButton}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("FundWalletScreen")}
+            style={styles.fundWalletButton}
+          >
             <AddCircle variant="Bold" color="#573CC7" />
-            <Text style={styles.fundWalletText}>Fund Wallet</Text>
+            <Text style={styles.fundWalletText} allowFontScaling={false}>
+              Fund Wallet
+            </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -98,42 +106,44 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 15,
     overflow: "hidden",
     backgroundColor: COLORS.violet400,
+    height: screenHeight * 0.34,
+    paddingBottom: 20,
   },
   container: {
     paddingHorizontal: 16,
-    paddingTop: 24,
+    paddingTop: 10,
     flex: 1,
+    justifyContent: "space-between",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   headerContent: {
     flexDirection: "row",
     alignItems: "center",
   },
   avatar: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     marginRight: 8,
   },
   greetingText: {
     fontFamily: "Outfit-SemiBold",
     color: "#fff",
-    fontSize: RFValue(18),
+    fontSize: RFValue(16),
   },
   greetingSubText: {
     fontFamily: "Outfit-Regular",
     color: "#fff",
-    fontSize: RFValue(14),
+    fontSize: RFValue(12),
   },
   balanceContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
   },
   balanceContent: {
     flexDirection: "row",
@@ -149,18 +159,18 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   balanceValueContainer: {
-    marginBottom: 20,
+    // marginBottom: 20,
   },
   balanceValue: {
     fontFamily: "Outfit-SemiBold",
     color: "#fff",
-    fontSize: RFValue(28),
+    fontSize: RFValue(26),
   },
   fundWalletButton: {
     backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 14,
+    paddingVertical: 12,
     borderRadius: 10,
     flexDirection: "row",
   },
@@ -168,6 +178,6 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: COLORS.violet400,
     marginLeft: 4,
-    fontSize: RFValue(16),
+    fontSize: RFValue(14), // Adjusted font size
   },
 });

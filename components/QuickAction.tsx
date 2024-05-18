@@ -7,7 +7,6 @@ import {
   View,
 } from "react-native";
 import React from "react";
-import { Wifi } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -36,7 +35,9 @@ const QuickAction: React.FC<{
   };
   return (
     <View className="p-4">
-      <Text style={styles.quickAction}>Quick Action</Text>
+      <Text style={styles.quickAction} allowFontScaling={false}>
+        Quick Action
+      </Text>
       <View className="flex-row items-center justify-between mt-4">
         {/* Cards */}
         <TouchableOpacity
@@ -44,7 +45,12 @@ const QuickAction: React.FC<{
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
           <Airtime />
-          <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
+          <Text
+            style={styles.cardText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            allowFontScaling={false}
+          >
             Airtime
           </Text>
         </TouchableOpacity>
@@ -53,7 +59,12 @@ const QuickAction: React.FC<{
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
           <Data />
-          <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
+          <Text
+            style={styles.cardText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            allowFontScaling={false}
+          >
             Data
           </Text>
         </TouchableOpacity>
@@ -62,7 +73,12 @@ const QuickAction: React.FC<{
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
           <Tv />
-          <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
+          <Text
+            style={styles.cardText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            allowFontScaling={false}
+          >
             TV
           </Text>
         </TouchableOpacity>
@@ -71,7 +87,12 @@ const QuickAction: React.FC<{
           style={[styles.card, { width: cardWidth, height: cardHeight }]}
         >
           <Electricity />
-          <Text style={styles.cardText} numberOfLines={1} ellipsizeMode="tail">
+          <Text
+            style={styles.cardText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            allowFontScaling={false}
+          >
             Electicity
           </Text>
         </TouchableOpacity>
@@ -80,7 +101,9 @@ const QuickAction: React.FC<{
         onPress={handleButtonClick}
         className="w-full bg-white p-4 justify-center items-center mt-4 rounded-2xl"
       >
-        <Text style={styles.moreText}>More</Text>
+        <Text style={styles.moreText} allowFontScaling={false}>
+          More
+        </Text>
       </TouchableOpacity>
     </View>
   );
