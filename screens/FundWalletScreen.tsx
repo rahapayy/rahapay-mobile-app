@@ -1,5 +1,6 @@
 import {
   Image,
+  ImageBackground,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -10,12 +11,12 @@ import {
 } from "react-native";
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, DocumentDownload } from "iconsax-react-native";
+import { ArrowLeft, Copy } from "iconsax-react-native";
 import SPACING from "../config/SPACING";
 import FONT_SIZE from "../config/font-size";
 import COLORS from "../config/colors";
-import Airtel from "../assets/svg/airtel.svg";
 import { RFValue } from "react-native-responsive-fontsize";
+import Circle from "../assets/svg/Group 803.svg";
 
 const FundWalletScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -34,6 +35,32 @@ const FundWalletScreen: React.FC<{
             <Text style={[styles.headerText]} allowFontScaling={false}>
               Virtual Funding Accounts
             </Text>
+          </View>
+
+          {/* Cards */}
+
+          <View className="p-4">
+            <ImageBackground
+              source={require("../assets/images/layer.png")}
+              resizeMode="cover"
+              style={styles.walletContain}
+            >
+              {/* Card Details */}
+              <View className="flex-row justify-between">
+                <Text style={styles.virtualText}>Virtual Account</Text>
+                <Circle />
+              </View>
+
+              <Text style={styles.bankName}>Moniepoint Microfinance Bank</Text>
+              <View style={styles.copyContainer}>
+                <Text style={styles.copyText}>Copy your account number</Text>
+                <View className="flex-row">
+                  <Text style={styles.accountNumber}>01234567890</Text>
+                  <Copy color="#fff" />
+                </View>
+              </View>
+              <Text style={styles.accountName}>Akinola John</Text>
+            </ImageBackground>
           </View>
         </View>
       </ScrollView>
@@ -117,4 +144,16 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     fontSize: FONT_SIZE.medium,
   },
+  walletContain: {
+    paddingHorizontal: SPACING * 2,
+    paddingVertical: SPACING * 2,
+    backgroundColor: COLORS.violet300,
+    borderRadius: 10,
+  },
+  virtualText: {},
+  bankName: {},
+  copyContainer: {},
+  copyText: {},
+  accountNumber: {},
+  accountName: {},
 });

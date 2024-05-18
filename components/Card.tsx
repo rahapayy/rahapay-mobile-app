@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 15,
     overflow: "hidden",
     backgroundColor: COLORS.violet400,
-    height: screenHeight * 0.34,
+    height: screenHeight * 0.35,
     paddingBottom: 20,
   },
   container: {
@@ -158,13 +158,11 @@ const styles = StyleSheet.create({
   eyeIcon: {
     marginLeft: 10,
   },
-  balanceValueContainer: {
-    // marginBottom: 20,
-  },
+  balanceValueContainer: {},
   balanceValue: {
     fontFamily: "Outfit-SemiBold",
     color: "#fff",
-    fontSize: RFValue(26),
+    fontSize: RFValue(30),
   },
   fundWalletButton: {
     backgroundColor: "#fff",
