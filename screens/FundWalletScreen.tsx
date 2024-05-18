@@ -75,23 +75,32 @@ const FundWalletScreen: React.FC<{
                 >
                   {/* Card Details */}
                   <View style={styles.cardHeader}>
-                    <Text style={styles.virtualText}>Virtual Account</Text>
+                    <Text style={styles.virtualText} allowFontScaling={false}>
+                      Virtual Account
+                    </Text>
                     <Circle />
                   </View>
 
-                  <Text style={styles.bankName}>{account.bankName}</Text>
+                  <Text style={styles.bankName} allowFontScaling={false}>
+                    {account.bankName}
+                  </Text>
                   <View style={styles.copyContainer}>
-                    <Text style={styles.copyText}>
+                    <Text style={styles.copyText} allowFontScaling={false}>
                       Copy your account number
                     </Text>
                     <View style={styles.accountNumberContainer}>
-                      <Text style={styles.accountNumber}>
+                      <Text
+                        style={styles.accountNumber}
+                        allowFontScaling={false}
+                      >
                         {account.accountNumber}
                       </Text>
                       <Copy color="#fff" />
                     </View>
                   </View>
-                  <Text style={styles.accountName}>{account.accountName}</Text>
+                  <Text style={styles.accountName} allowFontScaling={false}>
+                    {account.accountName}
+                  </Text>
                 </ImageBackground>
               </View>
             ))}
@@ -211,7 +220,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingVertical: 2,
     paddingHorizontal: SPACING,
-    width: 180,
+    width: 220,
     marginBottom: 5,
   },
   copyText: {
