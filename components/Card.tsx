@@ -52,7 +52,7 @@ const Card: React.FC<{
               </View>
             </View>
             <TouchableOpacity
-              onPress={() => navigation.navigate("TransactionHistoryScreen")}
+              onPress={() => navigation.navigate("NotificationScreen")}
             >
               <Notification color="#fff" />
             </TouchableOpacity>
@@ -61,7 +61,10 @@ const Card: React.FC<{
           <View style={styles.balanceContainer}>
             <View style={styles.balanceContent}>
               <WalletAdd1 color="#fff" size={24} />
-              <Text style={styles.availableBalanceText} allowFontScaling={false}>
+              <Text
+                style={styles.availableBalanceText}
+                allowFontScaling={false}
+              >
                 Available Balance
               </Text>
             </View>
@@ -100,7 +103,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 15,
     overflow: "hidden",
     backgroundColor: COLORS.violet400,
-    height: screenHeight * 0.34, 
+    height: screenHeight * 0.34,
     paddingBottom: 20,
   },
   container: {
@@ -121,18 +124,18 @@ const styles = StyleSheet.create({
   },
   avatar: {
     width: 40,
-    height: 40, 
+    height: 40,
     marginRight: 8,
   },
   greetingText: {
     fontFamily: "Outfit-SemiBold",
     color: "#fff",
-    fontSize: RFValue(16), 
+    fontSize: RFValue(16),
   },
   greetingSubText: {
     fontFamily: "Outfit-Regular",
     color: "#fff",
-    fontSize: RFValue(12), 
+    fontSize: RFValue(12),
   },
   balanceContainer: {
     flexDirection: "row",
@@ -147,7 +150,7 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: "#fff",
     marginLeft: 4,
-    fontSize: RFValue(14), 
+    fontSize: RFValue(14),
   },
   eyeIcon: {
     marginLeft: 10,
@@ -158,13 +161,13 @@ const styles = StyleSheet.create({
   balanceValue: {
     fontFamily: "Outfit-SemiBold",
     color: "#fff",
-    fontSize: RFValue(26), 
+    fontSize: RFValue(26),
   },
   fundWalletButton: {
     backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 12, 
+    paddingVertical: 12,
     borderRadius: 10,
     flexDirection: "row",
   },

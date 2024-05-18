@@ -115,7 +115,7 @@ export default RecentTransaction;
 const styles = StyleSheet.create({
   rtText: {
     fontFamily: "Outfit-SemiBold",
-    fontSize: RFValue(16),
+    fontSize: RFValue(14),
   },
   viewmoreText: {
     fontFamily: "Outfit-Regular",
