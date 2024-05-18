@@ -5,6 +5,7 @@ import {
   View,
   Dimensions,
   Image,
+  ImageBackground,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -35,8 +36,12 @@ const WalletCard: React.FC<{
   );
 
   return (
-    <SafeAreaView>
-      <View style={styles.walletContain}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ImageBackground
+        source={require("../assets/images/layer.png")}
+        resizeMode="cover"
+        style={styles.walletContain}
+      >
         <View
           style={{
             flexDirection: "row",
@@ -74,16 +79,7 @@ const WalletCard: React.FC<{
             </Text>
           </TouchableOpacity>
         </View>
-        <Image
-          source={require("../assets/images/layer.png")}
-          style={{
-            width: 100,
-            height: 100,
-            position: "absolute",
-            zIndex: -1,
-          }}
-        />
-      </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -109,8 +105,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(25),
     fontWeight: "700",
     color: COLOR.white,
-    fontFamily: "Outfit-Bold",
-
+    fontFamily: "Outfit-SemiBold",
     marginBottom: SPACING * 2,
   },
   containRow: {
