@@ -20,7 +20,9 @@ const Button: React.FC<ButtonProps> = ({ title, onPress, style, ...rest }) => {
       onPress={onPress}
       {...rest}
     >
-      <Text style={styles.buttonText}>{title}</Text>
+      <Text style={styles.buttonText} allowFontScaling={false}>
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 };
