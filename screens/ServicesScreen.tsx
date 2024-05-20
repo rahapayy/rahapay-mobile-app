@@ -27,7 +27,7 @@ const ServicesScreen: React.FC<{
             Services
           </Text>
           {/* Card */}
-          <View className="w-full bg-white p-6 mt-10 rounded-xl overflow-hidden">
+          <View className="w-full h-96 bg-white p-6 mt-10 rounded-xl overflow-hidden">
             <View className="flex flex-row flex-wrap justify-between">
               <TouchableOpacity
                 onPress={() => navigation.navigate("AirtimeScreen")}
@@ -94,6 +94,74 @@ const ServicesScreen: React.FC<{
                 </Text>
               </TouchableOpacity>
             </View>
+
+            {/*  */}
+            <View className="flex flex-row flex-wrap justify-between mt-4">
+              <TouchableOpacity
+                onPress={() => navigation.navigate("ReferralScreen")}
+                className="items-center mb-4 w-1/5"
+              >
+                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                  {/* <Airtime /> */}
+                </View>
+                <Text
+                  style={styles.titleText}
+                  // numberOfLines={1}
+                  // ellipsizeMode="tail"
+                  allowFontScaling={false}
+                >
+                  Refer & Earn
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("")}
+                className="items-center mb-4 w-1/5"
+              >
+                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                  {/* <Data /> */}
+                </View>
+                <Text
+                  style={styles.titleText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  allowFontScaling={false}
+                >
+                  Education
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("")}
+                className="items-center mb-4 w-1/5"
+              >
+                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                  {/* <Tv /> */}
+                </View>
+                <Text
+                  style={styles.titleText}
+                  // numberOfLines={1}
+                  // ellipsizeMode="tail"
+                  allowFontScaling={false}
+                >
+                  Airtime to Cash
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("")}
+                className="items-center mb-4 w-1/5"
+              >
+                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                  {/* <Electricity /> */}
+                </View>
+                <Text
+                  style={styles.titleText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  allowFontScaling={false}
+                >
+                  Betting
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -112,5 +180,6 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     fontSize: FONT_SIZE.extraSmall,
     marginTop: SPACING,
+    textAlign: "center",
   },
 });
