@@ -5,21 +5,27 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, DocumentDownload } from "iconsax-react-native";
+import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
 import SPACING from "../../config/SPACING";
 import FONT_SIZE from "../../config/font-size";
 import COLORS from "../../config/colors";
-import Airtel from "../assets/svg/airtel.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const ChangePinScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const [showBalance, setShowBalance] = useState(true);
+  const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
+
+  const handleButtonClick = () => {
+    navigation.navigate("VerifyEmailScreen");
+  };
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
@@ -34,6 +40,69 @@ const ChangePinScreen: React.FC<{
             <Text style={[styles.headerText]} allowFontScaling={false}>
               Change Pin
             </Text>
+          </View>
+
+          <View className="p-6">
+            <View>
+              <Text style={styles.label} allowFontScaling={false}>
+                Current Pin
+              </Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  placeholderTextColor="#BABFC3"
+                  allowFontScaling={false}
+                />
+                <TouchableOpacity onPress={toggleBalanceVisibility}>
+                  {showBalance ? (
+                    <Eye color="#000" size={20} />
+                  ) : (
+                    <EyeSlash color="#000" size={20} />
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View className="mt-4">
+              <Text style={styles.label} allowFontScaling={false}>
+                New Pin
+              </Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  placeholderTextColor="#BABFC3"
+                  allowFontScaling={false}
+                />
+                <TouchableOpacity onPress={toggleBalanceVisibility}>
+                  {showBalance ? (
+                    <Eye color="#000" size={20} />
+                  ) : (
+                    <EyeSlash color="#000" size={20} />
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View className="mt-4">
+              <Text style={styles.label} allowFontScaling={false}>
+                Confirm Pin
+              </Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  placeholderTextColor="#BABFC3"
+                  allowFontScaling={false}
+                />
+                <TouchableOpacity onPress={toggleBalanceVisibility}>
+                  {showBalance ? (
+                    <Eye color="#000" size={20} />
+                  ) : (
+                    <EyeSlash color="#000" size={20} />
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -116,5 +185,25 @@ const styles = StyleSheet.create({
     color: "#000",
     fontFamily: "Outfit-Regular",
     fontSize: FONT_SIZE.medium,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    fontSize: RFValue(12),
+    borderRadius: 10,
+    padding: 18,
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#DFDFDF",
+  },
+  input: {
+    flex: 1,
+    height: "100%",
+    fontSize: RFValue(12),
+  },
+  label: {
+    fontFamily: "Outfit-Regular",
+    marginBottom: 10,
+    fontSize: RFValue(12),
   },
 });
