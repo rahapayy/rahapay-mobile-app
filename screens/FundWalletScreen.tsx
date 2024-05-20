@@ -1,5 +1,6 @@
 import {
   Image,
+  ImageBackground,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -10,16 +11,43 @@ import {
 } from "react-native";
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, DocumentDownload } from "iconsax-react-native";
+import { ArrowLeft, Copy } from "iconsax-react-native";
 import SPACING from "../config/SPACING";
 import FONT_SIZE from "../config/font-size";
 import COLORS from "../config/colors";
-import Airtel from "../assets/svg/airtel.svg";
 import { RFValue } from "react-native-responsive-fontsize";
+import Circle from "../assets/svg/Group 803.svg";
 
 const FundWalletScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const accounts = [
+    {
+      id: 1,
+      bankName: "Moniepoint Microfinance Bank",
+      accountNumber: "01234567890",
+      accountName: "Akinola John",
+    },
+    {
+      id: 2,
+      bankName: "First Bank of Nigeria",
+      accountNumber: "09876543210",
+      accountName: "Akinola John",
+    },
+    {
+      id: 3,
+      bankName: "GTBank",
+      accountNumber: "11223344556",
+      accountName: "Akinola John",
+    },
+    {
+      id: 4,
+      bankName: "Access Bank",
+      accountNumber: "22334455667",
+      accountName: "Akinola John",
+    },
+  ];
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
@@ -34,6 +62,48 @@ const FundWalletScreen: React.FC<{
             <Text style={[styles.headerText]} allowFontScaling={false}>
               Virtual Funding Accounts
             </Text>
+          </View>
+
+          {/* Cards */}
+          <View style={styles.cardsContainer}>
+            {accounts.map((account) => (
+              <View key={account.id} style={styles.cardWrapper}>
+                <ImageBackground
+                  source={require("../assets/images/layer.png")}
+                  resizeMode="cover"
+                  style={styles.walletContain}
+                >
+                  {/* Card Details */}
+                  <View style={styles.cardHeader}>
+                    <Text style={styles.virtualText} allowFontScaling={false}>
+                      Virtual Account
+                    </Text>
+                    <Circle />
+                  </View>
+
+                  <Text style={styles.bankName} allowFontScaling={false}>
+                    {account.bankName}
+                  </Text>
+                  <View style={styles.copyContainer}>
+                    <Text style={styles.copyText} allowFontScaling={false}>
+                      Copy your account number
+                    </Text>
+                    <View style={styles.accountNumberContainer}>
+                      <Text
+                        style={styles.accountNumber}
+                        allowFontScaling={false}
+                      >
+                        {account.accountNumber}
+                      </Text>
+                      <Copy color="#fff" />
+                    </View>
+                  </View>
+                  <Text style={styles.accountName} allowFontScaling={false}>
+                    {account.accountName}
+                  </Text>
+                </ImageBackground>
+              </View>
+            ))}
           </View>
         </View>
       </ScrollView>
@@ -116,5 +186,63 @@ const styles = StyleSheet.create({
     color: "#000",
     fontFamily: "Outfit-Regular",
     fontSize: FONT_SIZE.medium,
+  },
+  cardsContainer: {
+    paddingHorizontal: SPACING * 2,
+  },
+  cardWrapper: {
+    marginBottom: SPACING * 2,
+  },
+  walletContain: {
+    paddingHorizontal: SPACING * 2,
+    paddingVertical: SPACING,
+    backgroundColor: COLORS.violet300,
+    borderRadius: 10,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  virtualText: {
+    fontFamily: "Outfit-Regular",
+    color: "#fff",
+    fontSize: FONT_SIZE.small,
+    marginBottom: SPACING,
+  },
+  bankName: {
+    fontFamily: "Outfit-Medium",
+    color: "#fff",
+    fontSize: FONT_SIZE.medium,
+    marginBottom: SPACING,
+  },
+  copyContainer: {
+    backgroundColor: COLORS.violet700,
+    borderRadius: 5,
+    paddingVertical: 2,
+    paddingHorizontal: SPACING,
+    width: 220,
+    marginBottom: 5,
+  },
+  copyText: {
+    fontFamily: "Outfit-Regular",
+    color: "#fff",
+    fontSize: RFValue(12),
+    marginBottom: 5,
+  },
+  accountNumberContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  accountNumber: {
+    fontFamily: "Outfit-Medium",
+    color: "#fff",
+    fontSize: FONT_SIZE.large,
+    marginBottom: 5,
+    marginRight: 5,
+  },
+  accountName: {
+    fontFamily: "Outfit-Medium",
+    fontSize: FONT_SIZE.medium,
+    color: "#fff",
   },
 });

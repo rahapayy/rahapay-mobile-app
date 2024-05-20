@@ -131,12 +131,12 @@ export default CreateTransactionPinScreen;
 const styles = StyleSheet.create({
   headText: {
     fontFamily: "Outfit-Medium",
-    fontSize: RFValue(24),
+    fontSize: RFValue(20),
     marginBottom: 10,
   },
   subText: {
     fontFamily: "Outfit-Regular",
-    fontSize: RFValue(16),
+    fontSize: RFValue(14),
     textAlign: "center",
   },
   inputContainer: {

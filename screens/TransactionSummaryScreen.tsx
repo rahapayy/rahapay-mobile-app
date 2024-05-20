@@ -163,17 +163,17 @@ const styles = StyleSheet.create({
   },
   headText: {
     fontFamily: "Outfit-Regular",
-    fontSize: RFValue(18),
+    fontSize: RFValue(16),
     marginBottom: SPACING,
   },
   titleText: {
     fontFamily: "Outfit-Regular",
-    fontSize: RFValue(16),
+    fontSize: RFValue(14),
     paddingVertical: SPACING,
   },
   descriptionText: {
     fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
+    fontSize: RFValue(12),
     color: "#9BA1A8",
   },
   completedText: {

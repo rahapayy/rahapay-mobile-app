@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   walletContain: {
     paddingHorizontal: SPACING * 2,
     paddingVertical: SPACING * 2,
-    backgroundColor: COLOR.violet400,
+    backgroundColor: COLOR.violet300,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",

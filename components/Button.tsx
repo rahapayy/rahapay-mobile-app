@@ -32,7 +32,7 @@ export default Button;
 const styles = StyleSheet.create({
   button: {
     backgroundColor: COLORS.violet400,
-    paddingVertical: SPACING * 1.8,
+    paddingVertical: SPACING * 1.5,
     paddingHorizontal: 24,
     borderRadius: 15,
     justifyContent: "center",
