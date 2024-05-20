@@ -1,5 +1,3 @@
-// ProfileScreen.tsx
-
 import {
   SafeAreaView,
   ScrollView,

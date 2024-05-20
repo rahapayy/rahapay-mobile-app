@@ -13,6 +13,7 @@ import {
   AddCircle,
   Eye,
   EyeSlash,
+  Headphone,
   Notification,
   WalletAdd1,
 } from "iconsax-react-native";
@@ -51,11 +52,16 @@ const Card: React.FC<{
                 </Text>
               </View>
             </View>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("NotificationScreen")}
-            >
-              <Notification color="#fff" />
-            </TouchableOpacity>
+            <View className="flex-row gap-4">
+              <TouchableOpacity>
+                <Headphone color="#fff" size={24} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("NotificationScreen")}
+              >
+                <Notification color="#fff" size={24} />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View style={styles.balanceContainer}>
@@ -176,6 +182,6 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: COLORS.violet400,
     marginLeft: 4,
-    fontSize: RFValue(14), // Adjusted font size
+    fontSize: RFValue(14),
   },
 });
