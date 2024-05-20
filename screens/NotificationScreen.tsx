@@ -8,18 +8,20 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, DocumentDownload } from "iconsax-react-native";
 import SPACING from "../config/SPACING";
 import FONT_SIZE from "../config/font-size";
 import COLORS from "../config/colors";
-import Airtel from "../assets/svg/airtel.svg";
 import { RFValue } from "react-native-responsive-fontsize";
+import LottieView from "lottie-react-native";
 
 const NotificationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const [hasTransaction, setHasTransaction] = useState(true);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
@@ -35,6 +37,58 @@ const NotificationScreen: React.FC<{
               Notifications
             </Text>
           </View>
+
+          {hasTransaction ? (
+            // Render transactions
+            <View className="p-4">
+              <TouchableOpacity
+                onPress={() => navigation.navigate("TransactionSummaryScreen")}
+                style={styles.transactionItem}
+              >
+                <Image
+                  source={require("../assets/images/small-logo.png")}
+                  style={styles.transactionImage}
+                />
+                <View style={styles.transactionTextContainer}>
+                  <View style={styles.transactionTextRow}>
+                    <Text style={styles.item} allowFontScaling={false}>
+                      Transaction Completed
+                    </Text>
+                    <Text style={styles.valueText} allowFontScaling={false}>
+                      Apr 01, 2024, 02:12 PM
+                    </Text>
+                  </View>
+                  <View style={styles.transactionTextRow}>
+                    <Text style={styles.date} allowFontScaling={false}>
+                      Transaction with ID #1234567890 was completed successful
+                    </Text>
+                    {/* Transaction status */}
+                    <View>
+                      <Text
+                        style={styles.completedText}
+                        allowFontScaling={false}
+                      >
+                        View
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            // Render no transaction message
+            <View style={styles.noTransactionContainer}>
+              <LottieView
+                source={require("../assets/animation/noTransaction.json")}
+                autoPlay
+                loop
+                style={styles.loadingAnimation}
+              />
+              <Text style={styles.notransactionText}>
+                You don’t have any transactions
+              </Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -97,7 +151,7 @@ const styles = StyleSheet.create({
   },
   completedText: {
     fontFamily: "Outfit-Regular",
-    color: "#06C270",
+    color: COLORS.violet500,
   },
   button: {
     flexDirection: "row",
@@ -116,5 +170,62 @@ const styles = StyleSheet.create({
     color: "#000",
     fontFamily: "Outfit-Regular",
     fontSize: FONT_SIZE.medium,
+  },
+  loadingAnimation: {
+    width: 200,
+    height: 200,
+    alignSelf: "center",
+  },
+  notransactionText: {
+    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(14),
+    textAlign: "center",
+  },
+  noTransactionContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  transactionItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 5,
+    padding: SPACING,
+    borderRadius: 10,
+    backgroundColor: COLORS.white,
+    overflow: "hidden",
+  },
+  transactionImage: {
+    width: 40,
+    height: 40,
+    marginRight: 10,
+  },
+  transactionTextContainer: {
+    flex: 1,
+  },
+  transactionTextRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  failedText: {
+    color: "#FF2E2E",
+    fontFamily: "Outfit-Regular",
+  },
+  valueText: {
+    fontFamily: "Outfit-Medium",
+    fontSize: RFValue(8),
+  },
+  item: {
+    fontFamily: "Outfit-Medium",
+    fontSize: RFValue(12),
+  },
+  date: {
+    fontFamily: "Outfit-Regular",
+    color: "#9BA1A8",
+    fontSize: RFValue(10),
+    width: 200,
+    marginTop: 5,
   },
 });
