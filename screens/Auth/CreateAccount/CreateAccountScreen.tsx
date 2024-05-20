@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 import React, { useState } from "react";
-import { AddCircle, ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
+import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
@@ -142,12 +142,12 @@ export default CreateAccountScreen;
 const styles = StyleSheet.create({
   headText: {
     fontFamily: "Outfit-Medium",
-    fontSize: RFValue(24),
+    fontSize: RFValue(20),
     marginBottom: 10,
   },
   subText: {
     fontFamily: "Outfit-Regular",
-    fontSize: RFValue(16),
+    fontSize: RFValue(14),
   },
   textInput: {
     borderWidth: 1,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: "Outfit-Regular",
     marginBottom: 10,
-    fontSize: RFValue(14),
+    fontSize: RFValue(12),
   },
   vertical: {
     backgroundColor: COLORS.black100,
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    fontSize: RFValue(14),
+    fontSize: RFValue(12),
     borderRadius: 10,
     padding: 18,
     width: "100%",
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: "100%",
-    fontSize: RFValue(14),
+    fontSize: RFValue(12),
   },
   numberText: {
     fontFamily: "Outfit-Regular",

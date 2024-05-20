@@ -121,12 +121,12 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   headText: {
     fontFamily: "Outfit-Medium",
-    fontSize: RFValue(24),
+    fontSize: RFValue(20),
     marginBottom: 10,
   },
   subText: {
     fontFamily: "Outfit-Regular",
-    fontSize: RFValue(16),
+    fontSize: RFValue(14),
   },
   textInput: {
     borderWidth: 1,
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: "Outfit-Regular",
     marginBottom: 10,
-    fontSize: RFValue(14),
+    fontSize: RFValue(12),
   },
   vertical: {
     backgroundColor: COLORS.black100,
@@ -174,6 +174,6 @@ const styles = StyleSheet.create({
   forgotPasswordText: {
     fontFamily: "Outfit-Regular",
     color: COLORS.violet600,
-    fontSize: FONT_SIZE.medium,
+    fontSize: FONT_SIZE.small,
   },
 });

@@ -52,12 +52,12 @@ const Router = () => {
             options={{ headerShown: false }}
           />
         ) : (
-        <Stack.Screen
-          name="AuthRoute"
-          component={AuthRoute}
-          options={{ headerShown: false }}
-        />
-        )} 
+          <Stack.Screen
+            name="AuthRoute"
+            component={AuthRoute}
+            options={{ headerShown: false }}
+          />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
