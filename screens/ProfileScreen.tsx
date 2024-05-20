@@ -1,5 +1,6 @@
+// ProfileScreen.tsx
+
 import {
-  Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -7,6 +8,8 @@ import {
   TouchableOpacity,
   View,
   Switch,
+  Image,
+  Platform,
 } from "react-native";
 import React, { useState } from "react";
 import FONT_SIZE from "../config/font-size";
@@ -25,12 +28,15 @@ import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import BiometricModal from "../components/modals/BiometricModal";
+import CloseAccountModal from "../components/modals/CloseAccountModal";
 
 const ProfileScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [biometricModalVisible, setBiometricModalVisible] = useState(false);
+  const [isCloseAccountModalVisible, setIsCloseAccountModalVisible] =
+    useState(false);
 
   const toggleBiometricSwitch = () => {
     setBiometricModalVisible(true);
@@ -44,15 +50,29 @@ const ProfileScreen: React.FC<{
     setIsBiometricEnabled(!isBiometricEnabled);
     setBiometricModalVisible(false);
   };
+
+  const handleOpenCloseAccountModal = () => {
+    setIsCloseAccountModalVisible(true);
+  };
+
+  const handleCloseAccountModalClose = () => {
+    setIsCloseAccountModalVisible(false);
+  };
+
+  const handleConfirmCloseAccount = () => {
+    // Handle account closure logic here
+    setIsCloseAccountModalVisible(false);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
-        <View className="p-4">
+        <View style={styles.container}>
           <Text style={styles.headText} allowFontScaling={false}>
             Profile
           </Text>
 
-          <View className="w-full bg-white p-4 rounded-lg mt-6 flex-row items-center">
+          <View style={styles.profileContainer}>
             <Image
               source={require("../assets/images/avatar.png")}
               style={styles.avatar}
@@ -80,12 +100,12 @@ const ProfileScreen: React.FC<{
           </TouchableOpacity>
 
           {/* Settings Section */}
-          <View className="mt-4">
+          <View>
             <Text style={styles.titleHeadText}>Account</Text>
-            <View className="w-full bg-white p-4 rounded-lg mt-4">
+            <View style={styles.settingsContainer}>
               <TouchableOpacity
                 onPress={() => navigation.navigate("PersonalInformationScreen")}
-                className="flex-row items-center mb-4"
+                style={styles.settingsItem}
               >
                 <Profile variant="Bold" color={COLORS.violet400} size={24} />
                 <Text style={styles.titleText} allowFontScaling={false}>
@@ -94,7 +114,7 @@ const ProfileScreen: React.FC<{
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => navigation.navigate("ReferralScreen")}
-                className="flex-row items-center"
+                style={styles.settingsItem}
               >
                 <People variant="Bold" color={COLORS.violet400} size={24} />
                 <Text style={styles.titleText} allowFontScaling={false}>
@@ -104,12 +124,12 @@ const ProfileScreen: React.FC<{
             </View>
 
             {/* Security */}
-            <View className="mt-4">
+            <View>
               <Text style={styles.titleHeadText}>Security</Text>
-              <View className="w-full bg-white p-4 rounded-lg mt-4">
+              <View style={styles.settingsContainer}>
                 <TouchableOpacity
                   onPress={() => navigation.navigate("ChangePasswordScreen")}
-                  className="flex-row items-center mb-4"
+                  style={styles.settingsItem}
                 >
                   <Lock variant="Bold" color={COLORS.violet400} size={24} />
                   <Text style={styles.titleText} allowFontScaling={false}>
@@ -118,15 +138,15 @@ const ProfileScreen: React.FC<{
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => navigation.navigate("ChangePinScreen")}
-                  className="flex-row items-center mb-4"
+                  style={styles.settingsItem}
                 >
                   <Lock variant="Bold" color={COLORS.violet400} size={24} />
                   <Text style={styles.titleText} allowFontScaling={false}>
                     Change Pin
                   </Text>
                 </TouchableOpacity>
-                <View className="flex-row justify-between items-center">
-                  <View className="flex-row items-center">
+                <View style={styles.switchContainer}>
+                  <View style={styles.switchLabel}>
                     <FingerScan
                       variant="Bold"
                       color={COLORS.violet400}
@@ -150,14 +170,14 @@ const ProfileScreen: React.FC<{
             </View>
 
             {/* Others */}
-            <View className="mt-4">
-              <Text style={styles.titleHeadText}>Security</Text>
-              <View className="w-full bg-white p-4 rounded-lg mt-4">
+            <View>
+              <Text style={styles.titleHeadText}>Others</Text>
+              <View style={styles.settingsContainer}>
                 <TouchableOpacity
                   onPress={() =>
                     navigation.navigate("EnableNotificationScreen")
                   }
-                  className="flex-row items-center mb-4"
+                  style={styles.settingsItem}
                 >
                   <Notification
                     variant="Bold"
@@ -170,14 +190,17 @@ const ProfileScreen: React.FC<{
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => navigation.navigate("HelpAndSupportScreen")}
-                  className="flex-row items-center mb-4"
+                  style={styles.settingsItem}
                 >
                   <Lock variant="Bold" color={COLORS.violet400} size={24} />
                   <Text style={styles.titleText} allowFontScaling={false}>
                     Help & Support
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity className="flex-row items-center">
+                <TouchableOpacity
+                  onPress={handleOpenCloseAccountModal}
+                  style={styles.settingsItem}
+                >
                   <Message2 variant="Bold" color={COLORS.violet400} size={24} />
                   <Text style={styles.titleText} allowFontScaling={false}>
                     Close Account
@@ -186,8 +209,8 @@ const ProfileScreen: React.FC<{
               </View>
             </View>
 
-            {/* Close Account */}
-            <TouchableOpacity className="mb-10 mt-10 flex-row items-center justify-center">
+            {/* Logout */}
+            <TouchableOpacity style={styles.logoutContainer}>
               <Text style={styles.logoutButton} allowFontScaling={false}>
                 Logout
               </Text>
@@ -202,6 +225,11 @@ const ProfileScreen: React.FC<{
         onToggle={handleToggleBiometrics}
         isEnabled={isBiometricEnabled}
       />
+      <CloseAccountModal
+        visible={isCloseAccountModalVisible}
+        onClose={handleCloseAccountModalClose}
+        onConfirm={handleConfirmCloseAccount}
+      />
     </SafeAreaView>
   );
 };
@@ -209,14 +237,25 @@ const ProfileScreen: React.FC<{
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    padding: SPACING * 2,
+  },
   headText: {
     fontFamily: "Outfit-Regular",
     fontSize: FONT_SIZE.large,
   },
+  profileContainer: {
+    flexDirection: "row",
+    backgroundColor: COLORS.white,
+    padding: SPACING,
+    borderRadius: SPACING,
+    marginTop: SPACING * 3,
+    alignItems: "center",
+  },
   avatar: {
     width: 50,
     height: 50,
-    marginRight: 8,
+    marginRight: SPACING,
   },
   name: {
     fontFamily: "Outfit-Medium",
@@ -244,15 +283,43 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     fontSize: FONT_SIZE.medium,
     color: "#9BA1A8",
+    marginTop: SPACING,
+  },
+  settingsContainer: {
+    backgroundColor: COLORS.white,
+    padding: SPACING,
+    borderRadius: SPACING,
+    marginTop: SPACING,
+  },
+  settingsItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: SPACING,
   },
   titleText: {
     fontFamily: "Outfit-Medium",
     fontSize: FONT_SIZE.small,
     marginLeft: SPACING,
   },
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  switchLabel: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  logoutContainer: {
+    marginTop: SPACING * 5,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   logoutButton: {
     color: "#FF2E2E",
     fontFamily: "Outfit-Medium",
     fontSize: FONT_SIZE.small,
+    marginRight: SPACING,
   },
 });

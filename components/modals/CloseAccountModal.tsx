@@ -1,3 +1,5 @@
+// CloseAccountModal.tsx
+
 import React from "react";
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import COLORS from "../../config/colors";
@@ -5,12 +7,11 @@ import FONT_SIZE from "../../config/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../config/SPACING";
 
-const BiometricModal: React.FC<{
+const CloseAccountModal: React.FC<{
   visible: boolean;
   onClose: () => void;
-  onToggle: () => void;
-  isEnabled: boolean;
-}> = ({ visible, onClose, onToggle, isEnabled }) => {
+  onConfirm: () => void;
+}> = ({ visible, onClose, onConfirm }) => {
   return (
     <Modal
       transparent={true}
@@ -20,19 +21,23 @@ const BiometricModal: React.FC<{
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
-          <View className="px-10 justify-center items-center">
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <Text style={styles.modalText} allowFontScaling={false}>
-              {isEnabled ? "Disable Biometrics?" : "Biometric Authentication"}
+              Close My Account
             </Text>
             <Text style={styles.subModalText} allowFontScaling={false}>
-              {isEnabled
-                ? "Disable fingerprint authentication for both Login and Transactions?"
-                : "Enable fingerprint authentication for both Login and Transactions?"}
+              This action cannot be reversed. Are you sure you want to
+              permanently close your account?
             </Text>
-            <View className="flex-row gap-4">
-              <TouchableOpacity style={styles.modalButton} onPress={onToggle}>
+            <View style={{ flexDirection: "row", gap: SPACING }}>
+              <TouchableOpacity style={styles.modalButton} onPress={onConfirm}>
                 <Text style={styles.modalButtonText} allowFontScaling={false}>
-                  {isEnabled ? "Disable" : "Yes, Enable"}
+                  Yes, Close Account
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -61,7 +66,7 @@ const BiometricModal: React.FC<{
   );
 };
 
-export default BiometricModal;
+export default CloseAccountModal;
 
 const styles = StyleSheet.create({
   modalOverlay: {
