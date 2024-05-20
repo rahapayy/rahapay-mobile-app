@@ -23,6 +23,7 @@ import COLORS from "../config/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Switch } from "@rneui/base";
 
 const ProfileScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -108,16 +109,25 @@ const ProfileScreen: React.FC<{
                     Change Pin
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity className="flex-row items-center">
-                  <FingerScan
-                    variant="Bold"
-                    color={COLORS.violet400}
-                    size={24}
+                <View className="flex-row justify-between items-center">
+                  <View className="flex-row items-center">
+                    <FingerScan
+                      variant="Bold"
+                      color={COLORS.violet400}
+                      size={24}
+                    />
+                    <Text style={styles.titleText} allowFontScaling={false}>
+                      Biometrics
+                    </Text>
+                  </View>
+                  <Switch
+                    thumbColor={COLORS.white}
+                    trackColor={{
+                      false: COLORS.black100,
+                      true: COLORS.violet400,
+                    }}
                   />
-                  <Text style={styles.titleText} allowFontScaling={false}>
-                    Fingerprint Authentication
-                  </Text>
-                </TouchableOpacity>
+                </View>
               </View>
             </View>
 
