@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     fontSize: FONT_SIZE.medium,
     color: "#9BA1A8",
-    marginTop: SPACING,
+    marginTop: SPACING * 2,
   },
   settingsContainer: {
     backgroundColor: COLORS.white,
@@ -297,8 +297,8 @@ const styles = StyleSheet.create({
     marginBottom: SPACING,
   },
   titleText: {
-    fontFamily: "Outfit-Medium",
-    fontSize: FONT_SIZE.small,
+    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(14),
     marginLeft: SPACING,
   },
   switchContainer: {
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoutContainer: {
-    marginTop: SPACING * 5,
+    marginTop: SPACING * 3,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
