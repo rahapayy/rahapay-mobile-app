@@ -6,8 +6,9 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Switch,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import FONT_SIZE from "../config/font-size";
 import {
   FingerScan,
@@ -23,11 +24,26 @@ import COLORS from "../config/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Switch } from "@rneui/base";
+import BiometricModal from "../components/modals/BiometricModal";
 
 const ProfileScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
+  const [biometricModalVisible, setBiometricModalVisible] = useState(false);
+
+  const toggleBiometricSwitch = () => {
+    setBiometricModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setBiometricModalVisible(false);
+  };
+
+  const handleToggleBiometrics = () => {
+    setIsBiometricEnabled(!isBiometricEnabled);
+    setBiometricModalVisible(false);
+  };
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
@@ -126,6 +142,8 @@ const ProfileScreen: React.FC<{
                       false: COLORS.black100,
                       true: COLORS.violet400,
                     }}
+                    value={isBiometricEnabled}
+                    onValueChange={toggleBiometricSwitch}
                   />
                 </View>
               </View>
@@ -178,6 +196,12 @@ const ProfileScreen: React.FC<{
           </View>
         </View>
       </ScrollView>
+      <BiometricModal
+        visible={biometricModalVisible}
+        onClose={handleModalClose}
+        onToggle={handleToggleBiometrics}
+        isEnabled={isBiometricEnabled}
+      />
     </SafeAreaView>
   );
 };
