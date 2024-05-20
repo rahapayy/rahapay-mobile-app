@@ -21,17 +21,17 @@ const BiometricModal: React.FC<{
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
           <View className="px-10 justify-center items-center">
-            <Text style={styles.modalText}>
+            <Text style={styles.modalText} allowFontScaling={false}>
               {isEnabled ? "Disable Biometrics?" : "Biometric Authentication"}
             </Text>
-            <Text style={styles.subModalText}>
+            <Text style={styles.subModalText} allowFontScaling={false}>
               {isEnabled
                 ? "Disable fingerprint authentication for both Login and Transactions?"
                 : "Enable fingerprint authentication for both Login and Transactions?"}
             </Text>
             <View className="flex-row gap-4">
               <TouchableOpacity style={styles.modalButton} onPress={onToggle}>
-                <Text style={styles.modalButtonText}>
+                <Text style={styles.modalButtonText} allowFontScaling={false}>
                   {isEnabled ? "Disable" : "Yes, Enable"}
                 </Text>
               </TouchableOpacity>
@@ -46,7 +46,10 @@ const BiometricModal: React.FC<{
                 ]}
                 onPress={onClose}
               >
-                <Text style={[styles.modalButtonText, { color: "#FF2E2E" }]}>
+                <Text
+                  style={[styles.modalButtonText, { color: "#FF2E2E" }]}
+                  allowFontScaling={false}
+                >
                   Cancel
                 </Text>
               </TouchableOpacity>
@@ -72,7 +75,6 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     alignItems: "center",
-    paddingHorizontal: 5,
   },
   modalText: {
     fontFamily: "Outfit-Medium",

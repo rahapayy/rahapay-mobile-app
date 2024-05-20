@@ -187,7 +187,7 @@ const ProfileScreen: React.FC<{
             </View>
 
             {/* Close Account */}
-            <TouchableOpacity className="mb-20 mt-10 flex-row items-center justify-center">
+            <TouchableOpacity className="mb-10 mt-10 flex-row items-center justify-center">
               <Text style={styles.logoutButton} allowFontScaling={false}>
                 Logout
               </Text>
