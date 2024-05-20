@@ -39,8 +39,14 @@ const PersonalInformationScreen: React.FC<{
           </View>
         </View>
 
-        <View>
-          <Image source={require("../../assets/svg/Group 803.svg")} />
+        <View className="justify-center items-center gap-4 mt-4">
+          <Image
+            source={require("../../assets/images/avatar.png")}
+            className="w-16 h-16"
+          />
+          <Text style={styles.nameText} allowFontScaling={false}>
+            John Doe
+          </Text>
         </View>
 
         <View className="p-4">
@@ -230,5 +236,9 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: "#fff",
     fontSize: RFValue(16),
+  },
+  nameText: {
+    fontFamily: "Outfit-Medium",
+    fontSize: RFValue(14),
   },
 });

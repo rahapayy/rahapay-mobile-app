@@ -45,7 +45,7 @@ const ProfileScreen: React.FC<{
                 John Doe
               </Text>
               <Text style={styles.subName} allowFontScaling={false}>
-                johndoe11@rahapay.com
+                @johndoe
               </Text>
             </View>
           </View>
