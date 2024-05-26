@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   View,
   Platform,
+  TextInput,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft } from "iconsax-react-native";
+import { ArrowLeft, Profile, ProfileCircle } from "iconsax-react-native";
 import SPACING from "../../config/SPACING";
 import FONT_SIZE from "../../config/font-size";
 import COLORS from "../../config/colors";
@@ -90,14 +91,56 @@ const AirtimeScreen: React.FC<{
                   </Text>
                   <View></View>
 
+                  {/* Select Network Provider */}
                   <Text style={styles.headText} allowFontScaling={false}>
                     Select Network Provider
                   </Text>
-                  <View className="flex-row gap-4">
-                    <Airtel />
-                    <Mtn />
-                    <Eti />
-                    <Glo />
+                  <View className="flex-row p-2 bg-white rounded-xl  items-center justify-between">
+                    <TouchableOpacity>
+                      <Airtel />
+                    </TouchableOpacity>
+                    <TouchableOpacity>
+                      <Mtn />
+                    </TouchableOpacity>
+                    <TouchableOpacity>
+                      <Eti />
+                    </TouchableOpacity>
+                    <TouchableOpacity>
+                      <Glo />
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Inputs */}
+                  <View>
+                    <View className="mt-4">
+                      <Text style={styles.label} allowFontScaling={false}>
+                        Phone Number
+                      </Text>
+                      <View style={styles.inputContainer}>
+                        <TextInput
+                          style={styles.input}
+                          placeholder="Enter phone number"
+                          placeholderTextColor="#BABFC3"
+                          allowFontScaling={false}
+                        />
+                        <TouchableOpacity>
+                          <ProfileCircle color={COLORS.violet400} />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                    <View className="mt-4">
+                      <Text style={styles.label} allowFontScaling={false}>
+                        Amount
+                      </Text>
+                      <View style={styles.inputContainer}>
+                        <TextInput
+                          style={styles.input}
+                          placeholder="Amount"
+                          placeholderTextColor="#BABFC3"
+                          allowFontScaling={false}
+                        />
+                      </View>
+                    </View>
                   </View>
                 </View>
               ) : (
@@ -172,5 +215,26 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(12),
     marginBottom: SPACING,
+  },
+  label: {
+    fontFamily: "Outfit-Regular",
+    marginBottom: 10,
+    fontSize: RFValue(12),
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    fontSize: RFValue(12),
+    borderRadius: 10,
+    padding: 18,
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#DFDFDF",
+  },
+  input: {
+    flex: 1,
+    height: "100%",
+    fontSize: RFValue(12),
+    fontFamily: "Outfit-Regular",
   },
 });
