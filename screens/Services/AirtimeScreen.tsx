@@ -1,25 +1,29 @@
+import React, { useState } from "react";
 import {
-  Image,
-  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  Platform,
 } from "react-native";
-import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, DocumentDownload } from "iconsax-react-native";
+import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../../config/SPACING";
 import FONT_SIZE from "../../config/font-size";
 import COLORS from "../../config/colors";
-import Airtel from "../assets/svg/airtel.svg";
 import { RFValue } from "react-native-responsive-fontsize";
+import Airtel from "../../assets/svg/air.svg";
+import Mtn from "../../assets/svg/mtn.svg";
+import Eti from "../../assets/svg/eti.svg";
+import Glo from "../../assets/svg/glo.svg";
 
 const AirtimeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const [activeTab, setActiveTab] = useState("Local");
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
@@ -34,6 +38,75 @@ const AirtimeScreen: React.FC<{
             <Text style={[styles.headerText]} allowFontScaling={false}>
               Airtime Top-up
             </Text>
+          </View>
+          <View className="px-6">
+            <View style={styles.tabsContainer}>
+              <TouchableOpacity
+                style={[styles.tab, activeTab === "Local" && styles.activeTab]}
+                onPress={() => setActiveTab("Local")}
+              >
+                <Text
+                  style={[
+                    styles.tabText,
+                    activeTab === "Local" && styles.activeTabText,
+                  ]}
+                  allowFontScaling={false}
+                >
+                  Local
+                </Text>
+                {activeTab === "Local" && (
+                  <View style={styles.activeTabIndicator} />
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.tab,
+                  activeTab === "International" && styles.activeTab,
+                ]}
+                onPress={() => setActiveTab("International")}
+              >
+                <Text
+                  style={[
+                    styles.tabText,
+                    activeTab === "International" && styles.activeTabText,
+                  ]}
+                  allowFontScaling={false}
+                >
+                  International
+                </Text>
+                {activeTab === "International" && (
+                  <View style={styles.activeTabIndicator} />
+                )}
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.tabContent}>
+              {activeTab === "Local" ? (
+                // Local tab
+                <View>
+                  <Text style={styles.headText} allowFontScaling={false}>
+                    Saved Beneficiaries
+                  </Text>
+                  <View></View>
+
+                  <Text style={styles.headText} allowFontScaling={false}>
+                    Select Network Provider
+                  </Text>
+                  <View className="flex-row gap-4">
+                    <Airtel />
+                    <Mtn />
+                    <Eti />
+                    <Glo />
+                  </View>
+                </View>
+              ) : (
+                // International tab
+                <View>
+                  <Text style={styles.contentText}>Hello</Text>
+                </View>
+              )}
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -60,61 +133,44 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     flex: 1,
   },
-  headerTextDark: {
-    color: COLORS.white,
+  tabsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginVertical: SPACING,
   },
-  headTextContainer: {
-    flex: 1,
+  tab: {
     alignItems: "center",
-    justifyContent: "center",
+    flex: 1,
   },
-  itemText: {
-    fontSize: FONT_SIZE.medium,
-    fontFamily: "Outfit-Medium",
-    paddingVertical: SPACING * 2,
+  tabText: {
+    fontSize: RFValue(14),
+    color: "#9BA1A8",
+    fontFamily: "Outfit-Regular",
   },
-  container: {
-    backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING,
-    paddingVertical: SPACING,
-    borderRadius: SPACING,
-    marginTop: SPACING * 4,
+  activeTab: {
+    alignItems: "center",
+  },
+  activeTabText: {
+    color: COLORS.violet400,
+  },
+  activeTabIndicator: {
+    height: 2,
+    backgroundColor: COLORS.violet400,
+    marginTop: 4,
+    width: "100%",
+  },
+  tabContent: {
+    marginTop: SPACING,
+    fontFamily: "Outfit-Regular",
+  },
+  contentText: {
+    fontSize: RFValue(18),
+    fontFamily: "Outfit-Regular",
+    color: "#000",
   },
   headText: {
     fontFamily: "Outfit-Regular",
-    fontSize: RFValue(18),
+    fontSize: RFValue(12),
     marginBottom: SPACING,
-  },
-  titleText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(16),
-    paddingVertical: SPACING,
-  },
-  descriptionText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
-    color: "#9BA1A8",
-  },
-  completedText: {
-    fontFamily: "Outfit-Regular",
-    color: "#06C270",
-  },
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderStyle: "dotted",
-    borderColor: "#000",
-    paddingVertical: SPACING,
-    paddingHorizontal: SPACING * 3,
-    borderRadius: 8,
-    marginTop: SPACING * 2,
-  },
-  buttonText: {
-    marginLeft: SPACING,
-    color: "#000",
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.medium,
   },
 });
