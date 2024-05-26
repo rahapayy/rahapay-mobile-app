@@ -17,6 +17,7 @@ import EnableNotificationScreen from "../screens/Profile/EnableNotificationScree
 import HelpAndSupportScreen from "../screens/Profile/HelpAndSupportScreen";
 import PersonalInformationScreen from "../screens/Profile/PersonalInformationScreen";
 import ReferralScreen from "../screens/Profile/ReferralScreen";
+import ReviewSummaryScreen from "../screens/ReviewSummaryScreen";
 
 const Stack = createNativeStackNavigator();
 const AppStack = () => {
@@ -107,6 +108,11 @@ const AppStack = () => {
       <Stack.Screen
         name="ReferralScreen"
         component={ReferralScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ReviewSummaryScreen"
+        component={ReviewSummaryScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
