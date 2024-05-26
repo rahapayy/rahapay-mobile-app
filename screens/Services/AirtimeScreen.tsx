@@ -20,6 +20,7 @@ import Airtel from "../../assets/svg/air.svg";
 import Mtn from "../../assets/svg/mtn.svg";
 import Eti from "../../assets/svg/eti.svg";
 import Glo from "../../assets/svg/glo.svg";
+import Button from "../../components/Button";
 
 const AirtimeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -184,7 +185,7 @@ const AirtimeScreen: React.FC<{
                   </View>
 
                   {/* Save as Beneficiary Toogle */}
-                  <View>
+                  <View className="mb-4">
                     <View className="flex-row items-center gap-2 mt-2">
                       <Text
                         style={styles.beneficiaryText}
@@ -195,6 +196,18 @@ const AirtimeScreen: React.FC<{
                       <Switch />
                     </View>
                   </View>
+
+                  {/* Button */}
+                  <Button
+                    title={"Proceed"}
+                    style={{
+                      backgroundColor: COLORS.violet200,
+                    }}
+                    onPress={() => {
+                      navigation.navigate("ReviewSummaryScreen");
+                    }}
+                  />
+
                   {/* Coming Soon Airtime services */}
                   {/* <View className="bg-[#EEEBF9] rounded-xl mt-4">
                     <View className="p-4">
