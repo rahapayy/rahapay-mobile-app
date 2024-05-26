@@ -9,9 +9,10 @@ import {
 } from "react-native";
 import { PanGestureHandler, State } from "react-native-gesture-handler";
 import LottieView from "lottie-react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const windowWidth = Dimensions.get("window").width;
-const sliderWidth = 380;
+const sliderWidth = 360;
 const knobWidth = 50;
 const maxTranslateX = sliderWidth - knobWidth - 20;
 
@@ -118,7 +119,6 @@ export default SwipeButton;
 const styles = StyleSheet.create({
   contain: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   centeredView: {
     flex: 1,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#C9C1EC",
     justifyContent: "center",
     borderRadius: 10,
-    overflow: "hidden", // This prevents the text from showing outside the background
+    overflow: "hidden",
   },
   sliderKnob: {
     backgroundColor: "#4931AE",
@@ -146,15 +146,15 @@ const styles = StyleSheet.create({
   },
   sliderTextContainer: {
     position: "absolute",
-    width: sliderWidth - knobWidth, // Adjusted width to prevent text overflow
+    width: sliderWidth - knobWidth,
     height: 60,
     justifyContent: "center",
     alignItems: "center",
-    left: 0, // Position it at the start of the sliderBackground
+    left: 0,
     zIndex: 0,
   },
   slideText: {
-    fontSize: 20,
+    fontSize: RFValue(14),
     fontWeight: "500",
     color: "#333",
     fontFamily: "Outfit-Regular",
