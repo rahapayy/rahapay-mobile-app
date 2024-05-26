@@ -8,6 +8,7 @@ import {
   View,
   Platform,
   TextInput,
+  Switch,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, Profile, ProfileCircle } from "iconsax-react-native";
@@ -24,6 +25,9 @@ const AirtimeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [activeTab, setActiveTab] = useState("Local");
+  const [amount, setAmount] = useState("");
+
+  const amounts = [50, 100, 200, 500, 1000, 2000, 3000, 5000];
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -89,7 +93,14 @@ const AirtimeScreen: React.FC<{
                   <Text style={styles.headText} allowFontScaling={false}>
                     Saved Beneficiaries
                   </Text>
-                  <View></View>
+                  <View className="flex-row mb-4 gap-2">
+                    <View className="bg-[#EEEBF9] p-3 rounded-2xl">
+                      <Text>My number</Text>
+                    </View>
+                    <View className="bg-[#EEEBF9] p-3 rounded-2xl">
+                      <Text>+234 0862753934</Text>
+                    </View>
+                  </View>
 
                   {/* Select Network Provider */}
                   <Text style={styles.headText} allowFontScaling={false}>
@@ -133,15 +144,71 @@ const AirtimeScreen: React.FC<{
                         Amount
                       </Text>
                       <View style={styles.inputContainer}>
+                        <Text>₦ </Text>
                         <TextInput
                           style={styles.input}
                           placeholder="Amount"
                           placeholderTextColor="#BABFC3"
                           allowFontScaling={false}
+                          value={amount}
+                          onChangeText={(text) => setAmount(text)}
                         />
                       </View>
                     </View>
                   </View>
+                  {/* Top up suggestion box */}
+                  <View className="bg-[#EEEBF9] rounded-xl mt-4">
+                    <View className="p-4">
+                      <Text style={styles.topupText} allowFontScaling={false}>
+                        Topup
+                      </Text>
+
+                      {/* Top up amount */}
+                      <View className="flex-row flex-wrap">
+                        {amounts.map((amount, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            onPress={() => setAmount(amount.toString())}
+                            className={"bg-white rounded p-2 m-2"}
+                          >
+                            <Text
+                              style={styles.amountText}
+                              allowFontScaling={false}
+                            >
+                              ₦{amount}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* Save as Beneficiary Toogle */}
+                  <View>
+                    <View className="flex-row items-center gap-2 mt-2">
+                      <Text
+                        style={styles.beneficiaryText}
+                        allowFontScaling={false}
+                      >
+                        Save as beneficiary
+                      </Text>
+                      <Switch />
+                    </View>
+                  </View>
+                  {/* Coming Soon Airtime services */}
+                  {/* <View className="bg-[#EEEBF9] rounded-xl mt-4">
+                    <View className="p-4">
+                      <Text style={styles.topupText} allowFontScaling={false}>
+                        Airtime services
+                      </Text>
+                      
+                      <View>
+                        <View>
+
+                        </View>
+                      </View>
+                    </View>
+                  </View> */}
                 </View>
               ) : (
                 // International tab
@@ -236,5 +303,15 @@ const styles = StyleSheet.create({
     height: "100%",
     fontSize: RFValue(12),
     fontFamily: "Outfit-Regular",
+  },
+  topupText: {
+    fontFamily: "Outfit-Regular",
+  },
+  amountText: {
+    fontFamily: "Outfit-Regular",
+  },
+  beneficiaryText: {
+    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(12),
   },
 });
