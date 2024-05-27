@@ -21,6 +21,12 @@ import SwipeButton from "../components/SwipeButton";
 const ReviewSummaryScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const handleSwipeConfirm = () => {
+    navigation.navigate("TransactionCompletedScreen");
+    console.log("Swipe confirmed!");
+    // Perform your action here, e.g., sending a request to the server
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
@@ -38,7 +44,7 @@ const ReviewSummaryScreen: React.FC<{
           </View>
 
           <View className="justify-center items-center mt-10">
-            <Airtel />
+            <Airtel width={120} height={120} />
             <Text style={styles.itemText} allowFontScaling={false}>
               AIRTEL Airtime VTU Topup
             </Text>
@@ -111,7 +117,7 @@ const ReviewSummaryScreen: React.FC<{
             </View>
 
             <View className="mt-12">
-              <SwipeButton />
+              <SwipeButton onConfirm={handleSwipeConfirm} />
             </View>
           </View>
         </View>

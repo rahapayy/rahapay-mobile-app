@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -15,12 +15,14 @@ const windowWidth = Dimensions.get("window").width;
 const sliderWidth = 360;
 const knobWidth = 50;
 const maxTranslateX = sliderWidth - knobWidth - 20;
+interface SwipeButtonProps {
+  onConfirm: () => void;
+}
 
-const SwipeButton = () => {
+const SwipeButton: React.FC<SwipeButtonProps> = ({ onConfirm }) => {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const translateX = useRef(new Animated.Value(0)).current;
 
-  // Note we use the same interpolate values as translateX for the text so it starts hidden behind the knob
   const textTranslateX = translateX.interpolate({
     inputRange: [0, maxTranslateX],
     outputRange: [-10, maxTranslateX - knobWidth / 2],
@@ -32,15 +34,12 @@ const SwipeButton = () => {
     { useNativeDriver: true }
   );
 
-  const onHandlerStateChange = (event: {
-    nativeEvent: { oldState?: any; translationX?: any };
-  }) => {
+  const onHandlerStateChange = (event: { nativeEvent: { oldState?: any; translationX?: any; }; }) => {
     if (event.nativeEvent.oldState === State.ACTIVE) {
       let { translationX } = event.nativeEvent;
       translationX = translationX < 0 ? 0 : translationX;
       const confirmed = translationX > maxTranslateX * 0.7;
 
-      // Use a spring effect when releasing the knob
       Animated.spring(translateX, {
         toValue: confirmed ? maxTranslateX : 0,
         bounciness: 10,
@@ -48,11 +47,13 @@ const SwipeButton = () => {
       }).start(() => {
         if (confirmed && !isConfirmed) {
           setIsConfirmed(true);
+          onConfirm(); // Call the passed callback function
 
-          // Here, you should also handle the confirmed action,
-          // like sending a request to the server or navigating to another screen
-          // after some processing, you might want to reset the swipe button
-          // for that, you will need another state transition or callback.
+          // Reset the swipe button after some time (optional)
+          setTimeout(() => {
+            setIsConfirmed(false);
+            translateX.setValue(0);
+          }, 2000);
         }
       });
     }
