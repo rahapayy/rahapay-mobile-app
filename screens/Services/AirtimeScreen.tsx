@@ -198,7 +198,7 @@ const AirtimeScreen: React.FC<{
                   </View>
 
                   {/* Button */}
-                  <Button
+                  {/* <Button
                     title={"Proceed"}
                     style={{
                       backgroundColor: COLORS.violet200,
@@ -206,7 +206,7 @@ const AirtimeScreen: React.FC<{
                     onPress={() => {
                       navigation.navigate("ReviewSummaryScreen");
                     }}
-                  />
+                  /> */}
 
                   {/* Coming Soon Airtime services */}
                   {/* <View className="bg-[#EEEBF9] rounded-xl mt-4">
@@ -226,10 +226,47 @@ const AirtimeScreen: React.FC<{
               ) : (
                 // International tab
                 <View>
-                  <Text style={styles.contentText}>Hello</Text>
+                  <Text style={styles.headText} allowFontScaling={false}>
+                    Saved Beneficiaries
+                  </Text>
+                  <View className="flex-row mb-4 gap-2">
+                    <View className="bg-[#EEEBF9] p-3 rounded-2xl">
+                      <Text>My number</Text>
+                    </View>
+                    <View className="bg-[#EEEBF9] p-3 rounded-2xl">
+                      <Text>+234 0862753934</Text>
+                    </View>
+                  </View>
+
+                  <View className="mt-4 mb-6">
+                    <Text style={styles.label} allowFontScaling={false}>
+                      Phone Number
+                    </Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Enter phone number"
+                        placeholderTextColor="#BABFC3"
+                        allowFontScaling={false}
+                      />
+                      <TouchableOpacity>
+                        <ProfileCircle color={COLORS.violet400} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 </View>
               )}
             </View>
+
+            <Button
+              title={"Proceed"}
+              style={{
+                backgroundColor: COLORS.violet200,
+              }}
+              onPress={() => {
+                navigation.navigate("ReviewSummaryScreen");
+              }}
+            />
           </View>
         </View>
       </ScrollView>
