@@ -18,6 +18,7 @@ import HelpAndSupportScreen from "../screens/Profile/HelpAndSupportScreen";
 import PersonalInformationScreen from "../screens/Profile/PersonalInformationScreen";
 import ReferralScreen from "../screens/Profile/ReferralScreen";
 import ReviewSummaryScreen from "../screens/ReviewSummaryScreen";
+import TransactionCompletedScreen from "../screens/TransactionCompletedScreen";
 
 const Stack = createNativeStackNavigator();
 const AppStack = () => {
@@ -113,6 +114,11 @@ const AppStack = () => {
       <Stack.Screen
         name="ReviewSummaryScreen"
         component={ReviewSummaryScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TransactionCompletedScreen"
+        component={TransactionCompletedScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
