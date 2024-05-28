@@ -120,6 +120,7 @@ const ConfirmPinScreen: React.FC<{
           title={"Create Pin"}
           onPress={handleButtonClick}
           className="mt-4"
+          textColor="#fff"
         />
       </View>
     </SafeAreaView>
