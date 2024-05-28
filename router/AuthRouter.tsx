@@ -14,6 +14,7 @@ import LoginScreen from "../screens/Auth/Login/LoginScreen";
 import CreateTransactionPinScreen from "../screens/Auth/CreateAccount/CreateTransactionPinScreen";
 import ConfirmPinScreen from "../screens/Auth/CreateAccount/ConfirmPinScreen";
 import SuccessfulScreen from "../screens/Auth/CreateAccount/SuccessfulScreen";
+import CreateTagScreen from "../screens/Auth/CreateAccount/CreateTagScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -74,6 +75,11 @@ const AuthRoute = () => {
       <Stack.Screen
         name="VerifyEmailScreen"
         component={VerifyEmailScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CreateTagScreen"
+        component={CreateTagScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
