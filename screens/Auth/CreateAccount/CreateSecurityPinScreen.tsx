@@ -74,7 +74,7 @@ const CreateTransactionPinScreen: React.FC<{
             />
           </View>
           <Text style={styles.headText} allowFontScaling={false}>
-            Create Your Raha PIN
+            Create Your Security PIN
           </Text>
           <Text style={styles.subText} allowFontScaling={false}>
             Use this pin to process your transactions
