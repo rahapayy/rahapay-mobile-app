@@ -196,32 +196,6 @@ const AirtimeScreen: React.FC<{
                       <Switch />
                     </View>
                   </View>
-
-                  {/* Button */}
-                  {/* <Button
-                    title={"Proceed"}
-                    style={{
-                      backgroundColor: COLORS.violet200,
-                    }}
-                    onPress={() => {
-                      navigation.navigate("ReviewSummaryScreen");
-                    }}
-                  /> */}
-
-                  {/* Coming Soon Airtime services */}
-                  {/* <View className="bg-[#EEEBF9] rounded-xl mt-4">
-                    <View className="p-4">
-                      <Text style={styles.topupText} allowFontScaling={false}>
-                        Airtime services
-                      </Text>
-                      
-                      <View>
-                        <View>
-
-                        </View>
-                      </View>
-                    </View>
-                  </View> */}
                 </View>
               ) : (
                 // International tab
@@ -266,6 +240,7 @@ const AirtimeScreen: React.FC<{
               onPress={() => {
                 navigation.navigate("ReviewSummaryScreen");
               }}
+              textColor="#fff"
             />
           </View>
         </View>
