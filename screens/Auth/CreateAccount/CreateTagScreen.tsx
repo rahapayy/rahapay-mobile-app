@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   },
   subText: {
     fontFamily: "Outfit-ExtraLight",
-    fontSize: RFValue(14),
+    fontSize: RFValue(13),
   },
   textInput: {
     borderWidth: 1,

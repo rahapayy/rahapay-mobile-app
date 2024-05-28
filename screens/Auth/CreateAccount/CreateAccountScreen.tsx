@@ -118,13 +118,6 @@ const CreateAccountScreen: React.FC<{
                 </TouchableOpacity>
               </View>
             </View>
-
-            {/* <TouchableOpacity
-              onPress={() => navigation.navigate("VerifyEmailScreen")}
-              style={styles.proceedButton}
-            >
-              <Text style={styles.proceedButtonText}>Proceed</Text>
-            </TouchableOpacity> */}
             <Button
               title={"Proceed"}
               onPress={handleButtonClick}
@@ -147,8 +140,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   subText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
+    fontFamily: "Outfit-ExtraLight",
+    fontSize: RFValue(13),
   },
   textInput: {
     borderWidth: 1,

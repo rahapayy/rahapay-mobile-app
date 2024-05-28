@@ -133,8 +133,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   subText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
+    fontFamily: "Outfit-ExtraLight",
+    fontSize: RFValue(13),
   },
   inputContainer: {
     flexDirection: "column",
