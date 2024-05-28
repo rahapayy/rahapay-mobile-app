@@ -45,7 +45,7 @@ const VerifyEmailScreen: React.FC<{
   };
 
   const handleButtonClick = () => {
-    navigation.navigate("CreateTransactionPinScreen");
+    navigation.navigate("CreateTagScreen");
   };
 
   return (

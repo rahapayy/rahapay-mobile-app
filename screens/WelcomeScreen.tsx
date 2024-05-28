@@ -50,7 +50,7 @@ const WelcomeScreen: React.FC<{
           textColor="#fff"
         />
         <Button
-          title={"Create another account"}
+          title={"Create an account"}
           onPress={() => navigation.navigate("CreateAccountScreen")}
           style={{
             borderWidth: 1,

@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: {
-    fontSize: RFValue(14),
+    fontSize: RFValue(12),
     fontFamily: "Outfit-Regular",
   },
 });
