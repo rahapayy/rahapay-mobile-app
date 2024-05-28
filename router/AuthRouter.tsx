@@ -11,7 +11,7 @@ import ResetPasswordScreen from "../screens/Auth/ForgotPassword/ResetPasswordScr
 import EnterCodeScreen from "../screens/Auth/ForgotPassword/EnterCodeScreen";
 import CreateNewPasswordScreen from "../screens/Auth/ForgotPassword/CreateNewPasswordScreen";
 import LoginScreen from "../screens/Auth/Login/LoginScreen";
-import CreateTransactionPinScreen from "../screens/Auth/CreateAccount/CreatePinScreen";
+import CreatePinScreen from "../screens/Auth/CreateAccount/CreatePinScreen";
 import ConfirmPinScreen from "../screens/Auth/CreateAccount/ConfirmPinScreen";
 import SuccessfulScreen from "../screens/Auth/CreateAccount/SuccessfulScreen";
 import CreateTagScreen from "../screens/Auth/CreateAccount/CreateTagScreen";
@@ -103,8 +103,8 @@ const AuthRoute = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="CreateTransactionPinScreen"
-        component={CreateTransactionPinScreen}
+        name="CreatePinScreen"
+        component={CreatePinScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
