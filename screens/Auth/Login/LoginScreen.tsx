@@ -100,6 +100,7 @@ const LoginScreen: React.FC<{
               title={"Log in"}
               onPress={handleLogin}
               style={styles.proceedButton}
+              textColor="#fff"
             />
             <Button
               title={"Create another account"}
@@ -108,6 +109,7 @@ const LoginScreen: React.FC<{
                 backgroundColor: COLORS.violet200,
                 marginTop: SPACING * 2,
               }}
+              textColor="#fff"
             />
           </KeyboardAvoidingView>
         </View>
@@ -125,8 +127,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   subText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
+    fontFamily: "Outfit-ExtraLight",
+    fontSize: RFValue(13),
   },
   textInput: {
     borderWidth: 1,
@@ -174,6 +176,6 @@ const styles = StyleSheet.create({
   forgotPasswordText: {
     fontFamily: "Outfit-Regular",
     color: COLORS.violet600,
-    fontSize: FONT_SIZE.small,
+    fontSize: RFValue(12),
   },
 });
