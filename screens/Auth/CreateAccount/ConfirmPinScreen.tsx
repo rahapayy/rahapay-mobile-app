@@ -74,7 +74,7 @@ const ConfirmPinScreen: React.FC<{
             />
           </View>
           <Text style={styles.headText} allowFontScaling={false}>
-            Confirm Your Raha PIN
+            Confirm Your Security PIN
           </Text>
           <Text style={styles.subText} allowFontScaling={false}>
             Use this pin to process your transactions
