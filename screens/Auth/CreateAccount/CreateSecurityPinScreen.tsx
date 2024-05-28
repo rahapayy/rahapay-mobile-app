@@ -120,6 +120,7 @@ const CreateTransactionPinScreen: React.FC<{
           title={"Continue"}
           onPress={handleButtonClick}
           className="mt-4"
+          textColor="#fff"
         />
       </View>
     </SafeAreaView>
