@@ -129,6 +129,7 @@ const CreateAccountScreen: React.FC<{
               title={"Proceed"}
               onPress={handleButtonClick}
               style={styles.proceedButton}
+              textColor="#fff"
             />
           </KeyboardAvoidingView>
         </View>
