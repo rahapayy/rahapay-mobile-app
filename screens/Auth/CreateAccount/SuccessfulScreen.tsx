@@ -32,6 +32,7 @@ const SuccessfulScreen: React.FC<{
           title={"Continue"}
           onPress={handleButtonClick}
           className="mt-32 w-full"
+          textColor="#fff"
         />
       </View>
     </SafeAreaView>
