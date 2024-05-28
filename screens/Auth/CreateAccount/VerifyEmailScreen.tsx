@@ -104,6 +104,7 @@ const VerifyEmailScreen: React.FC<{
             title={"Verify Account"}
             onPress={handleButtonClick}
             className="mt-4"
+            textColor="#fff"
           />
 
           <View className=" justify-center items-center mt-6">
