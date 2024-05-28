@@ -12,6 +12,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
 import SPACING from "../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import Button from "../components/Button";
 
 const { height: screenHeight } = Dimensions.get("window");
 
@@ -39,23 +40,26 @@ const WelcomeScreen: React.FC<{
         </Text>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("CreateAccountScreen")}
-          style={styles.createAccountButton}
-        >
-          <Text style={styles.createAccountText} allowFontScaling={false}>
-            Create an Account
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
+        <Button
+          title={"Log in"}
           onPress={() => navigation.navigate("LoginScreen")}
-          style={styles.loginButton}
-        >
-          <Text style={styles.loginText} allowFontScaling={false}>
-            Login
-          </Text>
-        </TouchableOpacity>
+          style={{
+            backgroundColor: COLORS.violet400,
+            marginTop: SPACING * 2,
+          }}
+          textColor="#fff"
+        />
+        <Button
+          title={"Create another account"}
+          onPress={() => navigation.navigate("CreateAccountScreen")}
+          style={{
+            borderWidth: 1,
+            borderColor: COLORS.violet400,
+            backgroundColor: "transparent",
+            marginTop: SPACING * 2,
+          }}
+          textColor="#000"
+        />
       </View>
     </SafeAreaView>
   );
@@ -93,9 +97,11 @@ const styles = StyleSheet.create({
   buttonContainer: {
     paddingHorizontal: SPACING,
     marginBottom: SPACING,
+    justifyContent: "center",
+    alignItems: "center",
   },
   createAccountButton: {
-    paddingVertical: SPACING * 1.5,
+    paddingVertical: SPACING * 1.6,
     backgroundColor: COLORS.violet400,
     borderRadius: 10,
     justifyContent: "center",
@@ -108,7 +114,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(14),
   },
   loginButton: {
-    paddingVertical: SPACING * 1.5,
+    paddingVertical: SPACING * 1.6,
     borderWidth: 1,
     borderColor: COLORS.violet400,
     borderRadius: 10,

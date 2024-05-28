@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import React, { FC } from "react";
 import COLORS from "../../config/colors";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const { height: windowHeight, width: windowWidth } = Dimensions.get("window");
 
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: RFValue(14),
     fontFamily: "Outfit-Regular",
   },
 });

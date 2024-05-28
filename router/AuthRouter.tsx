@@ -51,15 +51,15 @@ const AuthRoute = () => {
 
   return (
     <Stack.Navigator>
-      {showOnboarding && (
-        <>
-          <Stack.Screen
-            name="Onboarding"
-            component={Onboarding}
-            options={{ headerShown: false }}
-          />
-        </>
-      )}
+      {/* {showOnboarding && (
+        <> */}
+      <Stack.Screen
+        name="Onboarding"
+        component={Onboarding}
+        options={{ headerShown: false }}
+      />
+      {/* </>
+      )} */}
       <Stack.Screen
         name="WelcomeScreen"
         component={WelcomeScreen}
