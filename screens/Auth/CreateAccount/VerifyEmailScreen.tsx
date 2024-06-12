@@ -1,3 +1,4 @@
+import React, { useEffect, useRef, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -8,10 +9,9 @@ import {
   View,
   Keyboard,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
 import { ArrowLeft } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RouteProp, useRoute } from "@react-navigation/native"; // Import useRoute
+import { RouteProp, useRoute } from "@react-navigation/native";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../config/SPACING";
 import COLORS from "../../../config/colors";
@@ -19,7 +19,6 @@ import Button from "../../../components/Button";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 
-// Define the type for route parameters
 type VerifyEmailScreenRouteParams = {
   email: string;
 };
@@ -28,18 +27,31 @@ const VerifyEmailScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const route =
-    useRoute<RouteProp<{ params: VerifyEmailScreenRouteParams }, "params">>(); // Use RouteProp with the defined type
-  const email = route.params.email; // Get the email from route params
+    useRoute<RouteProp<{ params: VerifyEmailScreenRouteParams }, "params">>();
+  const email = route.params.email;
 
   const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
   const boxRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
   const [boxIsFocused, setBoxIsFocused] = useState(new Array(6).fill(false));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isInputFilled, setIsInputFilled] = useState(false);
+  const [resendCountdown, setResendCountdown] = useState(60);
+  const { mutateAsync: verifyOtp } = useApi.post("/auth/verify-email");
+  const { mutateAsync: resendOtp } = useApi.post("/auth/resend-otp");
 
   useEffect(() => {
     setIsInputFilled(boxes.every((box) => box !== ""));
   }, [boxes]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (resendCountdown > 0) {
+      timer = setTimeout(() => setResendCountdown((prev) => prev - 1), 1000);
+    }
+
+    return () => clearTimeout(timer);
+  }, [resendCountdown]);
 
   const handleInput = (text: string, index: number) => {
     if (/^\d{0,1}$/.test(text)) {
@@ -67,7 +79,6 @@ const VerifyEmailScreen: React.FC<{
       boxRefs.current[index - 1]?.focus();
     }
   };
-  const { mutateAsync: verifyOtp } = useApi.post("/auth/verify-email");
 
   const handleButtonClick = async () => {
     const otp = boxes.join("");
@@ -99,6 +110,22 @@ const VerifyEmailScreen: React.FC<{
       handleShowFlash({
         message: "Please enter the complete OTP",
         type: "warning",
+      });
+    }
+  };
+
+  const resendOTP = async () => {
+    try {
+      await resendOtp({ email });
+      handleShowFlash({
+        message: "OTP resent successfully!",
+        type: "success",
+      });
+      setResendCountdown(60); // Reset countdown timer
+    } catch (error) {
+      handleShowFlash({
+        message: "Failed to resend OTP. Please try again later.",
+        type: "danger",
       });
     }
   };
@@ -159,10 +186,10 @@ const VerifyEmailScreen: React.FC<{
             onPress={handleButtonClick}
             className="mt-4"
             textColor="#fff"
-            disabled={isSubmitting || !isInputFilled} // Disable button if submitting or input not filled
+            disabled={isSubmitting || !isInputFilled}
             style={
               isSubmitting || !isInputFilled ? styles.disabledButton : null
-            } // Apply disabled style
+            }
           />
 
           <View className="justify-center items-center mt-6">
@@ -170,11 +197,18 @@ const VerifyEmailScreen: React.FC<{
               Didn’t receive an OTP?
             </Text>
 
-            <View style={styles.countdownContainer}>
-              <Text style={styles.countdownText} allowFontScaling={false}>
-                Resend OTP (59s)
-              </Text>
-            </View>
+            <TouchableOpacity
+              onPress={resendOTP}
+              disabled={resendCountdown > 0}
+            >
+              <View style={styles.countdownContainer}>
+                <Text style={styles.countdownText} allowFontScaling={false}>
+                  {resendCountdown > 0
+                    ? `Resend OTP (${resendCountdown}s)`
+                    : "Resend OTP"}
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
