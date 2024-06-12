@@ -17,11 +17,21 @@ import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/Button";
+import useApi from "../../../utils/api";
+import { AuthContext } from "../../../context/AuthContext";
+import { handleShowFlash } from "../../../components/FlashMessageComponent";
 
 const CreateAccountScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const [fullName, setfullName] = useState("");
+  const [email, setemail] = useState("");
+  const [phoneNumber, setphoneNumber] = useState("");
+  const [password, setpassword] = useState("");
   const [showBalance, setShowBalance] = useState(true);
+
+  // Create a boolean that checks if all fields have been entered
+  const isFormComplete = fullName && email && phoneNumber && password;
 
   const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
 
@@ -58,6 +68,8 @@ const CreateAccountScreen: React.FC<{
                 placeholder="First & Last name"
                 allowFontScaling={false}
                 placeholderTextColor={"#DFDFDF"}
+                value={fullName}
+                onChangeText={setfullName}
               />
             </View>
             <View className="mt-4">
@@ -69,6 +81,8 @@ const CreateAccountScreen: React.FC<{
                 placeholder="Example@email.com"
                 placeholderTextColor={"#DFDFDF"}
                 allowFontScaling={false}
+                value={email}
+                onChangeText={setemail}
               />
             </View>
 
@@ -82,12 +96,12 @@ const CreateAccountScreen: React.FC<{
                   alt=""
                   className="w-6 h-6"
                 />
-                <View>
+                <TouchableOpacity>
                   <Text style={styles.numberText} allowFontScaling={false}>
                     {" "}
                     +234{" "}
                   </Text>
-                </View>
+                </TouchableOpacity>
                 <View style={styles.vertical} />
                 <TextInput
                   style={styles.input}
@@ -95,6 +109,8 @@ const CreateAccountScreen: React.FC<{
                   placeholderTextColor="#BABFC3"
                   keyboardType="numeric"
                   allowFontScaling={false}
+                  value={phoneNumber}
+                  onChangeText={setphoneNumber}
                 />
               </View>
             </View>
@@ -108,6 +124,8 @@ const CreateAccountScreen: React.FC<{
                   placeholder="Password"
                   placeholderTextColor="#BABFC3"
                   allowFontScaling={false}
+                  value={password}
+                  onChangeText={setpassword}
                 />
                 <TouchableOpacity onPress={toggleBalanceVisibility}>
                   {showBalance ? (
@@ -121,8 +139,13 @@ const CreateAccountScreen: React.FC<{
             <Button
               title={"Proceed"}
               onPress={handleButtonClick}
-              style={styles.proceedButton}
+              style={[
+                styles.proceedButton,
+                // If the form is not complete, add styles.proceedButtonDisabled
+                !isFormComplete && styles.proceedButtonDisabled,
+              ]}
               textColor="#fff"
+              disabled={!isFormComplete} // Disable the button if the form is incomplete
             />
           </KeyboardAvoidingView>
         </View>
@@ -185,5 +208,8 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: "#fff",
     fontSize: RFValue(16),
+  },
+  proceedButtonDisabled: {
+    backgroundColor: COLORS.violet200,
   },
 });
