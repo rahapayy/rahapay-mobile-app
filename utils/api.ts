@@ -10,13 +10,11 @@ const axiosInstance: AxiosInstance = Axios.create({
   baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
-    "secure-app-password": process.env.EXPO_PRIVATE_API_KEY,
   },
 });
 
 // Request interceptor to add the Authorization header
 axiosInstance.interceptors.request.use(async (config) => {
-  config.headers["secure-app-password"] = process.env.EXPO_PRIVATE_API_KEY;
   const accessToken = await getItem("access_token");
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
@@ -26,21 +24,21 @@ axiosInstance.interceptors.request.use(async (config) => {
 });
 
 // Response interceptor to handle 401 responses
-// axiosInstance.interceptors.response.use(
-//   (response) => {
-//     return response;
-//   },
-//   async (error) => {
-//     if (error.response && error.response.status === 401) {
-//       try {
-//         await AsyncStorage.removeItem("access_token");
-//       } catch (e) {
-//         console.error(e);
-//       }
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    if (error.response && error.response.status === 401) {
+      try {
+        await AsyncStorage.removeItem("access_token");
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const axios = axiosInstance;
 

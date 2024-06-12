@@ -6,7 +6,13 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "react-native";
 import Router from "./router/Router";
-import TestStack from "./router/TestStack";
+import { AuthProvider } from "./context/AuthContext";
+import { QueryClient, QueryClientProvider } from "react-query";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import FlashMessageComponent from "./components/FlashMessageComponent";
+import FlashMessage from "react-native-flash-message";
+
+const queryClient = new QueryClient();
 
 const theme = createTheme({
   lightColors: {},
@@ -37,12 +43,20 @@ export default function App() {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <StatusBar barStyle={"default"} />
-        <Router />
-        {/* <TestStack /> */}
-      </GestureHandlerRootView>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider theme={theme}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <QueryClientProvider client={queryClient}>
+            <StatusBar barStyle={"default"} />
+            <Router />
+          </QueryClientProvider>
+          <FlashMessage
+            statusBarHeight={StatusBar.currentHeight || 0}
+            position="top"
+            MessageComponent={FlashMessageComponent}
+          />
+        </GestureHandlerRootView>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
