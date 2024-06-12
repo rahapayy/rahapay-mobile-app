@@ -178,6 +178,17 @@ const CreateAccountScreen: React.FC<{
                 </TouchableOpacity>
               </View>
             </View>
+            <View className="mt-4">
+              <Text style={styles.label} allowFontScaling={false}>
+                Referral
+              </Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Referral (Optional)"
+                placeholderTextColor={"#DFDFDF"}
+                allowFontScaling={false}
+              />
+            </View>
             <Button
               title="Proceed"
               onPress={handleButtonClick}
@@ -213,7 +224,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     borderColor: "#DFDFDF",
-    padding: 18,
+    padding: SPACING * 1.5,
   },
   label: {
     fontFamily: "Outfit-Regular",
@@ -231,7 +242,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     fontSize: RFValue(12),
     borderRadius: 10,
-    padding: 18,
+    padding: SPACING * 1.5,
     width: "100%",
     borderWidth: 1,
     borderColor: "#DFDFDF",
