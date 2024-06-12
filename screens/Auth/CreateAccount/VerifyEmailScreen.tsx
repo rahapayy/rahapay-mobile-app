@@ -10,19 +10,25 @@ import {
 import React, { useRef, useState } from "react";
 import { ArrowLeft } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RouteProp, useRoute } from '@react-navigation/native';
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../config/SPACING";
 import COLORS from "../../../config/colors";
 import Button from "../../../components/Button";
+import useApi from "../../../utils/api";
+import { handleShowFlash } from "../../../components/FlashMessageComponent";
+
+type VerifyEmailRouteProp = RouteProp<{ params: { email: string } }, 'params'>;
 
 const VerifyEmailScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const route = useRoute<VerifyEmailRouteProp>();
+  const email = route.params.email;
   const [boxes, setBoxes] = useState(["", "", "", "", ""]);
-
   const boxRefs = useRef<Array<TextInput | null>>(new Array(5).fill(null));
-
   const [boxIsFocused, setBoxIsFocused] = useState(new Array(5).fill(false));
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInput = (text: string, index: number) => {
     if (/^\d{0,1}$/.test(text)) {
@@ -30,7 +36,6 @@ const VerifyEmailScreen: React.FC<{
       newBoxes[index] = text;
       setBoxes(newBoxes);
 
-      // Check if all input boxes are cleared
       const allBoxesCleared = newBoxes.every((box) => box === "");
 
       if (text === "" && index > 0) {
@@ -38,14 +43,41 @@ const VerifyEmailScreen: React.FC<{
       } else if (index < 4 && !allBoxesCleared) {
         boxRefs.current[index + 1]?.focus();
       } else if (allBoxesCleared) {
-        // If all boxes are cleared, focus on the first box
         boxRefs.current[0]?.focus();
       }
     }
   };
 
-  const handleButtonClick = () => {
-    navigation.navigate("CreateTagScreen");
+  const { mutateAsync: verifyOtp } = useApi.post("/auth/verify-email");
+
+  const handleButtonClick = async () => {
+    const otp = boxes.join("");
+
+    if (otp.length === 5) {
+      setIsSubmitting(true);
+      try {
+        const response = await verifyOtp({ otp, email });
+        handleShowFlash({
+          message: "Email verified successfully!",
+          type: "success",
+        });
+        navigation.navigate("CreateTagScreen");
+      } catch (error) {
+        const err = error as { response?: { data?: { message?: string } }; message: string };
+        const errorMessage = err.response?.data?.message || err.message || "An error occurred";
+        handleShowFlash({
+          message: errorMessage,
+          type: "danger",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    } else {
+      handleShowFlash({
+        message: "Please enter the complete OTP",
+        type: "warning",
+      });
+    }
   };
 
   return (
@@ -61,11 +93,9 @@ const VerifyEmailScreen: React.FC<{
               Verify Email Address
             </Text>
             <Text style={styles.subText} allowFontScaling={false}>
-              Enter the OTP sent to Johndoe@gmail.com
+              Enter the OTP sent to {email}
             </Text>
           </View>
-
-          {/* Input boxes */}
 
           <View style={styles.inputContainer}>
             <View style={styles.inputRow}>
@@ -105,9 +135,10 @@ const VerifyEmailScreen: React.FC<{
             onPress={handleButtonClick}
             className="mt-4"
             textColor="#fff"
+            disabled={isSubmitting}
           />
 
-          <View className=" justify-center items-center mt-6">
+          <View className="justify-center items-center mt-6">
             <Text style={styles.otpText} allowFontScaling={false}>
               Didn’t receive an OTP?
             </Text>
