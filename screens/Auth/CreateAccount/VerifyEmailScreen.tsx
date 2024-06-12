@@ -6,33 +6,40 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Keyboard,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ArrowLeft } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RouteProp, useRoute } from '@react-navigation/native'; // Import useRoute
+import { RouteProp, useRoute } from "@react-navigation/native"; // Import useRoute
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../config/SPACING";
 import COLORS from "../../../config/colors";
 import Button from "../../../components/Button";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
+
 // Define the type for route parameters
 type VerifyEmailScreenRouteParams = {
   email: string;
 };
 
-
 const VerifyEmailScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const route = useRoute<RouteProp<{ params: VerifyEmailScreenRouteParams }, 'params'>>(); // Use RouteProp with the defined type
+  const route =
+    useRoute<RouteProp<{ params: VerifyEmailScreenRouteParams }, "params">>(); // Use RouteProp with the defined type
   const email = route.params.email; // Get the email from route params
 
   const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
   const boxRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
   const [boxIsFocused, setBoxIsFocused] = useState(new Array(6).fill(false));
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isInputFilled, setIsInputFilled] = useState(false);
+
+  useEffect(() => {
+    setIsInputFilled(boxes.every((box) => box !== ""));
+  }, [boxes]);
 
   const handleInput = (text: string, index: number) => {
     if (/^\d{0,1}$/.test(text)) {
@@ -44,7 +51,7 @@ const VerifyEmailScreen: React.FC<{
 
       if (text === "" && index > 0) {
         boxRefs.current[index - 1]?.focus();
-      } else if (index < 5 && !allBoxesCleared) { // Updated to check for 6 boxes
+      } else if (index < 5 && !allBoxesCleared) {
         boxRefs.current[index + 1]?.focus();
       } else if (allBoxesCleared) {
         boxRefs.current[0]?.focus();
@@ -52,6 +59,14 @@ const VerifyEmailScreen: React.FC<{
     }
   };
 
+  const handleKeyPress = (index: number, event: any) => {
+    if (event.nativeEvent.key === "Backspace" && index > 0) {
+      const newBoxes = [...boxes];
+      newBoxes[index - 1] = "";
+      setBoxes(newBoxes);
+      boxRefs.current[index - 1]?.focus();
+    }
+  };
   const { mutateAsync: verifyOtp } = useApi.post("/auth/verify-email");
 
   const handleButtonClick = async () => {
@@ -67,8 +82,12 @@ const VerifyEmailScreen: React.FC<{
         });
         navigation.navigate("CreateTagScreen");
       } catch (error) {
-        const err = error as { response?: { data?: { message?: string } }; message: string };
-        const errorMessage = err.response?.data?.message || err.message || "An error occurred";
+        const err = error as {
+          response?: { data?: { message?: string } };
+          message: string;
+        };
+        const errorMessage =
+          err.response?.data?.message || err.message || "An error occurred";
         handleShowFlash({
           message: errorMessage,
           type: "danger",
@@ -129,97 +148,102 @@ const VerifyEmailScreen: React.FC<{
                       ...prevState.slice(index + 1),
                     ])
                   }
+                  onKeyPress={(event) => handleKeyPress(index, event)}
                 />
-             
               ))}
-              </View>
-            </View>
-  
-            <Button
-              title={"Verify Account"}
-              onPress={handleButtonClick}
-              className="mt-4"
-              textColor="#fff"
-              disabled={isSubmitting}
-            />
-  
-            <View className="justify-center items-center mt-6">
-              <Text style={styles.otpText} allowFontScaling={false}>
-                Didn’t receive an OTP?
-              </Text>
-  
-              <View style={styles.countdownContainer}>
-                <Text style={styles.countdownText} allowFontScaling={false}>
-                  Resend OTP (59s)
-                </Text>
-              </View>
             </View>
           </View>
-        </ScrollView>
-      </SafeAreaView>
-    );
-  };
-  
-  export default VerifyEmailScreen;
-  
-  const styles = StyleSheet.create({
-    headText: {
-      fontFamily: "Outfit-Medium",
-      fontSize: RFValue(20),
-      marginBottom: 10,
-    },
-    subText: {
-      fontFamily: "Outfit-ExtraLight",
-      fontSize: RFValue(13),
-    },
-    inputContainer: {
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center",
-      paddingVertical: SPACING * 2,
-      borderRadius: 15,
-    },
-    input: {
-      flex: 1,
-      height: "100%",
-      fontSize: RFValue(19),
-      fontWeight: "bold",
-    },
-    inputRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-    },
-    inputBox: {
-      flex: 1,
-      textAlign: "center",
-      paddingVertical: SPACING * 1.5,
-      paddingHorizontal: SPACING,
-      borderRadius: 10,
-      margin: SPACING / 2,
-      borderWidth: 1,
-      borderColor: "#DFDFDF",
-      fontSize: RFValue(19),
-      fontWeight: "bold",
-    },
-    inputBoxFocused: {
-      borderColor: COLORS.violet400,
-      borderWidth: 1,
-    },
-    otpText: {
-      fontSize: RFValue(14),
-      fontFamily: "Outfit-Regular",
-    },
-    countdownContainer: {
-      marginTop: SPACING * 2,
-      backgroundColor: COLORS.violet200,
-      paddingVertical: SPACING * 2,
-      paddingHorizontal: SPACING * 2,
-      borderRadius: 4,
-    },
-    countdownText: {
-      fontFamily: "Outfit-Regular",
-      fontSize: RFValue(14),
-    },
-  });
-  
+
+          <Button
+            title={"Verify Account"}
+            onPress={handleButtonClick}
+            className="mt-4"
+            textColor="#fff"
+            disabled={isSubmitting || !isInputFilled} // Disable button if submitting or input not filled
+            style={
+              isSubmitting || !isInputFilled ? styles.disabledButton : null
+            } // Apply disabled style
+          />
+
+          <View className="justify-center items-center mt-6">
+            <Text style={styles.otpText} allowFontScaling={false}>
+              Didn’t receive an OTP?
+            </Text>
+
+            <View style={styles.countdownContainer}>
+              <Text style={styles.countdownText} allowFontScaling={false}>
+                Resend OTP (59s)
+              </Text>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+export default VerifyEmailScreen;
+
+const styles = StyleSheet.create({
+  headText: {
+    fontFamily: "Outfit-Medium",
+    fontSize: RFValue(20),
+    marginBottom: 10,
+  },
+  subText: {
+    fontFamily: "Outfit-ExtraLight",
+    fontSize: RFValue(13),
+  },
+  inputContainer: {
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: SPACING * 2,
+    borderRadius: 15,
+  },
+  input: {
+    flex: 1,
+    height: "100%",
+    fontSize: RFValue(19),
+    fontWeight: "bold",
+  },
+  inputRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  inputBox: {
+    flex: 1,
+    textAlign: "center",
+    paddingVertical: SPACING * 1.5,
+    paddingHorizontal: SPACING,
+    borderRadius: 10,
+    margin: SPACING / 2,
+    borderWidth: 1,
+    borderColor: "#DFDFDF",
+    fontSize: RFValue(19),
+    fontWeight: "bold",
+  },
+  inputBoxFocused: {
+    borderColor: COLORS.violet400,
+    borderWidth: 1,
+  },
+  otpText: {
+    fontSize: RFValue(14),
+    fontFamily: "Outfit-Regular",
+  },
+  countdownContainer: {
+    marginTop: SPACING * 2,
+    backgroundColor: COLORS.violet200,
+    paddingVertical: SPACING * 2,
+    paddingHorizontal: SPACING * 2,
+    borderRadius: 4,
+  },
+  countdownText: {
+    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(14),
+  },
+  disabledButton: {
+    backgroundColor: COLORS.violet200,
+  },
+});
