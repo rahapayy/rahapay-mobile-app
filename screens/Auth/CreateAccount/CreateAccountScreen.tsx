@@ -19,7 +19,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/Button";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-
+import { ActivityIndicator } from "react-native";
 
 const CreateAccountScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -30,6 +30,7 @@ const CreateAccountScreen: React.FC<{
   const [password, setpassword] = useState("");
   const [showBalance, setShowBalance] = useState(false);
   const countryCode = "+234";
+  const [isLoading, setIsLoading] = useState(false);
 
   // Create a boolean that checks if all fields have been entered
   const isFormComplete =
@@ -38,6 +39,7 @@ const CreateAccountScreen: React.FC<{
   const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
 
   const handleButtonClick = async () => {
+    setIsLoading(true);
     if (isFormComplete) {
       try {
         const response = await mutateAsync({
@@ -52,7 +54,8 @@ const CreateAccountScreen: React.FC<{
         //   message: "Account created successfully!",
         //   type: "success",
         // });
-        navigation.navigate("VerifyEmailScreen", {email});
+
+        navigation.navigate("VerifyEmailScreen", { email });
       } catch (error) {
         // Extract the message from the error response
         const err = error as {
@@ -66,6 +69,8 @@ const CreateAccountScreen: React.FC<{
           message: errorMessage,
           type: "danger",
         });
+      } finally {
+        setIsLoading(false); // Reset isLoading to false after API call
       }
     }
   };
@@ -174,15 +179,16 @@ const CreateAccountScreen: React.FC<{
               </View>
             </View>
             <Button
-              title={"Proceed"}
+              title="Proceed"
               onPress={handleButtonClick}
+              isLoading={isLoading}
               style={[
                 styles.proceedButton,
                 // If the form is not complete, add styles.proceedButtonDisabled
                 !isFormComplete && styles.proceedButtonDisabled,
               ]}
               textColor="#fff"
-              disabled={!isFormComplete} // Disable the button if the form is incomplete
+              disabled={!isFormComplete || isLoading} // Disable the button if the form is incomplete or if loading
             />
           </KeyboardAvoidingView>
         </View>
