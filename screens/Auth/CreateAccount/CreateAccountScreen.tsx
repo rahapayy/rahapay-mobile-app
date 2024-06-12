@@ -18,7 +18,6 @@ import SPACING from "../../../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/Button";
 import useApi from "../../../utils/api";
-import { AuthContext } from "../../../context/AuthContext";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 
 const CreateAccountScreen: React.FC<{
@@ -28,16 +27,51 @@ const CreateAccountScreen: React.FC<{
   const [email, setemail] = useState("");
   const [phoneNumber, setphoneNumber] = useState("");
   const [password, setpassword] = useState("");
-  const [showBalance, setShowBalance] = useState(true);
+  const [showBalance, setShowBalance] = useState(false);
+  const countryCode = "+234";
 
   // Create a boolean that checks if all fields have been entered
-  const isFormComplete = fullName && email && phoneNumber && password;
+  const isFormComplete =
+    fullName && email && phoneNumber && password && countryCode;
 
   const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
 
-  const handleButtonClick = () => {
-    navigation.navigate("VerifyEmailScreen");
+  const handleButtonClick = async () => {
+    if (isFormComplete) {
+      try {
+        const response = await mutateAsync({
+          fullName,
+          email,
+          phoneNumber,
+          countryCode,
+          password,
+        });
+
+        console.log("Request Payload:", payload);
+
+        handleShowFlash({
+          message: "Account created successfully!",
+          type: "success",
+        });
+        navigation.navigate("VerifyEmailScreen");
+      } catch (error) {
+        // Extract the message from the error response
+        const err = error as {
+          response?: { data?: { message?: string } };
+          message: string;
+        };
+        const errorMessage =
+          err.response?.data?.message || err.message || "An error occurred";
+        console.error("API Error:", err.response?.data || err.message); // Log the full error response
+        handleShowFlash({
+          message: errorMessage,
+          type: "danger",
+        });
+      }
+    }
   };
+
+  const { mutateAsync } = useApi.post("/auth/onboarding");
   return (
     <SafeAreaView>
       <ScrollView showsVerticalScrollIndicator={false}>

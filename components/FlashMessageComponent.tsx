@@ -10,45 +10,43 @@ import {
 } from "react-native-flash-message";
 import { RFValue } from "react-native-responsive-fontsize";
 
-import Happy from "./../assets/svg/happy.svg";
-import Sad from "./../assets/svg/sad.svg";
-import Default from "./../assets/svg/bulb.svg";
-
 const FlashMessageComponent = ({ message }: MessageComponentProps) => {
   return (
     <View
       style={{
         paddingHorizontal: SPACING,
-        paddingVertical: SPACING * 2,
-        backgroundColor:
-          message.type === "success"
-            ? COLORS.success
-            : message.type === "info" || message.type === "default"
-            ? COLORS.info
-            : COLORS.error,
-        borderRadius: 20,
-        flexDirection: "row",
-        alignItems: "center",
       }}
     >
-      {/* {message.type === "success" ? (
-        <Happy />
-      ) : message.type === "info" || message.type === "default" ? (
-        <Default />
-      ) : (
-        <Sad />
-      )} */}
-      <Text
+      <View
         style={{
-          fontSize: RFValue(16),
-          color: COLORS.white,
-          fontWeight: "bold",
-          marginLeft: SPACING,
-          width: "80%",
+          marginTop: SPACING * 5,
+          paddingHorizontal: SPACING,
+          paddingVertical: SPACING * 2,
+          backgroundColor:
+            message.type === "success"
+              ? COLORS.success
+              : message.type === "info" || message.type === "default"
+              ? COLORS.info
+              : COLORS.error,
+          borderRadius: 10,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        {message.message || "An error occurred."}
-      </Text>
+        <Text
+          allowFontScaling={false}
+          style={{
+            fontSize: RFValue(12),
+            color: COLORS.white,
+            marginLeft: SPACING,
+            fontFamily: "Outfit-Regular",
+            textAlign: "center",
+          }}
+        >
+          {message.message || "An error occurred."}
+        </Text>
+      </View>
     </View>
   );
 };
