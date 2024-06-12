@@ -91,16 +91,20 @@ const CreateAccountScreen: React.FC<{
                 Phone Number
               </Text>
               <View style={styles.inputContainer}>
-                <Image
-                  source={require("../../../assets/images/flag-for-nigeria.png")}
-                  alt=""
-                  className="w-6 h-6"
-                />
-                <TouchableOpacity>
-                  <Text style={styles.numberText} allowFontScaling={false}>
-                    {" "}
-                    +234{" "}
-                  </Text>
+                <TouchableOpacity
+                  style={{ flexDirection: "row", alignItems: "center" }}
+                >
+                  <Image
+                    source={require("../../../assets/images/flag-for-nigeria.png")}
+                    alt=""
+                    className="w-6 h-6"
+                  />
+                  <View>
+                    <Text style={styles.numberText} allowFontScaling={false}>
+                      {" "}
+                      +234{" "}
+                    </Text>
+                  </View>
                 </TouchableOpacity>
                 <View style={styles.vertical} />
                 <TextInput
