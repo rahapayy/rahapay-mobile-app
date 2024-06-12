@@ -20,6 +20,7 @@ import Button from "../../../components/Button";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 
+
 const CreateAccountScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
@@ -47,13 +48,11 @@ const CreateAccountScreen: React.FC<{
           password,
         });
 
-        console.log("Request Payload:", payload);
-
-        handleShowFlash({
-          message: "Account created successfully!",
-          type: "success",
-        });
-        navigation.navigate("VerifyEmailScreen");
+        // handleShowFlash({
+        //   message: "Account created successfully!",
+        //   type: "success",
+        // });
+        navigation.navigate("VerifyEmailScreen", {email});
       } catch (error) {
         // Extract the message from the error response
         const err = error as {
