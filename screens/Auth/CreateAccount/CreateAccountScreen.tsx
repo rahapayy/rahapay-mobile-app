@@ -19,7 +19,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/Button";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import { ActivityIndicator } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const CreateAccountScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -78,7 +78,11 @@ const CreateAccountScreen: React.FC<{
   const { mutateAsync } = useApi.post("/auth/onboarding");
   return (
     <SafeAreaView>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        enableOnAndroid={true}
+        extraScrollHeight={Platform.OS === "ios" ? 20 : 0}
+      >
         <View className="p-4">
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <ArrowLeft color="#000" />
@@ -92,11 +96,6 @@ const CreateAccountScreen: React.FC<{
               Let’s set up your account in minutes
             </Text>
           </View>
-          <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
-            keyboardVerticalOffset={Platform.OS === "ios" ? -50 : 0}
-          >
             <View className="mt-10">
               <Text style={styles.label} allowFontScaling={false}>
                 Full Name
@@ -201,9 +200,8 @@ const CreateAccountScreen: React.FC<{
               textColor="#fff"
               disabled={!isFormComplete || isLoading} // Disable the button if the form is incomplete or if loading
             />
-          </KeyboardAvoidingView>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };
