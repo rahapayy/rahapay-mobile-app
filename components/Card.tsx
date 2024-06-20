@@ -30,6 +30,7 @@ const Card: React.FC<{
   const [showBalance, setShowBalance] = useState(true);
 
   const { userInfo } = useContext(AuthContext);
+  const firstName = userInfo?.data?.user?.fullName?.split(" ")[0];
 
   const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
 
@@ -48,7 +49,7 @@ const Card: React.FC<{
               />
               <View>
                 <Text style={styles.greetingText} allowFontScaling={false}>
-                  Hello, {userInfo?.data?.user?.fullName} 👋
+                  Hello, {firstName} 👋
                 </Text>
                 <Text style={styles.greetingSubText} allowFontScaling={false}>
                   Let's make some bills payment!
