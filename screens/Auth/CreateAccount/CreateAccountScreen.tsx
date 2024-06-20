@@ -28,7 +28,7 @@ const CreateAccountScreen: React.FC<{
   const [email, setemail] = useState("");
   const [phoneNumber, setphoneNumber] = useState("");
   const [password, setpassword] = useState("");
-  const [showBalance, setShowBalance] = useState(false);
+  const [showPassword, setShowPassword] = useState(true);
   const countryCode = "+234";
   const [isLoading, setIsLoading] = useState(false);
 
@@ -36,7 +36,7 @@ const CreateAccountScreen: React.FC<{
   const isFormComplete =
     fullName && email && phoneNumber && password && countryCode;
 
-  const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
+  const toggleBalanceVisibility = () => setShowPassword((prev) => !prev);
 
   const handleButtonClick = async () => {
     setIsLoading(true);
@@ -96,110 +96,111 @@ const CreateAccountScreen: React.FC<{
               Let’s set up your account in minutes
             </Text>
           </View>
-            <View className="mt-10">
-              <Text style={styles.label} allowFontScaling={false}>
-                Full Name
-              </Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="First & Last name"
-                allowFontScaling={false}
-                placeholderTextColor={"#DFDFDF"}
-                value={fullName}
-                onChangeText={setfullName}
-              />
-            </View>
-            <View className="mt-4">
-              <Text style={styles.label} allowFontScaling={false}>
-                Email Address
-              </Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Example@email.com"
-                placeholderTextColor={"#DFDFDF"}
-                allowFontScaling={false}
-                value={email}
-                onChangeText={setemail}
-              />
-            </View>
-
-            <View className="mt-4">
-              <Text style={styles.label} allowFontScaling={false}>
-                Phone Number
-              </Text>
-              <View style={styles.inputContainer}>
-                <TouchableOpacity
-                  style={{ flexDirection: "row", alignItems: "center" }}
-                >
-                  <Image
-                    source={require("../../../assets/images/flag-for-nigeria.png")}
-                    alt=""
-                    className="w-6 h-6"
-                  />
-                  <View>
-                    <Text style={styles.numberText} allowFontScaling={false}>
-                      {" "}
-                      +234{" "}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-                <View style={styles.vertical} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="8038929383"
-                  placeholderTextColor="#BABFC3"
-                  keyboardType="numeric"
-                  allowFontScaling={false}
-                  value={phoneNumber}
-                  onChangeText={setphoneNumber}
-                />
-              </View>
-            </View>
-            <View className="mt-4">
-              <Text style={styles.label} allowFontScaling={false}>
-                Create Password
-              </Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Password"
-                  placeholderTextColor="#BABFC3"
-                  allowFontScaling={false}
-                  value={password}
-                  onChangeText={setpassword}
-                />
-                <TouchableOpacity onPress={toggleBalanceVisibility}>
-                  {showBalance ? (
-                    <Eye color="#000" size={20} />
-                  ) : (
-                    <EyeSlash color="#000" size={20} />
-                  )}
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View className="mt-4">
-              <Text style={styles.label} allowFontScaling={false}>
-                Referral
-              </Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Referral (Optional)"
-                placeholderTextColor={"#DFDFDF"}
-                allowFontScaling={false}
-              />
-            </View>
-            <Button
-              title="Proceed"
-              onPress={handleButtonClick}
-              isLoading={isLoading}
-              style={[
-                styles.proceedButton,
-                // If the form is not complete, add styles.proceedButtonDisabled
-                !isFormComplete && styles.proceedButtonDisabled,
-              ]}
-              textColor="#fff"
-              disabled={!isFormComplete || isLoading} // Disable the button if the form is incomplete or if loading
+          <View className="mt-10">
+            <Text style={styles.label} allowFontScaling={false}>
+              Full Name
+            </Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="First & Last name"
+              allowFontScaling={false}
+              placeholderTextColor={"#DFDFDF"}
+              value={fullName}
+              onChangeText={setfullName}
             />
+          </View>
+          <View className="mt-4">
+            <Text style={styles.label} allowFontScaling={false}>
+              Email Address
+            </Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Example@email.com"
+              placeholderTextColor={"#DFDFDF"}
+              allowFontScaling={false}
+              value={email}
+              onChangeText={setemail}
+            />
+          </View>
+
+          <View className="mt-4">
+            <Text style={styles.label} allowFontScaling={false}>
+              Phone Number
+            </Text>
+            <View style={styles.inputContainer}>
+              <TouchableOpacity
+                style={{ flexDirection: "row", alignItems: "center" }}
+              >
+                <Image
+                  source={require("../../../assets/images/flag-for-nigeria.png")}
+                  alt=""
+                  className="w-6 h-6"
+                />
+                <View>
+                  <Text style={styles.numberText} allowFontScaling={false}>
+                    {" "}
+                    +234{" "}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <View style={styles.vertical} />
+              <TextInput
+                style={styles.input}
+                placeholder="8038929383"
+                placeholderTextColor="#BABFC3"
+                keyboardType="numeric"
+                allowFontScaling={false}
+                value={phoneNumber}
+                onChangeText={setphoneNumber}
+              />
+            </View>
+          </View>
+          <View className="mt-4">
+            <Text style={styles.label} allowFontScaling={false}>
+              Create Password
+            </Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Password"
+                placeholderTextColor="#BABFC3"
+                allowFontScaling={false}
+                value={password}
+                onChangeText={setpassword}
+                secureTextEntry={showPassword}
+              />
+              <TouchableOpacity onPress={toggleBalanceVisibility}>
+                {showPassword ? (
+                  <EyeSlash color="#000" size={20} />
+                ) : (
+                  <Eye color="#000" size={20} />
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View className="mt-4">
+            <Text style={styles.label} allowFontScaling={false}>
+              Referral
+            </Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Referral (Optional)"
+              placeholderTextColor={"#DFDFDF"}
+              allowFontScaling={false}
+            />
+          </View>
+          <Button
+            title="Proceed"
+            onPress={handleButtonClick}
+            isLoading={isLoading}
+            style={[
+              styles.proceedButton,
+              // If the form is not complete, add styles.proceedButtonDisabled
+              !isFormComplete && styles.proceedButtonDisabled,
+            ]}
+            textColor="#fff"
+            disabled={!isFormComplete || isLoading} // Disable the button if the form is incomplete or if loading
+          />
         </View>
       </KeyboardAwareScrollView>
     </SafeAreaView>
