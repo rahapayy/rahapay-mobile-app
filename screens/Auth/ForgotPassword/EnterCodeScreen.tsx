@@ -9,15 +9,23 @@ import {
 } from "react-native";
 import React, { useRef, useState } from "react";
 import { ArrowLeft } from "iconsax-react-native";
+import { RouteProp, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../config/SPACING";
 import COLORS from "../../../config/colors";
 import Button from "../../../components/Button";
 
+type EnterCodeScreenRouteParams = {
+  email: string;
+};
+
 const EnterCodeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const route =
+    useRoute<RouteProp<{ params: EnterCodeScreenRouteParams }, "params">>();
+  const email = route.params.email;
   const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
 
   const boxRefs = useRef<Array<TextInput | null>>(new Array(5).fill(null));
@@ -61,7 +69,7 @@ const EnterCodeScreen: React.FC<{
               Enter Code
             </Text>
             <Text style={styles.subText} allowFontScaling={false}>
-              Enter the code sent to Johndoe@gmail.com
+              Enter the code sent to {email}
             </Text>
           </View>
 
