@@ -14,6 +14,7 @@ interface UserInfoType {
   fullName: string;
   phoneNumber: string;
   data: {
+    user: any;
     token: string;
   };
   access_token: string;
