@@ -32,7 +32,7 @@ import { AuthContext } from "../context/AuthContext";
 const ProfileScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { userInfo } = useContext(AuthContext);
+  const { userInfo, logout } = useContext(AuthContext);
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [biometricModalVisible, setBiometricModalVisible] = useState(false);
   const [isCloseAccountModalVisible, setIsCloseAccountModalVisible] =
@@ -62,6 +62,10 @@ const ProfileScreen: React.FC<{
   const handleConfirmCloseAccount = () => {
     // Handle account closure logic here
     setIsCloseAccountModalVisible(false);
+  };
+
+  const handleLogout = () => {
+    logout();
   };
 
   return (
@@ -210,7 +214,10 @@ const ProfileScreen: React.FC<{
             </View>
 
             {/* Logout */}
-            <TouchableOpacity style={styles.logoutContainer}>
+            <TouchableOpacity
+              onPress={handleLogout}
+              style={styles.logoutContainer}
+            >
               <Text style={styles.logoutButton} allowFontScaling={false}>
                 Logout
               </Text>
