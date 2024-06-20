@@ -131,7 +131,7 @@ const BottomTab: React.FC = () => {
           headerShown: false,
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Cards"
         component={CardsScreen}
         options={{
@@ -142,7 +142,7 @@ const BottomTab: React.FC = () => {
             focused ? <TabBarLabel focused={focused} title="Cards" /> : null,
           headerShown: false,
         }}
-      />
+      /> */}
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
