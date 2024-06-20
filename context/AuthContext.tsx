@@ -59,7 +59,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [idleStartTime, setIdleStartTime] = useState<number | null>(null);
   const [isAppReady, setIsAppReady] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [appState, setAppState] = useState<AppStateStatus>(AppState.currentState);
+  const [appState, setAppState] = useState<AppStateStatus>(
+    AppState.currentState
+  );
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -122,11 +124,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (id: string, password: string) => {
     try {
       setIsLoading(true);
       const res = await axios.post(`/auth/login`, {
-        email,
+        id,
         password,
       });
       let userInfo = res.data;
@@ -198,7 +200,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setAppState(nextAppState);
     };
 
-    const unsubscribe = AppState.addEventListener("change", handleAppStateChange);
+    const unsubscribe = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
 
     return () => {
       unsubscribe.remove();
@@ -213,7 +218,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const appVersion = Constants.default.expoConfig?.version;
       if (appVersion && updateData?.version) {
         const appVersionNumber = parseFloat(appVersion.replace(/\./g, ""));
-        const updateVersionNumber = parseFloat(updateData.version.replace(/\./g, ""));
+        const updateVersionNumber = parseFloat(
+          updateData.version.replace(/\./g, "")
+        );
         if (updateVersionNumber > appVersionNumber) {
           console.log("has new version");
           Alert.alert(
@@ -259,7 +266,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const checkStatusAsync = async () => {
     const status = await BackgroundFetch.getStatusAsync();
-    const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_FETCH_TASK);
+    const isRegistered = await TaskManager.isTaskRegisteredAsync(
+      BACKGROUND_FETCH_TASK
+    );
     setStatus(status);
     setIsRegistered(isRegistered);
   };
@@ -298,8 +307,8 @@ TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
 
 async function registerBackgroundFetchAsync() {
   return BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
-    minimumInterval: 60, 
-    stopOnTerminate: false, 
-    startOnBoot: true, 
+    minimumInterval: 60,
+    stopOnTerminate: false,
+    startOnBoot: true,
   });
 }

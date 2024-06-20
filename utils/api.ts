@@ -2,7 +2,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { UseQueryOptions, useMutation, useQuery } from "react-query";
 import Axios, { AxiosInstance, AxiosResponse } from "axios";
 import { getItem } from "./ayncStorage";
-import { createContext, useContext } from "react";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 type MethodTypes = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";

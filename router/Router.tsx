@@ -10,7 +10,7 @@ import { AuthContext } from "../context/AuthContext";
 const Stack = createNativeStackNavigator();
 
 const Router = () => {
-  const { userInfo, isAuthenticated, isAppReady } = useContext(AuthContext);
+  const { isAuthenticated, isAppReady } = useContext(AuthContext);
 
   if (!isAppReady) {
     // Loading indicator screen
