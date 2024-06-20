@@ -35,14 +35,14 @@ const LoginScreen: React.FC<{
   const handleLogin = async () => {
     setIsLoading(true);
     try {
-      login(id, password);
+      await login(id, password);
       // Handle successful login
       // Save the token or any necessary data from response.data
       handleShowFlash({
         message: "Logged in successfully!",
         type: "success",
       });
-      navigation.navigate("HomeScreen");
+      navigation.navigate("AppStack");
     } catch (error) {
       const err = error as {
         response?: { data?: { message?: string } };
