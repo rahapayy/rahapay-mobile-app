@@ -99,7 +99,7 @@ const QuickAction: React.FC<{
       </View>
       <TouchableOpacity
         onPress={handleButtonClick}
-        className="w-full bg-white p-4 justify-center items-center mt-4 rounded-2xl"
+        className="w-full bg-white p-3 justify-center items-center mt-4 rounded-lg"
       >
         <Text style={styles.moreText} allowFontScaling={false}>
           More
