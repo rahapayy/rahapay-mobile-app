@@ -21,9 +21,9 @@ import FONT_SIZE from "../../../config/font-size";
 const CreateNewPasswordScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [showBalance, setShowBalance] = useState(true);
+  const [showPassword, setShowPassword] = useState(true);
 
-  const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   const handleButtonClick = () => {
     navigation.navigate("LoginScreen");
@@ -61,11 +61,11 @@ const CreateNewPasswordScreen: React.FC<{
                   allowFontScaling={false}
                   placeholderTextColor="#BABFC3"
                 />
-                <TouchableOpacity onPress={toggleBalanceVisibility}>
-                  {showBalance ? (
-                    <Eye color="#000" size={20} />
-                  ) : (
+                <TouchableOpacity onPress={togglePasswordVisibility}>
+                  {showPassword ? (
                     <EyeSlash color="#000" size={20} />
+                  ) : (
+                    <Eye color="#000" size={20} />
                   )}
                 </TouchableOpacity>
               </View>
@@ -74,6 +74,7 @@ const CreateNewPasswordScreen: React.FC<{
               title={"Done"}
               onPress={handleButtonClick}
               style={styles.proceedButton}
+              textColor="#fff"
             />
           </KeyboardAvoidingView>
         </View>
@@ -87,12 +88,12 @@ export default CreateNewPasswordScreen;
 const styles = StyleSheet.create({
   headText: {
     fontFamily: "Outfit-Medium",
-    fontSize: RFValue(24),
+    fontSize: RFValue(20),
     marginBottom: 10,
   },
   subText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(16),
+    fontFamily: "Outfit-ExtraLight",
+    fontSize: RFValue(13),
   },
   textInput: {
     borderWidth: 1,
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: "Outfit-Regular",
     marginBottom: 10,
-    fontSize: RFValue(14),
+    fontSize: RFValue(12),
   },
   vertical: {
     backgroundColor: COLORS.black100,
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: "100%",
-    fontSize: RFValue(14),
+    fontSize: RFValue(12),
   },
   numberText: {
     fontFamily: "Outfit-Regular",

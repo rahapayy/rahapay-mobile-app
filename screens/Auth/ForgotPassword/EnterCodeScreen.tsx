@@ -52,6 +52,15 @@ const EnterCodeScreen: React.FC<{
     }
   };
 
+  const handleKeyPress = (index: number, event: any) => {
+    if (event.nativeEvent.key === "Backspace" && index > 0) {
+      const newBoxes = [...boxes];
+      newBoxes[index - 1] = "";
+      setBoxes(newBoxes);
+      boxRefs.current[index - 1]?.focus();
+    }
+  };
+
   const handleButtonClick = async () => {
     const otp = boxes.join("");
     if (otp.length === 6) {
@@ -130,6 +139,7 @@ const EnterCodeScreen: React.FC<{
                       ...prevState.slice(index + 1),
                     ])
                   }
+                  onKeyPress={(event) => handleKeyPress(index, event)}
                 />
               ))}
             </View>
@@ -182,7 +192,7 @@ const styles = StyleSheet.create({
   inputBox: {
     flex: 1,
     textAlign: "center",
-    paddingVertical: SPACING * 2,
+    paddingVertical: SPACING * 1.5,
     paddingHorizontal: SPACING,
     borderRadius: 10,
     margin: SPACING / 2,
