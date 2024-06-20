@@ -10,11 +10,12 @@ import React, { useState } from "react";
 import { RFValue } from "react-native-responsive-fontsize";
 import LottieView from "lottie-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import SPACING from "../config/SPACING";
 
 const RecentTransaction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [hasTransaction, setHasTransaction] = useState(true);
+  const [hasTransaction, setHasTransaction] = useState(false);
 
   return (
     <View className="p-4">
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
   noTransactionContainer: {
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 5,
   },
   transactionItem: {
     flexDirection: "row",
