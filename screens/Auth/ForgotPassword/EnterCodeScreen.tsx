@@ -15,6 +15,8 @@ import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../config/SPACING";
 import COLORS from "../../../config/colors";
 import Button from "../../../components/Button";
+import useApi from "../../../utils/api";
+import { handleShowFlash } from "../../../components/FlashMessageComponent";
 
 type EnterCodeScreenRouteParams = {
   email: string;
@@ -27,10 +29,10 @@ const EnterCodeScreen: React.FC<{
     useRoute<RouteProp<{ params: EnterCodeScreenRouteParams }, "params">>();
   const email = route.params.email;
   const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
-
-  const boxRefs = useRef<Array<TextInput | null>>(new Array(5).fill(null));
-
-  const [boxIsFocused, setBoxIsFocused] = useState(new Array(5).fill(false));
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const boxRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
+  const [boxIsFocused, setBoxIsFocused] = useState(new Array(6).fill(false));
+  const { mutateAsync: verifyOtp } = useApi.post("/auth/verify/reset-otp");
 
   const handleInput = (text: string, index: number) => {
     if (/^\d{0,1}$/.test(text)) {
@@ -38,22 +40,49 @@ const EnterCodeScreen: React.FC<{
       newBoxes[index] = text;
       setBoxes(newBoxes);
 
-      // Check if all input boxes are cleared
       const allBoxesCleared = newBoxes.every((box) => box === "");
 
       if (text === "" && index > 0) {
         boxRefs.current[index - 1]?.focus();
-      } else if (index < 4 && !allBoxesCleared) {
+      } else if (index < 5 && !allBoxesCleared) {
         boxRefs.current[index + 1]?.focus();
       } else if (allBoxesCleared) {
-        // If all boxes are cleared, focus on the first box
         boxRefs.current[0]?.focus();
       }
     }
   };
 
-  const handleButtonClick = () => {
-    navigation.navigate("CreateNewPasswordScreen");
+  const handleButtonClick = async () => {
+    const otp = boxes.join("");
+    if (otp.length === 6) {
+      setIsSubmitting(true);
+      try {
+        await verifyOtp({ otp, email });
+        handleShowFlash({
+          message: "OTP verified successfully!",
+          type: "success",
+        });
+        navigation.navigate("CreateNewPasswordScreen");
+      } catch (error) {
+        const err = error as {
+          response?: { data?: { message?: string } };
+          message: string;
+        };
+        const errorMessage =
+          err.response?.data?.message || err.message || "An error occurred";
+        handleShowFlash({
+          message: errorMessage,
+          type: "danger",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    } else {
+      handleShowFlash({
+        message: "Please enter the complete OTP",
+        type: "warning",
+      });
+    }
   };
 
   return (
@@ -72,8 +101,6 @@ const EnterCodeScreen: React.FC<{
               Enter the code sent to {email}
             </Text>
           </View>
-
-          {/* Input boxes */}
 
           <View style={styles.inputContainer}>
             <View style={styles.inputRow}>
@@ -112,6 +139,9 @@ const EnterCodeScreen: React.FC<{
             title={"Proceed"}
             onPress={handleButtonClick}
             className="mt-4"
+            textColor="#fff"
+            isLoading={isSubmitting}
+            disabled={isSubmitting || boxes.some((box) => !box)}
           />
         </View>
       </ScrollView>
