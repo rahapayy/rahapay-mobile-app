@@ -71,8 +71,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const storedAccessToken = await AsyncStorage.getItem("access_token");
         if (storedUserInfo) {
           setUserInfo(JSON.parse(storedUserInfo));
-        }
-        if (storedAccessToken) {
           setIsAuthenticated(true);
         }
       } catch (error) {
@@ -84,7 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     checkLoginStatus();
-  }, [isAuthenticated]);
+  }, []);
 
   const onboarding = async (
     email: string,
