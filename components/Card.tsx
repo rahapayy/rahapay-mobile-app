@@ -48,7 +48,7 @@ const Card: React.FC<{
               />
               <View>
                 <Text style={styles.greetingText} allowFontScaling={false}>
-                  Hello, {userInfo?.data?.user?.fullName}
+                  Hello, {userInfo?.data?.user?.fullName} 👋
                 </Text>
                 <Text style={styles.greetingSubText} allowFontScaling={false}>
                   Let's make some bills payment!
