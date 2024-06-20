@@ -38,7 +38,7 @@ const ResetPasswordScreen: React.FC<{
         type: "success",
       });
 
-      navigation.navigate("EnterCodeScreen");
+      navigation.navigate("EnterCodeScreen", email);
     } catch (error) {
       const err = error as {
         response?: { data?: { message?: string } };

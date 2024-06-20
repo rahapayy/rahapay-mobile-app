@@ -18,7 +18,7 @@ import Button from "../../../components/Button";
 const EnterCodeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [boxes, setBoxes] = useState(["", "", "", "", ""]);
+  const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
 
   const boxRefs = useRef<Array<TextInput | null>>(new Array(5).fill(null));
 
@@ -116,12 +116,12 @@ export default EnterCodeScreen;
 const styles = StyleSheet.create({
   headText: {
     fontFamily: "Outfit-Medium",
-    fontSize: RFValue(24),
+    fontSize: RFValue(20),
     marginBottom: 10,
   },
   subText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(16),
+    fontFamily: "Outfit-ExtraLight",
+    fontSize: RFValue(13),
   },
   inputContainer: {
     flexDirection: "column",
