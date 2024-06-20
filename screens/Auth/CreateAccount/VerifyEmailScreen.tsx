@@ -36,6 +36,7 @@ const VerifyEmailScreen: React.FC<{
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isInputFilled, setIsInputFilled] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(60);
+  const [isLoading, setIsLoading] = useState(false);
   const { mutateAsync: verifyOtp } = useApi.post("/auth/verify-email");
   const { mutateAsync: resendOtp } = useApi.post("/auth/resend-otp");
 
@@ -82,7 +83,7 @@ const VerifyEmailScreen: React.FC<{
 
   const handleButtonClick = async () => {
     const otp = boxes.join("");
-
+    setIsLoading(true);
     if (otp.length === 6) {
       setIsSubmitting(true);
       try {
@@ -105,6 +106,7 @@ const VerifyEmailScreen: React.FC<{
         });
       } finally {
         setIsSubmitting(false);
+        setIsLoading(false);
       }
     } else {
       handleShowFlash({
@@ -186,7 +188,8 @@ const VerifyEmailScreen: React.FC<{
             onPress={handleButtonClick}
             className="mt-4"
             textColor="#fff"
-            disabled={isSubmitting || !isInputFilled}
+            isLoading={isLoading}
+            disabled={isSubmitting || !isInputFilled || isLoading}
             style={
               isSubmitting || !isInputFilled ? styles.disabledButton : null
             }
@@ -263,13 +266,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   otpText: {
-    fontSize: RFValue(14),
+    fontSize: RFValue(13),
     fontFamily: "Outfit-Regular",
   },
   countdownContainer: {
     marginTop: SPACING * 2,
     backgroundColor: COLORS.violet200,
-    paddingVertical: SPACING * 2,
+    paddingVertical: SPACING * 1.5,
     paddingHorizontal: SPACING * 2,
     borderRadius: 4,
   },
