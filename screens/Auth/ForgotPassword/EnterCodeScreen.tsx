@@ -9,20 +9,30 @@ import {
 } from "react-native";
 import React, { useRef, useState } from "react";
 import { ArrowLeft } from "iconsax-react-native";
+import { RouteProp, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../config/SPACING";
 import COLORS from "../../../config/colors";
 import Button from "../../../components/Button";
+import useApi from "../../../utils/api";
+import { handleShowFlash } from "../../../components/FlashMessageComponent";
+
+type EnterCodeScreenRouteParams = {
+  email: string;
+};
 
 const EnterCodeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [boxes, setBoxes] = useState(["", "", "", "", ""]);
-
-  const boxRefs = useRef<Array<TextInput | null>>(new Array(5).fill(null));
-
-  const [boxIsFocused, setBoxIsFocused] = useState(new Array(5).fill(false));
+  const route =
+    useRoute<RouteProp<{ params: EnterCodeScreenRouteParams }, "params">>();
+  const email = route.params.email;
+  const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const boxRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
+  const [boxIsFocused, setBoxIsFocused] = useState(new Array(6).fill(false));
+  const { mutateAsync: verifyOtp } = useApi.post("/auth/verify/reset-otp");
 
   const handleInput = (text: string, index: number) => {
     if (/^\d{0,1}$/.test(text)) {
@@ -30,22 +40,58 @@ const EnterCodeScreen: React.FC<{
       newBoxes[index] = text;
       setBoxes(newBoxes);
 
-      // Check if all input boxes are cleared
       const allBoxesCleared = newBoxes.every((box) => box === "");
 
       if (text === "" && index > 0) {
         boxRefs.current[index - 1]?.focus();
-      } else if (index < 4 && !allBoxesCleared) {
+      } else if (index < 5 && !allBoxesCleared) {
         boxRefs.current[index + 1]?.focus();
       } else if (allBoxesCleared) {
-        // If all boxes are cleared, focus on the first box
         boxRefs.current[0]?.focus();
       }
     }
   };
 
-  const handleButtonClick = () => {
-    navigation.navigate("CreateNewPasswordScreen");
+  const handleKeyPress = (index: number, event: any) => {
+    if (event.nativeEvent.key === "Backspace" && index > 0) {
+      const newBoxes = [...boxes];
+      newBoxes[index - 1] = "";
+      setBoxes(newBoxes);
+      boxRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleButtonClick = async () => {
+    const otp = boxes.join("");
+    if (otp.length === 6) {
+      setIsSubmitting(true);
+      try {
+        await verifyOtp({ otp, email });
+        handleShowFlash({
+          message: "OTP verified successfully!",
+          type: "success",
+        });
+        navigation.navigate("CreateNewPasswordScreen");
+      } catch (error) {
+        const err = error as {
+          response?: { data?: { message?: string } };
+          message: string;
+        };
+        const errorMessage =
+          err.response?.data?.message || err.message || "An error occurred";
+        handleShowFlash({
+          message: errorMessage,
+          type: "danger",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    } else {
+      handleShowFlash({
+        message: "Please enter the complete OTP",
+        type: "warning",
+      });
+    }
   };
 
   return (
@@ -61,11 +107,9 @@ const EnterCodeScreen: React.FC<{
               Enter Code
             </Text>
             <Text style={styles.subText} allowFontScaling={false}>
-              Enter the code sent to Johndoe@gmail.com
+              Enter the code sent to {email}
             </Text>
           </View>
-
-          {/* Input boxes */}
 
           <View style={styles.inputContainer}>
             <View style={styles.inputRow}>
@@ -95,6 +139,7 @@ const EnterCodeScreen: React.FC<{
                       ...prevState.slice(index + 1),
                     ])
                   }
+                  onKeyPress={(event) => handleKeyPress(index, event)}
                 />
               ))}
             </View>
@@ -104,6 +149,9 @@ const EnterCodeScreen: React.FC<{
             title={"Proceed"}
             onPress={handleButtonClick}
             className="mt-4"
+            textColor="#fff"
+            isLoading={isSubmitting}
+            disabled={isSubmitting || boxes.some((box) => !box)}
           />
         </View>
       </ScrollView>
@@ -116,12 +164,12 @@ export default EnterCodeScreen;
 const styles = StyleSheet.create({
   headText: {
     fontFamily: "Outfit-Medium",
-    fontSize: RFValue(24),
+    fontSize: RFValue(20),
     marginBottom: 10,
   },
   subText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(16),
+    fontFamily: "Outfit-ExtraLight",
+    fontSize: RFValue(13),
   },
   inputContainer: {
     flexDirection: "column",
@@ -144,7 +192,7 @@ const styles = StyleSheet.create({
   inputBox: {
     flex: 1,
     textAlign: "center",
-    paddingVertical: SPACING * 2,
+    paddingVertical: SPACING * 1.5,
     paddingHorizontal: SPACING,
     borderRadius: 10,
     margin: SPACING / 2,

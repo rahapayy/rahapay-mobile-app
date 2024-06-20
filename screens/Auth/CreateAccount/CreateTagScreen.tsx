@@ -1,6 +1,4 @@
 import {
-  Image,
-  KeyboardAvoidingView,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -10,24 +8,62 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
-import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
+import React, { useEffect, useState } from "react";
+import { ArrowLeft } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/Button";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import useApi from "../../../utils/api";
+import { handleShowFlash } from "../../../components/FlashMessageComponent";
 
 const CreateTagScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [showBalance, setShowBalance] = useState(true);
+  const [tag, setTag] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
 
-  const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
+  // const { mutateAsync: updateTagMutateAsync } = useApi.patch("/auth/username");
+  const { data: suggestedTagsResponse } = useApi.get(
+    "/auth/suggest-username?numberOfSuggestions=7"
+  );
 
-  const handleButtonClick = () => {
-    navigation.navigate("CreatePinScreen");
+  const updateTagMutation = useApi.patch<{ userName: string }, Error>('/auth/username');
+
+  const handleSetTag = async () => {
+    setLoading(true);
+    try {
+await updateTagMutation.mutateAsync({ userName: tag });
+
+      // Here you would navigate to another screen or reset the state as required
+      navigation.navigate("NextScreen");
+      // Show success message
+      handleShowFlash({
+        message: "Tag updated successfully!",
+        type: "success",
+      });
+      setTag("");
+    } catch (error) {
+      handleShowFlash({
+        message: "Failed to update tag. Please try another.",
+        type: "danger",
+      });
+      // Optionally log the error too
+      console.error("Failed to update tag:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    if (suggestedTagsResponse) {
+      setSuggestedTags(suggestedTagsResponse.data); // Assuming the response data is an array of strings
+    }
+  }, [suggestedTagsResponse]);
+
   return (
     <SafeAreaView>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -35,7 +71,6 @@ const CreateTagScreen: React.FC<{
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <ArrowLeft color="#000" />
           </TouchableOpacity>
-
           <View className="mt-4">
             <Text style={styles.headText} allowFontScaling={false}>
               Create a RahaPay Tag
@@ -44,15 +79,19 @@ const CreateTagScreen: React.FC<{
               Send and receive money from your loved ones with your RahaPay tag
             </Text>
           </View>
-          <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
-            keyboardVerticalOffset={Platform.OS === "ios" ? -50 : 0}
+          <KeyboardAwareScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            enableOnAndroid={true}
+            extraScrollHeight={Platform.OS === "ios" ? 20 : 0}
           >
             <View className="mt-6">
-              <Text style={styles.label} allowFontScaling={false}>
-                Set Username
-              </Text>
+              <View>
+                <Text style={styles.label} allowFontScaling={false}>
+                  Set Username
+                </Text>
+                {/* Loading component for check if the user name is availble */}
+                <View></View>
+              </View>
               <View style={styles.inputContainer}>
                 <Text style={{}} allowFontScaling={false}>
                   @{" "}
@@ -62,16 +101,34 @@ const CreateTagScreen: React.FC<{
                   placeholder="eg. john"
                   placeholderTextColor="#BABFC3"
                   allowFontScaling={false}
+                  value={tag}
+                  onChangeText={setTag}
                 />
               </View>
             </View>
+            {/* Suggested availble usertags */}
+            {suggestedTags.map((suggestedTag, index) => (
+              <TouchableOpacity
+                key={index}
+                style={{
+                  padding: SPACING,
+                  backgroundColor: COLORS.black200,
+                  marginTop: SPACING,
+                }}
+                onPress={() => setTag(suggestedTag)}
+              >
+                <Text>{`@${suggestedTag}`}</Text>
+              </TouchableOpacity>
+            ))}
+
             <Button
-              title={"Set My Tag"}
-              onPress={handleButtonClick}
+              title="Set My Tag"
+              onPress={handleSetTag}
+              isLoading={loading}
               style={styles.proceedButton}
-              textColor="#fff"
+              textColor={COLORS.white}
             />
-          </KeyboardAvoidingView>
+          </KeyboardAwareScrollView>
         </View>
       </ScrollView>
     </SafeAreaView>

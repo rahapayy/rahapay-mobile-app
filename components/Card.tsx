@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   ImageBackground,
   SafeAreaView,
@@ -20,6 +20,7 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { AuthContext } from "../context/AuthContext";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
@@ -27,6 +28,9 @@ const Card: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [showBalance, setShowBalance] = useState(true);
+
+  const { userInfo } = useContext(AuthContext);
+  const firstName = userInfo?.data?.user?.fullName?.split(" ")[0];
 
   const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
 
@@ -45,7 +49,7 @@ const Card: React.FC<{
               />
               <View>
                 <Text style={styles.greetingText} allowFontScaling={false}>
-                  Hello, Akinola
+                  Hello, {firstName} 👋
                 </Text>
                 <Text style={styles.greetingSubText} allowFontScaling={false}>
                   Let's make some bills payment!
@@ -85,7 +89,7 @@ const Card: React.FC<{
 
           <View style={styles.balanceValueContainer}>
             <Text style={styles.balanceValue} allowFontScaling={false}>
-              {showBalance ? "₦120,000.00" : "*******"}
+              {showBalance ? "₦0.00" : "*******"}
             </Text>
           </View>
 

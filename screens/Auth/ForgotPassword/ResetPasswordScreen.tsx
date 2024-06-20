@@ -16,18 +16,53 @@ import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/Button";
-import FONT_SIZE from "../../../config/font-size";
+import useApi from "../../../utils/api";
+import { handleShowFlash } from "../../../components/FlashMessageComponent";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const ResetPasswordScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const handleButtonClick = () => {
-    navigation.navigate("EnterCodeScreen");
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { mutateAsync } = useApi.post("/auth/forgot-password");
+
+  const handleButtonClick = async () => {
+    setIsLoading(true);
+    try {
+      const response = await mutateAsync({ email });
+
+      handleShowFlash({
+        message: "Password reset link sent to your email",
+        type: "success",
+      });
+
+      navigation.navigate("EnterCodeScreen", {email});
+    } catch (error) {
+      const err = error as {
+        response?: { data?: { message?: string } };
+        message: string;
+      };
+      const errorMessage =
+        err.response?.data?.message || err.message || "An error occurred";
+      console.error("API Error:", err.response?.data || err.message);
+      handleShowFlash({
+        message: errorMessage,
+        type: "danger",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <SafeAreaView>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        enableOnAndroid={true}
+        extraScrollHeight={Platform.OS === "ios" ? 20 : 0}
+      >
         <View className="p-4">
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <ArrowLeft color="#000" />
@@ -55,6 +90,8 @@ const ResetPasswordScreen: React.FC<{
                 placeholder="Enter your email address"
                 placeholderTextColor={"#DFDFDF"}
                 allowFontScaling={false}
+                value={email}
+                onChangeText={setEmail}
               />
             </View>
 
@@ -62,10 +99,13 @@ const ResetPasswordScreen: React.FC<{
               title={"Reset Password"}
               onPress={handleButtonClick}
               style={styles.proceedButton}
+              textColor="#fff"
+              isLoading={isLoading}
+              disabled={isLoading || !email} // Disable the button if the email is empty or if loading
             />
           </KeyboardAvoidingView>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };
@@ -75,18 +115,18 @@ export default ResetPasswordScreen;
 const styles = StyleSheet.create({
   headText: {
     fontFamily: "Outfit-Medium",
-    fontSize: RFValue(24),
+    fontSize: RFValue(20),
     marginBottom: 10,
   },
   subText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(16),
+    fontFamily: "Outfit-ExtraLight",
+    fontSize: RFValue(13),
   },
   textInput: {
     borderWidth: 1,
     borderRadius: 10,
     borderColor: "#DFDFDF",
-    padding: 18,
+    padding: SPACING * 1.5,
   },
   label: {
     fontFamily: "Outfit-Regular",
@@ -104,7 +144,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     fontSize: RFValue(14),
     borderRadius: 10,
-    padding: 18,
+    padding: SPACING * 1.5,
     width: "100%",
     borderWidth: 1,
     borderColor: "#DFDFDF",
@@ -125,9 +165,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: RFValue(16),
   },
-  forgotPasswordText: {
-    fontFamily: "Outfit-Regular",
-    color: COLORS.violet600,
-    fontSize: FONT_SIZE.medium,
+  proceedButtonDisabled: {
+    backgroundColor: COLORS.violet200,
   },
 });

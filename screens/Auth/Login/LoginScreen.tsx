@@ -8,28 +8,59 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/Button";
-import FONT_SIZE from "../../../config/font-size";
+import { handleShowFlash } from "../../../components/FlashMessageComponent";
+import { AuthContext } from "../../../context/AuthContext";
 
 const LoginScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [showBalance, setShowBalance] = useState(true);
+  const [showPassword, setShowPassword] = useState(true);
+  const [id, setId] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
-  const handleLogin = () => {
-    navigation.navigate("HomeScreen");
+  const { login } = useContext(AuthContext);
+
+  const handleLogin = async () => {
+    setIsLoading(true);
+    try {
+      await login(id, password);
+      // Handle successful login
+      // Save the token or any necessary data from response.data
+      handleShowFlash({
+        message: "Logged in successfully!",
+        type: "success",
+      });
+      navigation.navigate("AppStack");
+    } catch (error) {
+      const err = error as {
+        response?: { data?: { message?: string } };
+        message: string;
+      };
+      const errorMessage =
+        err.response?.data?.message || err.message || "An error occurred";
+      handleShowFlash({
+        message: errorMessage,
+        type: "danger",
+      });
+      console.error("Error logging in", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleButtonClick = () => {
+  const handleCreateAccount = () => {
     navigation.navigate("CreateAccountScreen");
   };
 
@@ -60,9 +91,12 @@ const LoginScreen: React.FC<{
               </Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="First & Last name"
+                placeholder="Email or Phone Number"
                 placeholderTextColor={"#DFDFDF"}
                 allowFontScaling={false}
+                value={id}
+                onChangeText={setId}
+                autoCapitalize="none"
               />
             </View>
 
@@ -76,12 +110,15 @@ const LoginScreen: React.FC<{
                   placeholder="Password"
                   placeholderTextColor="#BABFC3"
                   allowFontScaling={false}
+                  secureTextEntry={showPassword}
+                  value={password}
+                  onChangeText={setPassword}
                 />
-                <TouchableOpacity onPress={toggleBalanceVisibility}>
-                  {showBalance ? (
-                    <Eye color="#000" size={20} />
-                  ) : (
+                <TouchableOpacity onPress={togglePasswordVisibility}>
+                  {showPassword ? (
                     <EyeSlash color="#000" size={20} />
+                  ) : (
+                    <Eye color="#000" size={20} />
                   )}
                 </TouchableOpacity>
               </View>
@@ -101,10 +138,12 @@ const LoginScreen: React.FC<{
               onPress={handleLogin}
               style={styles.proceedButton}
               textColor="#fff"
+              isLoading={isLoading} // Show loading indicator when logging in
+              disabled={!id || !password || isLoading} // Disable button if id or password is empty or logging in
             />
             <Button
               title={"Create another account"}
-              onPress={handleButtonClick}
+              onPress={handleCreateAccount}
               style={{
                 backgroundColor: COLORS.violet200,
                 marginTop: SPACING * 2,
@@ -141,12 +180,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: RFValue(12),
   },
-  vertical: {
-    backgroundColor: COLORS.black100,
-    width: 1,
-    height: "100%",
-    marginHorizontal: SPACING,
-  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -160,18 +193,10 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: "100%",
-    fontSize: RFValue(14),
-  },
-  numberText: {
-    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(12),
   },
   proceedButton: {
     marginTop: SPACING * 4,
-  },
-  proceedButtonText: {
-    fontFamily: "Outfit-Regular",
-    color: "#fff",
-    fontSize: RFValue(16),
   },
   forgotPasswordText: {
     fontFamily: "Outfit-Regular",

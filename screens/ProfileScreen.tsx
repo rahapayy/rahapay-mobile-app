@@ -9,7 +9,7 @@ import {
   Image,
   Platform,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import FONT_SIZE from "../config/font-size";
 import {
   FingerScan,
@@ -27,10 +27,12 @@ import SPACING from "../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import BiometricModal from "../components/modals/BiometricModal";
 import CloseAccountModal from "../components/modals/CloseAccountModal";
+import { AuthContext } from "../context/AuthContext";
 
 const ProfileScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const { userInfo, logout } = useContext(AuthContext);
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [biometricModalVisible, setBiometricModalVisible] = useState(false);
   const [isCloseAccountModalVisible, setIsCloseAccountModalVisible] =
@@ -62,6 +64,10 @@ const ProfileScreen: React.FC<{
     setIsCloseAccountModalVisible(false);
   };
 
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
@@ -77,10 +83,10 @@ const ProfileScreen: React.FC<{
             />
             <View>
               <Text style={styles.name} allowFontScaling={false}>
-                John Doe
+                {userInfo?.data?.user?.fullName}
               </Text>
               <Text style={styles.subName} allowFontScaling={false}>
-                @johndoe
+                {userInfo?.data?.user?.phoneNumber}
               </Text>
             </View>
           </View>
@@ -208,7 +214,10 @@ const ProfileScreen: React.FC<{
             </View>
 
             {/* Logout */}
-            <TouchableOpacity style={styles.logoutContainer}>
+            <TouchableOpacity
+              onPress={handleLogout}
+              style={styles.logoutContainer}
+            >
               <Text style={styles.logoutButton} allowFontScaling={false}>
                 Logout
               </Text>

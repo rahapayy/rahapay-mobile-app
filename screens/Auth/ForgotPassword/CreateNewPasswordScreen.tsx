@@ -17,16 +17,61 @@ import SPACING from "../../../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/Button";
 import FONT_SIZE from "../../../config/font-size";
+import useApi from "../../../utils/api";
+import { handleShowFlash } from "../../../components/FlashMessageComponent";
+import { RouteProp, useRoute } from "@react-navigation/native";
+
+type CreateNewPasswordScreenRouteParams = {
+  token: string;
+};
 
 const CreateNewPasswordScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [showBalance, setShowBalance] = useState(true);
+  const route = useRoute<RouteProp<{ params: CreateNewPasswordScreenRouteParams }, 'params'>>();
+  const token = route.params.token;
 
-  const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
+  const [showPassword, setShowPassword] = useState(true);
+  const [showPassword2, setShowPassword2] = useState(true);
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  const togglePasswordVisibility2 = () => setShowPassword2((prev) => !prev);
 
-  const handleButtonClick = () => {
-    navigation.navigate("LoginScreen");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { mutateAsync } = useApi.patch("/auth/reset-password");
+
+  const handleButtonClick = async () => {
+    if (password !== confirmPassword) {
+      handleShowFlash({
+        message: "Passwords do not match",
+        type: "danger",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await mutateAsync({ password, token });
+      handleShowFlash({
+        message: "Password reset successfully!",
+        type: "success",
+      });
+      navigation.navigate("LoginScreen");
+    } catch (error) {
+      const err = error as {
+        response?: { data?: { message?: string } };
+        message: string;
+      };
+      const errorMessage =
+        err.response?.data?.message || err.message || "An error occurred";
+      handleShowFlash({
+        message: errorMessage,
+        type: "danger",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -57,23 +102,55 @@ const CreateNewPasswordScreen: React.FC<{
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                  placeholder="Password"
+                  placeholder="Enter new password"
+                  placeholderTextColor={"#DFDFDF"}
+                  secureTextEntry={showPassword}
                   allowFontScaling={false}
-                  placeholderTextColor="#BABFC3"
+                  value={password}
+                  onChangeText={setPassword}
                 />
-                <TouchableOpacity onPress={toggleBalanceVisibility}>
-                  {showBalance ? (
-                    <Eye color="#000" size={20} />
-                  ) : (
+                <TouchableOpacity onPress={togglePasswordVisibility}>
+                  {showPassword ? (
                     <EyeSlash color="#000" size={20} />
+                  ) : (
+                    <Eye color="#000" size={20} />
                   )}
                 </TouchableOpacity>
               </View>
+
+              <View className="mt-4">
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Confirm new password"
+                    placeholderTextColor={"#DFDFDF"}
+                    secureTextEntry={showPassword2}
+                    allowFontScaling={false}
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                  />
+                  <TouchableOpacity onPress={togglePasswordVisibility2}>
+                    {showPassword2 ? (
+                      <EyeSlash color="#000" size={20} />
+                    ) : (
+                      <Eye color="#000" size={20} />
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
             <Button
-              title={"Done"}
+              title={"Reset Password"}
               onPress={handleButtonClick}
-              style={styles.proceedButton}
+              className="mt-4"
+              textColor="#fff"
+              isLoading={isSubmitting}
+              disabled={isSubmitting || !password || !confirmPassword}
+              style={
+                isSubmitting || !password || !confirmPassword
+                  ? styles.disabledButton
+                  : null
+              }
             />
           </KeyboardAvoidingView>
         </View>
@@ -87,23 +164,17 @@ export default CreateNewPasswordScreen;
 const styles = StyleSheet.create({
   headText: {
     fontFamily: "Outfit-Medium",
-    fontSize: RFValue(24),
+    fontSize: RFValue(20),
     marginBottom: 10,
   },
   subText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(16),
-  },
-  textInput: {
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: "#DFDFDF",
-    padding: 18,
+    fontFamily: "Outfit-ExtraLight",
+    fontSize: RFValue(13),
   },
   label: {
     fontFamily: "Outfit-Regular",
     marginBottom: 10,
-    fontSize: RFValue(14),
+    fontSize: RFValue(12),
   },
   vertical: {
     backgroundColor: COLORS.black100,
@@ -124,7 +195,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: "100%",
-    fontSize: RFValue(14),
+    fontSize: RFValue(12),
   },
   numberText: {
     fontFamily: "Outfit-Regular",
@@ -141,5 +212,8 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: COLORS.violet600,
     fontSize: FONT_SIZE.medium,
+  },
+  disabledButton: {
+    backgroundColor: COLORS.violet200,
   },
 });

@@ -45,6 +45,11 @@ const COLORS = {
   violet900: "#1C1344",
   //  White
   white: "#FFFFFF",
+
+  success: "#28a745", // Green for success messages
+  info: "#17a2b8",    // Blue for info messages
+  default: "#6c757d", // Gray for default messages
+  error: "#dc3545"    // Red for error messages
 };
 
 export default COLORS;

@@ -1,3 +1,4 @@
+import React, { useEffect, useRef, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -6,23 +7,52 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Keyboard,
 } from "react-native";
-import React, { useRef, useState } from "react";
 import { ArrowLeft } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RouteProp, useRoute } from "@react-navigation/native";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../config/SPACING";
 import COLORS from "../../../config/colors";
 import Button from "../../../components/Button";
+import useApi from "../../../utils/api";
+import { handleShowFlash } from "../../../components/FlashMessageComponent";
+
+type VerifyEmailScreenRouteParams = {
+  email: string;
+};
 
 const VerifyEmailScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [boxes, setBoxes] = useState(["", "", "", "", ""]);
+  const route =
+    useRoute<RouteProp<{ params: VerifyEmailScreenRouteParams }, "params">>();
+  const email = route.params.email;
 
-  const boxRefs = useRef<Array<TextInput | null>>(new Array(5).fill(null));
+  const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
+  const boxRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
+  const [boxIsFocused, setBoxIsFocused] = useState(new Array(6).fill(false));
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isInputFilled, setIsInputFilled] = useState(false);
+  const [resendCountdown, setResendCountdown] = useState(60);
+  const [isLoading, setIsLoading] = useState(false);
+  const { mutateAsync: verifyOtp } = useApi.post("/auth/verify-email");
+  const { mutateAsync: resendOtp } = useApi.post("/auth/resend-otp");
 
-  const [boxIsFocused, setBoxIsFocused] = useState(new Array(5).fill(false));
+  useEffect(() => {
+    setIsInputFilled(boxes.every((box) => box !== ""));
+  }, [boxes]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (resendCountdown > 0) {
+      timer = setTimeout(() => setResendCountdown((prev) => prev - 1), 1000);
+    }
+
+    return () => clearTimeout(timer);
+  }, [resendCountdown]);
 
   const handleInput = (text: string, index: number) => {
     if (/^\d{0,1}$/.test(text)) {
@@ -30,22 +60,76 @@ const VerifyEmailScreen: React.FC<{
       newBoxes[index] = text;
       setBoxes(newBoxes);
 
-      // Check if all input boxes are cleared
       const allBoxesCleared = newBoxes.every((box) => box === "");
 
       if (text === "" && index > 0) {
         boxRefs.current[index - 1]?.focus();
-      } else if (index < 4 && !allBoxesCleared) {
+      } else if (index < 5 && !allBoxesCleared) {
         boxRefs.current[index + 1]?.focus();
       } else if (allBoxesCleared) {
-        // If all boxes are cleared, focus on the first box
         boxRefs.current[0]?.focus();
       }
     }
   };
 
-  const handleButtonClick = () => {
-    navigation.navigate("CreateTagScreen");
+  const handleKeyPress = (index: number, event: any) => {
+    if (event.nativeEvent.key === "Backspace" && index > 0) {
+      const newBoxes = [...boxes];
+      newBoxes[index - 1] = "";
+      setBoxes(newBoxes);
+      boxRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleButtonClick = async () => {
+    const otp = boxes.join("");
+    setIsLoading(true);
+    if (otp.length === 6) {
+      setIsSubmitting(true);
+      try {
+        const response = await verifyOtp({ otp, email });
+        handleShowFlash({
+          message: "Email verified successfully!",
+          type: "success",
+        });
+        navigation.navigate("CreateTagScreen");
+      } catch (error) {
+        const err = error as {
+          response?: { data?: { message?: string } };
+          message: string;
+        };
+        const errorMessage =
+          err.response?.data?.message || err.message || "An error occurred";
+        handleShowFlash({
+          message: errorMessage,
+          type: "danger",
+        });
+      } finally {
+        setIsSubmitting(false);
+        setIsLoading(false);
+      }
+    } else {
+      handleShowFlash({
+        message: "Please enter the complete OTP",
+        type: "warning",
+      });
+    }
+  };
+
+  const resendOTP = async () => {
+    try {
+      await resendOtp({ email });
+      handleShowFlash({
+        message: "OTP resent successfully!",
+        type: "success",
+      });
+      setResendCountdown(60); // Reset countdown timer
+    } catch (error) {
+      handleShowFlash({
+        message: "Failed to resend OTP. Please try again later.",
+        type: "danger",
+      });
+    }
   };
 
   return (
@@ -61,11 +145,9 @@ const VerifyEmailScreen: React.FC<{
               Verify Email Address
             </Text>
             <Text style={styles.subText} allowFontScaling={false}>
-              Enter the OTP sent to Johndoe@gmail.com
+              Enter the OTP sent to {email}
             </Text>
           </View>
-
-          {/* Input boxes */}
 
           <View style={styles.inputContainer}>
             <View style={styles.inputRow}>
@@ -95,6 +177,7 @@ const VerifyEmailScreen: React.FC<{
                       ...prevState.slice(index + 1),
                     ])
                   }
+                  onKeyPress={(event) => handleKeyPress(index, event)}
                 />
               ))}
             </View>
@@ -105,18 +188,30 @@ const VerifyEmailScreen: React.FC<{
             onPress={handleButtonClick}
             className="mt-4"
             textColor="#fff"
+            isLoading={isLoading}
+            disabled={isSubmitting || !isInputFilled || isLoading}
+            style={
+              isSubmitting || !isInputFilled ? styles.disabledButton : null
+            }
           />
 
-          <View className=" justify-center items-center mt-6">
+          <View className="justify-center items-center mt-6">
             <Text style={styles.otpText} allowFontScaling={false}>
               Didn’t receive an OTP?
             </Text>
 
-            <View style={styles.countdownContainer}>
-              <Text style={styles.countdownText} allowFontScaling={false}>
-                Resend OTP (59s)
-              </Text>
-            </View>
+            <TouchableOpacity
+              onPress={resendOTP}
+              disabled={resendCountdown > 0}
+            >
+              <View style={styles.countdownContainer}>
+                <Text style={styles.countdownText} allowFontScaling={false}>
+                  {resendCountdown > 0
+                    ? `Resend OTP (${resendCountdown}s)`
+                    : "Resend OTP"}
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -157,7 +252,7 @@ const styles = StyleSheet.create({
   inputBox: {
     flex: 1,
     textAlign: "center",
-    paddingVertical: SPACING * 2,
+    paddingVertical: SPACING * 1.5,
     paddingHorizontal: SPACING,
     borderRadius: 10,
     margin: SPACING / 2,
@@ -171,15 +266,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   otpText: {
-    fontSize: RFValue(14),
+    fontSize: RFValue(13),
     fontFamily: "Outfit-Regular",
   },
   countdownContainer: {
     marginTop: SPACING * 2,
     backgroundColor: COLORS.violet200,
-    paddingVertical: SPACING * 2,
+    paddingVertical: SPACING * 1.5,
     paddingHorizontal: SPACING * 2,
     borderRadius: 4,
   },
-  countdownText: {},
+  countdownText: {
+    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(14),
+  },
+  disabledButton: {
+    backgroundColor: COLORS.violet200,
+  },
 });

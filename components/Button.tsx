@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   TouchableOpacityProps,
   useWindowDimensions,
+  View,
+  ActivityIndicator,
 } from "react-native";
 import React from "react";
 import COLORS from "../config/colors";
@@ -15,6 +17,7 @@ const { height: windowHeight, width: windowWidth } = Dimensions.get("window");
 interface ButtonProps extends TouchableOpacityProps {
   title: string;
   textColor?: string;
+  isLoading?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -22,6 +25,7 @@ const Button: React.FC<ButtonProps> = ({
   onPress,
   style,
   textColor = "black",
+  isLoading = false,
   ...rest
 }) => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -30,18 +34,24 @@ const Button: React.FC<ButtonProps> = ({
   const buttonWidth = screenWidth * 0.85;
   const buttonHeight = screenHeight * 0.06;
   const buttonBottomMargin = screenHeight * 0.1;
+
   return (
     <TouchableOpacity
       style={[styles.button, style]}
       onPress={onPress}
       {...rest}
     >
-      <Text
-        style={[styles.buttonText, { color: textColor }]}
-        allowFontScaling={false}
-      >
-        {title}
-      </Text>
+      <View style={styles.contentContainer}>
+        {isLoading && (
+          <ActivityIndicator size="small" color="#fff" style={styles.spinner} />
+        )}
+        <Text
+          style={[styles.buttonText, { color: textColor }]}
+          allowFontScaling={false}
+        >
+          {title}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -60,5 +70,12 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: RFValue(12),
     fontFamily: "Outfit-Regular",
+  },
+  contentContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  spinner: {
+    marginRight: 8,
   },
 });

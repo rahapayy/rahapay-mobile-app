@@ -15,6 +15,8 @@ import Electricity from "../assets/svg/electricity_svgrepo.com.svg";
 import Data from "../assets/svg/signal_svgrepo.com.svg";
 import SPACING from "../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Ionicons, Octicons } from "@expo/vector-icons";
+import COLORS from "../config/colors";
 
 const ServicesScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -27,7 +29,7 @@ const ServicesScreen: React.FC<{
             Services
           </Text>
           {/* Card */}
-          <View className="w-full h-96 bg-white p-6 mt-10 rounded-xl overflow-hidden">
+          <View className="w-full bg-white p-6 mt-10 rounded-xl overflow-hidden">
             <View className="flex flex-row flex-wrap justify-between">
               <TouchableOpacity
                 onPress={() => navigation.navigate("AirtimeScreen")}
@@ -96,13 +98,13 @@ const ServicesScreen: React.FC<{
             </View>
 
             {/*  */}
-            <View className="flex flex-row flex-wrap justify-between mt-4">
+            <View className="flex flex-row flex-wrap justify-between mt-6">
               <TouchableOpacity
                 onPress={() => navigation.navigate("ReferralScreen")}
                 className="items-center mb-4 w-1/5"
               >
                 <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
-                  {/* <Airtime /> */}
+                  <Ionicons name="gift" size={24} color={COLORS.violet400} />
                 </View>
                 <Text
                   style={styles.titleText}
@@ -118,7 +120,11 @@ const ServicesScreen: React.FC<{
                 className="items-center mb-4 w-1/5"
               >
                 <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
-                  {/* <Data /> */}
+                  <Ionicons
+                    name="school-sharp"
+                    size={24}
+                    color={COLORS.violet400}
+                  />
                 </View>
                 <Text
                   style={styles.titleText}
@@ -134,23 +140,11 @@ const ServicesScreen: React.FC<{
                 className="items-center mb-4 w-1/5"
               >
                 <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
-                  {/* <Tv /> */}
-                </View>
-                <Text
-                  style={styles.titleText}
-                  // numberOfLines={1}
-                  // ellipsizeMode="tail"
-                  allowFontScaling={false}
-                >
-                  Airtime to Cash
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("")}
-                className="items-center mb-4 w-1/5"
-              >
-                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
-                  {/* <Electricity /> */}
+                  <Ionicons
+                    name="football"
+                    size={24}
+                    color={COLORS.violet400}
+                  />
                 </View>
                 <Text
                   style={styles.titleText}
@@ -159,6 +153,26 @@ const ServicesScreen: React.FC<{
                   allowFontScaling={false}
                 >
                   Betting
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("")}
+                className="items-center mb-4 w-1/5"
+              >
+                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                  <Octicons
+                    name="arrow-switch"
+                    size={24}
+                    color={COLORS.violet400}
+                  />
+                </View>
+                <Text
+                  style={styles.titleText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  allowFontScaling={false}
+                >
+                  Transfer
                 </Text>
               </TouchableOpacity>
             </View>

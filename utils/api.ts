@@ -4,19 +4,40 @@ import Axios, { AxiosInstance, AxiosResponse } from "axios";
 import { getItem } from "./ayncStorage";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
-type MethodTypes = "GET" | "POST" | "PUT" | "DELETE";
+type MethodTypes = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 const axiosInstance: AxiosInstance = Axios.create({
   baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
-    "secure-app-password": process.env.EXPO_PRIVATE_API_KEY,
   },
 });
 
+let onUnauthorizedCallback = () => {}; // Initial empty function
+
+// Function to set the callback
+export const setOnUnauthorizedCallback = (cb: () => void) => {
+  onUnauthorizedCallback = cb;
+};
+
+// Response interceptor to handle 401 responses
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response && error.response.status === 401) {
+      try {
+        await AsyncStorage.removeItem("access_token");
+        onUnauthorizedCallback(); // Call the onUnauthorized callback
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Request interceptor to add the Authorization header
 axiosInstance.interceptors.request.use(async (config) => {
-  config.headers["secure-app-password"] = process.env.EXPO_PRIVATE_API_KEY;
   const accessToken = await getItem("access_token");
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
@@ -26,21 +47,21 @@ axiosInstance.interceptors.request.use(async (config) => {
 });
 
 // Response interceptor to handle 401 responses
-// axiosInstance.interceptors.response.use(
-//   (response) => {
-//     return response;
-//   },
-//   async (error) => {
-//     if (error.response && error.response.status === 401) {
-//       try {
-//         await AsyncStorage.removeItem("access_token");
-//       } catch (e) {
-//         console.error(e);
-//       }
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    if (error.response && error.response.status === 401) {
+      try {
+        await AsyncStorage.removeItem("access_token");
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const axios = axiosInstance;
 
@@ -66,4 +87,9 @@ export default {
   put: (url: string) =>
     useMutation((data: any) => makeRequest("PUT", url, data)),
   delete: (url: string) => useMutation(() => makeRequest("DELETE", url)),
+  patch: <TData, TError>(path: string) => {
+    return useMutation<TData, TError, TData>((data) =>
+      axiosInstance.patch(path, data)
+    );
+  },
 };

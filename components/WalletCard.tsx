@@ -54,7 +54,7 @@ const WalletCard: React.FC<{
         </View>
         {showBalance ? (
           <Text style={styles.balance}>
-            <Text style={{ fontSize: RFValue(16) }}></Text> ₦ 120,000.00
+            <Text style={{ fontSize: RFValue(16) }}></Text> ₦ 0.00
           </Text>
         ) : (
           <Text style={styles.balance}>********</Text>
