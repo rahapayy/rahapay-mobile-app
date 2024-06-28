@@ -19,17 +19,10 @@ import Button from "../../../components/Button";
 import FONT_SIZE from "../../../config/font-size";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import { RouteProp, useRoute } from "@react-navigation/native";
-
-type CreateNewPasswordScreenRouteParams = {
-  token: string;
-};
 
 const CreateNewPasswordScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const route = useRoute<RouteProp<{ params: CreateNewPasswordScreenRouteParams }, 'params'>>();
-  const token = route.params.token;
 
   const [showPassword, setShowPassword] = useState(true);
   const [showPassword2, setShowPassword2] = useState(true);
@@ -52,7 +45,7 @@ const CreateNewPasswordScreen: React.FC<{
 
     setIsSubmitting(true);
     try {
-      await mutateAsync({ password, token });
+      await mutateAsync({ password });
       handleShowFlash({
         message: "Password reset successfully!",
         type: "success",
