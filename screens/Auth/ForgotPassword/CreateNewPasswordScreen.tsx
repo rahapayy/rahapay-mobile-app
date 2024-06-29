@@ -1,17 +1,7 @@
-import {
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
 import React, { useState } from "react";
 import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -22,7 +12,10 @@ import { handleShowFlash } from "../../../components/FlashMessageComponent";
 
 const CreateNewPasswordScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
-}> = ({ navigation }) => {
+  route: { params: { resetToken: string } };
+}> = ({ navigation, route }) => {
+  const { resetToken } = route.params;
+  console.log("Received resetToken in CreateNewPasswordScreen:", resetToken);
 
   const [showPassword, setShowPassword] = useState(true);
   const [showPassword2, setShowPassword2] = useState(true);
@@ -45,7 +38,8 @@ const CreateNewPasswordScreen: React.FC<{
 
     setIsSubmitting(true);
     try {
-      await mutateAsync({ password });
+      console.log("Making request with resetToken:", resetToken);
+      await mutateAsync({ password, resetToken });
       handleShowFlash({
         message: "Password reset successfully!",
         type: "success",
@@ -112,6 +106,9 @@ const CreateNewPasswordScreen: React.FC<{
               </View>
 
               <View className="mt-4">
+                <Text style={styles.label} allowFontScaling={false}>
+                  Confirm Password
+                </Text>
                 <View style={styles.inputContainer}>
                   <TextInput
                     style={styles.input}

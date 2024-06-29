@@ -1,3 +1,8 @@
+import React, { useRef, useState } from "react";
+import { ArrowLeft } from "iconsax-react-native";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RFValue } from "react-native-responsive-fontsize";
 import {
   SafeAreaView,
   ScrollView,
@@ -7,11 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useRef, useState } from "react";
-import { ArrowLeft } from "iconsax-react-native";
-import { RouteProp, useRoute } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../config/SPACING";
 import COLORS from "../../../config/colors";
 import Button from "../../../components/Button";
@@ -66,12 +66,20 @@ const EnterCodeScreen: React.FC<{
     if (otp.length === 6) {
       setIsSubmitting(true);
       try {
-        await verifyOtp({ otp, email });
+        const response = await verifyOtp({ otp, email });
+        console.log("API Response:", response.data); // Ensure the resetToken is part of this response
         handleShowFlash({
           message: "OTP verified successfully!",
           type: "success",
         });
-        navigation.navigate("CreateNewPasswordScreen");
+        const resetToken = response.data.data.resetToken; // Correct path to resetToken
+        console.log("Received resetToken:", resetToken); // Debugging line
+        if (!resetToken) {
+          throw new Error("Reset token is missing from the response");
+        }
+        navigation.navigate("CreateNewPasswordScreen", {
+          resetToken: resetToken,
+        });
       } catch (error) {
         const err = error as {
           response?: { data?: { message?: string } };
@@ -205,16 +213,4 @@ const styles = StyleSheet.create({
     borderColor: COLORS.violet400,
     borderWidth: 1,
   },
-  otpText: {
-    fontSize: RFValue(14),
-    fontFamily: "Outfit-Regular",
-  },
-  countdownContainer: {
-    marginTop: SPACING * 2,
-    backgroundColor: COLORS.violet200,
-    paddingVertical: SPACING * 2,
-    paddingHorizontal: SPACING * 2,
-    borderRadius: 4,
-  },
-  countdownText: {},
 });

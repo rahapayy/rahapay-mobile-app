@@ -38,7 +38,7 @@ const ResetPasswordScreen: React.FC<{
         type: "success",
       });
 
-      navigation.navigate("EnterCodeScreen", {email});
+      navigation.navigate("EnterCodeScreen", { email });
     } catch (error) {
       const err = error as {
         response?: { data?: { message?: string } };
@@ -98,10 +98,10 @@ const ResetPasswordScreen: React.FC<{
             <Button
               title={"Reset Password"}
               onPress={handleButtonClick}
-              style={styles.proceedButton}
+              style={styles.proceedButton }
               textColor="#fff"
               isLoading={isLoading}
-              disabled={isLoading || !email} // Disable the button if the email is empty or if loading
+              disabled={isLoading || !email}
             />
           </KeyboardAvoidingView>
         </View>
@@ -166,6 +166,9 @@ const styles = StyleSheet.create({
     fontSize: RFValue(16),
   },
   proceedButtonDisabled: {
+    backgroundColor: COLORS.violet200,
+  },
+  disabledButton: {
     backgroundColor: COLORS.violet200,
   },
 });
