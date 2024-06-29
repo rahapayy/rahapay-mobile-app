@@ -15,7 +15,6 @@ const CreateNewPasswordScreen: React.FC<{
   route: { params: { resetToken: string } };
 }> = ({ navigation, route }) => {
   const { resetToken } = route.params;
-  console.log("Received resetToken in CreateNewPasswordScreen:", resetToken);
 
   const [showPassword, setShowPassword] = useState(true);
   const [showPassword2, setShowPassword2] = useState(true);
