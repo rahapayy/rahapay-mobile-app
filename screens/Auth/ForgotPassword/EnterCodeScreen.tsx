@@ -67,13 +67,11 @@ const EnterCodeScreen: React.FC<{
       setIsSubmitting(true);
       try {
         const response = await verifyOtp({ otp, email });
-        console.log("API Response:", response.data); // Ensure the resetToken is part of this response
         handleShowFlash({
           message: "OTP verified successfully!",
           type: "success",
         });
-        const resetToken = response.data.data.resetToken; // Correct path to resetToken
-        console.log("Received resetToken:", resetToken); // Debugging line
+        const resetToken = response.data.data.resetToken; 
         if (!resetToken) {
           throw new Error("Reset token is missing from the response");
         }
