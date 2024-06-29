@@ -52,6 +52,14 @@ const EnterCodeScreen: React.FC<{
     }
   };
 
+  const handlePaste = (text: string) => {
+    if (/^\d{6}$/.test(text)) {
+      const newBoxes = text.split("");
+      setBoxes(newBoxes);
+      boxRefs.current[5]?.focus();
+    }
+  };
+
   const handleKeyPress = (index: number, event: any) => {
     if (event.nativeEvent.key === "Backspace" && index > 0) {
       const newBoxes = [...boxes];
@@ -71,7 +79,7 @@ const EnterCodeScreen: React.FC<{
           message: "OTP verified successfully!",
           type: "success",
         });
-        const resetToken = response.data.data.resetToken; 
+        const resetToken = response.data?.resetToken;
         if (!resetToken) {
           throw new Error("Reset token is missing from the response");
         }
@@ -128,9 +136,15 @@ const EnterCodeScreen: React.FC<{
                     boxIsFocused[index] && styles.inputBoxFocused,
                   ]}
                   keyboardType="numeric"
-                  value={value ? "*" : ""}
+                  value={value}
                   allowFontScaling={false}
-                  onChangeText={(text) => handleInput(text, index)}
+                  onChangeText={(text) => {
+                    if (text.length > 1) {
+                      handlePaste(text);
+                    } else {
+                      handleInput(text, index);
+                    }
+                  }}
                   onFocus={() =>
                     setBoxIsFocused((prevState) => [
                       ...prevState.slice(0, index),
