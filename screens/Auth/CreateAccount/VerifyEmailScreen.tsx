@@ -265,8 +265,8 @@ const styles = StyleSheet.create({
   inputBox: {
     flex: 1,
     textAlign: "center",
-    paddingVertical: SPACING * 1.5,
-    paddingHorizontal: SPACING,
+    width: 50,
+    height: 56,
     borderRadius: 10,
     margin: SPACING / 2,
     borderWidth: 1,
