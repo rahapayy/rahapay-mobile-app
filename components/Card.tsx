@@ -30,9 +30,13 @@ const Card: React.FC<{
 }> = ({ navigation }) => {
   const [showBalance, setShowBalance] = useState(true);
 
-  const { userInfo } = useContext(AuthContext);
-  const firstName = userInfo?.data?.user?.fullName?.split(" ")[0];
+  const { userDetails } = useContext(AuthContext);
+  const fullName = userDetails?.fullName || "User";
+  const firstName = fullName.split(" ")[0];
+
+  console.log("userDetails in Card:", userDetails);
   const { balance } = useWallet();
+  // console.log(balance);
 
   const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
 
