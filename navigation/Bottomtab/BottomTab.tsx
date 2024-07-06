@@ -1,13 +1,23 @@
 import React from "react";
 import { StyleSheet, Text, TextProps } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Home, Profile, MoreSquare, WalletAdd1, Cards } from "iconsax-react-native";
+import {
+  Home,
+  Profile,
+  MoreSquare,
+  WalletAdd1,
+  Cards,
+} from "iconsax-react-native";
 import HomeScreen from "../../screens/HomeScreen";
 import ServicesScreen from "../../screens/ServicesScreen";
 import WalletScreen from "../../screens/WalletScreen";
 import ProfileScreen from "../../screens/ProfileScreen";
-import CardsScreen from "../../screens/CardsScreen";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 
 const Tab = createBottomTabNavigator();
 
@@ -61,7 +71,10 @@ interface AnimatedIconProps {
   IconComponent: React.ElementType;
 }
 
-const AnimatedIcon: React.FC<AnimatedIconProps> = ({ focused, IconComponent }) => {
+const AnimatedIcon: React.FC<AnimatedIconProps> = ({
+  focused,
+  IconComponent,
+}) => {
   const scale = useSharedValue(1);
 
   React.useEffect(() => {
@@ -74,7 +87,15 @@ const AnimatedIcon: React.FC<AnimatedIconProps> = ({ focused, IconComponent }) =
 
   return (
     <Animated.View style={animatedStyle}>
-      <IconComponent size={27} color={focused ? customColors.activeTintColor : customColors.inactiveTintColor} variant={focused ? "Bold" : "Linear"} />
+      <IconComponent
+        size={27}
+        color={
+          focused
+            ? customColors.activeTintColor
+            : customColors.inactiveTintColor
+        }
+        variant={focused ? "Bold" : "Linear"}
+      />
     </Animated.View>
   );
 };

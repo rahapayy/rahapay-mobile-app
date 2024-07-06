@@ -31,15 +31,17 @@ const CreateTagScreen: React.FC<{
     "/auth/suggest-username?numberOfSuggestions=7"
   );
 
-  const updateTagMutation = useApi.patch<{ userName: string }, Error>('/auth/username');
+  const updateTagMutation = useApi.patch<{ userName: string }, Error>(
+    "/auth/username"
+  );
 
   const handleSetTag = async () => {
     setLoading(true);
     try {
-await updateTagMutation.mutateAsync({ userName: tag });
+      await updateTagMutation.mutateAsync({ userName: tag });
 
       // Here you would navigate to another screen or reset the state as required
-      navigation.navigate("NextScreen");
+      navigation.navigate("CreatePinScreen");
       // Show success message
       handleShowFlash({
         message: "Tag updated successfully!",
@@ -53,6 +55,7 @@ await updateTagMutation.mutateAsync({ userName: tag });
       });
       // Optionally log the error too
       console.error("Failed to update tag:", error);
+      console.error({ error });
     } finally {
       setLoading(false);
     }
@@ -107,19 +110,21 @@ await updateTagMutation.mutateAsync({ userName: tag });
               </View>
             </View>
             {/* Suggested availble usertags */}
-            {suggestedTags.map((suggestedTag, index) => (
-              <TouchableOpacity
-                key={index}
-                style={{
-                  padding: SPACING,
-                  backgroundColor: COLORS.black200,
-                  marginTop: SPACING,
-                }}
-                onPress={() => setTag(suggestedTag)}
-              >
-                <Text>{`@${suggestedTag}`}</Text>
-              </TouchableOpacity>
-            ))}
+            {/* {suggestedTags.length && */}
+            {suggestedTags.length > 0 &&
+              suggestedTags?.map((suggestedTag, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={{
+                    padding: SPACING,
+                    backgroundColor: COLORS.black200,
+                    marginTop: SPACING,
+                  }}
+                  onPress={() => setTag(suggestedTag)}
+                >
+                  <Text>{`@${suggestedTag}`}</Text>
+                </TouchableOpacity>
+              ))}
 
             <Button
               title="Set My Tag"

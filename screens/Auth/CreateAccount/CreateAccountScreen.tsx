@@ -50,10 +50,10 @@ const CreateAccountScreen: React.FC<{
           password,
         });
 
-        // handleShowFlash({
-        //   message: "Account created successfully!",
-        //   type: "success",
-        // });
+        handleShowFlash({
+          message: "Account created successfully!",
+          type: "success",
+        });
 
         navigation.navigate("VerifyEmailScreen", { email });
       } catch (error) {

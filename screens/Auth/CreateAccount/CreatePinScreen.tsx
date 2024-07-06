@@ -45,7 +45,7 @@ const CreateTransactionPinScreen: React.FC<{
   };
 
   const handleButtonClick = () => {
-    navigation.navigate("ConfirmPinScreen");
+    navigation.navigate("ConfirmPinScreen", { pin: boxes.join("") });
   };
   return (
     <SafeAreaView style={{ flex: 1 }}>

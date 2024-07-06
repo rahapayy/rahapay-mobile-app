@@ -14,11 +14,23 @@ import COLORS from "../../../config/colors";
 import Button from "../../../components/Button";
 import { ArrowLeft } from "iconsax-react-native";
 import { TextInput } from "react-native";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import useApi from "../../../utils/api";
+import { handleShowFlash } from "../../../components/FlashMessageComponent";
+
+type ConfirmPinScreenRouteParams = {
+  pin: string;
+};
 
 const ConfirmPinScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const route =
+    useRoute<RouteProp<{ params: ConfirmPinScreenRouteParams }, "params">>();
+  const prevPin = route.params.pin;
+
   const [boxes, setBoxes] = useState(["", "", "", ""]);
+  const [loading, setLoading] = useState(false);
 
   const boxRefs = useRef<Array<TextInput | null>>(new Array(4).fill(null));
 
@@ -43,9 +55,40 @@ const ConfirmPinScreen: React.FC<{
       }
     }
   };
+  const { mutateAsync } = useApi.post("/auth/create-pin");
 
-  const handleButtonClick = () => {
-    navigation.navigate("SuccessfulScreen");
+  const handleButtonClick = async () => {
+    setLoading(true);
+    try {
+      const pin = boxes.join("");
+      if (pin !== prevPin) {
+        handleShowFlash({
+          message: "Pins are not the same",
+          type: "danger",
+        });
+      } else {
+        await mutateAsync({ securityPin: boxes.join("") });
+
+        // Here you would navigate to another screen or reset the state as required
+        navigation.navigate("SuccessfulScreen");
+        // Show success message
+        handleShowFlash({
+          message: "Security pin added successfully!",
+          type: "success",
+        });
+        setBoxes(["", "", "", ""]);
+      }
+    } catch (error) {
+      handleShowFlash({
+        message: "Failed to add pin. Please try again later.",
+        type: "danger",
+      });
+      // Optionally log the error too
+      console.error("Failed to update pin:", error);
+      console.error({ error });
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -119,6 +162,7 @@ const ConfirmPinScreen: React.FC<{
         <Button
           title={"Create Pin"}
           onPress={handleButtonClick}
+          isLoading={loading}
           className="mt-4"
           textColor="#fff"
         />

@@ -134,7 +134,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUserInfo(userInfo);
       setIsAuthenticated(true);
       AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
-      AsyncStorage.setItem("access_token", userInfo.data.token);
+      AsyncStorage.setItem("access_token", userInfo.data.accessToken);
       return userInfo;
     } catch (error: any) {
       throw new Error("Incorrect email or password");
