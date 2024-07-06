@@ -41,6 +41,8 @@ export const AuthContext = createContext<{
   isLoggedIn: () => boolean;
   isAppReady: boolean;
   isAuthenticated: boolean;
+  userDetails: any;
+  fetchUserDetails: (token: any) => Promise<void>;
 }>({
   isLoading: false,
   userInfo: null,
@@ -52,10 +54,13 @@ export const AuthContext = createContext<{
   isLoggedIn: () => false,
   isAuthenticated: false,
   isAppReady: false,
+  userDetails: null,
+  fetchUserDetails: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userInfo, setUserInfo] = useState<UserInfoType | any>(null);
+  const [userDetails, setUserDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [idleStartTime, setIdleStartTime] = useState<number | null>(null);
   const [isAppReady, setIsAppReady] = useState(false);
@@ -69,9 +74,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const storedUserInfo = await AsyncStorage.getItem("userInfo");
         const storedAccessToken = await AsyncStorage.getItem("access_token");
+        const storedUserDetails = await AsyncStorage.getItem("userDetails");
         if (storedUserInfo) {
-          setUserInfo(JSON.parse(storedUserInfo));
+          const parsedUserInfo = JSON.parse(storedUserInfo);
+          setUserInfo(parsedUserInfo);
           setIsAuthenticated(true);
+
+          if (storedAccessToken && storedUserDetails) {
+            setUserDetails(JSON.parse(storedUserDetails));
+          } else {
+            await fetchUserDetails(parsedUserInfo.data.accessToken);
+          }
         }
       } catch (error) {
         console.error("Error reading user info from AsyncStorage:", error);
@@ -123,23 +136,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const login = async (id: string, password: string) => {
+  const login = async (id: any, password: any) => {
     try {
       setIsLoading(true);
-      const res = await axios.post(`/auth/login`, {
-        id,
-        password,
-      });
+      const res = await axios.post(`/auth/login`, { id, password });
       let userInfo = res.data;
       setUserInfo(userInfo);
-      setIsAuthenticated(true);
       AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
-      AsyncStorage.setItem("access_token", userInfo.data.token);
+      setIsAuthenticated(true);
+
+      // Fetch user details
+      await fetchUserDetails(userInfo.data.accessToken);
+
       return userInfo;
-    } catch (error: any) {
+    } catch (error) {
       throw new Error("Incorrect email or password");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchUserDetails = async (token: any) => {
+    try {
+      const res = await axios.get(`/user/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUserDetails(res.data.data);
+      AsyncStorage.setItem("userDetails", JSON.stringify(res.data.data));
+    } catch (error) {
+      console.error("Failed to fetch user details:", error);
     }
   };
 
@@ -147,14 +172,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(false);
     setIsAuthenticated(false);
     AsyncStorage.removeItem("access_token");
+    AsyncStorage.removeItem("userDetails"); // Clear userDetails on logout
   }, []);
 
   const logout = () => {
     setIsLoading(false);
     setUserInfo(null);
     setIsAuthenticated(false);
+    setUserDetails(null); // Clear userDetails on logout
     AsyncStorage.removeItem("userInfo");
     AsyncStorage.removeItem("access_token");
+    AsyncStorage.removeItem("userDetails");
   };
 
   const isLoggedIn = React.useMemo(() => {
@@ -185,6 +213,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const storedUserInfo = await AsyncStorage.getItem("userInfo");
         if (!storedUserInfo) {
           authLogout();
+        } else {
+          const parsedUserInfo = JSON.parse(storedUserInfo);
+          setUserInfo(parsedUserInfo);
+          setIsAuthenticated(true);
+          const storedUserDetails = await AsyncStorage.getItem("userDetails");
+          if (storedUserDetails) {
+            setUserDetails(JSON.parse(storedUserDetails));
+          } else {
+            await fetchUserDetails(parsedUserInfo.data.accessToken);
+          }
         }
       }
 
@@ -286,6 +324,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUserInfo,
         onboarding,
         verifyEmail,
+        userDetails,
+        fetchUserDetails,
         login,
         logout,
         isLoggedIn,
@@ -301,6 +341,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
   AsyncStorage.removeItem("userInfo");
   AsyncStorage.removeItem("access_token");
+  AsyncStorage.removeItem("userDetails");
   return BackgroundFetch.BackgroundFetchResult.NewData;
 });
 

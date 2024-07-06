@@ -21,6 +21,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthContext } from "../context/AuthContext";
+import useWallet from "../hooks/use-wallet";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
@@ -29,8 +30,13 @@ const Card: React.FC<{
 }> = ({ navigation }) => {
   const [showBalance, setShowBalance] = useState(true);
 
-  const { userInfo } = useContext(AuthContext);
-  const firstName = userInfo?.data?.user?.fullName?.split(" ")[0];
+  const { userDetails } = useContext(AuthContext);
+  const fullName = userDetails?.fullName || "User";
+  const firstName = fullName.split(" ")[0];
+
+  console.log("userDetails in Card:", userDetails);
+  const { balance } = useWallet();
+  // console.log(balance);
 
   const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
 
@@ -88,9 +94,16 @@ const Card: React.FC<{
           </View>
 
           <View style={styles.balanceValueContainer}>
-            <Text style={styles.balanceValue} allowFontScaling={false}>
-              {showBalance ? "₦0.00" : "*******"}
-            </Text>
+            {showBalance ? (
+              <Text style={styles.balanceValue} allowFontScaling={false}>
+                ₦{" "}
+                {balance.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                })}
+              </Text>
+            ) : (
+              <Text style={styles.balanceValue}>********</Text>
+            )}
           </View>
 
           <TouchableOpacity

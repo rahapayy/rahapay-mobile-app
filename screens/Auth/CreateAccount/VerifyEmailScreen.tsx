@@ -7,7 +7,6 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Keyboard,
 } from "react-native";
 import { ArrowLeft } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -69,6 +68,14 @@ const VerifyEmailScreen: React.FC<{
       } else if (allBoxesCleared) {
         boxRefs.current[0]?.focus();
       }
+    }
+  };
+
+  const handlePaste = (text: string) => {
+    if (/^\d{6}$/.test(text)) {
+      const newBoxes = text.split("");
+      setBoxes(newBoxes);
+      boxRefs.current[5]?.focus();
     }
   };
 
@@ -162,7 +169,13 @@ const VerifyEmailScreen: React.FC<{
                   keyboardType="numeric"
                   value={value ? "*" : ""}
                   allowFontScaling={false}
-                  onChangeText={(text) => handleInput(text, index)}
+                  onChangeText={(text) => {
+                    if (text.length > 1) {
+                      handlePaste(text);
+                    } else {
+                      handleInput(text, index);
+                    }
+                  }}
                   onFocus={() =>
                     setBoxIsFocused((prevState) => [
                       ...prevState.slice(0, index),
@@ -252,8 +265,8 @@ const styles = StyleSheet.create({
   inputBox: {
     flex: 1,
     textAlign: "center",
-    paddingVertical: SPACING * 1.5,
-    paddingHorizontal: SPACING,
+    width: 50,
+    height: 56,
     borderRadius: 10,
     margin: SPACING / 2,
     borderWidth: 1,

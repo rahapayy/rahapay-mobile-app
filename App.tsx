@@ -1,14 +1,12 @@
 import React, { useCallback } from "react";
 import { createTheme, ThemeProvider } from "@rneui/themed";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "react-native";
 import Router from "./router/Router";
 import { AuthProvider } from "./context/AuthContext";
 import { QueryClient, QueryClientProvider } from "react-query";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import FlashMessageComponent from "./components/FlashMessageComponent";
 import FlashMessage from "react-native-flash-message";
 
