@@ -1,9 +1,7 @@
 import {
   Image,
-  KeyboardAvoidingView,
   Platform,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -24,23 +22,30 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 const CreateAccountScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [fullName, setfullName] = useState("");
-  const [email, setemail] = useState("");
-  const [phoneNumber, setphoneNumber] = useState("");
-  const [password, setpassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(true);
   const countryCode = "+234";
   const [isLoading, setIsLoading] = useState(false);
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
   // Create a boolean that checks if all fields have been entered
   const isFormComplete =
-    fullName && email && phoneNumber && password && countryCode;
+    fullName &&
+    email &&
+    phoneNumber &&
+    password &&
+    confirmPassword &&
+    countryCode;
 
-  const toggleBalanceVisibility = () => setShowPassword((prev) => !prev);
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   const handleButtonClick = async () => {
     setIsLoading(true);
-    if (isFormComplete) {
+    if (isFormComplete && password === confirmPassword) {
       try {
         const response = await mutateAsync({
           fullName,
@@ -65,19 +70,39 @@ const CreateAccountScreen: React.FC<{
         const errorMessage =
           err.response?.data?.message || err.message || "An error occurred";
         console.error("API Error:", err.response?.data || err.message); // Log the full error response
-        handleShowFlash({
-          message: errorMessage,
-          type: "danger",
-        });
+
+        // Check for specific error conditions, e.g., wrong password
+        if (errorMessage.toLowerCase().includes("password")) {
+          handleShowFlash({
+            message: "Incorrect password entered. Please try again.",
+            type: "danger",
+          });
+        } else {
+          handleShowFlash({
+            message: errorMessage,
+            type: "danger",
+          });
+        }
       } finally {
         setIsLoading(false); // Reset isLoading to false after API call
       }
+    } else {
+      setConfirmPasswordError("Passwords do not match");
+    }
+  };
+
+  const handleConfirmPasswordChange = (value: string) => {
+    setConfirmPassword(value);
+    if (password !== value) {
+      setConfirmPasswordError("Passwords do not match");
+    } else {
+      setConfirmPasswordError("");
     }
   };
 
   const { mutateAsync } = useApi.post("/auth/onboarding");
   return (
-    <SafeAreaView>
+    <SafeAreaView className="flex-1">
       <KeyboardAwareScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         enableOnAndroid={true}
@@ -106,7 +131,7 @@ const CreateAccountScreen: React.FC<{
               allowFontScaling={false}
               placeholderTextColor={"#DFDFDF"}
               value={fullName}
-              onChangeText={setfullName}
+              onChangeText={setFullName}
             />
           </View>
           <View className="mt-4">
@@ -119,7 +144,7 @@ const CreateAccountScreen: React.FC<{
               placeholderTextColor={"#DFDFDF"}
               allowFontScaling={false}
               value={email}
-              onChangeText={setemail}
+              onChangeText={setEmail}
             />
           </View>
 
@@ -151,7 +176,7 @@ const CreateAccountScreen: React.FC<{
                 keyboardType="numeric"
                 allowFontScaling={false}
                 value={phoneNumber}
-                onChangeText={setphoneNumber}
+                onChangeText={setPhoneNumber}
               />
             </View>
           </View>
@@ -166,10 +191,10 @@ const CreateAccountScreen: React.FC<{
                 placeholderTextColor="#BABFC3"
                 allowFontScaling={false}
                 value={password}
-                onChangeText={setpassword}
+                onChangeText={setPassword}
                 secureTextEntry={showPassword}
               />
-              <TouchableOpacity onPress={toggleBalanceVisibility}>
+              <TouchableOpacity onPress={togglePasswordVisibility}>
                 {showPassword ? (
                   <EyeSlash color="#000" size={20} />
                 ) : (
@@ -178,6 +203,33 @@ const CreateAccountScreen: React.FC<{
               </TouchableOpacity>
             </View>
           </View>
+
+          <View className="mt-4">
+            <Text style={styles.label} allowFontScaling={false}>
+              Confirm Password
+            </Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Confirm Password"
+                secureTextEntry={showPassword}
+                value={confirmPassword}
+                onChangeText={handleConfirmPasswordChange}
+                allowFontScaling={false}
+              />
+              <TouchableOpacity onPress={togglePasswordVisibility}>
+                {showPassword ? (
+                  <EyeSlash color="#000" size={20} />
+                ) : (
+                  <Eye color="#000" size={20} />
+                )}
+              </TouchableOpacity>
+            </View>
+            {confirmPasswordError ? (
+              <Text style={styles.errorText}>{confirmPasswordError}</Text>
+            ) : null}
+          </View>
+
           <View className="mt-4">
             <Text style={styles.label} allowFontScaling={false}>
               Referral
@@ -250,6 +302,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     fontSize: RFValue(12),
+    fontFamily: "Outfit-Regular",
   },
   numberText: {
     fontFamily: "Outfit-Regular",
@@ -264,5 +317,10 @@ const styles = StyleSheet.create({
   },
   proceedButtonDisabled: {
     backgroundColor: COLORS.violet200,
+  },
+  errorText: {
+    color: COLORS.red300, // Example color
+    fontSize: RFValue(12),
+    marginTop: SPACING,
   },
 });
