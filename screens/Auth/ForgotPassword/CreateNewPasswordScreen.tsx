@@ -1,17 +1,7 @@
-import {
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
 import React, { useState } from "react";
 import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -19,17 +9,12 @@ import Button from "../../../components/Button";
 import FONT_SIZE from "../../../config/font-size";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import { RouteProp, useRoute } from "@react-navigation/native";
-
-type CreateNewPasswordScreenRouteParams = {
-  token: string;
-};
 
 const CreateNewPasswordScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
-}> = ({ navigation }) => {
-  const route = useRoute<RouteProp<{ params: CreateNewPasswordScreenRouteParams }, 'params'>>();
-  const token = route.params.token;
+  route: { params: { resetToken: string } };
+}> = ({ navigation, route }) => {
+  const { resetToken } = route.params;
 
   const [showPassword, setShowPassword] = useState(true);
   const [showPassword2, setShowPassword2] = useState(true);
@@ -52,7 +37,8 @@ const CreateNewPasswordScreen: React.FC<{
 
     setIsSubmitting(true);
     try {
-      await mutateAsync({ password, token });
+      console.log("Making request with resetToken:", resetToken);
+      await mutateAsync({ password, resetToken });
       handleShowFlash({
         message: "Password reset successfully!",
         type: "success",
@@ -119,6 +105,9 @@ const CreateNewPasswordScreen: React.FC<{
               </View>
 
               <View className="mt-4">
+                <Text style={styles.label} allowFontScaling={false}>
+                  Confirm Password
+                </Text>
                 <View style={styles.inputContainer}>
                   <TextInput
                     style={styles.input}

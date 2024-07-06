@@ -32,7 +32,9 @@ import { AuthContext } from "../context/AuthContext";
 const ProfileScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { userInfo, logout } = useContext(AuthContext);
+  // const { userInfo, logout } = useContext(AuthContext);
+  const { userDetails, logout } = useContext(AuthContext);
+
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [biometricModalVisible, setBiometricModalVisible] = useState(false);
   const [isCloseAccountModalVisible, setIsCloseAccountModalVisible] =
@@ -83,10 +85,10 @@ const ProfileScreen: React.FC<{
             />
             <View>
               <Text style={styles.name} allowFontScaling={false}>
-                {userInfo?.data?.user?.fullName}
+                {userDetails?.fullName}
               </Text>
               <Text style={styles.subName} allowFontScaling={false}>
-                {userInfo?.data?.user?.phoneNumber}
+                {userDetails?.email}
               </Text>
             </View>
           </View>

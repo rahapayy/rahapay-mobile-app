@@ -1,3 +1,8 @@
+import React, { useRef, useState } from "react";
+import { ArrowLeft } from "iconsax-react-native";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RFValue } from "react-native-responsive-fontsize";
 import {
   SafeAreaView,
   ScrollView,
@@ -7,11 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useRef, useState } from "react";
-import { ArrowLeft } from "iconsax-react-native";
-import { RouteProp, useRoute } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../config/SPACING";
 import COLORS from "../../../config/colors";
 import Button from "../../../components/Button";
@@ -52,6 +52,14 @@ const EnterCodeScreen: React.FC<{
     }
   };
 
+  const handlePaste = (text: string) => {
+    if (/^\d{6}$/.test(text)) {
+      const newBoxes = text.split("");
+      setBoxes(newBoxes);
+      boxRefs.current[5]?.focus();
+    }
+  };
+
   const handleKeyPress = (index: number, event: any) => {
     if (event.nativeEvent.key === "Backspace" && index > 0) {
       const newBoxes = [...boxes];
@@ -66,12 +74,18 @@ const EnterCodeScreen: React.FC<{
     if (otp.length === 6) {
       setIsSubmitting(true);
       try {
-        await verifyOtp({ otp, email });
+        const response = await verifyOtp({ otp, email });
         handleShowFlash({
           message: "OTP verified successfully!",
           type: "success",
         });
-        navigation.navigate("CreateNewPasswordScreen");
+        const resetToken = response.data?.resetToken;
+        if (!resetToken) {
+          throw new Error("Reset token is missing from the response");
+        }
+        navigation.navigate("CreateNewPasswordScreen", {
+          resetToken: resetToken,
+        });
       } catch (error) {
         const err = error as {
           response?: { data?: { message?: string } };
@@ -122,9 +136,15 @@ const EnterCodeScreen: React.FC<{
                     boxIsFocused[index] && styles.inputBoxFocused,
                   ]}
                   keyboardType="numeric"
-                  value={value ? "*" : ""}
+                  value={value}
                   allowFontScaling={false}
-                  onChangeText={(text) => handleInput(text, index)}
+                  onChangeText={(text) => {
+                    if (text.length > 1) {
+                      handlePaste(text);
+                    } else {
+                      handleInput(text, index);
+                    }
+                  }}
                   onFocus={() =>
                     setBoxIsFocused((prevState) => [
                       ...prevState.slice(0, index),
@@ -205,16 +225,4 @@ const styles = StyleSheet.create({
     borderColor: COLORS.violet400,
     borderWidth: 1,
   },
-  otpText: {
-    fontSize: RFValue(14),
-    fontFamily: "Outfit-Regular",
-  },
-  countdownContainer: {
-    marginTop: SPACING * 2,
-    backgroundColor: COLORS.violet200,
-    paddingVertical: SPACING * 2,
-    paddingHorizontal: SPACING * 2,
-    borderRadius: 4,
-  },
-  countdownText: {},
 });
