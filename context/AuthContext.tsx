@@ -116,6 +116,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       let userInfo = res.data;
       setUserInfo(userInfo);
       AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
+
+      setIsAuthenticated(true);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);

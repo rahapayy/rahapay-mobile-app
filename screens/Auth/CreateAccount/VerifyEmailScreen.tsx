@@ -123,17 +123,27 @@ const VerifyEmailScreen: React.FC<{
     }
   };
 
-  const resendOTP = async () => {
+ const resendOTP = async () => {
     try {
-      await resendOtp({ email });
+      const userId = "668ab8b616064c92c9e024ca";
+      await resendOtp({ id: userId });
       handleShowFlash({
         message: "OTP resent successfully!",
         type: "success",
       });
       setResendCountdown(60); // Reset countdown timer
     } catch (error) {
+      console.log("Resend OTP Error:", error); // Log the error object
+      const err = error as {
+        response?: { data?: { message?: string } };
+        message: string;
+      };
+      const errorMessage =
+        err.response?.data?.message || err.message || "An error occurred";
+      console.log(errorMessage);
+
       handleShowFlash({
-        message: "Failed to resend OTP. Please try again later.",
+        message: errorMessage,
         type: "danger",
       });
     }
