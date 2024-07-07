@@ -31,7 +31,6 @@ const Card: React.FC<{
   const [showBalance, setShowBalance] = useState(true);
 
   const { userDetails, userInfo } = useContext(AuthContext);
-  console.log("userInfo:", userInfo); // Log the entire userInfo object to understand its structure
   
   const fullName = userDetails?.fullName || "User";
   const firstName = fullName.split(" ")[0];

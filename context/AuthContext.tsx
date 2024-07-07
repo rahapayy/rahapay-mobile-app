@@ -262,7 +262,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           updateData.version.replace(/\./g, "")
         );
         if (updateVersionNumber > appVersionNumber) {
-          console.log("has new version");
+          // console.log("has new version");
           Alert.alert(
             "New Version Available",
             `There is a new version of the app available. Please update to the latest version to continue using the app.`,
@@ -288,7 +288,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       }
     } catch (error: any) {
-      console.log({ ...error });
+      // console.log({ ...error });
     }
   }, []);
 
