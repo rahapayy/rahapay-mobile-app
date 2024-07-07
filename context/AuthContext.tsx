@@ -271,7 +271,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 text: "Update",
                 onPress: () => {
                   Linking.openURL(
-                    "https://play.google.com/store/apps/details?id=com.shaydee11.billslink"
+                    ""
                   );
                 },
               },
