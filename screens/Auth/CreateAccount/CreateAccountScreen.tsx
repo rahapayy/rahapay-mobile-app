@@ -55,7 +55,10 @@ const CreateAccountScreen: React.FC<{
           type: "success",
         });
 
-        navigation.navigate("VerifyEmailScreen", { email });
+        navigation.navigate("VerifyEmailScreen", {
+          email,
+          id: response.data.data.id,
+        });
       } catch (error) {
         // Extract the message from the error response
         const err = error as {

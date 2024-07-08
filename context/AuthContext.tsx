@@ -114,8 +114,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         phoneNumber,
       });
       let userInfo = res.data;
+      console.log({ userInfo });
       setUserInfo(userInfo);
       AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
+      AsyncStorage.setItem("access_token", userInfo.data.accessToken);
+
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);

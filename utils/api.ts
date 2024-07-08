@@ -73,6 +73,8 @@ const makeRequest = async (method: MethodTypes, url: string, data?: any) => {
     data,
   });
 
+  console.log({ response: response.data.data });
+
   return response;
 };
 

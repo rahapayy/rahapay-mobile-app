@@ -20,6 +20,7 @@ import { handleShowFlash } from "../../../components/FlashMessageComponent";
 
 type VerifyEmailScreenRouteParams = {
   email: string;
+  id: string;
 };
 
 const VerifyEmailScreen: React.FC<{
@@ -28,6 +29,7 @@ const VerifyEmailScreen: React.FC<{
   const route =
     useRoute<RouteProp<{ params: VerifyEmailScreenRouteParams }, "params">>();
   const email = route.params.email;
+  const id = route.params.id;
 
   const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
   const boxRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
@@ -125,7 +127,7 @@ const VerifyEmailScreen: React.FC<{
 
   const resendOTP = async () => {
     try {
-      await resendOtp({ email });
+      await resendOtp({ id });
       handleShowFlash({
         message: "OTP resent successfully!",
         type: "success",
