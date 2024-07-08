@@ -7,10 +7,16 @@ const useWallet = () => {
   const { userInfo } = useContext(AuthContext);
 
   // Fetch data from both endpoints
-  const { data: dashboardData } = useSWR(`user/dashboard/me/`);
-  const { data: reservedAccountsData } = useSWR(`user/reserved-accounts`);
+  const { data: dashboardData, isValidating: isDashboardLoading } =
+    useSWR(`user/dashboard/me/`);
+  const {
+    data: reservedAccountsData,
+    isValidating: isReservedAccountsLoading,
+  } = useSWR(`user/reserved-accounts`);
 
-  console.log(dashboardData, reservedAccountsData);
+  const isLoading = isDashboardLoading || isReservedAccountsLoading;
+
+  // console.log(dashboardData, reservedAccountsData);
 
   // Assuming 'reservedAccountsData' already contains the account data directly
   // hence we're checking for 'reservedAccountsData?.data' instead of 'reservedAccountsData?.payment_account'
@@ -48,6 +54,6 @@ const useWallet = () => {
       updated_at: trx.updated_at || "",
     })) || [];
 
-  return { balance, account, transactions };
+  return { balance, account, transactions, isLoading };
 };
 export default useWallet;

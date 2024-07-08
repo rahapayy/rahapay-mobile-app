@@ -3,11 +3,9 @@ import {
   StyleSheet,
   Text,
   View,
-  Dimensions,
-  Image,
   ImageBackground,
 } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { AddCircle, Eye, EyeSlash, WalletAdd1 } from "iconsax-react-native";
@@ -15,11 +13,15 @@ import SPACING from "../config/SPACING";
 import COLOR from "../config/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
+import useWallet from "../hooks/use-wallet";
+import { Skeleton } from "@rneui/base";
 
 const WalletCard: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [showBalance, setShowBalance] = useState(true);
+
+  const { balance } = useWallet();
 
   const toggleBalanceVisibility = React.useCallback(
     () => setShowBalance((prev) => !prev),
@@ -53,9 +55,14 @@ const WalletCard: React.FC<{
           )}
         </View>
         {showBalance ? (
-          <Text style={styles.balance}>
-            <Text style={{ fontSize: RFValue(16) }}></Text> ₦ 0.00
-          </Text>
+          <Skeleton>
+            <Text style={styles.balance}>
+              <Text style={{ fontSize: RFValue(16) }}></Text> ₦{" "}
+              {balance.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+              })}
+            </Text>
+          </Skeleton>
         ) : (
           <Text style={styles.balance}>********</Text>
         )}
