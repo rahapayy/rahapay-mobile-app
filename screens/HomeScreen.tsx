@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 import React from "react";
 import Card from "../components/Card";
 import QuickAction from "../components/QuickAction";
-import RecentTransaction from "../components/RecentTransaction";
+import RecentTransaction from "../components/RecentServiceTransaction";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 const HomeScreen: React.FC<{

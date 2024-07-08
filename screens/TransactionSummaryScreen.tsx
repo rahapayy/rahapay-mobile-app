@@ -10,16 +10,40 @@ import {
 } from "react-native";
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, DocumentDownload } from "iconsax-react-native";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { ArrowLeft, DocumentDownload, WalletAdd1 } from "iconsax-react-native";
 import SPACING from "../config/SPACING";
 import FONT_SIZE from "../config/font-size";
 import COLORS from "../config/colors";
 import Airtel from "../assets/svg/airtel.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 
-const TransactionSummaryScreen: React.FC<{
-  navigation: NativeStackNavigationProp<any, "">;
-}> = ({ navigation }) => {
+type TransactionType = {
+  purpose: string;
+  amount: number;
+  created_at: number;
+  status: string;
+  tranxType: string;
+  referenceId: string;
+};
+
+type TransactionSummaryRouteParams = {
+  transaction: TransactionType;
+};
+
+type TransactionSummaryScreenProps = {
+  navigation: NativeStackNavigationProp<any, any>;
+  route: RouteProp<{ params: TransactionSummaryRouteParams }, "params">;
+};
+
+const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
+  navigation,
+  route,
+}) => {
+  const { transaction } = route.params;
+
+  const isWalletFunding = transaction.tranxType === "WALLET_FUNDING";
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
@@ -37,9 +61,16 @@ const TransactionSummaryScreen: React.FC<{
           </View>
 
           <View className="justify-center items-center mt-10">
-            <Airtel />
+            {/* Image */}
+            {isWalletFunding ? (
+              <View style={styles.iconContainer}>
+                <WalletAdd1 color={COLORS.violet400} size={40} />
+              </View>
+            ) : (
+              <View></View>
+            )}
             <Text style={styles.itemText} allowFontScaling={false}>
-              AIRTEL Data Bundle
+              {transaction.tranxType}
             </Text>
           </View>
           <View className="p-4">
@@ -52,7 +83,7 @@ const TransactionSummaryScreen: React.FC<{
                   Transaction ID
                 </Text>
                 <Text style={styles.descriptionText} allowFontScaling={false}>
-                  #1234567890
+                  {transaction.referenceId}
                 </Text>
               </View>
               <View className="justify-between items-center flex-row">
@@ -60,50 +91,52 @@ const TransactionSummaryScreen: React.FC<{
                   Amount
                 </Text>
                 <Text style={styles.descriptionText} allowFontScaling={false}>
-                  NGN 1,000.00
+                  ₦ {transaction.amount}
                 </Text>
               </View>
-              <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText} allowFontScaling={false}>
-                  Package
-                </Text>
-                <Text style={styles.descriptionText} allowFontScaling={false}>
-                  AIRTEL - 1GB - Monthly
-                </Text>
-              </View>
-              <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText} allowFontScaling={false}>
-                  Recipient
-                </Text>
-                <Text style={styles.descriptionText} allowFontScaling={false}>
-                  +23480123456789
-                </Text>
-              </View>
+              {!isWalletFunding && (
+                <>
+                  <View className="justify-between items-center flex-row">
+                    <Text style={styles.titleText} allowFontScaling={false}>
+                      Package
+                    </Text>
+                    <Text
+                      style={styles.descriptionText}
+                      allowFontScaling={false}
+                    >
+                      AIRTEL - 1GB - Monthly
+                    </Text>
+                  </View>
+                  <View className="justify-between items-center flex-row">
+                    <Text style={styles.titleText} allowFontScaling={false}>
+                      Recipient
+                    </Text>
+                    <Text
+                      style={styles.descriptionText}
+                      allowFontScaling={false}
+                    >
+                      +23480123456789
+                    </Text>
+                  </View>
+                </>
+              )}
               <View className="justify-between items-center flex-row">
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Date
                 </Text>
                 <Text style={styles.descriptionText} allowFontScaling={false}>
-                  Mar 06, 2024, 02:12 PM
-                </Text>
-              </View>
-              <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText} allowFontScaling={false}>
-                  Paying
-                </Text>
-                <Text style={styles.descriptionText} allowFontScaling={false}>
-                  NGN 1,000.00
+                  {transaction.created_at}
                 </Text>
               </View>
 
               <View className="justify-between items-center flex-row">
                 <Text style={styles.titleText} allowFontScaling={false}>
-                  Mar 06, 2024, 02:12 PM
+                  Status
                 </Text>
                 {/* Transaction status */}
                 <View className="p-2 bg-[#E6F9F1] rounded-2xl">
                   <Text style={styles.completedText} allowFontScaling={false}>
-                    Completed
+                    {transaction.status}
                   </Text>
                 </View>
               </View>
@@ -140,6 +173,15 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.medium,
     fontFamily: "Outfit-Regular",
     flex: 1,
+  },
+  iconContainer: {
+    width: 70,
+    height: 70,
+    borderRadius: 50,
+    marginRight: 10,
+    backgroundColor: COLORS.violet100,
+    justifyContent: "center",
+    alignItems: "center",
   },
   headerTextDark: {
     color: COLORS.white,

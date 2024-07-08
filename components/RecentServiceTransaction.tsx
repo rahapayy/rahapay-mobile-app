@@ -12,17 +12,15 @@ import LottieView from "lottie-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import useWallet from "../hooks/use-wallet";
 
-const RecentTransaction: React.FC<{
+const RecentServiceTransaction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { transactions, isLoading } = useWallet();
+  const { serviceTransactions, isLoading } = useWallet();
   const [hasTransaction, setHasTransaction] = useState(false);
 
   useEffect(() => {
-    setHasTransaction(transactions.length > 0);
-  }, [transactions]);
-
-  // console.log("Transactions:", transactions);
+    setHasTransaction(serviceTransactions.length > 0);
+  }, [serviceTransactions]);
 
   return (
     <View style={styles.container}>
@@ -49,49 +47,21 @@ const RecentTransaction: React.FC<{
             <Text style={styles.loadingText}>Loading transactions...</Text>
           </View>
         ) : hasTransaction ? (
-          transactions.map(
+          serviceTransactions.map(
             (transaction: {
               id: React.Key | null | undefined;
-              purpose:
-                | string
-                | number
-                | boolean
-                | React.ReactElement<
-                    any,
-                    string | React.JSXElementConstructor<any>
-                  >
-                | Iterable<React.ReactNode>
-                | React.ReactPortal
-                | null
-                | undefined;
-              amount:
-                | string
-                | number
-                | boolean
-                | React.ReactElement<
-                    any,
-                    string | React.JSXElementConstructor<any>
-                  >
-                | Iterable<React.ReactNode>
-                | React.ReactPortal
-                | null
-                | undefined;
-              created_at:
-                | string
-                | number
-                | boolean
-                | React.ReactElement<
-                    any,
-                    string | React.JSXElementConstructor<any>
-                  >
-                | Iterable<React.ReactNode>
-                | React.ReactPortal
-                | null
-                | undefined;
+              tranxType: string;
+              amount: any;
+              created_at: any;
+              status: string;
             }) => (
               <TouchableOpacity
                 key={transaction.id}
-                onPress={() => navigation.navigate("TransactionSummaryScreen")}
+                onPress={() =>
+                  navigation.navigate("TransactionSummaryScreen", {
+                    transaction,
+                  })
+                }
                 style={styles.transactionItem}
               >
                 <Image
@@ -101,7 +71,7 @@ const RecentTransaction: React.FC<{
                 <View style={styles.transactionTextContainer}>
                   <View style={styles.transactionTextRow}>
                     <Text style={styles.item} allowFontScaling={false}>
-                      {transaction.purpose}
+                      {transaction.tranxType}
                     </Text>
                     <Text style={styles.valueText} allowFontScaling={false}>
                       ₦ {transaction.amount}
@@ -111,13 +81,12 @@ const RecentTransaction: React.FC<{
                     <Text style={styles.date} allowFontScaling={false}>
                       {transaction.created_at}
                     </Text>
-                    {/* Transaction status */}
                     <View style={styles.statusContainer}>
                       <Text
                         style={styles.completedText}
                         allowFontScaling={false}
                       >
-                        Completed
+                        {transaction.status}
                       </Text>
                     </View>
                   </View>
@@ -152,7 +121,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 10,
   },
   rtText: {
     fontFamily: "Outfit-SemiBold",
@@ -180,14 +149,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 20,
+    // marginTop: 10,
   },
   noTransactionAnimation: {
     width: 200,
     height: 200,
   },
   notransactionText: {
-    marginTop: 16,
+    // marginTop: 10,
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(14),
   },
@@ -238,4 +207,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RecentTransaction;
+export default RecentServiceTransaction;
