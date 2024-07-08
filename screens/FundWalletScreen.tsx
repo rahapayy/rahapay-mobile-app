@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, Copy } from "iconsax-react-native";
 import SPACING from "../config/SPACING";
@@ -17,36 +17,15 @@ import FONT_SIZE from "../config/font-size";
 import COLORS from "../config/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Circle from "../assets/svg/Group 803.svg";
+import useWallet from "../hooks/use-wallet";
+import { AuthContext } from "../context/AuthContext";
 
 const FundWalletScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const accounts = [
-    {
-      id: 1,
-      bankName: "Moniepoint Microfinance Bank",
-      accountNumber: "01234567890",
-      accountName: "Akinola John",
-    },
-    {
-      id: 2,
-      bankName: "First Bank of Nigeria",
-      accountNumber: "09876543210",
-      accountName: "Akinola John",
-    },
-    {
-      id: 3,
-      bankName: "GTBank",
-      accountNumber: "11223344556",
-      accountName: "Akinola John",
-    },
-    {
-      id: 4,
-      bankName: "Access Bank",
-      accountNumber: "22334455667",
-      accountName: "Akinola John",
-    },
-  ];
+  const { account } = useWallet();
+
+  const { userDetails } = useContext(AuthContext);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -66,44 +45,39 @@ const FundWalletScreen: React.FC<{
 
           {/* Cards */}
           <View style={styles.cardsContainer}>
-            {accounts.map((account) => (
-              <View key={account.id} style={styles.cardWrapper}>
-                <ImageBackground
-                  source={require("../assets/images/layer.png")}
-                  resizeMode="cover"
-                  style={styles.walletContain}
-                >
-                  {/* Card Details */}
-                  <View style={styles.cardHeader}>
-                    <Text style={styles.virtualText} allowFontScaling={false}>
-                      Virtual Account
-                    </Text>
-                    <Circle />
-                  </View>
+            <View style={styles.cardWrapper}>
+              <ImageBackground
+                source={require("../assets/images/layer.png")}
+                resizeMode="cover"
+                style={styles.walletContain}
+              >
+                {/* Card Details */}
+                <View style={styles.cardHeader}>
+                  <Text style={styles.virtualText} allowFontScaling={false}>
+                    Virtual Account
+                  </Text>
+                  <Circle />
+                </View>
 
-                  <Text style={styles.bankName} allowFontScaling={false}>
-                    {account.bankName}
+                <Text style={styles.bankName} allowFontScaling={false}>
+                  {account.bankName}
+                </Text>
+                <View style={styles.copyContainer}>
+                  <Text style={styles.copyText} allowFontScaling={false}>
+                    Copy your account number
                   </Text>
-                  <View style={styles.copyContainer}>
-                    <Text style={styles.copyText} allowFontScaling={false}>
-                      Copy your account number
+                  <View style={styles.accountNumberContainer}>
+                    <Text style={styles.accountNumber} allowFontScaling={false}>
+                      {account.accountNumber}
                     </Text>
-                    <View style={styles.accountNumberContainer}>
-                      <Text
-                        style={styles.accountNumber}
-                        allowFontScaling={false}
-                      >
-                        {account.accountNumber}
-                      </Text>
-                      <Copy color="#fff" />
-                    </View>
+                    <Copy color="#fff" />
                   </View>
-                  <Text style={styles.accountName} allowFontScaling={false}>
-                    {account.accountName}
-                  </Text>
-                </ImageBackground>
-              </View>
-            ))}
+                </View>
+                <Text style={styles.accountName} allowFontScaling={false}>
+                  {userDetails?.fullName}
+                </Text>
+              </ImageBackground>
+            </View>
           </View>
         </View>
       </ScrollView>
