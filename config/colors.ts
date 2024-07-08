@@ -46,10 +46,22 @@ const COLORS = {
   //  White
   white: "#FFFFFF",
 
+  // Orange
+  orange50: "#FFF4E5",
+  orange100: "#FFECB3",
+  orange200: "#FFD580",
+  orange300: "#FFA726",
+  orange400: "#FF9800",
+  orange500: "#FB8C00",
+  orange600: "#F57C00",
+  orange700: "#EF6C00",
+  orange800: "#E65100",
+  orange900: "#DD2C00",
+
   success: "#28a745", // Green for success messages
-  info: "#17a2b8",    // Blue for info messages
+  info: "#17a2b8", // Blue for info messages
   default: "#6c757d", // Gray for default messages
-  error: "#dc3545"    // Red for error messages
+  error: "#dc3545", // Red for error messages
 };
 
 export default COLORS;
