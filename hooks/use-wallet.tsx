@@ -43,15 +43,15 @@ const useWallet = () => {
 
   const transactions =
     combinedData?.transaction?.map((trx: any) => ({
-      amount: trx.amount || 0,
-      created_at: trx.created_at || "",
-      id: trx._id,
-      ownerId: trx.ownerId || "",
-      purpose: trx.purpose || "",
-      referenceId: trx.referenceId || "",
-      status: trx.status || "",
-      tranxType: trx.tranxType || "",
-      updated_at: trx.updated_at || "",
+      amount: trx.amountPaid || 0,
+      created_at: trx.paidOn?.$date || "",
+      id: trx._id?.$oid || "",
+      ownerId: trx.accountReference?.$oid || "",
+      purpose: trx.paymentMethod || "",
+      referenceId: trx.transactionReference || "",
+      status: trx.paymentStatus || "",
+      tranxType: trx.transactionType || "",
+      updated_at: trx.updated_at?.$date || "",
     })) || [];
 
   return { balance, account, transactions, isLoading };
