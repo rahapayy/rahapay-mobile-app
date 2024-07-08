@@ -14,7 +14,6 @@ import COLOR from "../config/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
 import useWallet from "../hooks/use-wallet";
-import { Skeleton } from "@rneui/base";
 
 const WalletCard: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -55,14 +54,12 @@ const WalletCard: React.FC<{
           )}
         </View>
         {showBalance ? (
-          <Skeleton>
-            <Text style={styles.balance}>
-              <Text style={{ fontSize: RFValue(16) }}></Text> ₦{" "}
-              {balance.toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-              })}
-            </Text>
-          </Skeleton>
+          <Text style={styles.balance}>
+            <Text style={{ fontSize: RFValue(16) }}></Text> ₦{" "}
+            {balance.toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+            })}
+          </Text>
         ) : (
           <Text style={styles.balance}>********</Text>
         )}

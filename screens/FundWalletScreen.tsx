@@ -19,6 +19,8 @@ import { RFValue } from "react-native-responsive-fontsize";
 import Circle from "../assets/svg/Group 803.svg";
 import useWallet from "../hooks/use-wallet";
 import { AuthContext } from "../context/AuthContext";
+import { handleShowFlash } from "../components/FlashMessageComponent";
+import * as Clipboard from "expo-clipboard";
 
 const FundWalletScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -26,6 +28,14 @@ const FundWalletScreen: React.FC<{
   const { account } = useWallet();
 
   const { userDetails } = useContext(AuthContext);
+
+  const copyToClipboard = async (textToCopy: string) => {
+    await Clipboard.setStringAsync(textToCopy);
+    handleShowFlash({
+      message: "Account copied!",
+      type: "success",
+    });
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -70,7 +80,13 @@ const FundWalletScreen: React.FC<{
                     <Text style={styles.accountNumber} allowFontScaling={false}>
                       {account.accountNumber}
                     </Text>
-                    <Copy color="#fff" />
+                    <TouchableOpacity
+                      onPress={() =>
+                        copyToClipboard(account?.accountNumber.toString() || "")
+                      }
+                    >
+                      <Copy color="#fff" />
+                    </TouchableOpacity>
                   </View>
                 </View>
                 <Text style={styles.accountName} allowFontScaling={false}>
