@@ -134,8 +134,17 @@ const VerifyEmailScreen: React.FC<{
       });
       setResendCountdown(60); // Reset countdown timer
     } catch (error) {
+      console.log("Resend OTP Error:", error); // Log the error object
+      const err = error as {
+        response?: { data?: { message?: string } };
+        message: string;
+      };
+      const errorMessage =
+        err.response?.data?.message || err.message || "An error occurred";
+      console.log(errorMessage);
+
       handleShowFlash({
-        message: "Failed to resend OTP. Please try again later.",
+        message: errorMessage,
         type: "danger",
       });
     }

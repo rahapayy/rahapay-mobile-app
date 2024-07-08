@@ -30,11 +30,12 @@ const Card: React.FC<{
 }> = ({ navigation }) => {
   const [showBalance, setShowBalance] = useState(true);
 
-  const { userDetails } = useContext(AuthContext);
+  const { userDetails, userInfo } = useContext(AuthContext);
+  
   const fullName = userDetails?.fullName || "User";
   const firstName = fullName.split(" ")[0];
 
-  console.log("userDetails in Card:", userDetails);
+  // console.log("userDetails in Card:", userDetails);
   const { balance } = useWallet();
   // console.log(balance);
 

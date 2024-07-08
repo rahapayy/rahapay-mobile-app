@@ -39,7 +39,6 @@ axiosInstance.interceptors.response.use(
 // Request interceptor to add the Authorization header
 axiosInstance.interceptors.request.use(async (config) => {
   const accessToken = await getItem("access_token");
-  console.log({ accessToken });
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }

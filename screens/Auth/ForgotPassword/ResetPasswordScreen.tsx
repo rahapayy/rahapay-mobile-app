@@ -2,7 +2,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -57,7 +56,7 @@ const ResetPasswordScreen: React.FC<{
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView className="flex-1">
       <KeyboardAwareScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         enableOnAndroid={true}
@@ -98,7 +97,10 @@ const ResetPasswordScreen: React.FC<{
             <Button
               title={"Reset Password"}
               onPress={handleButtonClick}
-              style={styles.proceedButton }
+              style={[
+                styles.proceedButton,
+                (!email || isLoading) && styles.disabledButton,
+              ]}
               textColor="#fff"
               isLoading={isLoading}
               disabled={isLoading || !email}

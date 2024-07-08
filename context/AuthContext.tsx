@@ -119,6 +119,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
       AsyncStorage.setItem("access_token", userInfo.data.accessToken);
 
+      setIsAuthenticated(true);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -263,7 +264,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           updateData.version.replace(/\./g, "")
         );
         if (updateVersionNumber > appVersionNumber) {
-          console.log("has new version");
+          // console.log("has new version");
           Alert.alert(
             "New Version Available",
             `There is a new version of the app available. Please update to the latest version to continue using the app.`,
@@ -271,9 +272,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               {
                 text: "Update",
                 onPress: () => {
-                  Linking.openURL(
-                    "https://play.google.com/store/apps/details?id=com.shaydee11.billslink"
-                  );
+                  Linking.openURL("");
                 },
               },
               {
@@ -289,7 +288,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       }
     } catch (error: any) {
-      console.log({ ...error });
+      // console.log({ ...error });
     }
   }, []);
 

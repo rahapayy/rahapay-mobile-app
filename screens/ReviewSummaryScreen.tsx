@@ -22,7 +22,8 @@ const ReviewSummaryScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const handleSwipeConfirm = () => {
-    navigation.navigate("TransactionCompletedScreen");
+    navigation.navigate("TransactionStatusScreen");
+
     console.log("Swipe confirmed!");
     // Perform your action here, e.g., sending a request to the server
   };

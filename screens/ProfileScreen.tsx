@@ -88,7 +88,7 @@ const ProfileScreen: React.FC<{
                 {userDetails?.fullName}
               </Text>
               <Text style={styles.subName} allowFontScaling={false}>
-                {userDetails?.email}
+                {userDetails?.userName}
               </Text>
             </View>
           </View>

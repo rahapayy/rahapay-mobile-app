@@ -33,7 +33,7 @@ const AirtimeScreen: React.FC<{
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
-        <View>
+        <View className="p-4">
           <View style={styles.header}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
@@ -45,7 +45,7 @@ const AirtimeScreen: React.FC<{
               Airtime Top-up
             </Text>
           </View>
-          <View className="px-6">
+          <View className="">
             <View style={styles.tabsContainer}>
               <TouchableOpacity
                 style={[styles.tab, activeTab === "Local" && styles.activeTab]}
@@ -231,7 +231,6 @@ const AirtimeScreen: React.FC<{
                 </View>
               )}
             </View>
-
             <Button
               title={"Proceed"}
               style={{
