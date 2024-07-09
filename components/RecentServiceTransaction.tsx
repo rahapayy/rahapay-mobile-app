@@ -74,7 +74,10 @@ const RecentServiceTransaction: React.FC<{
                       {transaction.tranxType}
                     </Text>
                     <Text style={styles.valueText} allowFontScaling={false}>
-                      ₦ {transaction.amount}
+                      ₦{" "}
+                      {transaction.amount.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                      })}
                     </Text>
                   </View>
                   <View style={styles.transactionTextRow}>
