@@ -15,6 +15,7 @@ import {
   ArrowDown2,
   ArrowLeft,
   ProfileCircle,
+  TickCircle,
 } from "iconsax-react-native";
 import SPACING from "../../config/SPACING";
 import FONT_SIZE from "../../config/font-size";
@@ -29,6 +30,7 @@ import Button from "../../components/Button";
 const DataScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const [selectedOperator, setSelectedOperator] = useState("");
 
   return (
     <SafeAreaView className="flex-1">
@@ -45,7 +47,7 @@ const DataScreen: React.FC<{
               Buy Data Bundle
             </Text>
           </View>
-          <View className="px-6">
+          <View className="p-4">
             <View style={styles.tabContent}>
               <View>
                 <Text style={styles.headText} allowFontScaling={false}>
@@ -65,17 +67,97 @@ const DataScreen: React.FC<{
                   Select Network Provider
                 </Text>
                 <View className="flex-row p-2 bg-white rounded-xl  items-center justify-between">
-                  <TouchableOpacity>
-                    <Airtel />
+                  <TouchableOpacity
+                    onPress={() => setSelectedOperator("Airtel")}
+                    style={[
+                      selectedOperator === "Airtel" && styles.selectedOperator,
+                    ]}
+                  >
+                    <View>
+                      <Airtel />
+                      {selectedOperator === "Airtel" && (
+                        <TickCircle
+                          size={18}
+                          variant="Bold"
+                          color="#fff"
+                          style={{
+                            zIndex: 1,
+                            position: "absolute",
+                            top: 0,
+                            right: 0,
+                          }}
+                        />
+                      )}
+                    </View>
                   </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Mtn />
+                  <TouchableOpacity
+                    onPress={() => setSelectedOperator("Mtn")}
+                    style={[
+                      selectedOperator === "Mtn" && styles.selectedOperator,
+                    ]}
+                  >
+                    <View>
+                      <Mtn />
+                      {selectedOperator === "Mtn" && (
+                        <TickCircle
+                          size={18}
+                          variant="Bold"
+                          color="#fff"
+                          style={{
+                            zIndex: 1,
+                            position: "absolute",
+                            top: 0,
+                            right: 0,
+                          }}
+                        />
+                      )}
+                    </View>
                   </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Eti />
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Glo />
+                  <TouchableOpacity
+                onPress={() => setSelectedOperator("9Mobile")}
+                style={[
+                  selectedOperator === "9Mobile" && styles.selectedOperator,
+                ]}
+              >
+                <View>
+                  <Eti />
+                  {selectedOperator === "9Mobile" && (
+                    <TickCircle
+                      size={18}
+                      variant="Bold"
+                      color="#fff"
+                      style={{
+                        zIndex: 1,
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                      }}
+                    />
+                  )}
+                </View>
+              </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setSelectedOperator("Glo")}
+                    style={[
+                      selectedOperator === "Glo" && styles.selectedOperator,
+                    ]}
+                  >
+                    <View>
+                      <Glo />
+                      {selectedOperator === "Glo" && (
+                        <TickCircle
+                          size={18}
+                          variant="Bold"
+                          color="#fff"
+                          style={{
+                            zIndex: 1,
+                            position: "absolute",
+                            top: 0,
+                            right: 0,
+                          }}
+                        />
+                      )}
+                    </View>
                   </TouchableOpacity>
                 </View>
 
@@ -158,7 +240,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: SPACING * 2,
     paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
-    paddingBottom: SPACING * 3,
   },
   leftIcon: {
     marginRight: SPACING,
@@ -168,32 +249,6 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.medium,
     fontFamily: "Outfit-Regular",
     flex: 1,
-  },
-  tabsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginVertical: SPACING,
-  },
-  tab: {
-    alignItems: "center",
-    flex: 1,
-  },
-  tabText: {
-    fontSize: RFValue(14),
-    color: "#9BA1A8",
-    fontFamily: "Outfit-Regular",
-  },
-  activeTab: {
-    alignItems: "center",
-  },
-  activeTabText: {
-    color: COLORS.violet400,
-  },
-  activeTabIndicator: {
-    height: 2,
-    backgroundColor: COLORS.violet400,
-    marginTop: 4,
-    width: "100%",
   },
   tabContent: {
     marginTop: SPACING,
@@ -233,11 +288,12 @@ const styles = StyleSheet.create({
   topupText: {
     fontFamily: "Outfit-Regular",
   },
-  amountText: {
-    fontFamily: "Outfit-Regular",
-  },
+
   beneficiaryText: {
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(12),
+  },
+  selectedOperator: {
+    opacity: 0.5,
   },
 });
