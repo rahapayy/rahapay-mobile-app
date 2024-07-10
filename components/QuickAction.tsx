@@ -55,7 +55,7 @@ const QuickAction: React.FC<{
       onPress={() => navigation.navigate(item.navigateTo)}
       style={[styles.card, { width: cardWidth, height: cardHeight }]}
     >
-      <item.icon />
+      <item.icon color={COLORS.violet300} size={26} />
       <Text
         style={styles.cardText}
         numberOfLines={1}
