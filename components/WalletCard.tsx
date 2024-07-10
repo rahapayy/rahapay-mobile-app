@@ -55,7 +55,7 @@ const WalletCard: React.FC<{
         </View>
         {showBalance ? (
           <Text style={styles.balance}>
-            <Text style={{ fontSize: RFValue(16) }}></Text> ₦{" "}
+            ₦{" "}
             {balance.toLocaleString("en-US", {
               minimumFractionDigits: 2,
             })}
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
   },
   balance: {
-    fontSize: RFValue(25),
+    fontSize: RFValue(30),
     fontWeight: "700",
     color: COLOR.white,
     fontFamily: "Outfit-SemiBold",

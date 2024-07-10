@@ -12,10 +12,8 @@ import {
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {
-  ArrowDown,
   ArrowDown2,
   ArrowLeft,
-  Profile,
   ProfileCircle,
 } from "iconsax-react-native";
 import SPACING from "../../config/SPACING";
@@ -31,12 +29,9 @@ import Button from "../../components/Button";
 const DataScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [amount, setAmount] = useState("");
-
-  const amounts = [50, 100, 200, 500, 1000, 2000, 3000, 5000];
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView className="flex-1">
       <ScrollView>
         <View>
           <View style={styles.header}>
@@ -146,6 +141,7 @@ const DataScreen: React.FC<{
               onPress={() => {
                 navigation.navigate("ReviewSummaryScreen");
               }}
+              textColor="#fff"
             />
           </View>
         </View>

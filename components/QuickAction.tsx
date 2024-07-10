@@ -1,10 +1,10 @@
 import {
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   useWindowDimensions,
   View,
+  FlatList,
 } from "react-native";
 import React from "react";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -14,6 +14,14 @@ import Airtime from "../assets/svg/smartphone-rotate-angle_svgrepo.com.svg";
 import Tv from "../assets/svg/tv_svgrepo.com.svg";
 import Electricity from "../assets/svg/electricity_svgrepo.com.svg";
 import Data from "../assets/svg/signal_svgrepo.com.svg";
+import { More } from "iconsax-react-native";
+import SPACING from "../config/SPACING";
+
+interface ActionItem {
+  icon: React.ElementType;
+  title: string;
+  navigateTo: string;
+}
 
 const QuickAction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -30,9 +38,35 @@ const QuickAction: React.FC<{
     width: cardWidth - 36, // take into account paddingHorizontal
   };
 
-  const handleButtonClick = () => {
-    navigation.navigate("Services");
-  };
+  const actionItems = [
+    { icon: Airtime, title: "Airtime", navigateTo: "AirtimeScreen" },
+    { icon: Data, title: "Data", navigateTo: "DataScreen" },
+    { icon: Tv, title: "TV", navigateTo: "TvSubscriptionScreen" },
+    {
+      icon: Electricity,
+      title: "Electricity",
+      navigateTo: "ElectricityScreen",
+    },
+    { icon: More, title: "More", navigateTo: "Services" },
+  ];
+
+  const renderCard = ({ item }: { item: ActionItem }) => (
+    <TouchableOpacity
+      onPress={() => navigation.navigate(item.navigateTo)}
+      style={[styles.card, { width: cardWidth, height: cardHeight }]}
+    >
+      <item.icon />
+      <Text
+        style={styles.cardText}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+        allowFontScaling={false}
+      >
+        {item.title}
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
     <View className="p-4">
       <Text style={styles.quickAction} allowFontScaling={false}>
@@ -40,71 +74,16 @@ const QuickAction: React.FC<{
       </Text>
       <View className="flex-row items-center justify-between mt-4">
         {/* Cards */}
-        <TouchableOpacity
-          onPress={() => navigation.navigate("AirtimeScreen")}
-          style={[styles.card, { width: cardWidth, height: cardHeight }]}
-        >
-          <Airtime />
-          <Text
-            style={styles.cardText}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            allowFontScaling={false}
-          >
-            Airtime
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("DataScreen")}
-          style={[styles.card, { width: cardWidth, height: cardHeight }]}
-        >
-          <Data />
-          <Text
-            style={styles.cardText}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            allowFontScaling={false}
-          >
-            Data
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("TvSubscriptionScreen")}
-          style={[styles.card, { width: cardWidth, height: cardHeight }]}
-        >
-          <Tv />
-          <Text
-            style={styles.cardText}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            allowFontScaling={false}
-          >
-            TV
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("ElectricityScreen")}
-          style={[styles.card, { width: cardWidth, height: cardHeight }]}
-        >
-          <Electricity />
-          <Text
-            style={styles.cardText}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            allowFontScaling={false}
-          >
-            Electicity
-          </Text>
-        </TouchableOpacity>
+
+        <FlatList
+          data={actionItems}
+          renderItem={renderCard}
+          keyExtractor={(item, index) => index.toString()}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 4 }}
+        />
       </View>
-      <TouchableOpacity
-        onPress={handleButtonClick}
-        className="w-full bg-white p-3 justify-center items-center mt-4 rounded-lg"
-      >
-        <Text style={styles.moreText} allowFontScaling={false}>
-          More
-        </Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -120,14 +99,13 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     justifyContent: "center",
     alignItems: "center",
-    gap: 10,
-    paddingHorizontal: 18,
-    paddingVertical: 15,
+    margin: SPACING / 2,
     borderRadius: 20,
   },
   cardText: {
     fontSize: RFValue(12),
     fontFamily: "Outfit-Regular",
+    marginTop: SPACING,
   },
   moreText: {
     fontFamily: "Outfit-Regular",
