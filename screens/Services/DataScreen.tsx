@@ -114,28 +114,28 @@ const DataScreen: React.FC<{
                     </View>
                   </TouchableOpacity>
                   <TouchableOpacity
-                onPress={() => setSelectedOperator("9Mobile")}
-                style={[
-                  selectedOperator === "9Mobile" && styles.selectedOperator,
-                ]}
-              >
-                <View>
-                  <Eti />
-                  {selectedOperator === "9Mobile" && (
-                    <TickCircle
-                      size={18}
-                      variant="Bold"
-                      color="#fff"
-                      style={{
-                        zIndex: 1,
-                        position: "absolute",
-                        top: 0,
-                        right: 0,
-                      }}
-                    />
-                  )}
-                </View>
-              </TouchableOpacity>
+                    onPress={() => setSelectedOperator("9Mobile")}
+                    style={[
+                      selectedOperator === "9Mobile" && styles.selectedOperator,
+                    ]}
+                  >
+                    <View>
+                      <Eti />
+                      {selectedOperator === "9Mobile" && (
+                        <TickCircle
+                          size={18}
+                          variant="Bold"
+                          color="#fff"
+                          style={{
+                            zIndex: 1,
+                            position: "absolute",
+                            top: 0,
+                            right: 0,
+                          }}
+                        />
+                      )}
+                    </View>
+                  </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => setSelectedOperator("Glo")}
                     style={[
