@@ -10,6 +10,11 @@ import {
 } from "react-native";
 import COLORS from "../config/colors";
 import useSWR from "swr";
+import Airtel from "../assets/svg/airtelbig.svg";
+import Mtn from "../assets/svg/mtnbig.svg";
+import Eti from "../assets/svg/9mobilebig.svg";
+import Glo from "../assets/svg/globig.svg";
+import SPACING from "../config/SPACING";
 
 const { height } = Dimensions.get("window");
 
@@ -63,6 +68,10 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
         );
       }}
     >
+      {selectedOperator === "Airtel" && <Airtel width={32} height={32} />}
+      {selectedOperator === "Mtn" && <Mtn width={32} height={32} />}
+      {selectedOperator === "9Mobile" && <Eti width={32} height={32} />}
+      {selectedOperator === "Glo" && <Glo width={32} height={32} />}
       <Text style={styles.planText} allowFontScaling={false}>
         {item.plan_name}
       </Text>
@@ -157,8 +166,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   dataPlanContainer: {
-    padding: 10,
-    marginBottom: 5,
+    // padding: 10,
+    gap: 6,
+    marginBottom: SPACING,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -169,8 +179,6 @@ const styles = StyleSheet.create({
   for: {
     fontSize: 10,
     fontWeight: "bold",
-    marginRight: 5,
-    marginLeft: 5,
     fontFamily: "Outfit-Regular",
   },
   planText: {
