@@ -35,6 +35,12 @@ interface DataScreenProps {
 const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
   const [selectedOperator, setSelectedOperator] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<{
+    plan: string;
+    days: string;
+    plan_id: string;
+    amount: number;
+  } | null>(null);
 
   const onSelectPackage = (
     plan: string,
@@ -42,9 +48,11 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
     plan_id: string,
     amount: number
   ) => {
-    
     // Handle the selected package
     console.log({ plan, days, plan_id, amount });
+    setSelectedPlan({ plan, days, plan_id, amount });
+
+    setModalVisible(false);
   };
 
   return (
@@ -206,12 +214,14 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                         style={{
                           flex: 1,
                           fontFamily: "Outfit-Regular",
-                          color: "#DFDFDF",
+                          color: selectedPlan ? "#000" : "#DFDFDF",
                           fontSize: RFValue(12),
                         }}
                         allowFontScaling={false}
                       >
-                        Select plan
+                        {selectedPlan
+                          ? `${selectedPlan.plan} - ${selectedPlan.days} - ${selectedPlan.amount}`
+                          : "Select plan"}
                       </Text>
                       <ArrowDown2 color="#000" />
                     </TouchableOpacity>
