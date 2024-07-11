@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   Platform,
   SafeAreaView,
@@ -10,22 +11,78 @@ import {
 } from "react-native";
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, DocumentDownload } from "iconsax-react-native";
+import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../config/SPACING";
 import FONT_SIZE from "../config/font-size";
 import COLORS from "../config/colors";
-import Airtel from "../assets/svg/airtel.svg";
+import Airtel from "../assets/svg/airtelbig.svg";
+import Mtn from "../assets/svg/mtnbig.svg";
+import Eti from "../assets/svg/9mobilebig.svg";
+import Glo from "../assets/svg/globig.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 import SwipeButton from "../components/SwipeButton";
+import { RouteProp } from "@react-navigation/native";
+import useApi from "../utils/api";
+import { handleShowFlash } from "../components/FlashMessageComponent";
 
-const ReviewSummaryScreen: React.FC<{
-  navigation: NativeStackNavigationProp<any, "">;
-}> = ({ navigation }) => {
-  const handleSwipeConfirm = () => {
-    navigation.navigate("TransactionStatusScreen");
+type Params = {
+  selectedOperator: string;
+  selectedPlan: {
+    plan: string;
+    days: string;
+    plan_id: string;
+    amount: number;
+  };
+  phoneNumber: string;
+};
 
-    console.log("Swipe confirmed!");
-    // Perform your action here, e.g., sending a request to the server
+interface ReviewSummaryScreenProps {
+  navigation: NativeStackNavigationProp<any>;
+  route: RouteProp<{ params: Params }, "params">;
+}
+
+const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
+  navigation,
+  route,
+}) => {
+  const { selectedOperator, selectedPlan, phoneNumber } = route.params;
+
+  const { mutateAsync } = useApi.post("/top-up/data");
+
+  const handleSwipeConfirm = async (reset: () => void) => {
+    try {
+      const response = await mutateAsync({
+        planId: selectedPlan.plan_id,
+        networkType: selectedOperator.toLowerCase(),
+        phoneNumber: phoneNumber,
+      });
+
+      if (response.data.success) {
+        navigation.navigate("TransactionStatusScreen", {
+          status: "successful",
+        });
+      } else {
+        navigation.navigate("TransactionStatusScreen", { status: "failed" });
+      }
+    } catch (err) {
+      console.error("Error topping up data:", err);
+
+      if (err.response?.status === 503) {
+        // Alert.alert(
+        //   "Server Unavailable",
+        //   "The server is currently unavailable. Please try again later.",
+        //   [{ text: "OK" }]
+        // );
+        handleShowFlash({
+          message: "The server is currently unavailable. Please try again later.",
+          type: "danger",
+        });
+      } else {
+        navigation.navigate("TransactionStatusScreen", { status: "failed" });
+      }
+    } finally {
+      reset(); // Reset the swipe button state after the API call completes
+    }
   };
 
   return (
@@ -45,9 +102,15 @@ const ReviewSummaryScreen: React.FC<{
           </View>
 
           <View className="justify-center items-center mt-10">
-            <Airtel width={120} height={120} />
+            {/* Image */}
+            {selectedOperator === "Airtel" && (
+              <Airtel width={100} height={100} />
+            )}
+            {selectedOperator === "Mtn" && <Mtn width={100} height={100} />}
+            {selectedOperator === "9Mobile" && <Eti width={100} height={100} />}
+            {selectedOperator === "Glo" && <Glo width={100} height={100} />}
             <Text style={styles.itemText} allowFontScaling={false}>
-              AIRTEL Airtime VTU Topup
+              {selectedOperator} Data Bundle
             </Text>
           </View>
           <View className="p-4">
@@ -55,20 +118,13 @@ const ReviewSummaryScreen: React.FC<{
               <Text style={styles.headText} allowFontScaling={false}>
                 Transaction summary
               </Text>
-              {/* <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText} allowFontScaling={false}>
-                  Transaction ID
-                </Text>
-                <Text style={styles.descriptionText} allowFontScaling={false}>
-                  #1234567890
-                </Text>
-              </View> */}
+
               <View className="justify-between items-center flex-row">
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Amount
                 </Text>
                 <Text style={styles.descriptionText} allowFontScaling={false}>
-                  NGN 1,000.00
+                  ₦ {selectedPlan.amount}
                 </Text>
               </View>
               <View className="justify-between items-center flex-row">
@@ -76,7 +132,7 @@ const ReviewSummaryScreen: React.FC<{
                   Package
                 </Text>
                 <Text style={styles.descriptionText} allowFontScaling={false}>
-                  AIRTEL - 1GB - Monthly
+                  {selectedPlan.plan} - {selectedPlan.days}
                 </Text>
               </View>
               <View className="justify-between items-center flex-row">
@@ -84,23 +140,7 @@ const ReviewSummaryScreen: React.FC<{
                   Recipient
                 </Text>
                 <Text style={styles.descriptionText} allowFontScaling={false}>
-                  +23480123456789
-                </Text>
-              </View>
-              <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText} allowFontScaling={false}>
-                  Date
-                </Text>
-                <Text style={styles.descriptionText} allowFontScaling={false}>
-                  Mar 06, 2024, 02:12 PM
-                </Text>
-              </View>
-              <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText} allowFontScaling={false}>
-                  Paying
-                </Text>
-                <Text style={styles.descriptionText} allowFontScaling={false}>
-                  NGN 1,000.00
+                  {phoneNumber}
                 </Text>
               </View>
               <View className="justify-between items-center flex-row">
@@ -124,7 +164,6 @@ const ReviewSummaryScreen: React.FC<{
                 </View>
               </View>
             </View>
-
             <View className="mt-12">
               <SwipeButton onConfirm={handleSwipeConfirm} />
             </View>

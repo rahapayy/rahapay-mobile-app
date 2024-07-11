@@ -34,14 +34,12 @@ interface SelectDataPlanModalProps {
       ) => void;
     };
   };
-  navigation: any;
 }
 
 const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
   visible,
   onClose,
   route,
-  navigation,
 }) => {
   const selectedOperator = route.params?.selectedOperator || "";
   const onSelectPackage = route.params?.onSelectPackage;
@@ -78,7 +76,7 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
         -
       </Text>
       <Text style={styles.planText} allowFontScaling={false}>
-        {item.amount}
+        ₦ {item.amount}
       </Text>
     </TouchableOpacity>
   );

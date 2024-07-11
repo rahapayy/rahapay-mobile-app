@@ -15,8 +15,9 @@ const windowWidth = Dimensions.get("window").width;
 const sliderWidth = 360;
 const knobWidth = 50;
 const maxTranslateX = sliderWidth - knobWidth - 20;
+
 interface SwipeButtonProps {
-  onConfirm: () => void;
+  onConfirm: (reset: () => void) => void;
 }
 
 const SwipeButton: React.FC<SwipeButtonProps> = ({ onConfirm }) => {
@@ -34,7 +35,9 @@ const SwipeButton: React.FC<SwipeButtonProps> = ({ onConfirm }) => {
     { useNativeDriver: true }
   );
 
-  const onHandlerStateChange = (event: { nativeEvent: { oldState?: any; translationX?: any; }; }) => {
+  const onHandlerStateChange = (event: {
+    nativeEvent: { oldState?: any; translationX?: any };
+  }) => {
     if (event.nativeEvent.oldState === State.ACTIVE) {
       let { translationX } = event.nativeEvent;
       translationX = translationX < 0 ? 0 : translationX;
@@ -47,13 +50,10 @@ const SwipeButton: React.FC<SwipeButtonProps> = ({ onConfirm }) => {
       }).start(() => {
         if (confirmed && !isConfirmed) {
           setIsConfirmed(true);
-          onConfirm(); // Call the passed callback function
-
-          // Reset the swipe button after some time (optional)
-          setTimeout(() => {
+          onConfirm(() => {
             setIsConfirmed(false);
             translateX.setValue(0);
-          }, 2000);
+          });
         }
       });
     }

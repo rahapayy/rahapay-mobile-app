@@ -27,6 +27,7 @@ import Eti from "../../assets/svg/eti.svg";
 import Glo from "../../assets/svg/glo.svg";
 import Button from "../../components/Button";
 import SelectDataPlanModal from "../../components/SelectDataPlanModal";
+import { Skeleton } from "@rneui/base";
 
 interface DataScreenProps {
   navigation: NativeStackNavigationProp<any>;
@@ -214,7 +215,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                     <TouchableOpacity
                       style={[
                         styles.inputContainer,
-                        !selectedOperator && {}, // Apply opacity if no operator is selected
+                        !selectedOperator && {},
                       ]}
                       onPress={() => {
                         if (selectedOperator) {
@@ -263,7 +264,13 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                   : COLORS.violet400,
               }}
               onPress={() => {
-                navigation.navigate("ReviewSummaryScreen");
+                if (selectedPlan) {
+                  navigation.navigate("ReviewSummaryScreen", {
+                    selectedOperator,
+                    selectedPlan,
+                    phoneNumber,
+                  });
+                }
               }}
               disabled={isButtonDisabled}
               textColor="#fff"
@@ -278,7 +285,6 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                   onSelectPackage,
                 },
               }}
-              navigation={navigation}
             />
           </View>
         </View>
@@ -336,7 +342,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    height: "100%",
+    // height: "100%",
     fontSize: RFValue(12),
     fontFamily: "Outfit-Regular",
   },
