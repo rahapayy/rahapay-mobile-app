@@ -26,11 +26,15 @@ import Mtn from "../../assets/svg/mtn.svg";
 import Eti from "../../assets/svg/eti.svg";
 import Glo from "../../assets/svg/glo.svg";
 import Button from "../../components/Button";
+import SelectDataPlanModal from "../../components/SelectDataPlanModal";
 
-const DataScreen: React.FC<{
-  navigation: NativeStackNavigationProp<any, "">;
-}> = ({ navigation }) => {
+interface DataScreenProps {
+  navigation: NativeStackNavigationProp<any>;
+}
+
+const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
   const [selectedOperator, setSelectedOperator] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
 
   return (
     <SafeAreaView className="flex-1">
@@ -183,7 +187,10 @@ const DataScreen: React.FC<{
                     <Text style={styles.label} allowFontScaling={false}>
                       Plan
                     </Text>
-                    <TouchableOpacity style={styles.inputContainer}>
+                    <TouchableOpacity
+                      style={styles.inputContainer}
+                      onPress={() => setModalVisible(true)}
+                    >
                       <Text
                         style={{
                           flex: 1,
@@ -224,6 +231,11 @@ const DataScreen: React.FC<{
                 navigation.navigate("ReviewSummaryScreen");
               }}
               textColor="#fff"
+            />
+
+            <SelectDataPlanModal
+              visible={modalVisible}
+              onClose={() => setModalVisible(false)}
             />
           </View>
         </View>
@@ -274,7 +286,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     fontSize: RFValue(12),
     borderRadius: 10,
-    padding: 18,
+    padding: 14,
     width: "100%",
     borderWidth: 1,
     borderColor: "#DFDFDF",

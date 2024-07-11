@@ -12,7 +12,7 @@ import LottieView from "lottie-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const windowWidth = Dimensions.get("window").width;
-const sliderWidth = 360;
+const sliderWidth = 375;
 const knobWidth = 50;
 const maxTranslateX = sliderWidth - knobWidth - 20;
 interface SwipeButtonProps {
