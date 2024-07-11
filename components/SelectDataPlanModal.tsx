@@ -15,6 +15,7 @@ import Mtn from "../assets/svg/mtnbig.svg";
 import Eti from "../assets/svg/9mobilebig.svg";
 import Glo from "../assets/svg/globig.svg";
 import SPACING from "../config/SPACING";
+import { FontAwesome6 } from "@expo/vector-icons";
 
 const { height } = Dimensions.get("window");
 
@@ -100,9 +101,15 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
       <View style={styles.centeredView}>
         <TouchableOpacity style={styles.overlay} onPress={onClose} />
         <View style={styles.modalView}>
-          <Text style={styles.modalText} allowFontScaling={false}>
-            Select Data Plan
-          </Text>
+          <View className="flex-row justify-between">
+            <Text style={styles.modalText} allowFontScaling={false}>
+              Select Data Plan
+            </Text>
+
+            <TouchableOpacity onPress={onClose}>
+              <FontAwesome6 name="xmark" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
           <FlatList
             data={dataPlans}
             renderItem={renderDataPlan}
