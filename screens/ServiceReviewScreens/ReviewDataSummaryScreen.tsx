@@ -12,18 +12,18 @@ import {
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft } from "iconsax-react-native";
-import SPACING from "../config/SPACING";
-import FONT_SIZE from "../config/font-size";
-import COLORS from "../config/colors";
-import Airtel from "../assets/svg/airtelbig.svg";
-import Mtn from "../assets/svg/mtnbig.svg";
-import Eti from "../assets/svg/9mobilebig.svg";
-import Glo from "../assets/svg/globig.svg";
+import SPACING from "../../config/SPACING";
+import FONT_SIZE from "../../config/font-size";
+import COLORS from "../../config/colors";
+import Airtel from "../../assets/svg/airtelbig.svg";
+import Mtn from "../../assets/svg/mtnbig.svg";
+import Eti from "../../assets/svg/9mobilebig.svg";
+import Glo from "../../assets/svg/globig.svg";
 import { RFValue } from "react-native-responsive-fontsize";
-import SwipeButton from "../components/SwipeButton";
+import SwipeButton from "../../components/SwipeButton";
 import { RouteProp } from "@react-navigation/native";
-import useApi from "../utils/api";
-import { handleShowFlash } from "../components/FlashMessageComponent";
+import useApi from "../../utils/api";
+import { handleShowFlash } from "../../components/FlashMessageComponent";
 
 type Params = {
   selectedOperator: string;
@@ -36,12 +36,18 @@ type Params = {
   phoneNumber: string;
 };
 
-interface ReviewSummaryScreenProps {
+interface ReviewDataSummaryScreenProps {
   navigation: NativeStackNavigationProp<any>;
   route: RouteProp<{ params: Params }, "params">;
 }
 
-const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
+interface AxiosError {
+  response?: {
+    status: number;
+  };
+}
+
+const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
   navigation,
   route,
 }) => {
@@ -64,17 +70,15 @@ const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
       } else {
         navigation.navigate("TransactionStatusScreen", { status: "failed" });
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Error topping up data:", err);
 
-      if (err.response?.status === 503) {
-        // Alert.alert(
-        //   "Server Unavailable",
-        //   "The server is currently unavailable. Please try again later.",
-        //   [{ text: "OK" }]
-        // );
+      const axiosError = err as AxiosError;
+
+      if (axiosError.response?.status === 503) {
         handleShowFlash({
-          message: "The server is currently unavailable. Please try again later.",
+          message:
+            "The server is currently unavailable. Please try again later.",
           type: "danger",
         });
       } else {
@@ -148,7 +152,7 @@ const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
                   Date
                 </Text>
                 <Text style={styles.descriptionText} allowFontScaling={false}>
-                  Mar 06, 2024, 02:12 PM
+                  {new Date().toLocaleString()}
                 </Text>
               </View>
 
@@ -174,7 +178,7 @@ const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
   );
 };
 
-export default ReviewSummaryScreen;
+export default ReviewDataSummaryScreen;
 
 const styles = StyleSheet.create({
   header: {

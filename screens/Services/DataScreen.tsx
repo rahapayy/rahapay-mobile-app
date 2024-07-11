@@ -265,7 +265,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
               }}
               onPress={() => {
                 if (selectedPlan) {
-                  navigation.navigate("ReviewSummaryScreen", {
+                  navigation.navigate("ReviewDataSummaryScreen", {
                     selectedOperator,
                     selectedPlan,
                     phoneNumber,

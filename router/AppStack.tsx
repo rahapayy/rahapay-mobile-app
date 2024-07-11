@@ -17,8 +17,9 @@ import EnableNotificationScreen from "../screens/Profile/EnableNotificationScree
 import HelpAndSupportScreen from "../screens/Profile/HelpAndSupportScreen";
 import PersonalInformationScreen from "../screens/Profile/PersonalInformationScreen";
 import ReferralScreen from "../screens/Profile/ReferralScreen";
-import ReviewSummaryScreen from "../screens/ReviewSummaryScreen";
 import TransactionStatusScreen from "../screens/TransactionStatusScreen";
+import ReviewAirtimeSummaryScreen from "../screens/ServiceReviewScreens/ReviewAirtimeSummaryScreen";
+import ReviewDataSummaryScreen from "../screens/ServiceReviewScreens/ReviewDataSummaryScreen";
 
 const Stack = createNativeStackNavigator();
 const AppStack = () => {
@@ -112,8 +113,13 @@ const AppStack = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="ReviewSummaryScreen"
-        component={ReviewSummaryScreen}
+        name="ReviewDataSummaryScreen"
+        component={ReviewDataSummaryScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ReviewAirtimeSummaryScreen"
+        component={ReviewAirtimeSummaryScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

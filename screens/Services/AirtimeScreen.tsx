@@ -28,8 +28,28 @@ const AirtimeScreen: React.FC<{
   const [activeTab, setActiveTab] = useState("Local");
   const [amount, setAmount] = useState("");
   const [selectedOperator, setSelectedOperator] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const amounts = [50, 100, 200, 500, 1000, 2000, 3000, 5000];
+
+  // Check if all required fields are filled
+  const isButtonDisabled = !selectedOperator || !phoneNumber || !amount;
+
+  const handleProceed = () => {
+    // Validate and sanitize the amount
+    const sanitizedAmount = parseFloat(amount);
+
+    if (isNaN(sanitizedAmount) || sanitizedAmount <= 0) {
+      alert("Please enter a valid positive amount.");
+      return;
+    }
+
+    navigation.navigate("ReviewAirtimeSummaryScreen", {
+      selectedOperator,
+      phoneNumber,
+      amount: sanitizedAmount,
+    });
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -217,6 +237,9 @@ const AirtimeScreen: React.FC<{
                           placeholder="Enter phone number"
                           placeholderTextColor="#BABFC3"
                           allowFontScaling={false}
+                          value={phoneNumber}
+                          keyboardType="numeric"
+                          onChangeText={setPhoneNumber}
                         />
                         <TouchableOpacity>
                           <ProfileCircle color={COLORS.violet400} />
@@ -235,6 +258,7 @@ const AirtimeScreen: React.FC<{
                           placeholderTextColor="#BABFC3"
                           allowFontScaling={false}
                           value={amount}
+                          keyboardType="numeric"
                           onChangeText={(text) => setAmount(text)}
                         />
                       </View>
@@ -317,11 +341,12 @@ const AirtimeScreen: React.FC<{
             <Button
               title={"Proceed"}
               style={{
-                backgroundColor: COLORS.violet200,
+                backgroundColor: isButtonDisabled
+                  ? COLORS.violet200
+                  : COLORS.violet400,
               }}
-              onPress={() => {
-                navigation.navigate("ReviewSummaryScreen");
-              }}
+              onPress={handleProceed}
+              disabled={isButtonDisabled}
               textColor="#fff"
             />
           </View>
