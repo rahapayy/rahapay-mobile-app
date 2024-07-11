@@ -41,7 +41,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
     plan_id: string;
     amount: number;
   } | null>(null);
-
+  const [phoneNumber, setPhoneNumber] = useState("");
   const onSelectPackage = (
     plan: string,
     days: string,
@@ -54,6 +54,9 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
 
     setModalVisible(false);
   };
+
+  // Check if all required fields are filled
+  const isButtonDisabled = !selectedOperator || !phoneNumber || !selectedPlan;
 
   return (
     <SafeAreaView className="flex-1">
@@ -194,8 +197,10 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                       <TextInput
                         style={styles.input}
                         placeholder="Enter phone number"
-                        placeholderTextColor="#BABFC3"
+                        placeholderTextColor="#9BA1A8"
                         allowFontScaling={false}
+                        value={phoneNumber}
+                        onChangeText={setPhoneNumber}
                       />
                       <TouchableOpacity>
                         <ProfileCircle color={COLORS.violet400} />
@@ -207,14 +212,22 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                       Plan
                     </Text>
                     <TouchableOpacity
-                      style={styles.inputContainer}
-                      onPress={() => setModalVisible(true)}
+                      style={[
+                        styles.inputContainer,
+                        !selectedOperator && {}, // Apply opacity if no operator is selected
+                      ]}
+                      onPress={() => {
+                        if (selectedOperator) {
+                          setModalVisible(true);
+                        }
+                      }}
+                      disabled={!selectedOperator}
                     >
                       <Text
                         style={{
                           flex: 1,
                           fontFamily: "Outfit-Regular",
-                          color: selectedPlan ? "#000" : "#DFDFDF",
+                          color: selectedPlan ? "#000" : "#9BA1A8",
                           fontSize: RFValue(12),
                         }}
                         allowFontScaling={false}
@@ -242,15 +255,17 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                 </View>
               </View>
             </View>
-
             <Button
               title={"Proceed"}
               style={{
-                backgroundColor: COLORS.violet200,
+                backgroundColor: isButtonDisabled
+                  ? COLORS.violet200
+                  : COLORS.violet400,
               }}
               onPress={() => {
                 navigation.navigate("ReviewSummaryScreen");
               }}
+              disabled={isButtonDisabled}
               textColor="#fff"
             />
 

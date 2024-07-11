@@ -55,14 +55,14 @@ const ReviewSummaryScreen: React.FC<{
               <Text style={styles.headText} allowFontScaling={false}>
                 Transaction summary
               </Text>
-              <View className="justify-between items-center flex-row">
+              {/* <View className="justify-between items-center flex-row">
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Transaction ID
                 </Text>
                 <Text style={styles.descriptionText} allowFontScaling={false}>
                   #1234567890
                 </Text>
-              </View>
+              </View> */}
               <View className="justify-between items-center flex-row">
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Amount
@@ -103,10 +103,18 @@ const ReviewSummaryScreen: React.FC<{
                   NGN 1,000.00
                 </Text>
               </View>
+              <View className="justify-between items-center flex-row">
+                <Text style={styles.titleText} allowFontScaling={false}>
+                  Date
+                </Text>
+                <Text style={styles.descriptionText} allowFontScaling={false}>
+                  Mar 06, 2024, 02:12 PM
+                </Text>
+              </View>
 
               <View className="justify-between items-center flex-row">
                 <Text style={styles.titleText} allowFontScaling={false}>
-                  Mar 06, 2024, 02:12 PM
+                  Status
                 </Text>
                 {/* Transaction status */}
                 <View className="p-2 bg-[#FFEFC3] rounded-2xl">
