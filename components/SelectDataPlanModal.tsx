@@ -6,20 +6,83 @@ import {
   Modal,
   TouchableOpacity,
   Dimensions,
+  FlatList,
 } from "react-native";
 import COLORS from "../config/colors";
+import useSWR from "swr";
 
 const { height } = Dimensions.get("window");
+
+interface DataPlan {
+  plan_id: string;
+  plan_name: string;
+  plan_day: string;
+  amount: number;
+}
 
 interface SelectDataPlanModalProps {
   visible: boolean;
   onClose: () => void;
+  route: {
+    params: {
+      selectedOperator?: string;
+      onSelectPackage: (
+        plan: string,
+        days: string,
+        plan_id: string,
+        amount: number
+      ) => void;
+    };
+  };
+  navigation: any;
 }
 
 const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
   visible,
   onClose,
+  route,
+  navigation,
 }) => {
+  const selectedOperator = route.params?.selectedOperator || "";
+  const onSelectPackage = route.params?.onSelectPackage;
+
+  const { data } = useSWR(`/top-up/get-plan?networkType=${selectedOperator}`);
+
+  const dataPlans = React.useMemo(() => data || [], [data]);
+
+  const renderDataPlan = ({ item }: { item: DataPlan }) => (
+    <TouchableOpacity
+      style={[
+        styles.dataPlanContainer,
+        selectedOperator === item.plan_name && styles.selectedDataPlan,
+      ]}
+      onPress={() => {
+        onSelectPackage(
+          item.plan_name,
+          item.plan_day,
+          item.plan_id,
+          item.amount
+        );
+      }}
+    >
+      <Text style={styles.planText} allowFontScaling={false}>
+        {item.plan_name}
+      </Text>
+      <Text style={styles.for} allowFontScaling={false}>
+        -
+      </Text>
+      <Text style={styles.planText} allowFontScaling={false}>
+        {item.plan_day}{" "}
+      </Text>
+      <Text style={styles.for} allowFontScaling={false}>
+        -
+      </Text>
+      <Text style={styles.planText} allowFontScaling={false}>
+        {item.amount}
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
     <Modal
       animationType="slide"
@@ -33,7 +96,13 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
           <Text style={styles.modalText} allowFontScaling={false}>
             Select Data Plan
           </Text>
-          {/* Add your plan options here */}
+          <FlatList
+            data={dataPlans}
+            renderItem={renderDataPlan}
+            keyExtractor={(item, index) =>
+              `${item.plan_name}_${item.plan_id || index}`
+            }
+          />
         </View>
       </View>
     </Modal>
@@ -88,5 +157,27 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
+  },
+  dataPlanContainer: {
+    padding: 10,
+    marginBottom: 5,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  selectedDataPlan: {
+    borderTopWidth: 4,
+    borderTopColor: "#3498db",
+  },
+  for: {
+    fontSize: 10,
+    fontWeight: "bold",
+    marginRight: 5,
+    marginLeft: 5,
+    fontFamily: "Outfit-Regular",
+  },
+  planText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    fontFamily: "Outfit-Regular",
   },
 });

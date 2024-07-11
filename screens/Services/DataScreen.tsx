@@ -36,6 +36,17 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
   const [selectedOperator, setSelectedOperator] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
+  const onSelectPackage = (
+    plan: string,
+    days: string,
+    plan_id: string,
+    amount: number
+  ) => {
+    
+    // Handle the selected package
+    console.log({ plan, days, plan_id, amount });
+  };
+
   return (
     <SafeAreaView className="flex-1">
       <ScrollView>
@@ -236,6 +247,13 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
             <SelectDataPlanModal
               visible={modalVisible}
               onClose={() => setModalVisible(false)}
+              route={{
+                params: {
+                  selectedOperator,
+                  onSelectPackage,
+                },
+              }}
+              navigation={navigation}
             />
           </View>
         </View>
