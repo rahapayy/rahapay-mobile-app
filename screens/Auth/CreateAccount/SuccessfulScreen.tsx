@@ -1,10 +1,10 @@
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import LottieView from "lottie-react-native";
-import FONT_SIZE from "../../../config/font-size";
-import SPACING from "../../../config/SPACING";
 import Button from "../../../components/Button";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import FONT_SIZE from "../../../config/font-size";
+import SPACING from "../../../config/SPACING";
 
 const SuccessfulScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -12,26 +12,29 @@ const SuccessfulScreen: React.FC<{
   const handleButtonClick = () => {
     navigation.navigate("LoginScreen");
   };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View className="p-4 mt-10 justify-center items-center">
-        <LottieView
-          source={require("../../../assets/animation/success.json")}
-          autoPlay
-          loop
-          style={{ width: 300, height: 300 }}
-        />
-        <Text style={styles.headText} allowFontScaling={false}>
-          Congratutions!
-        </Text>
-        <Text style={styles.subText} allowFontScaling={false}>
-          Great news! Your RahaPay account has been created successfully.
-        </Text>
+      <View style={styles.container}>
+        <View className="mt-20">
+          <LottieView
+            source={require("../../../assets/animation/success.json")}
+            autoPlay
+            loop
+            style={styles.animation}
+          />
+          <Text style={styles.headText}>Congratulations!</Text>
+          <Text style={styles.subText}>
+            Great news! Your RahaPay account has been created successfully.
+          </Text>
+        </View>
+      </View>
 
+      <View style={styles.buttonContainer}>
         <Button
           title={"Continue"}
           onPress={handleButtonClick}
-          className="mt-32 w-full"
+          style={styles.button}
           textColor="#fff"
         />
       </View>
@@ -39,17 +42,36 @@ const SuccessfulScreen: React.FC<{
   );
 };
 
-export default SuccessfulScreen;
-
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  animation: {
+    width: 300,
+    height: 300,
+  },
   headText: {
     fontFamily: "Outfit-Medium",
     fontSize: FONT_SIZE.extraLarge,
+    marginTop: 16,
+    textAlign: "center",
   },
   subText: {
     fontFamily: "Outfit-ExtraLight",
-    marginTop: SPACING,
     fontSize: FONT_SIZE.medium,
+    marginTop: 8,
     textAlign: "center",
   },
+  buttonContainer: {
+    paddingHorizontal: 24,
+    paddingBottom: SPACING * 4,
+  },
+  button: {
+    width: "100%",
+  },
 });
+
+export default SuccessfulScreen;
