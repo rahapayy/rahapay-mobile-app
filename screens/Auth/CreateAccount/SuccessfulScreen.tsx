@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
   },
   subText: {
     fontFamily: "Outfit-ExtraLight",
-    // fontSize: RFValue(13),
     marginTop: SPACING,
     fontSize: FONT_SIZE.medium,
     textAlign: "center",

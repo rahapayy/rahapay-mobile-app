@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  TextInput,
 } from "react-native";
 import React, { useRef, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -13,82 +14,122 @@ import SPACING from "../../../config/SPACING";
 import COLORS from "../../../config/colors";
 import Button from "../../../components/Button";
 import { ArrowLeft } from "iconsax-react-native";
-import { TextInput } from "react-native";
+import useApi from "../../../utils/api";
+import { handleShowFlash } from "../../../components/FlashMessageComponent";
 
-const CreateTransactionPinScreen: React.FC<{
+const CreatePinScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [boxes, setBoxes] = useState(["", "", "", ""]);
+  const [confirmBoxes, setConfirmBoxes] = useState(["", "", "", ""]);
+  const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState<"create" | "confirm">("create");
 
   const boxRefs = useRef<Array<TextInput | null>>(new Array(4).fill(null));
+  const confirmBoxRefs = useRef<Array<TextInput | null>>(new Array(4).fill(null));
 
   const [boxIsFocused, setBoxIsFocused] = useState(new Array(4).fill(false));
 
-  const handleInput = (text: string, index: number) => {
-    if (/^\d{0,1}$/.test(text)) {
-      const newBoxes = [...boxes];
-      newBoxes[index] = text;
-      setBoxes(newBoxes);
+  const handleInput = (text: string, index: number, confirm: boolean = false) => {
+    const currentBoxes = confirm ? confirmBoxes : boxes;
+    const setCurrentBoxes = confirm ? setConfirmBoxes : setBoxes;
 
-      // Check if all input boxes are cleared
+    if (/^\d{0,1}$/.test(text)) {
+      const newBoxes = [...currentBoxes];
+      newBoxes[index] = text;
+      setCurrentBoxes(newBoxes);
+
       const allBoxesCleared = newBoxes.every((box) => box === "");
 
       if (text === "" && index > 0) {
-        boxRefs.current[index - 1]?.focus();
-      } else if (index < 4 && !allBoxesCleared) {
-        boxRefs.current[index + 1]?.focus();
+        confirm
+          ? confirmBoxRefs.current[index - 1]?.focus()
+          : boxRefs.current[index - 1]?.focus();
+      } else if (index < 3 && !allBoxesCleared) {
+        confirm
+          ? confirmBoxRefs.current[index + 1]?.focus()
+          : boxRefs.current[index + 1]?.focus();
       } else if (allBoxesCleared) {
-        // If all boxes are cleared, focus on the first box
-        boxRefs.current[0]?.focus();
+        confirm
+          ? confirmBoxRefs.current[0]?.focus()
+          : boxRefs.current[0]?.focus();
       }
     }
   };
 
-  const handleButtonClick = () => {
-    navigation.navigate("ConfirmPinScreen", { pin: boxes.join("") });
+  const createPinMutation = useApi.post("/auth/create-pin");
+
+  const handleCreatePin = () => {
+    setStep("confirm");
   };
+
+  const handleConfirmPin = async () => {
+    setLoading(true);
+    const pin = boxes.join("");
+    const confirmPin = confirmBoxes.join("");
+
+    if (pin !== confirmPin) {
+      handleShowFlash({
+        message: "Pins do not match. Please try again.",
+        type: "danger",
+      });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await createPinMutation.mutateAsync({
+        securityPin: parseInt(pin, 10),
+        transactionPin: parseInt(pin, 10),
+      });
+      console.log("API response:", response);
+      handleShowFlash({
+        message: "Pins created successfully!",
+        type: "success",
+      });
+      navigation.navigate("SuccessfulScreen"); // Change to your next screen
+    } catch (error) {
+      console.error("Error creating PIN:", error);
+      handleShowFlash({
+        message: "Failed to create pins. Please try again.",
+        type: "danger",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View className="p-4">
+      <View style={{ padding: 16 }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <ArrowLeft color="#000" />
         </TouchableOpacity>
 
-        <View className="mt-4 justify-center items-center">
+        <View style={{ marginTop: 16, justifyContent: "center", alignItems: "center" }}>
           <View style={styles.topContain}>
-            <Image
-              source={require("../../../assets/images/star.png")}
-              className="w-3 h-3"
-            />
-            <Image
-              source={require("../../../assets/images/star.png")}
-              className="w-3 h-3"
-            />
-            <Image
-              source={require("../../../assets/images/star.png")}
-              className="w-3 h-3"
-            />
-            <Image
-              source={require("../../../assets/images/star.png")}
-              className="w-3 h-3"
-            />
+            {[...Array(4)].map((_, i) => (
+              <Image
+                key={i}
+                source={require("../../../assets/images/star.png")}
+                style={{ width: 12, height: 12 }}
+              />
+            ))}
           </View>
           <Text style={styles.headText} allowFontScaling={false}>
-            Create Your Security PIN
+            {step === "create" ? "Create Your Security PIN" : "Confirm Your Security PIN"}
           </Text>
           <Text style={styles.subText} allowFontScaling={false}>
             Use this pin to process your transactions
           </Text>
         </View>
 
-        {/* Input boxes */}
-
         <View style={styles.inputContainer}>
           <View style={styles.inputRow}>
-            {boxes.map((value, index) => (
+            {(step === "create" ? boxes : confirmBoxes).map((value, index) => (
               <TextInput
                 key={index}
-                ref={(ref) => (boxRefs.current[index] = ref)}
+                ref={(ref) => (step === "create" ? (boxRefs.current[index] = ref) : (confirmBoxRefs.current[index] = ref))}
                 style={[
                   styles.inputBox,
                   boxIsFocused[index] && styles.inputBoxFocused,
@@ -96,7 +137,7 @@ const CreateTransactionPinScreen: React.FC<{
                 keyboardType="numeric"
                 allowFontScaling={false}
                 value={value ? "*" : ""}
-                onChangeText={(text) => handleInput(text, index)}
+                onChangeText={(text) => handleInput(text, index, step === "confirm")}
                 onFocus={() =>
                   setBoxIsFocused((prevState) => [
                     ...prevState.slice(0, index),
@@ -117,9 +158,10 @@ const CreateTransactionPinScreen: React.FC<{
         </View>
 
         <Button
-          title={"Continue"}
-          onPress={handleButtonClick}
-          className="mt-4"
+          title={step === "create" ? "Continue" : "Confirm"}
+          onPress={step === "create" ? handleCreatePin : handleConfirmPin}
+          isLoading={loading}
+          style={{ marginTop: 16 }}
           textColor="#fff"
         />
       </View>
@@ -127,7 +169,7 @@ const CreateTransactionPinScreen: React.FC<{
   );
 };
 
-export default CreateTransactionPinScreen;
+export default CreatePinScreen;
 
 const styles = StyleSheet.create({
   headText: {
@@ -147,12 +189,6 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING * 2,
     borderRadius: 15,
   },
-  input: {
-    flex: 1,
-    height: "100%",
-    fontSize: RFValue(19),
-    fontWeight: "bold",
-  },
   inputRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -162,7 +198,7 @@ const styles = StyleSheet.create({
   inputBox: {
     flex: 1,
     textAlign: "center",
-    paddingVertical: SPACING * 2,
+    paddingVertical: SPACING * 1.5,
     paddingHorizontal: SPACING,
     borderRadius: 10,
     margin: SPACING,
@@ -185,9 +221,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: SPACING * 2,
-  },
-  starText: {
-    fontSize: RFValue(29),
-    color: COLORS.violet400,
   },
 });

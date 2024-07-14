@@ -109,11 +109,6 @@ const AuthRoute = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="ConfirmPinScreen"
-        component={ConfirmPinScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
         name="SuccessfulScreen"
         component={SuccessfulScreen}
         options={{ headerShown: false }}
