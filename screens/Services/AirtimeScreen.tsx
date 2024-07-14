@@ -21,6 +21,7 @@ import Mtn from "../../assets/svg/mtn.svg";
 import Eti from "../../assets/svg/eti.svg";
 import Glo from "../../assets/svg/glo.svg";
 import Button from "../../components/Button";
+import ComingSoon from "../../assets/svg/Coming Soon.svg";
 
 const AirtimeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -303,52 +304,58 @@ const AirtimeScreen: React.FC<{
                       <Switch />
                     </View>
                   </View>
+                  <Button
+                    title={"Proceed"}
+                    style={{
+                      backgroundColor: isButtonDisabled
+                        ? COLORS.violet200
+                        : COLORS.violet400,
+                    }}
+                    onPress={handleProceed}
+                    disabled={isButtonDisabled}
+                    textColor="#fff"
+                  />
                 </View>
               ) : (
                 // International tab
-                <View>
-                  <Text style={styles.headText} allowFontScaling={false}>
-                    Saved Beneficiaries
-                  </Text>
-                  <View className="flex-row mb-4 gap-2">
-                    <View className="bg-[#EEEBF9] p-3 rounded-2xl">
-                      <Text>My number</Text>
-                    </View>
-                    <View className="bg-[#EEEBF9] p-3 rounded-2xl">
-                      <Text>+234 0862753934</Text>
-                    </View>
-                  </View>
+                // <View>
+                //   <Text style={styles.headText} allowFontScaling={false}>
+                //     Saved Beneficiaries
+                //   </Text>
+                //   <View className="flex-row mb-4 gap-2">
+                //     <View className="bg-[#EEEBF9] p-3 rounded-2xl">
+                //       <Text>My number</Text>
+                //     </View>
+                //     <View className="bg-[#EEEBF9] p-3 rounded-2xl">
+                //       <Text>+234 0862753934</Text>
+                //     </View>
+                //   </View>
 
-                  <View className="mt-4 mb-6">
-                    <Text style={styles.label} allowFontScaling={false}>
-                      Phone Number
-                    </Text>
-                    <View style={styles.inputContainer}>
-                      <TextInput
-                        style={styles.input}
-                        placeholder="Enter phone number"
-                        placeholderTextColor="#BABFC3"
-                        allowFontScaling={false}
-                      />
-                      <TouchableOpacity>
-                        <ProfileCircle color={COLORS.violet400} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
+                //   <View className="mt-4 mb-6">
+                //     <Text style={styles.label} allowFontScaling={false}>
+                //       Phone Number
+                //     </Text>
+                //     <View style={styles.inputContainer}>
+                //       <TextInput
+                //         style={styles.input}
+                //         placeholder="Enter phone number"
+                //         placeholderTextColor="#BABFC3"
+                //         allowFontScaling={false}
+                //       />
+                //       <TouchableOpacity>
+                //         <ProfileCircle color={COLORS.violet400} />
+                //       </TouchableOpacity>
+                //     </View>
+                //   </View>
+                // </View>
+                <View className="justify-center items-center">
+                  <ComingSoon />
+                  <Text style={styles.comingsoonText}>
+                    We are creating something amazing. Stay tuned!
+                  </Text>
                 </View>
               )}
             </View>
-            <Button
-              title={"Proceed"}
-              style={{
-                backgroundColor: isButtonDisabled
-                  ? COLORS.violet200
-                  : COLORS.violet400,
-              }}
-              onPress={handleProceed}
-              disabled={isButtonDisabled}
-              textColor="#fff"
-            />
           </View>
         </View>
       </ScrollView>
@@ -447,5 +454,10 @@ const styles = StyleSheet.create({
   },
   selectedOperator: {
     opacity: 0.5,
+  },
+  comingsoonText: {
+    fontFamily: "Outfit-Regular",
+    fontSize: FONT_SIZE.medium,
+    textAlign: "center",
   },
 });
