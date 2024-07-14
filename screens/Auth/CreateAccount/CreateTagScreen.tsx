@@ -19,13 +19,17 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import FONT_SIZE from "../../../config/font-size";
 
 const CreateTagScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [tag, setTag] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
+
+  const isFormComplete = tag;
 
   // const { mutateAsync: updateTagMutateAsync } = useApi.patch("/auth/username");
   const { data: suggestedTagsResponse } = useApi.get(
@@ -117,15 +121,21 @@ const CreateTagScreen: React.FC<{
                     key={index}
                     style={{
                       paddingHorizontal: SPACING,
-                      paddingVertical: 3,
-                      borderRadius: 3,
+                      paddingVertical: 5,
+                      borderRadius: 5,
                       width: "auto",
                       backgroundColor: "#C9C1EC",
                       marginTop: SPACING,
                     }}
                     onPress={() => setTag(suggestedTag)}
                   >
-                    <Text style={{ color: "#5136C1", fontSize: SPACING }}>
+                    <Text
+                      style={{
+                        color: "#5136C1",
+                        fontSize: FONT_SIZE.extraSmall,
+                      }}
+                      allowFontScaling={false}
+                    >
                       {suggestedTag}
                     </Text>
                   </TouchableOpacity>
@@ -136,8 +146,13 @@ const CreateTagScreen: React.FC<{
               title="Set My Tag"
               onPress={handleSetTag}
               isLoading={loading}
-              style={styles.proceedButton}
+              style={[
+                styles.proceedButton,
+                // If the form is not complete, add styles.proceedButtonDisabled
+                !isFormComplete && styles.proceedButtonDisabled,
+              ]}
               textColor={COLORS.white}
+              disabled={!isFormComplete || isLoading}
             />
           </KeyboardAwareScrollView>
         </View>
@@ -194,11 +209,14 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
   },
   proceedButton: {
-    marginTop: SPACING * 4,
+    marginTop: SPACING * 2,
   },
   proceedButtonText: {
     fontFamily: "Outfit-Regular",
     color: "#fff",
     fontSize: RFValue(16),
+  },
+  proceedButtonDisabled: {
+    backgroundColor: COLORS.violet200,
   },
 });
