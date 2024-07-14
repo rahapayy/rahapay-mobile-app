@@ -116,7 +116,7 @@ const ServicesScreen: React.FC<{
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => navigation.navigate("")}
+                onPress={() => navigation.navigate("EducationScreen")}
                 className="items-center mb-4 w-1/5"
               >
                 <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
@@ -136,7 +136,7 @@ const ServicesScreen: React.FC<{
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => navigation.navigate("")}
+                onPress={() => navigation.navigate("BettingScreen")}
                 className="items-center mb-4 w-1/5"
               >
                 <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
@@ -156,7 +156,7 @@ const ServicesScreen: React.FC<{
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => navigation.navigate("")}
+                onPress={() => navigation.navigate("TransferScreen")}
                 className="items-center mb-4 w-1/5"
               >
                 <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">

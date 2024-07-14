@@ -10,14 +10,11 @@ import {
 } from "react-native";
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, DocumentDownload } from "iconsax-react-native";
+import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../../config/SPACING";
 import FONT_SIZE from "../../config/font-size";
-import COLORS from "../../config/colors";
-import Airtel from "../assets/svg/airtel.svg";
-import { RFValue } from "react-native-responsive-fontsize";
 
-const ElectricityScreen: React.FC<{
+const BettingScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   return (
@@ -32,7 +29,7 @@ const ElectricityScreen: React.FC<{
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
             <Text style={[styles.headerText]} allowFontScaling={false}>
-              Electricity Bills
+              Betting
             </Text>
           </View>
         </View>
@@ -41,7 +38,7 @@ const ElectricityScreen: React.FC<{
   );
 };
 
-export default ElectricityScreen;
+export default BettingScreen;
 
 const styles = StyleSheet.create({
   header: {
