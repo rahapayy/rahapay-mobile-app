@@ -31,28 +31,55 @@ const CreateAccountScreen: React.FC<{
   const countryCode = "+234";
   const [isLoading, setIsLoading] = useState(false);
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [showRequirements, setShowRequirements] = useState(false);
+  const [metRequirements, setMetRequirements] = useState<Set<number>>(
+    new Set()
+  );
 
-  // Create a boolean that checks if all fields have been entered
+  const passwordRequirements = [
+    { text: "At least 8 characters", regex: /.{8,}/ },
+    { text: "At least one uppercase letter", regex: /[A-Z]/ },
+    { text: "At least one lowercase letter", regex: /[a-z]/ },
+    { text: "At least one number", regex: /[0-9]/ },
+    { text: "At least one special character", regex: /[!@#$%^&*(),.?":{}|<>]/ },
+  ];
+
+  const validatePassword = (password: string) => {
+    return passwordRequirements.every((requirement) =>
+      requirement.regex.test(password)
+    );
+  };
+
   const isFormComplete =
-    fullName &&
-    email &&
-    phoneNumber &&
-    password &&
-    confirmPassword &&
+    fullName.trim() &&
+    email.trim() &&
+    phoneNumber.trim() &&
+    password.trim() &&
+    confirmPassword.trim() &&
     countryCode;
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   const handleButtonClick = async () => {
-    if (isFormComplete && password === confirmPassword) {
+    if (isFormComplete) {
+      if (!validatePassword(password)) {
+        setPasswordError("Password does not meet all requirements");
+        return;
+      }
+      if (password !== confirmPassword) {
+        setConfirmPasswordError("Passwords do not match");
+        return;
+      }
+
       setIsLoading(true);
       try {
         const response = await mutateAsync({
-          fullName,
-          email,
-          phoneNumber,
+          fullName: fullName.trim(),
+          email: email.trim(),
+          phoneNumber: phoneNumber.trim(),
           countryCode,
-          password,
+          password: password.trim(),
         });
 
         handleShowFlash({
@@ -66,32 +93,26 @@ const CreateAccountScreen: React.FC<{
           // id: response.data.data.id,
         });
       } catch (error) {
-        // Extract the message from the error response
         const err = error as {
           response?: { data?: { message?: string } };
           message: string;
         };
         const errorMessage =
           err.response?.data?.message || err.message || "An error occurred";
-        console.error("API Error:", err.response?.data || err.message); // Log the full error response
+        console.error("API Error:", err.response?.data || err.message);
 
-        // Check for specific error conditions, e.g., wrong password
-        if (errorMessage.toLowerCase().includes("password")) {
-          handleShowFlash({
-            message: "Incorrect password entered. Please try again.",
-            type: "danger",
-          });
-        } else {
-          handleShowFlash({
-            message: errorMessage,
-            type: "danger",
-          });
-        }
+        handleShowFlash({
+          message: errorMessage,
+          type: "danger",
+        });
       } finally {
-        setIsLoading(false); // Reset isLoading to false after API call
+        setIsLoading(false);
       }
     } else {
-      setConfirmPasswordError("Passwords do not match");
+      handleShowFlash({
+        message: "Please fill in all required fields",
+        type: "warning",
+      });
     }
   };
 
@@ -105,6 +126,7 @@ const CreateAccountScreen: React.FC<{
   };
 
   const { mutateAsync } = useApi.post("/auth/onboarding");
+
   return (
     <SafeAreaView className="flex-1">
       <KeyboardAwareScrollView
@@ -195,7 +217,26 @@ const CreateAccountScreen: React.FC<{
                 placeholderTextColor="#BABFC3"
                 allowFontScaling={false}
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(value) => {
+                  setPassword(value);
+                  setShowRequirements(true);
+
+                  const newMetRequirements = new Set<number>();
+                  passwordRequirements.forEach((req, index) => {
+                    if (req.regex.test(value)) {
+                      newMetRequirements.add(index);
+                    }
+                  });
+                  setMetRequirements(newMetRequirements);
+
+                  if (validatePassword(value)) {
+                    setPasswordError("");
+                    // Don't hide requirements immediately, let them stay green for a moment
+                    setTimeout(() => setShowRequirements(false), 1000);
+                  } else {
+                    setPasswordError("Password does not meet all requirements");
+                  }
+                }}
                 secureTextEntry={showPassword}
               />
               <TouchableOpacity onPress={togglePasswordVisibility}>
@@ -205,6 +246,45 @@ const CreateAccountScreen: React.FC<{
                   <Eye color="#000" size={20} />
                 )}
               </TouchableOpacity>
+            </View>
+
+            <View>
+              {showRequirements && (
+                <View style={styles.requirementsContainer}>
+                  {passwordRequirements.map((requirement, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.requirementItem,
+                        metRequirements.has(index)
+                          ? styles.requirementMet
+                          : styles.requirementNotMet,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.requirementIcon,
+                          metRequirements.has(index)
+                            ? styles.requirementMetIcon
+                            : styles.requirementNotMetIcon,
+                        ]}
+                      >
+                        {metRequirements.has(index) ? "✓" : "✗"}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.requirementText,
+                          metRequirements.has(index)
+                            ? styles.requirementMetText
+                            : styles.requirementNotMetText,
+                        ]}
+                      >
+                        {requirement.text}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
             </View>
           </View>
 
@@ -251,11 +331,10 @@ const CreateAccountScreen: React.FC<{
             isLoading={isLoading}
             style={[
               styles.proceedButton,
-              // If the form is not complete, add styles.proceedButtonDisabled
               !isFormComplete && styles.proceedButtonDisabled,
             ]}
             textColor="#fff"
-            disabled={!isFormComplete || isLoading} // Disable the button if the form is incomplete or if loading
+            disabled={!isFormComplete || isLoading}
           />
         </View>
       </KeyboardAwareScrollView>
@@ -323,8 +402,50 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.violet200,
   },
   errorText: {
-    color: COLORS.red300, // Example color
+    color: COLORS.red300,
     fontSize: RFValue(12),
     marginTop: SPACING,
+  },
+  requirementsContainer: {
+    marginTop: SPACING,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  requirementItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 16,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  requirementNotMet: {
+    backgroundColor: "#FFEBEE",
+    borderColor: "#FF8A80",
+  },
+  requirementMet: {
+    backgroundColor: "#E8F5E9",
+    borderColor: "#A5D6A7",
+  },
+  requirementIcon: {
+    marginRight: 4,
+    fontSize: RFValue(12),
+  },
+  requirementNotMetIcon: {
+    color: "#D32F2F",
+  },
+  requirementMetIcon: {
+    color: "#4CAF50",
+  },
+  requirementText: {
+    fontSize: RFValue(12),
+    fontFamily: "Outfit-Regular",
+  },
+  requirementNotMetText: {
+    color: "#D32F2F",
+  },
+  requirementMetText: {
+    color: "#4CAF50",
   },
 });
