@@ -7,7 +7,7 @@ import {
   View,
   TextInput,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../config/SPACING";
@@ -26,33 +26,63 @@ const CreatePinScreen: React.FC<{
   const [step, setStep] = useState<"create" | "confirm">("create");
 
   const boxRefs = useRef<Array<TextInput | null>>(new Array(4).fill(null));
-  const confirmBoxRefs = useRef<Array<TextInput | null>>(new Array(4).fill(null));
+  const confirmBoxRefs = useRef<Array<TextInput | null>>(
+    new Array(4).fill(null)
+  );
 
   const [boxIsFocused, setBoxIsFocused] = useState(new Array(4).fill(false));
 
-  const handleInput = (text: string, index: number, confirm: boolean = false) => {
+  useEffect(() => {
+    if (step === "confirm") {
+      confirmBoxRefs.current[0]?.focus();
+    } else {
+      boxRefs.current[0]?.focus();
+    }
+  }, [step]);
+
+  const handleInput = (
+    text: string,
+    index: number,
+    confirm: boolean = false
+  ) => {
     const currentBoxes = confirm ? confirmBoxes : boxes;
     const setCurrentBoxes = confirm ? setConfirmBoxes : setBoxes;
 
-    if (/^\d{0,1}$/.test(text)) {
-      const newBoxes = [...currentBoxes];
-      newBoxes[index] = text;
+    const newBoxes = [...currentBoxes];
+
+    // Handle input
+    if (text === "") {
+      newBoxes[index] = "";
       setCurrentBoxes(newBoxes);
-
-      const allBoxesCleared = newBoxes.every((box) => box === "");
-
-      if (text === "" && index > 0) {
+      if (index > 0) {
         confirm
           ? confirmBoxRefs.current[index - 1]?.focus()
           : boxRefs.current[index - 1]?.focus();
-      } else if (index < 3 && !allBoxesCleared) {
+      }
+    } else if (/^\d{0,1}$/.test(text)) {
+      newBoxes[index] = text;
+      setCurrentBoxes(newBoxes);
+      if (index < 3 && text !== "") {
         confirm
           ? confirmBoxRefs.current[index + 1]?.focus()
           : boxRefs.current[index + 1]?.focus();
-      } else if (allBoxesCleared) {
+      }
+    }
+  };
+
+  const handleKeyPress = (
+    event: { nativeEvent: { key: string } },
+    index: number,
+    confirm: boolean = false
+  ) => {
+    const currentBoxes = confirm ? confirmBoxes : boxes;
+    const setCurrentBoxes = confirm ? setConfirmBoxes : setBoxes;
+
+    if (event.nativeEvent.key === "Backspace" && currentBoxes[index] === "") {
+      if (index > 0) {
         confirm
-          ? confirmBoxRefs.current[0]?.focus()
-          : boxRefs.current[0]?.focus();
+          ? confirmBoxRefs.current[index - 1]?.focus()
+          : boxRefs.current[index - 1]?.focus();
       }
     }
   };
@@ -87,7 +117,7 @@ const CreatePinScreen: React.FC<{
         message: "Pins created successfully!",
         type: "success",
       });
-      navigation.navigate("SuccessfulScreen"); // Change to your next screen
+      navigation.navigate("SuccessfulScreen");
     } catch (error) {
       console.error("Error creating PIN:", error);
       handleShowFlash({
@@ -106,7 +136,13 @@ const CreatePinScreen: React.FC<{
           <ArrowLeft color="#000" />
         </TouchableOpacity>
 
-        <View style={{ marginTop: 16, justifyContent: "center", alignItems: "center" }}>
+        <View
+          style={{
+            marginTop: 16,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <View style={styles.topContain}>
             {[...Array(4)].map((_, i) => (
               <Image
@@ -117,7 +153,9 @@ const CreatePinScreen: React.FC<{
             ))}
           </View>
           <Text style={styles.headText} allowFontScaling={false}>
-            {step === "create" ? "Create Your Security PIN" : "Confirm Your Security PIN"}
+            {step === "create"
+              ? "Create Your Security PIN"
+              : "Confirm Your Security PIN"}
           </Text>
           <Text style={styles.subText} allowFontScaling={false}>
             Use this pin to process your transactions
@@ -129,7 +167,11 @@ const CreatePinScreen: React.FC<{
             {(step === "create" ? boxes : confirmBoxes).map((value, index) => (
               <TextInput
                 key={index}
-                ref={(ref) => (step === "create" ? (boxRefs.current[index] = ref) : (confirmBoxRefs.current[index] = ref))}
+                ref={(ref) =>
+                  step === "create"
+                    ? (boxRefs.current[index] = ref)
+                    : (confirmBoxRefs.current[index] = ref)
+                }
                 style={[
                   styles.inputBox,
                   boxIsFocused[index] && styles.inputBoxFocused,
@@ -137,7 +179,12 @@ const CreatePinScreen: React.FC<{
                 keyboardType="numeric"
                 allowFontScaling={false}
                 value={value ? "*" : ""}
-                onChangeText={(text) => handleInput(text, index, step === "confirm")}
+                onChangeText={(text) =>
+                  handleInput(text, index, step === "confirm")
+                }
+                onKeyPress={(event) =>
+                  handleKeyPress(event, index, step === "confirm")
+                }
                 onFocus={() =>
                   setBoxIsFocused((prevState) => [
                     ...prevState.slice(0, index),
@@ -198,7 +245,7 @@ const styles = StyleSheet.create({
   inputBox: {
     flex: 1,
     textAlign: "center",
-    paddingVertical: SPACING * 1.5,
+    paddingVertical: SPACING * 2,
     paddingHorizontal: SPACING,
     borderRadius: 10,
     margin: SPACING,
