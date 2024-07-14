@@ -72,7 +72,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [appState, setAppState] = useState<AppStateStatus>(
     AppState.currentState
   );
-  // const navigation = useNavigation<NativeStackNavigationProp<any, any>>();
 
   useEffect(() => {
     const checkLoginStatus = async () => {
