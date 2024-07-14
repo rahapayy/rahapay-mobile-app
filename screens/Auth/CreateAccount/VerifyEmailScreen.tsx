@@ -17,6 +17,7 @@ import COLORS from "../../../config/colors";
 import Button from "../../../components/Button";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type VerifyEmailScreenRouteParams = {
   email: string;
@@ -101,6 +102,7 @@ const VerifyEmailScreen: React.FC<{
           message: "Email verified successfully!",
           type: "success",
         });
+        AsyncStorage.setItem("access_token", response.data.data.accessToken);
         navigation.navigate("CreateTagScreen");
       } catch (error) {
         const err = error as {

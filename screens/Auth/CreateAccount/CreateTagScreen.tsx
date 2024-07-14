@@ -18,6 +18,7 @@ import Button from "../../../components/Button";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CreateTagScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -39,10 +40,7 @@ const CreateTagScreen: React.FC<{
     setLoading(true);
     try {
       await updateTagMutation.mutateAsync({ userName: tag });
-
-      // Here you would navigate to another screen or reset the state as required
       navigation.navigate("CreatePinScreen");
-      // Show success message
       handleShowFlash({
         message: "Tag updated successfully!",
         type: "success",
@@ -62,8 +60,12 @@ const CreateTagScreen: React.FC<{
   };
 
   useEffect(() => {
-    if (suggestedTagsResponse) {
-      setSuggestedTags(suggestedTagsResponse.data); // Assuming the response data is an array of strings
+    if (
+      suggestedTagsResponse?.data &&
+      suggestedTagsResponse.data &&
+      suggestedTagsResponse.data?.suggestedUserNames
+    ) {
+      setSuggestedTags(suggestedTagsResponse.data?.suggestedUserNames);
     }
   }, [suggestedTagsResponse]);
 
@@ -92,8 +94,6 @@ const CreateTagScreen: React.FC<{
                 <Text style={styles.label} allowFontScaling={false}>
                   Set Username
                 </Text>
-                {/* Loading component for check if the user name is availble */}
-                <View></View>
               </View>
               <View style={styles.inputContainer}>
                 <Text style={{}} allowFontScaling={false}>
@@ -110,21 +110,27 @@ const CreateTagScreen: React.FC<{
               </View>
             </View>
             {/* Suggested availble usertags */}
-            {/* {suggestedTags.length && */}
-            {suggestedTags.length > 0 &&
-              suggestedTags?.map((suggestedTag, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={{
-                    padding: SPACING,
-                    backgroundColor: COLORS.black200,
-                    marginTop: SPACING,
-                  }}
-                  onPress={() => setTag(suggestedTag)}
-                >
-                  <Text>{`@${suggestedTag}`}</Text>
-                </TouchableOpacity>
-              ))}
+            <View className="flex-row gap-2 w-full flex-wrap mt-3">
+              {suggestedTags?.length > 0 &&
+                suggestedTags?.map((suggestedTag, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={{
+                      paddingHorizontal: SPACING,
+                      paddingVertical: 3,
+                      borderRadius: 3,
+                      width: "auto",
+                      backgroundColor: "#C9C1EC",
+                      marginTop: SPACING,
+                    }}
+                    onPress={() => setTag(suggestedTag)}
+                  >
+                    <Text style={{ color: "#5136C1", fontSize: SPACING }}>
+                      {suggestedTag}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+            </View>
 
             <Button
               title="Set My Tag"

@@ -6,6 +6,9 @@ import * as BackgroundFetch from "expo-background-fetch";
 import * as TaskManager from "expo-task-manager";
 import SWR from "./Swr";
 import * as Constants from "expo-constants";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "react-native-screens/lib/typescript/native-stack/types";
+import ExistingUserScreen from "../screens/Auth/Login/ExistingUserScreen";
 
 // Define UserInfoType
 interface UserInfoType {
@@ -65,9 +68,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [idleStartTime, setIdleStartTime] = useState<number | null>(null);
   const [isAppReady, setIsAppReady] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showPinScreen, setShowPinScreen] = useState(false);
   const [appState, setAppState] = useState<AppStateStatus>(
     AppState.currentState
   );
+  // const navigation = useNavigation<NativeStackNavigationProp<any, any>>();
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -209,13 +214,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const idleTime =
           Number((await AsyncStorage.getItem("idleStartTime")) || 0) ||
           idleStartTime;
-        if (idleTime && Date.now() - idleTime > 2 * 60 * 1000) {
+        const storedUserInfo = await AsyncStorage.getItem("userInfo");
+        if (
+          idleTime &&
+          Date.now() - idleTime > 2 * 60 * 1000 &&
+          storedUserInfo
+        ) {
           setIdleStartTime(null);
           AsyncStorage.removeItem("idleStartTime");
-          authLogout();
+          setShowPinScreen(true);
+          // navigation.navigate("WelcomeBackScreen");
         }
 
-        const storedUserInfo = await AsyncStorage.getItem("userInfo");
         if (!storedUserInfo) {
           authLogout();
         } else {
@@ -318,6 +328,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await registerBackgroundFetchAsync();
     })();
   }, []);
+
+  if (showPinScreen) {
+    return (
+      <ExistingUserScreen
+        onCorrectPin={() => {
+          setShowPinScreen(false);
+          // Optionally refresh the user session here
+        }}
+      />
+    );
+  }
 
   return (
     <AuthContext.Provider

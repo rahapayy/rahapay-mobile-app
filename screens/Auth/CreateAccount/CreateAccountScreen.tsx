@@ -44,8 +44,8 @@ const CreateAccountScreen: React.FC<{
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   const handleButtonClick = async () => {
-    setIsLoading(true);
     if (isFormComplete && password === confirmPassword) {
+      setIsLoading(true);
       try {
         const response = await mutateAsync({
           fullName,
@@ -62,7 +62,8 @@ const CreateAccountScreen: React.FC<{
 
         navigation.navigate("VerifyEmailScreen", {
           email,
-          id: response.data.data.id,
+          id: "",
+          // id: response.data.data.id,
         });
       } catch (error) {
         // Extract the message from the error response

@@ -67,7 +67,7 @@ const ConfirmPinScreen: React.FC<{
           type: "danger",
         });
       } else {
-        await mutateAsync({ securityPin: boxes.join("") });
+        await mutateAsync({ securityPin: pin });
 
         // Here you would navigate to another screen or reset the state as required
         navigation.navigate("SuccessfulScreen");
@@ -78,13 +78,13 @@ const ConfirmPinScreen: React.FC<{
         });
         setBoxes(["", "", "", ""]);
       }
-    } catch (error) {
+    } catch (error: any) {
       handleShowFlash({
         message: "Failed to add pin. Please try again later.",
         type: "danger",
       });
       // Optionally log the error too
-      console.error("Failed to update pin:", error);
+      console.error("Failed to update pin:", error.message);
       console.error({ error });
     } finally {
       setLoading(false);

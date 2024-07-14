@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import FaceId from "../../../assets/svg/mingcute_faceid-line.svg";
 import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
 import Backspace from "../../../assets/svg/solar_backspace-linear.svg";
+import { authenticateWithBiometrics } from "../../../context/Biometrics";
 
-const ExistingUserScreen: React.FC = () => {
+const ExistingUserScreen: React.FC<{ onCorrectPin: () => void }> = ({
+  onCorrectPin,
+}) => {
   const [pin, setPin] = useState<string>("");
 
   const handlePinPress = (value: string) => {
@@ -30,6 +33,17 @@ const ExistingUserScreen: React.FC = () => {
     }
     return dots;
   };
+
+  const handleBiometricAuth = async () => {
+    const success = await authenticateWithBiometrics();
+    if (success) {
+      onCorrectPin();
+    }
+  };
+
+  useEffect(() => {
+    pin.length === 4 && onCorrectPin;
+  }, [pin]);
 
   return (
     <View style={styles.container}>
@@ -67,6 +81,8 @@ const ExistingUserScreen: React.FC = () => {
                 handleBackspace();
               } else if (key !== "face") {
                 handlePinPress(key);
+              } else {
+                handleBiometricAuth();
               }
             }}
           >
