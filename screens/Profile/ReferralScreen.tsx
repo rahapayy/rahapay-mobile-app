@@ -1,14 +1,12 @@
 import {
-  Image,
   Platform,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, Copy, People, Send2 } from "iconsax-react-native";
 import SPACING from "../../config/SPACING";
@@ -17,10 +15,22 @@ import COLORS from "../../config/colors";
 import ReferImg from "../../assets/svg/refer.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 import Money from "../../assets/svg/money-earn-svgrepo-com 1.svg";
+import { AuthContext } from "../../context/AuthContext";
+import { handleShowFlash } from "../../components/FlashMessageComponent";
+import * as Clipboard from "expo-clipboard";
 
 const ReferralScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const { userDetails } = useContext(AuthContext);
+
+  const copyToClipboard = async (textToCopy: string) => {
+    await Clipboard.setStringAsync(textToCopy);
+    handleShowFlash({
+      message: "Code copied!",
+      type: "success",
+    });
+  };
   return (
     <View>
       <SafeAreaView style={styles.safeArea}>
@@ -49,10 +59,13 @@ const ReferralScreen: React.FC<{
         <View className="flex-row gap-2 mb-2">
           <View style={styles.tagContain}>
             <Text style={styles.tagText} allowFontScaling={false}>
-              Akinola123
+              {userDetails?.userName}
             </Text>
           </View>
-          <TouchableOpacity style={styles.copyContain}>
+          <TouchableOpacity
+            onPress={() => copyToClipboard(userDetails?.userName)}
+            style={styles.copyContain}
+          >
             <Text style={styles.copyText} allowFontScaling={false}>
               Copy
             </Text>
