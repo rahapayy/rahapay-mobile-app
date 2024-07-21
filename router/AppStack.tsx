@@ -23,6 +23,7 @@ import ReviewDataSummaryScreen from "../screens/ServiceReviewScreens/ReviewDataS
 import BettingScreen from "../screens/Services/BettingScreen";
 import TransferScreen from "../screens/Services/TransferScreen";
 import EducationScreen from "../screens/Services/EducationScreen";
+import CustomerCareScreen from "../screens/CustomerCareScreen";
 
 const Stack = createNativeStackNavigator();
 const AppStack = () => {
@@ -143,6 +144,11 @@ const AppStack = () => {
       <Stack.Screen
         name="EducationScreen"
         component={EducationScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CustomerCareScreen"
+        component={CustomerCareScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
