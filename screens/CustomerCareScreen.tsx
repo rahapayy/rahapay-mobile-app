@@ -1,4 +1,5 @@
 import {
+  Image,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -9,16 +10,17 @@ import {
 } from "react-native";
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft } from "iconsax-react-native";
+import { ArrowLeft, Call, Message2, Messages2 } from "iconsax-react-native";
 import SPACING from "../config/SPACING";
 import FONT_SIZE from "../config/font-size";
-import PhoneImg from "../assets/svg/Frame 30141.svg";
+import COLORS from "../config/colors";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const CustomerCareScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F7F7" }}>
       <ScrollView>
         <View>
           <View style={styles.header}>
@@ -33,8 +35,39 @@ const CustomerCareScreen: React.FC<{
             </Text>
           </View>
 
-          <View>
-            <PhoneImg />
+          <View className="p-4 flex-1 justify-center items-center">
+            <Image
+              source={require("../assets/images/phoneimg.png")}
+              alt="img"
+              style={styles.centerImg}
+            />
+
+            <Text style={styles.headText} allowFontScaling={false}>
+              RahaPay Support
+            </Text>
+            <Text style={styles.subHead} allowFontScaling={false}>
+              Message or call us if you are having troble using any of our
+              services
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate("")}
+              style={styles.chatButton}
+            >
+              <Messages2 color="#fff" />
+              <Text style={styles.chatText} allowFontScaling={false}>
+                Start live Chat
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("")}
+              style={styles.callButton}
+            >
+              <Call color={COLORS.violet400} />
+              <Text style={styles.callText} allowFontScaling={false}>
+                Call Us
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -60,5 +93,56 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.medium,
     fontFamily: "Outfit-Regular",
     flex: 1,
+  },
+  centerImg: {
+    width: 320,
+    height: 300,
+    marginBottom: SPACING * 6,
+  },
+  headText: {
+    fontFamily: "Outfit-Medium",
+    textAlign: "center",
+    fontSize: FONT_SIZE.large,
+    marginBottom: SPACING,
+  },
+  subHead: {
+    fontFamily: "Outfit-Regular",
+    textAlign: "center",
+    fontSize: FONT_SIZE.small,
+    color: "#9BA1A8",
+    marginBottom: SPACING * 4,
+  },
+  chatButton: {
+    backgroundColor: COLORS.violet400,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 13,
+    borderRadius: 10,
+    flexDirection: "row",
+    marginTop: SPACING,
+    width: "100%",
+  },
+  chatText: {
+    fontFamily: "Outfit-Regular",
+    color: COLORS.white,
+    marginLeft: 4,
+    fontSize: RFValue(14),
+  },
+  callButton: {
+    borderWidth: 1,
+    borderColor: COLORS.violet400,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 13,
+    borderRadius: 10,
+    flexDirection: "row",
+    marginTop: SPACING,
+    width: "100%",
+  },
+  callText: {
+    fontFamily: "Outfit-Regular",
+    color: COLORS.violet400,
+    marginLeft: 4,
+    fontSize: RFValue(14),
   },
 });

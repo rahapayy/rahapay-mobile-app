@@ -35,8 +35,8 @@ const WelcomeScreen: React.FC<{
           Welcome to RahaPay!
         </Text>
         <Text style={styles.subText} allowFontScaling={false}>
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptas
-          temporibus pariatur aut debitis deserunt et?
+          Your one-stop solution for seamless online transactions. We aim to
+          make financial operations simple and efficient.
         </Text>
       </View>
       <View style={styles.buttonContainer}>
@@ -99,31 +99,5 @@ const styles = StyleSheet.create({
     marginBottom: SPACING,
     justifyContent: "center",
     alignItems: "center",
-  },
-  createAccountButton: {
-    paddingVertical: SPACING * 1.6,
-    backgroundColor: COLORS.violet400,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: SPACING,
-  },
-  createAccountText: {
-    fontFamily: "Outfit-Regular",
-    color: "#fff",
-    fontSize: RFValue(14),
-  },
-  loginButton: {
-    paddingVertical: SPACING * 1.6,
-    borderWidth: 1,
-    borderColor: COLORS.violet400,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: SPACING,
-  },
-  loginText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
   },
 });

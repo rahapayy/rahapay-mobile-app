@@ -14,7 +14,6 @@ import LoginScreen from "../screens/Auth/Login/LoginScreen";
 import SuccessfulScreen from "../screens/Auth/CreateAccount/SuccessfulScreen";
 import CreateTagScreen from "../screens/Auth/CreateAccount/CreateTagScreen";
 import CreateTransactionPinScreen from "../screens/Auth/CreateAccount/CreatePinScreen";
-import WelcomeBackScreen from "../screens/Auth/Login/WelcomeBackScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -110,12 +109,6 @@ const AuthRoute = () => {
       <Stack.Screen
         name="SuccessfulScreen"
         component={SuccessfulScreen}
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="WelcomeBackScreen"
-        component={WelcomeBackScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
