@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Share,
 } from "react-native";
 import React, { useContext } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -30,6 +31,29 @@ const ReferralScreen: React.FC<{
       message: "Code copied!",
       type: "success",
     });
+  };
+
+  const shareWithFriends = async () => {
+    try {
+      const referralCode = userDetails?.userName;
+      const message = `Join RahaPay and earn rewards! Use my referral code: ${referralCode}`;
+      const result = await Share.share({
+        message,
+        // Optionally, you can add a URL for iOS or a title for Android:
+        // url: 'https://www.example.com',
+        // title: 'Invite to RahaPay'
+      });
+
+      if (result.action === Share.sharedAction) {
+        // Shared successfully
+        console.log("Share was successful");
+      } else if (result.action === Share.dismissedAction) {
+        // Dismissed
+        console.log("Share was dismissed");
+      }
+    } catch (error) {
+      console.error("Error while trying to share:", error);
+    }
   };
   return (
     <View>
@@ -74,7 +98,7 @@ const ReferralScreen: React.FC<{
 
         <View className="w-80 mb-4">
           <TouchableOpacity
-            // onPress={() => navigation.navigate("FundWalletScreen")}
+            onPress={shareWithFriends}
             style={styles.shareButton}
           >
             <Send2 variant="Bold" color="#fff" />
