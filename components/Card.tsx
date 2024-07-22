@@ -22,6 +22,7 @@ import COLORS from "../config/colors";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthContext } from "../context/AuthContext";
 import useWallet from "../hooks/use-wallet";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
@@ -29,6 +30,26 @@ const Card: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [showBalance, setShowBalance] = useState(true);
+
+  React.useEffect(() => {
+    const getBalanceVisibility = async () => {
+      const balanceVisibility = await AsyncStorage.getItem("showBalance");
+      if (balanceVisibility !== null) {
+        setShowBalance(balanceVisibility === "true");
+      }
+    };
+    getBalanceVisibility();
+  }, []);
+
+  const toggleBalanceVisibility = async () => {
+    // Toggle the state
+    setShowBalance((prev) => {
+      const newVisibility = !prev;
+      // Store the new state in AsyncStorage
+      AsyncStorage.setItem("showBalance", String(newVisibility));
+      return newVisibility;
+    });
+  };
 
   const { userDetails, userInfo } = useContext(AuthContext);
 
@@ -38,8 +59,6 @@ const Card: React.FC<{
   // console.log("userDetails in Card:", userDetails);
   const { balance } = useWallet();
   // console.log(balance);
-
-  const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
 
   return (
     <ImageBackground
