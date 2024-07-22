@@ -14,19 +14,34 @@ import COLOR from "../config/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../config/colors";
 import useWallet from "../hooks/use-wallet";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const WalletCard: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [showBalance, setShowBalance] = useState(true);
-
   const { balance } = useWallet();
 
-  const toggleBalanceVisibility = React.useCallback(
-    () => setShowBalance((prev) => !prev),
-    []
-  );
+  const [showBalance, setShowBalance] = useState(true);
 
+  React.useEffect(() => {
+    const getBalanceVisibility = async () => {
+      const balanceVisibility = await AsyncStorage.getItem("showBalance");
+      if (balanceVisibility !== null) {
+        setShowBalance(balanceVisibility === "true");
+      }
+    };
+    getBalanceVisibility();
+  }, []);
+
+  const toggleBalanceVisibility = async () => {
+    // Toggle the state
+    setShowBalance((prev) => {
+      const newVisibility = !prev;
+      // Store the new state in AsyncStorage
+      AsyncStorage.setItem("showBalance", String(newVisibility));
+      return newVisibility;
+    });
+  };
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground
