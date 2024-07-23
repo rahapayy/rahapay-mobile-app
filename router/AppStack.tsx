@@ -5,7 +5,7 @@ import AirtimeScreen from "../screens/Services/AirtimeScreen";
 import DataScreen from "../screens/Services/DataScreen";
 import ElectricityScreen from "../screens/Services/ElectricityScreen";
 import TransferToUser from "../screens/Services/TransferToUser";
-import TvSubscriptionScreen from "../screens/Services/TvSubscriptionScreen";
+import TvSubscriptionScreen from "../screens/Services/CableTv/TvSubscriptionScreen";
 import TransactionHistoryScreen from "../screens/TransactionHistoryScreen";
 import TransactionSummaryScreen from "../screens/TransactionSummaryScreen";
 import FundWalletScreen from "../screens/FundWalletScreen";
@@ -24,6 +24,9 @@ import BettingScreen from "../screens/Services/BettingScreen";
 import TransferScreen from "../screens/Services/TransferScreen";
 import EducationScreen from "../screens/Services/EducationScreen";
 import CustomerCareScreen from "../screens/CustomerCareScreen";
+import ServiceDetailsScreen from "../screens/Services/CableTv/CableServiceDetailsScreen";
+import CardDetailsScreen from "../screens/Services/CableTv/CardDetailsScreen";
+import ReviewCableTvSummaryScreen from "../screens/ServiceReviewScreens/ReviewCableTvSummaryScreen";
 
 const Stack = createNativeStackNavigator();
 const AppStack = () => {
@@ -149,6 +152,21 @@ const AppStack = () => {
       <Stack.Screen
         name="CustomerCareScreen"
         component={CustomerCareScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CableServiceDetailsScreen"
+        component={ServiceDetailsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CardDetailsScreen"
+        component={CardDetailsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ReviewCableTvSummaryScreen"
+        component={ReviewCableTvSummaryScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

@@ -6,6 +6,7 @@ import AuthRoute from "./AuthRouter";
 import { ActivityIndicator, View } from "react-native";
 import COLORS from "../config/colors";
 import { AuthContext } from "../context/AuthContext";
+import LoadingLogo from "../assets/svg/loadingLogo.svg";
 
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +26,18 @@ const Router = () => {
       >
         <ActivityIndicator size="large" color={COLORS.violet600} />
       </View>
+      //    <Animatable.View
+      //    animation="pulse"
+      //    iterationCount="infinite"
+      //    style={{
+      //      backgroundColor: "#fff",
+      //      flex: 1,
+      //      justifyContent: "center",
+      //      alignItems: "center",
+      //    }}
+      //  >
+      //    <LoadingLogo />
+      //  </Animatable.View>
     );
   }
 
