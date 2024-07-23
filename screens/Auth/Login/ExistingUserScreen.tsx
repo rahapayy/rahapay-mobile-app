@@ -97,11 +97,18 @@ const ExistingUserScreen: React.FC<{ onCorrectPin: () => void }> = ({
         ))}
       </View>
       <Text style={styles.resetText}>
-        Having troubles remembering pin?{" "}
-        <Text style={styles.linkText}>Reset Pin</Text>
+        Having troubles remembering pin?
+        <TouchableOpacity>
+          <Text style={styles.linkText}>Reset Pin</Text>
+        </TouchableOpacity>
       </Text>
-      <Text style={styles.switchAccountText}>
-        Not you? <Text style={styles.linkText}>Switch Account</Text>
+      <Text style={styles.switchAccountText} allowFontScaling={false}>
+        Not you?
+        <TouchableOpacity>
+          <Text style={styles.linkText} allowFontScaling={false}>
+            Switch Account
+          </Text>
+        </TouchableOpacity>
       </Text>
     </View>
   );
@@ -181,8 +188,8 @@ const styles = StyleSheet.create({
   },
   switchAccountText: {
     fontSize: 14,
-    color: COLORS.violet400,
+    color: "#7D7D7D",
     marginTop: 8,
-    fontFamily: "Outfit-Bold",
+    fontFamily: "Outfit-Regular",
   },
 });

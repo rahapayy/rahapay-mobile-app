@@ -17,7 +17,6 @@ import Dstv from "../../../assets/svg/dstv.svg";
 import Gotv from "../../../assets/svg/gotv.svg";
 import Startimes from "../../../assets/svg/startimes.svg";
 import COLORS from "../../../config/colors";
-import Button from "../../../components/Button";
 import useSWR from "swr";
 
 const TvSubscriptionScreen: React.FC<{
@@ -25,23 +24,18 @@ const TvSubscriptionScreen: React.FC<{
 }> = ({ navigation }) => {
   const [selectedService, setSelectedService] = useState<string | null>(null);
 
-  const handleServiceSelect = (service: string) => {
-    setSelectedService(service);
-  };
-
   const { data } = useSWR(`/cable/`); // Fetch data
 
-  const handleProceed = () => {
-    if (selectedService) {
-      const filteredPlans = data.filter(
-        (plan: { cable_name: string }) =>
-          plan.cable_name.toLowerCase() === selectedService.toLowerCase()
-      );
-      navigation.navigate("CableServiceDetailsScreen", {
-        service: selectedService,
-        plans: filteredPlans,
-      });
-    }
+  const handleServiceSelect = (service: string) => {
+    setSelectedService(service);
+    const filteredPlans = data.filter(
+      (plan: { cable_name: string }) =>
+        plan.cable_name.toLowerCase() === service.toLowerCase()
+    );
+    navigation.navigate("CableServiceDetailsScreen", {
+      service,
+      plans: filteredPlans,
+    });
   };
 
   return (
@@ -104,19 +98,6 @@ const TvSubscriptionScreen: React.FC<{
               </TouchableOpacity>
             </View>
           </View>
-
-          <View className="py-64">
-            <Button
-              style={[
-                styles.proceedButton,
-                !selectedService && styles.disabledButton,
-              ]}
-              onPress={handleProceed}
-              disabled={!selectedService}
-              title={"Proceed"}
-              textColor="#fff"
-            />
-          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -169,16 +150,5 @@ const styles = StyleSheet.create({
     marginTop: SPACING,
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(10),
-  },
-  proceedButton: {
-    backgroundColor: COLORS.violet400,
-  },
-  disabledButton: {
-    backgroundColor: COLORS.violet200,
-  },
-  proceedButtonText: {
-    color: COLORS.white,
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.medium,
   },
 });

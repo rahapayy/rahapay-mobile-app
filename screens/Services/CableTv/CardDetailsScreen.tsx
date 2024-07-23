@@ -56,42 +56,49 @@ const CardDetailsScreen: React.FC<{
           </View>
 
           <View className="py-4 justify-center p-4">
-            <View className="mb-4">
-              <Text style={styles.label} allowFontScaling={false}>
-                Smartcard Number
-              </Text>
-              <TextInput
-                style={[
-                  styles.textInput,
-                  !isCardNumberValid && cardNumber.length > 0
-                    ? styles.invalidInput
-                    : null,
-                ]}
-                placeholder="Enter your card number"
-                allowFontScaling={false}
-                placeholderTextColor={"#DFDFDF"}
-                value={cardNumber}
-                onChangeText={setCardNumber}
-                keyboardType="numeric"
-                maxLength={10}
-              />
-              {!isCardNumberValid && cardNumber.length > 0 && (
-                <Text style={styles.errorText} allowFontScaling={false}>
-                  Smartcard number must be exactly 10 digits
+            <View className="bg-white rounded-lg p-4 mb-2">
+              <View className="mb-4">
+                <Text style={styles.label} allowFontScaling={false}>
+                  Smartcard Number
                 </Text>
-              )}
-            </View>
-            <View className="mb-4">
-              <Text style={styles.label} allowFontScaling={false}>
-                Amount
-              </Text>
-              <View style={styles.textInput}>
-                <Text>{`₦${planPrice}`}</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    !isCardNumberValid && cardNumber.length > 0
+                      ? styles.invalidInput
+                      : null,
+                  ]}
+                  placeholder="Enter your card number"
+                  allowFontScaling={false}
+                  placeholderTextColor={"#00000080"}
+                  value={cardNumber}
+                  onChangeText={setCardNumber}
+                  keyboardType="numeric"
+                  maxLength={10}
+                />
+                {!isCardNumberValid && cardNumber.length > 0 && (
+                  <Text style={styles.errorText} allowFontScaling={false}>
+                    Smartcard number must be exactly 10 digits
+                  </Text>
+                )}
+              </View>
+              <View className="mb-4">
+                <Text style={styles.label} allowFontScaling={false}>
+                  Amount
+                </Text>
+                <View style={styles.textInput}>
+                  <Text
+                    style={styles.price}
+                    allowFontScaling={false}
+                  >{`₦${planPrice}`}</Text>
+                </View>
               </View>
             </View>
 
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Text style={styles.changePlan}>Change Plan</Text>
+              <Text style={styles.changePlan} allowFontScaling={false}>
+                Change Plan
+              </Text>
             </TouchableOpacity>
 
             <Button
@@ -139,7 +146,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   textInput: {
-    borderWidth: 1,
+    backgroundColor: "#ECEEFA",
     borderRadius: 10,
     borderColor: "#DFDFDF",
     padding: SPACING * 1.5,
@@ -153,6 +160,7 @@ const styles = StyleSheet.create({
   changePlan: {
     fontFamily: "Outfit-Medium",
     color: COLORS.violet400,
+    fontSize: RFValue(10),
   },
   proceedButton: {
     marginTop: SPACING * 4,
@@ -167,5 +175,8 @@ const styles = StyleSheet.create({
     color: COLORS.red300,
     fontSize: RFValue(10),
     marginTop: 5,
+  },
+  price: {
+    fontFamily: "Outfit-Medium",
   },
 });
