@@ -59,6 +59,43 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
   // Check if all required fields are filled
   const isButtonDisabled = !selectedOperator || !phoneNumber || !selectedPlan;
 
+  const prefixes: { [key in OperatorType]: string[] } = {
+    Airtel: ["0802", "0808", "0708", "0812", "0902", "0907", "0901", "0904"],
+    Mtn: [
+      "0803",
+      "0806",
+      "0703",
+      "0706",
+      "0810",
+      "0813",
+      "0814",
+      "0816",
+      "0903",
+      "0906",
+      "0916",
+      "0913",
+    ],
+    "9Mobile": ["0809", "0817", "0818", "0909", "0908"],
+    Glo: ["0805", "0807", "0705", "0811", "0815", "0905"],
+  };
+
+  type OperatorType = "Airtel" | "Mtn" | "9Mobile" | "Glo";
+
+  const detectOperator = (number: string) => {
+    for (let operator in prefixes) {
+      if (
+        prefixes[operator as OperatorType].some((prefix) =>
+          number.startsWith(prefix)
+        )
+      ) {
+        setSelectedOperator(operator);
+        return;
+      }
+    }
+
+    setSelectedOperator("");
+  };
+
   return (
     <SafeAreaView className="flex-1">
       <ScrollView>
@@ -81,11 +118,34 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                   Saved Beneficiaries
                 </Text>
                 <View className="flex-row mb-4 gap-2">
-                  <View className="bg-[#EEEBF9] p-3 rounded-2xl">
-                    <Text>My number</Text>
-                  </View>
-                  <View className="bg-[#EEEBF9] p-3 rounded-2xl">
+                  <TouchableOpacity className="bg-[#EEEBF9] p-3 rounded-2xl">
                     <Text>+234 0862753934</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity className="bg-[#EEEBF9] p-3 rounded-2xl">
+                    <Text>+234 0862753934</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View className="mb-4">
+                  <Text style={styles.label} allowFontScaling={false}>
+                    Phone Number
+                  </Text>
+                  <View style={styles.inputContainer}>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter phone number"
+                      placeholderTextColor="#9BA1A8"
+                      allowFontScaling={false}
+                      value={phoneNumber}
+                      keyboardType="numeric"
+                      onChangeText={(text) => {
+                        setPhoneNumber(text);
+                        detectOperator(text);
+                      }}
+                    />
+                    <TouchableOpacity>
+                      <ProfileCircle color={COLORS.violet400} />
+                    </TouchableOpacity>
                   </View>
                 </View>
 
@@ -192,31 +252,10 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                 <View>
                   <View className="mt-4">
                     <Text style={styles.label} allowFontScaling={false}>
-                      Phone Number
-                    </Text>
-                    <View style={styles.inputContainer}>
-                      <TextInput
-                        style={styles.input}
-                        placeholder="Enter phone number"
-                        placeholderTextColor="#9BA1A8"
-                        allowFontScaling={false}
-                        value={phoneNumber}
-                        onChangeText={setPhoneNumber}
-                      />
-                      <TouchableOpacity>
-                        <ProfileCircle color={COLORS.violet400} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <View className="mt-4">
-                    <Text style={styles.label} allowFontScaling={false}>
                       Plan
                     </Text>
                     <TouchableOpacity
-                      style={[
-                        styles.inputContainer,
-                        !selectedOperator && {},
-                      ]}
+                      style={[styles.inputContainer, !selectedOperator && {}]}
                       onPress={() => {
                         if (selectedOperator) {
                           setModalVisible(true);
