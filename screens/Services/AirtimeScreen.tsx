@@ -68,7 +68,7 @@ const AirtimeScreen: React.FC<{
       "0903",
       "0906",
       "0916",
-      "0913"
+      "0913",
     ],
     "9Mobile": ["0809", "0817", "0818", "0909", "0908"],
     Glo: ["0805", "0807", "0705", "0811", "0815", "0905"],
@@ -149,17 +149,17 @@ const AirtimeScreen: React.FC<{
               {activeTab === "Local" ? (
                 // Local tab
                 <View>
-                  <Text style={styles.headText} allowFontScaling={false}>
+                  {/* <Text style={styles.headText} allowFontScaling={false}>
                     Saved Beneficiaries
                   </Text>
                   <View className="flex-row mb-4 gap-2">
-                    <View className="bg-[#EEEBF9] p-3 rounded-2xl">
+                    <TouchableOpacity className="bg-[#EEEBF9] p-3 rounded-2xl">
                       <Text>My number</Text>
-                    </View>
-                    <View className="bg-[#EEEBF9] p-3 rounded-2xl">
+                    </TouchableOpacity>
+                    <TouchableOpacity className="bg-[#EEEBF9] p-3 rounded-2xl">
                       <Text>+234 0862753934</Text>
-                    </View>
-                  </View>
+                    </TouchableOpacity>
+                  </View> */}
 
                   <View className="mt-2 mb-4">
                     <Text style={styles.label} allowFontScaling={false}>
@@ -333,7 +333,7 @@ const AirtimeScreen: React.FC<{
                   </View>
 
                   {/* Save as Beneficiary Toogle */}
-                  <View className="mb-4">
+                  {/* <View className="mb-4">
                     <View className="flex-row items-center gap-2 mt-2">
                       <Text
                         style={styles.beneficiaryText}
@@ -343,13 +343,14 @@ const AirtimeScreen: React.FC<{
                       </Text>
                       <Switch />
                     </View>
-                  </View>
+                  </View> */}
                   <Button
                     title={"Proceed"}
                     style={{
                       backgroundColor: isButtonDisabled
                         ? COLORS.violet200
                         : COLORS.violet400,
+                      marginTop: SPACING * 2,
                     }}
                     onPress={handleProceed}
                     disabled={isButtonDisabled}
