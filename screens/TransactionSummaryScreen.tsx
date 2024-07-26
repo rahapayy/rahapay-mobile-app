@@ -10,30 +10,32 @@ import {
 } from "react-native";
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp } from "@react-navigation/native";
 import { ArrowLeft, DocumentDownload, WalletAdd1 } from "iconsax-react-native";
 import SPACING from "../config/SPACING";
 import FONT_SIZE from "../config/font-size";
 import COLORS from "../config/colors";
 import Airtel from "../assets/svg/airtel.svg";
 import { RFValue } from "react-native-responsive-fontsize";
-
-type TransactionType = {
-  purpose: string;
-  amount: number;
-  created_at: number;
-  status: string;
-  tranxType: string;
-  referenceId: string;
-};
+import { RootStackParamList } from "../navigation/RootStackParams";
 
 type TransactionSummaryRouteParams = {
-  transaction: TransactionType;
+  transaction: {
+    purpose: string;
+    amount: number;
+    created_at: number;
+    status: string;
+    tranxType: string;
+    referenceId: string;
+  };
 };
 
 type TransactionSummaryScreenProps = {
-  navigation: NativeStackNavigationProp<any, any>;
-  route: RouteProp<{ params: TransactionSummaryRouteParams }, "params">;
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    "TransactionSummaryScreen"
+  >;
+  route: RouteProp<RootStackParamList, "TransactionSummaryScreen">;
 };
 
 const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
@@ -41,7 +43,6 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
   route,
 }) => {
   const { transaction } = route.params;
-
   const isWalletFunding = transaction.tranxType === "WALLET_FUNDING";
 
   return (

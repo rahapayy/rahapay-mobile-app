@@ -7,11 +7,26 @@ import * as Animatable from "react-native-animatable";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../components/Button";
 import { ReceiptText, Timer, Warning2 } from "iconsax-react-native";
+import { RootStackParamList } from "../navigation/RootStackParams";
 
-const TransactionStatusScreen: React.FC<{
-  navigation: NativeStackNavigationProp<any, "">;
-  status: "pending" | "failed" | "successful";
-}> = ({ navigation, status }) => {
+interface TransactionStatusScreenProps {
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    "TransactionStatusScreen"
+  >;
+  route: {
+    params: {
+      status: "pending" | "failed" | "successful";
+    };
+  };
+}
+
+const TransactionStatusScreen: React.FC<TransactionStatusScreenProps> = ({
+  navigation,
+  route,
+}) => {
+  const { status } = route.params;
+
   const getStatusProps = () => {
     switch (status) {
       case "pending":
@@ -48,42 +63,40 @@ const TransactionStatusScreen: React.FC<{
   };
 
   const { headText, subText, animation, icon } = getStatusProps();
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ flex: 1, justifyContent: "space-between" }}>
-        <View className="mt-20 justify-center items-center">
-          {/* Circle Image */}
-          <View style={styles.circleContain}>
-            <Animatable.View
-              animation={animation}
-              duration={2000}
-              iterationCount="infinite"
-            >
-              {icon}
-            </Animatable.View>
-          </View>
-          <View className="items-center mt-8">
-            <Text style={styles.headText} allowFontScaling={false}>
-              {headText}
-            </Text>
-            <Text style={styles.subText} allowFontScaling={false}>
-              {subText}
-            </Text>
-          </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.contentContainer}>
+        <View style={styles.iconContainer}>
+          <Animatable.View
+            animation={animation}
+            duration={2000}
+            iterationCount="infinite"
+          >
+            {icon}
+          </Animatable.View>
         </View>
-        <View style={styles.buttonContainer}>
-          <Button
-            title={"Done"}
-            textColor="#fff"
-            onPress={() => navigation.navigate("HomeScreen")}
-          />
-          <Button
-            title={"Pay Another Bill"}
-            textColor="#A07CFF"
-            style={styles.inactiveButton}
-            onPress={() => navigation.navigate("AirtimeScreen")}
-          />
+        <View style={styles.textContainer}>
+          <Text style={styles.headText} allowFontScaling={false}>
+            {headText}
+          </Text>
+          <Text style={styles.subText} allowFontScaling={false}>
+            {subText}
+          </Text>
         </View>
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Done"
+          textColor="#fff"
+          onPress={() => navigation.navigate("HomeScreen")}
+        />
+        <Button
+          title="Pay Another Bill"
+          textColor="#A07CFF"
+          style={styles.inactiveButton}
+          onPress={() => navigation.navigate("AirtimeScreen")}
+        />
       </View>
     </SafeAreaView>
   );
@@ -92,13 +105,21 @@ const TransactionStatusScreen: React.FC<{
 export default TransactionStatusScreen;
 
 const styles = StyleSheet.create({
-  circleContain: {
-    backgroundColor: COLORS.violet200,
-    width: 250,
-    height: 250,
-    borderRadius: SPACING * 15,
+  container: {
+    flex: 1,
+  },
+  contentContainer: {
+    flex: 1,
+    justifyContent: "space-between",
+  },
+  iconContainer: {
+    marginTop: 20,
     justifyContent: "center",
     alignItems: "center",
+  },
+  textContainer: {
+    alignItems: "center",
+    marginTop: 8,
   },
   headText: {
     fontFamily: "Outfit-Medium",

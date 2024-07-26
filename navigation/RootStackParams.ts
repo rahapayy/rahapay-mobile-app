@@ -6,7 +6,16 @@ export type RootStackParamList = {
   TransferToUserScreen: undefined;
   TvSubscriptionScreen: undefined;
   TransactionHistoryScreen: undefined;
-  TransactionSummaryScreen: undefined;
+  TransactionSummaryScreen: {
+    transaction: {
+      purpose: string;
+      amount: number;
+      created_at: number;
+      status: string;
+      tranxType: string;
+      referenceId: string;
+    };
+  };
   FundWalletScreen: undefined;
   NotificationScreen: undefined;
   AgentAccountVerificationScreen: undefined;
@@ -31,7 +40,9 @@ export type RootStackParamList = {
     phoneNumber: string;
     amount: number;
   };
-  TransactionStatusScreen: { status: "successful" | "failed" };
+  TransactionStatusScreen: {
+    status: "pending" | "failed" | "successful";
+  };
   BettingScreen: undefined;
   TransferScreen: undefined;
   EducationScreen: undefined;
