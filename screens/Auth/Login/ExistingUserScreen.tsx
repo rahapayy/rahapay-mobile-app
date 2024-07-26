@@ -5,10 +5,12 @@ import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
 import Backspace from "../../../assets/svg/solar_backspace-linear.svg";
 import { authenticateWithBiometrics } from "../../../context/Biometrics";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-const ExistingUserScreen: React.FC<{ onCorrectPin: () => void }> = ({
-  onCorrectPin,
-}) => {
+const ExistingUserScreen: React.FC<{
+  navigation: NativeStackNavigationProp<any>;
+  onCorrectPin: () => void;
+}> = ({ onCorrectPin, navigation }) => {
   const [pin, setPin] = useState<string>("");
 
   const handlePinPress = (value: string) => {
@@ -96,20 +98,24 @@ const ExistingUserScreen: React.FC<{ onCorrectPin: () => void }> = ({
           </TouchableOpacity>
         ))}
       </View>
-      <Text style={styles.resetText}>
-        Having troubles remembering pin?
-        <TouchableOpacity>
+      <View className="flex-row gap-2">
+        <Text style={styles.resetText}>Having troubles remembering pin?</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("ResetPinScreen")}>
           <Text style={styles.linkText}>Reset Pin</Text>
         </TouchableOpacity>
-      </Text>
-      <Text style={styles.switchAccountText} allowFontScaling={false}>
-        Not you?
-        <TouchableOpacity>
+      </View>
+      <View className="flex-row gap-2 mt-2">
+        <Text style={styles.switchAccountText} allowFontScaling={false}>
+          Not you?
+        </Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("CreateAccountScreen")}
+        >
           <Text style={styles.linkText} allowFontScaling={false}>
             Switch Account
           </Text>
         </TouchableOpacity>
-      </Text>
+      </View>
     </View>
   );
 };
