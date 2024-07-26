@@ -38,7 +38,13 @@ export type RootStackParamList = {
   CustomerCareScreen: undefined;
   CableServiceDetailsScreen: undefined;
   CardDetailsScreen: undefined;
-  ReviewCableTvSummaryScreen: undefined;
+  ReviewCableTvSummaryScreen: {
+    service: string;
+    planId: string;
+    planPrice: number;
+    cardNumber: string;
+    planName: string;
+  };
   MeterTypeScreen: {
     disco: string;
     planId: string;

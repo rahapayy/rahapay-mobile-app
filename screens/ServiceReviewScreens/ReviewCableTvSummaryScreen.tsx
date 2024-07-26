@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Platform,
   SafeAreaView,
@@ -7,8 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../../config/SPACING";
 import FONT_SIZE from "../../config/font-size";
@@ -16,30 +16,16 @@ import COLORS from "../../config/colors";
 import Dstv from "../../assets/svg/dstv.svg";
 import Gotv from "../../assets/svg/gotv.svg";
 import Startimes from "../../assets/svg/startimes.svg";
-import { RouteProp } from "@react-navigation/native";
 import SwipeButton from "../../components/SwipeButton";
 import { RFValue } from "react-native-responsive-fontsize";
 import useApi from "../../utils/api";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
+import { RootStackParamList } from "../../navigation/RootStackParams";
 
-interface AxiosError {
-  response?: {
-    status?: number;
-  };
-}
-
-type Params = {
-  service: string;
-  planId: string;
-  planPrice: number;
-  cardNumber: string;
-  planName: string;
-};
-
-interface ReviewCableTvSummaryScreenProps {
-  navigation: NativeStackNavigationProp<any>;
-  route: RouteProp<{ params: Params }, "params">;
-}
+type ReviewCableTvSummaryScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  "ReviewCableTvSummaryScreen"
+>;
 
 const ReviewCableTvSummaryScreen: React.FC<ReviewCableTvSummaryScreenProps> = ({
   navigation,
@@ -66,7 +52,6 @@ const ReviewCableTvSummaryScreen: React.FC<ReviewCableTvSummaryScreenProps> = ({
       }
     } catch (err: unknown) {
       console.error("Error processing cable TV subscription:", err);
-      // Handling different types of errors
       if (err instanceof Error) {
         if (err.message.includes("Network")) {
           handleShowFlash({
@@ -86,7 +71,6 @@ const ReviewCableTvSummaryScreen: React.FC<ReviewCableTvSummaryScreenProps> = ({
           });
         }
       } else if (err instanceof Object && "response" in err) {
-        // Handle specific status codes or response errors
         const response = (err as any).response;
         if (response?.status === 503) {
           handleShowFlash({
@@ -115,6 +99,7 @@ const ReviewCableTvSummaryScreen: React.FC<ReviewCableTvSummaryScreenProps> = ({
       reset(); // Reset the swipe button state after the API call completes
     }
   };
+
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
