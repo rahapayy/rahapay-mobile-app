@@ -16,7 +16,16 @@ export type RootStackParamList = {
   HelpAndSupportScreen: undefined;
   PersonalInformationScreen: undefined;
   ReferralScreen: undefined;
-  ReviewDataSummaryScreen: undefined;
+  ReviewDataSummaryScreen: {
+    selectedOperator: string;
+    selectedPlan: {
+      plan: string;
+      days: string;
+      plan_id: string;
+      amount: number;
+    };
+    phoneNumber: string;
+  };
   ReviewAirtimeSummaryScreen: {
     selectedOperator: string;
     phoneNumber: string;

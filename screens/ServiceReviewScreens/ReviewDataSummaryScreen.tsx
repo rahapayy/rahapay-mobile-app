@@ -1,6 +1,6 @@
+import React from "react";
 import {
   Alert,
-  Image,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -9,8 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../../config/SPACING";
 import FONT_SIZE from "../../config/font-size";
@@ -21,31 +20,14 @@ import Eti from "../../assets/svg/9mobilebig.svg";
 import Glo from "../../assets/svg/globig.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 import SwipeButton from "../../components/SwipeButton";
-import { RouteProp } from "@react-navigation/native";
 import useApi from "../../utils/api";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
+import { RootStackParamList } from "../../navigation/RootStackParams";
 
-type Params = {
-  selectedOperator: string;
-  selectedPlan: {
-    plan: string;
-    days: string;
-    plan_id: string;
-    amount: number;
-  };
-  phoneNumber: string;
-};
-
-interface ReviewDataSummaryScreenProps {
-  navigation: NativeStackNavigationProp<any>;
-  route: RouteProp<{ params: Params }, "params">;
-}
-
-interface AxiosError {
-  response?: {
-    status: number;
-  };
-}
+type ReviewDataSummaryScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  "ReviewDataSummaryScreen"
+>;
 
 const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
   navigation,
@@ -133,13 +115,12 @@ const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={[styles.headerText]} allowFontScaling={false}>
+            <Text style={styles.headerText} allowFontScaling={false}>
               Review Summary
             </Text>
           </View>
 
-          <View className="justify-center items-center mt-10">
-            {/* Image */}
+          <View style={styles.imageContainer}>
             {selectedOperator === "Airtel" && (
               <Airtel width={100} height={100} />
             )}
@@ -150,13 +131,13 @@ const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
               {selectedOperator} Data Bundle
             </Text>
           </View>
-          <View className="p-4">
+          <View style={styles.content}>
             <View style={styles.container}>
               <Text style={styles.headText} allowFontScaling={false}>
                 Transaction summary
               </Text>
 
-              <View className="justify-between items-center flex-row">
+              <View style={styles.row}>
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Amount
                 </Text>
@@ -164,7 +145,7 @@ const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
                   ₦ {selectedPlan.amount}
                 </Text>
               </View>
-              <View className="justify-between items-center flex-row">
+              <View style={styles.row}>
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Package
                 </Text>
@@ -172,7 +153,7 @@ const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
                   {selectedPlan.plan} - {selectedPlan.days}
                 </Text>
               </View>
-              <View className="justify-between items-center flex-row">
+              <View style={styles.row}>
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Recipient
                 </Text>
@@ -180,7 +161,7 @@ const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
                   {phoneNumber}
                 </Text>
               </View>
-              <View className="justify-between items-center flex-row">
+              <View style={styles.row}>
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Date
                 </Text>
@@ -189,19 +170,18 @@ const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
                 </Text>
               </View>
 
-              <View className="justify-between items-center flex-row">
+              <View style={styles.row}>
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Status
                 </Text>
-                {/* Transaction status */}
-                <View className="p-2 bg-[#FFEFC3] rounded-2xl">
+                <View style={styles.statusContainer}>
                   <Text style={styles.completedText} allowFontScaling={false}>
                     Pending
                   </Text>
                 </View>
               </View>
             </View>
-            <View className="mt-12">
+            <View style={styles.swipeButtonContainer}>
               <SwipeButton onConfirm={handleSwipeConfirm} />
             </View>
           </View>
@@ -230,18 +210,18 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     flex: 1,
   },
-  headerTextDark: {
-    color: COLORS.white,
-  },
-  headTextContainer: {
-    flex: 1,
-    alignItems: "center",
+  imageContainer: {
     justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
   },
   itemText: {
     fontSize: FONT_SIZE.small,
     fontFamily: "Outfit-Medium",
     paddingVertical: SPACING * 2,
+  },
+  content: {
+    padding: 16,
   },
   container: {
     backgroundColor: COLORS.white,
@@ -269,22 +249,17 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: "#FFCC3D",
   },
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderStyle: "dotted",
-    borderColor: "#000",
-    paddingVertical: SPACING,
-    paddingHorizontal: SPACING * 3,
-    borderRadius: 8,
-    marginTop: SPACING * 2,
+  statusContainer: {
+    padding: 8,
+    backgroundColor: "#FFEFC3",
+    borderRadius: 16,
   },
-  buttonText: {
-    marginLeft: SPACING,
-    color: "#000",
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.medium,
+  row: {
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  swipeButtonContainer: {
+    marginTop: 24,
   },
 });
