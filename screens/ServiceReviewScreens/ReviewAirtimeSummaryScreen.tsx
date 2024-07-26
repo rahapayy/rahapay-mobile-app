@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Alert,
   Image,
@@ -9,8 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useContext } from "react";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../../config/SPACING";
 import FONT_SIZE from "../../config/font-size";
@@ -21,21 +21,14 @@ import Eti from "../../assets/svg/9mobilebig.svg";
 import Glo from "../../assets/svg/globig.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 import SwipeButton from "../../components/SwipeButton";
-import { RouteProp } from "@react-navigation/native";
 import useApi from "../../utils/api";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
-import { AuthContext } from "../../context/AuthContext";
+import { RootStackParamList } from "../../navigation/RootStackParams";
 
-type Params = {
-  selectedOperator: string;
-  amount: number;
-  phoneNumber: string;
-};
-
-interface ReviewAirtimeSummaryScreenProps {
-  navigation: NativeStackNavigationProp<any>;
-  route: RouteProp<{ params: Params }, "params">;
-}
+type ReviewAirtimeSummaryScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  "ReviewAirtimeSummaryScreen"
+>;
 
 interface AxiosError {
   response?: {
@@ -54,9 +47,9 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
   const handleSwipeConfirm = async (reset: () => void) => {
     try {
       const response = await mutateAsync({
-        amount: amount,
+        amount,
         networkType: selectedOperator.toLowerCase(),
-        phoneNumber: phoneNumber,
+        phoneNumber,
       });
 
       if (response.data.success) {
@@ -69,8 +62,6 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
     } catch (err: unknown) {
       console.error("Error occurred:", err);
 
-      const axiosError = err as AxiosError;
-      // Handling different types of errors
       if (err instanceof Error) {
         if (err.message.includes("Network")) {
           handleShowFlash({
@@ -90,7 +81,6 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
           });
         }
       } else if (err instanceof Object && "response" in err) {
-        // Handle specific status codes or response errors
         const response = (err as any).response;
         if (response?.status === 503) {
           handleShowFlash({
@@ -116,7 +106,7 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
         });
       }
     } finally {
-      reset(); // Reset the swipe button state after the API call completes
+      reset();
     }
   };
 
@@ -131,13 +121,12 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={[styles.headerText]} allowFontScaling={false}>
+            <Text style={styles.headerText} allowFontScaling={false}>
               Review Summary
             </Text>
           </View>
 
-          <View className="justify-center items-center mt-10">
-            {/* Image */}
+          <View style={styles.imageContainer}>
             {selectedOperator === "Airtel" && (
               <Airtel width={100} height={100} />
             )}
@@ -148,13 +137,13 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
               {selectedOperator} Data Bundle
             </Text>
           </View>
-          <View className="p-4">
+          <View style={styles.content}>
             <View style={styles.container}>
               <Text style={styles.headText} allowFontScaling={false}>
                 Transaction summary
               </Text>
 
-              <View className="justify-between items-center flex-row">
+              <View style={styles.row}>
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Amount
                 </Text>
@@ -162,7 +151,7 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
                   ₦ {amount}
                 </Text>
               </View>
-              <View className="justify-between items-center flex-row">
+              <View style={styles.row}>
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Recipient
                 </Text>
@@ -170,7 +159,7 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
                   {phoneNumber}
                 </Text>
               </View>
-              <View className="justify-between items-center flex-row">
+              <View style={styles.row}>
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Date
                 </Text>
@@ -179,19 +168,18 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
                 </Text>
               </View>
 
-              <View className="justify-between items-center flex-row">
+              <View style={styles.row}>
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Status
                 </Text>
-                {/* Transaction status */}
-                <View className="p-2 bg-[#FFEFC3] rounded-2xl">
+                <View style={styles.statusContainer}>
                   <Text style={styles.completedText} allowFontScaling={false}>
                     Pending
                   </Text>
                 </View>
               </View>
             </View>
-            <View className="mt-12">
+            <View style={styles.swipeButtonContainer}>
               <SwipeButton onConfirm={handleSwipeConfirm} />
             </View>
           </View>
@@ -220,18 +208,18 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     flex: 1,
   },
-  headerTextDark: {
-    color: COLORS.white,
-  },
-  headTextContainer: {
-    flex: 1,
-    alignItems: "center",
+  imageContainer: {
     justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
   },
   itemText: {
     fontSize: FONT_SIZE.small,
     fontFamily: "Outfit-Medium",
     paddingVertical: SPACING * 2,
+  },
+  content: {
+    padding: 16,
   },
   container: {
     backgroundColor: COLORS.white,
@@ -259,22 +247,17 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: "#FFCC3D",
   },
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderStyle: "dotted",
-    borderColor: "#000",
-    paddingVertical: SPACING,
-    paddingHorizontal: SPACING * 3,
-    borderRadius: 8,
-    marginTop: SPACING * 2,
+  statusContainer: {
+    padding: 8,
+    backgroundColor: "#FFEFC3",
+    borderRadius: 16,
   },
-  buttonText: {
-    marginLeft: SPACING,
-    color: "#000",
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.medium,
+  row: {
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  swipeButtonContainer: {
+    marginTop: 24,
   },
 });

@@ -17,7 +17,11 @@ export type RootStackParamList = {
   PersonalInformationScreen: undefined;
   ReferralScreen: undefined;
   ReviewDataSummaryScreen: undefined;
-  ReviewAirtimeSummaryScreen: undefined;
+  ReviewAirtimeSummaryScreen: {
+    selectedOperator: string;
+    phoneNumber: string;
+    amount: number;
+  };
   TransactionStatusScreen: { status: "successful" | "failed" };
   BettingScreen: undefined;
   TransferScreen: undefined;
