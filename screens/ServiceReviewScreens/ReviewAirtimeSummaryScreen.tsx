@@ -70,15 +70,50 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
       console.error("Error occurred:", err);
 
       const axiosError = err as AxiosError;
-
-      if (axiosError.response?.status === 503) {
+      // Handling different types of errors
+      if (err instanceof Error) {
+        if (err.message.includes("Network")) {
+          handleShowFlash({
+            message:
+              "Network error. Please check your connection and try again.",
+            type: "danger",
+          });
+        } else if (err.message.includes("Timeout")) {
+          handleShowFlash({
+            message: "Request timed out. Please try again later.",
+            type: "danger",
+          });
+        } else {
+          handleShowFlash({
+            message: "An unexpected error occurred. Please try again.",
+            type: "danger",
+          });
+        }
+      } else if (err instanceof Object && "response" in err) {
+        // Handle specific status codes or response errors
+        const response = (err as any).response;
+        if (response?.status === 503) {
+          handleShowFlash({
+            message:
+              "The server is currently unavailable. Please try again later.",
+            type: "danger",
+          });
+        } else if (response?.status === 400) {
+          handleShowFlash({
+            message: "Bad request. Please check the input values.",
+            type: "danger",
+          });
+        } else {
+          handleShowFlash({
+            message: "An error occurred. Please try again.",
+            type: "danger",
+          });
+        }
+      } else {
         handleShowFlash({
-          message:
-            "The server is currently unavailable. Please try again later.",
+          message: "An unknown error occurred. Please try again.",
           type: "danger",
         });
-      } else {
-        navigation.navigate("TransactionStatusScreen", { status: "failed" });
       }
     } finally {
       reset(); // Reset the swipe button state after the API call completes
