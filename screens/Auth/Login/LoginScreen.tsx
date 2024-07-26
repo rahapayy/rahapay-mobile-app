@@ -1,3 +1,4 @@
+import React, { useContext, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -10,7 +11,6 @@ import {
   View,
   ActivityIndicator,
 } from "react-native";
-import React, { useContext, useState } from "react";
 import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../config/colors";
@@ -19,6 +19,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { AuthContext } from "../../../context/AuthContext";
+import { logError } from "../../../utils/errorLogger"; 
 
 const LoginScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -36,8 +37,6 @@ const LoginScreen: React.FC<{
     setIsLoading(true);
     try {
       await login(id, password);
-      // Handle successful login
-      // Save the token or any necessary data from response.data
       handleShowFlash({
         message: "Logged in successfully!",
         type: "success",
@@ -49,12 +48,12 @@ const LoginScreen: React.FC<{
         message: string;
       };
       const errorMessage =
-        err.response?.data?.message || err.message || "An error occurred";
+        err.response?.data?.message || "An error occurred. Please try again.";
       handleShowFlash({
         message: errorMessage,
         type: "danger",
       });
-      console.error("Error logging in", err);
+      logError(err); // Log the error using your custom error logger
     } finally {
       setIsLoading(false);
     }
