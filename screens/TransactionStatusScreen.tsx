@@ -5,26 +5,26 @@ import SPACING from "../config/SPACING";
 import { RFValue } from "react-native-responsive-fontsize";
 import * as Animatable from "react-native-animatable";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RouteProp } from "@react-navigation/native";
 import Button from "../components/Button";
 import { ReceiptText, Timer, Warning2 } from "iconsax-react-native";
 import { RootStackParamList } from "../navigation/RootStackParams";
 
-interface TransactionStatusScreenProps {
-  navigation: NativeStackNavigationProp<
-    RootStackParamList,
-    "TransactionStatusScreen"
-  >;
-  route: {
-    params: {
-      status: "pending" | "failed" | "successful";
-    };
-  };
-}
+type TransactionStatusScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "TransactionStatusScreen"
+>;
+type TransactionStatusScreenRouteProp = RouteProp<
+  RootStackParamList,
+  "TransactionStatusScreen"
+>;
 
-const TransactionStatusScreen: React.FC<TransactionStatusScreenProps> = ({
-  navigation,
-  route,
-}) => {
+type Props = {
+  navigation: TransactionStatusScreenNavigationProp;
+  route: TransactionStatusScreenRouteProp;
+};
+
+const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
   const { status } = route.params;
 
   const getStatusProps = () => {
@@ -63,11 +63,10 @@ const TransactionStatusScreen: React.FC<TransactionStatusScreenProps> = ({
   };
 
   const { headText, subText, animation, icon } = getStatusProps();
-
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.contentContainer}>
-        <View style={styles.iconContainer}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1, justifyContent: "space-between" }}>
+        <View style={styles.circleContain}>
           <Animatable.View
             animation={animation}
             duration={2000}
@@ -76,7 +75,7 @@ const TransactionStatusScreen: React.FC<TransactionStatusScreenProps> = ({
             {icon}
           </Animatable.View>
         </View>
-        <View style={styles.textContainer}>
+        <View style={{ alignItems: "center", marginTop: 8 }}>
           <Text style={styles.headText} allowFontScaling={false}>
             {headText}
           </Text>
@@ -84,19 +83,19 @@ const TransactionStatusScreen: React.FC<TransactionStatusScreenProps> = ({
             {subText}
           </Text>
         </View>
-      </View>
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Done"
-          textColor="#fff"
-          onPress={() => navigation.navigate("HomeScreen")}
-        />
-        <Button
-          title="Pay Another Bill"
-          textColor="#A07CFF"
-          style={styles.inactiveButton}
-          onPress={() => navigation.navigate("AirtimeScreen")}
-        />
+        <View style={styles.buttonContainer}>
+          <Button
+            title={"Done"}
+            textColor="#fff"
+            onPress={() => navigation.navigate("HomeScreen")}
+          />
+          <Button
+            title={"Pay Another Bill"}
+            textColor="#A07CFF"
+            style={styles.inactiveButton}
+            onPress={() => navigation.navigate("AirtimeScreen")}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -105,21 +104,13 @@ const TransactionStatusScreen: React.FC<TransactionStatusScreenProps> = ({
 export default TransactionStatusScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  contentContainer: {
-    flex: 1,
-    justifyContent: "space-between",
-  },
-  iconContainer: {
-    marginTop: 20,
+  circleContain: {
+    backgroundColor: COLORS.violet200,
+    width: 250,
+    height: 250,
+    borderRadius: SPACING * 15,
     justifyContent: "center",
     alignItems: "center",
-  },
-  textContainer: {
-    alignItems: "center",
-    marginTop: 8,
   },
   headText: {
     fontFamily: "Outfit-Medium",
