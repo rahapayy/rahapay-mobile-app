@@ -18,25 +18,60 @@ import Gotv from "../../../assets/svg/gotv.svg";
 import Startimes from "../../../assets/svg/startimes.svg";
 import COLORS from "../../../config/colors";
 import useSWR from "swr";
+import * as Animatable from "react-native-animatable";
+import LoadingLogo from "../../../assets/svg/loadingLogo.svg";
 
 const TvSubscriptionScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [selectedService, setSelectedService] = useState<string | null>(null);
 
-  const { data } = useSWR(`/cable/`); // Fetch data
+  const { data, error, isLoading } = useSWR(`/cable/`);
 
   const handleServiceSelect = (service: string) => {
     setSelectedService(service);
-    const filteredPlans = data.filter(
-      (plan: { cable_name: string }) =>
-        plan.cable_name.toLowerCase() === service.toLowerCase()
-    );
-    navigation.navigate("CableServiceDetailsScreen", {
-      service,
-      plans: filteredPlans,
-    });
+    if (data) {
+      const filteredPlans = data.filter(
+        (plan: { cable_name: string }) =>
+          plan.cable_name.toLowerCase() === service.toLowerCase()
+      );
+      navigation.navigate("CableServiceDetailsScreen", {
+        service,
+        plans: filteredPlans,
+      });
+    }
   };
+
+  if (error) {
+    return (
+      <SafeAreaView
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <Text>Error loading data.</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <SafeAreaView
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <Animatable.View
+          animation="pulse"
+          iterationCount="infinite"
+          // style={{
+          //   backgroundColor: "#fff",
+          //   flex: 1,
+          //   justifyContent: "center",
+          //   alignItems: "center",
+          // }}
+        >
+          <LoadingLogo />
+        </Animatable.View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

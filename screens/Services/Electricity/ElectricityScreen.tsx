@@ -15,13 +15,15 @@ import FONT_SIZE from "../../../config/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../config/colors";
 import useSWR from "swr";
+import * as Animatable from "react-native-animatable";
+import LoadingLogo from "../../../assets/svg/loadingLogo.svg";
 
 const ElectricityScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [selectedDisco, setSelectedDisco] = useState<string | null>(null);
 
-  const { data } = useSWR(`/electricity`); // Fetch data
+  const { data, error, isLoading } = useSWR(`/electricity`); // Fetch data
 
   const handleDiscoSelect = (disco: string, planId: string) => {
     setSelectedDisco(disco);
@@ -31,10 +33,32 @@ const ElectricityScreen: React.FC<{
     });
   };
 
+  if (error) {
+    return (
+      <SafeAreaView
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <Text>Error loading data.</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (isLoading || !data) {
+    return (
+      <SafeAreaView
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <Animatable.View animation="pulse" iterationCount="infinite">
+          <LoadingLogo />
+        </Animatable.View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
-        <View className="justify-center items-center">
+        <View>
           <View style={styles.header}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
@@ -53,23 +77,25 @@ const ElectricityScreen: React.FC<{
             </Text>
 
             <View style={styles.discoContainer}>
-              {data &&
-                data.map((item: { disco_name: string; plan_id: string }) => (
-                  <TouchableOpacity
-                    key={item.plan_id}
-                    style={[
-                      styles.boxSelect,
-                      selectedDisco === item.disco_name && styles.selectedBox,
-                    ]}
-                    onPress={() =>
-                      handleDiscoSelect(item.disco_name, item.plan_id)
-                    }
-                  >
-                    <Text style={styles.discoText} allowFontScaling={false}>
-                      {item.disco_name}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+              {Array.isArray(data.plan) &&
+                data.plan.map(
+                  (item: { disco_name: string; plan_id: string }) => (
+                    <TouchableOpacity
+                      key={item.plan_id}
+                      style={[
+                        styles.boxSelect,
+                        selectedDisco === item.disco_name && styles.selectedBox,
+                      ]}
+                      onPress={() =>
+                        handleDiscoSelect(item.disco_name, item.plan_id)
+                      }
+                    >
+                      <Text style={styles.discoText} allowFontScaling={false}>
+                        {item.disco_name}
+                      </Text>
+                    </TouchableOpacity>
+                  )
+                )}
             </View>
           </View>
         </View>
