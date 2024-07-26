@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import BottomTab from "../navigation/Bottomtab/BottomTab";
 import AirtimeScreen from "../screens/Services/AirtimeScreen";
 import DataScreen from "../screens/Services/DataScreen";
-import ElectricityScreen from "../screens/Services/ElectricityScreen";
+import ElectricityScreen from "../screens/Services/Electricity/ElectricityScreen";
 import TransferToUser from "../screens/Services/TransferToUser";
 import TvSubscriptionScreen from "../screens/Services/CableTv/TvSubscriptionScreen";
 import TransactionHistoryScreen from "../screens/TransactionHistoryScreen";
@@ -27,8 +27,13 @@ import CustomerCareScreen from "../screens/CustomerCareScreen";
 import ServiceDetailsScreen from "../screens/Services/CableTv/CableServiceDetailsScreen";
 import CardDetailsScreen from "../screens/Services/CableTv/CardDetailsScreen";
 import ReviewCableTvSummaryScreen from "../screens/ServiceReviewScreens/ReviewCableTvSummaryScreen";
+import MeterTypeScreen from "../screens/Services/Electricity/MeterTypeScreen";
+import ElectricityDetailsScreen from "../screens/Services/Electricity/ElectricityDetailsScreen";
+import ReviewElectricitySummaryScreen from "../screens/ServiceReviewScreens/ReviewElectricitySummaryScreen";
+import { RootStackParamList } from "../navigation/RootStackParams";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
 const AppStack = () => {
   return (
     <Stack.Navigator>
@@ -167,6 +172,21 @@ const AppStack = () => {
       <Stack.Screen
         name="ReviewCableTvSummaryScreen"
         component={ReviewCableTvSummaryScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="MeterTypeScreen"
+        component={MeterTypeScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ElectricityDetailsScreen"
+        component={ElectricityDetailsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ReviewElectricitySummaryScreen"
+        component={ReviewElectricitySummaryScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
