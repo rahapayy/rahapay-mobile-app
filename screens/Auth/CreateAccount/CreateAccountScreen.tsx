@@ -89,10 +89,10 @@ const CreateAccountScreen: React.FC<{
           password: password.trim(),
         });
 
-        handleShowFlash({
-          message: "Account created successfully!",
-          type: "success",
-        });
+        // handleShowFlash({
+        //   message: "Account created successfully! Please check your email to verify your account.",
+        //   type: "success",
+        // });
 
         navigation.navigate("VerifyEmailScreen", {
           email,
