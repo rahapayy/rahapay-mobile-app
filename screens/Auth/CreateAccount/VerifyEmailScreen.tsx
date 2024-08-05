@@ -17,7 +17,6 @@ import COLORS from "../../../config/colors";
 import Button from "../../../components/Button";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type VerifyEmailScreenRouteParams = {
   email: string;
@@ -30,7 +29,7 @@ const VerifyEmailScreen: React.FC<{
   const route =
     useRoute<RouteProp<{ params: VerifyEmailScreenRouteParams }, "params">>();
   const email = route.params.email;
-  const id = route.params.id;
+  const id = route.params?.id;
 
   const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
   const boxRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
@@ -102,7 +101,6 @@ const VerifyEmailScreen: React.FC<{
           message: "Email verified successfully!",
           type: "success",
         });
-        AsyncStorage.setItem("access_token", response.data.data.accessToken);
         navigation.navigate("CreateTagScreen");
       } catch (error) {
         const err = error as {
@@ -153,7 +151,7 @@ const VerifyEmailScreen: React.FC<{
   };
 
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView>
       <ScrollView>
         <View className="p-4">
           <TouchableOpacity onPress={() => navigation.goBack()}>

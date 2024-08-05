@@ -89,15 +89,14 @@ const CreateAccountScreen: React.FC<{
           password: password.trim(),
         });
 
-        handleShowFlash({
-          message: "Account created successfully!",
-          type: "success",
-        });
+        // handleShowFlash({
+        //   message: "Account created successfully!",
+        //   type: "success",
+        // });
 
         navigation.navigate("VerifyEmailScreen", {
           email,
-          id: "",
-          // id: response.data.data.id,
+          id: response.data.data.id,
         });
       } catch (error) {
         const err = error as {
