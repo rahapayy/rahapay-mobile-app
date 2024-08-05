@@ -18,6 +18,7 @@ import Button from "../../../components/Button";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import * as Animatable from "react-native-animatable";
 
 const CreateAccountScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -36,6 +37,12 @@ const CreateAccountScreen: React.FC<{
   const [metRequirements, setMetRequirements] = useState<Set<number>>(
     new Set()
   );
+
+  const [showEmailSection, setShowEmailSection] = useState(false);
+  const [showPhoneSection, setShowPhoneSection] = useState(false);
+  const [showPasswordSection, setShowPasswordSection] = useState(false);
+  const [showConfirmPasswordSection, setShowConfirmPasswordSection] =
+    useState(false);
 
   const passwordRequirements = [
     { text: "At least 8 characters", regex: /.{8,}/ },
@@ -116,12 +123,85 @@ const CreateAccountScreen: React.FC<{
     }
   };
 
+  const handleFullNameChange = (value: string) => {
+    setFullName(value);
+    setShowEmailSection(value.trim() !== "");
+    if (value.trim() === "") {
+      setShowPhoneSection(false);
+      setShowPasswordSection(false);
+      setShowConfirmPasswordSection(false);
+      setEmail("");
+      setPhoneNumber("");
+      setPassword("");
+      setConfirmPassword("");
+    }
+  };
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    setShowPhoneSection(value.trim() !== "");
+    if (value.trim() === "") {
+      setShowPasswordSection(false);
+      setShowConfirmPasswordSection(false);
+      setPhoneNumber("");
+      setPassword("");
+      setConfirmPassword("");
+    }
+  };
+
+  const handlePhoneNumberChange = (value: string) => {
+    setPhoneNumber(value);
+    setShowPasswordSection(value.trim() !== "");
+    if (value.trim() === "") {
+      setShowConfirmPasswordSection(false);
+      setPassword("");
+      setConfirmPassword("");
+    }
+  };
+
   const handleConfirmPasswordChange = (value: string) => {
     setConfirmPassword(value);
+    setShowConfirmPasswordSection(value.trim() !== "");
+    if (value.trim() === "") {
+      setConfirmPassword("");
+    }
     if (password !== value) {
       setConfirmPasswordError("Passwords do not match");
     } else {
       setConfirmPasswordError("");
+    }
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+
+    // Update password requirements status
+    const newMetRequirements = new Set<number>();
+    passwordRequirements.forEach((req, index) => {
+      if (req.regex.test(value)) {
+        newMetRequirements.add(index);
+      }
+    });
+    setMetRequirements(newMetRequirements);
+
+    // Determine if all requirements are met
+    const allRequirementsMet = passwordRequirements.every((req, index) =>
+      newMetRequirements.has(index)
+    );
+    setShowRequirements(!allRequirementsMet && value.length > 0);
+
+    // Update password error if necessary
+    if (validatePassword(value)) {
+      setPasswordError("");
+    } else {
+      setPasswordError("Password does not meet all requirements");
+    }
+
+    // Ensure confirm password section is visible if password is not empty
+    if (value) {
+      setShowConfirmPasswordSection(true);
+    } else {
+      setShowConfirmPasswordSection(false);
     }
   };
 
@@ -141,114 +221,112 @@ const CreateAccountScreen: React.FC<{
 
           <View className="mt-4">
             <Text style={styles.headText} allowFontScaling={false}>
-              Create an Account
+              Let's Get Started 🎉
             </Text>
             <Text style={styles.subText} allowFontScaling={false}>
-              Let’s set up your account in minutes
+              Just a few more details to set up your account.
             </Text>
           </View>
           <View className="mt-10">
             <Text style={styles.label} allowFontScaling={false}>
-              Full Name
+              First & Last name
             </Text>
             <TextInput
               style={styles.textInput}
-              placeholder="First & Last name"
+              placeholder="e.g John Doe"
               allowFontScaling={false}
-              placeholderTextColor={"#DFDFDF"}
+              placeholderTextColor={"#BABFC3"}
               value={fullName}
-              onChangeText={setFullName}
+              onChangeText={handleFullNameChange}
             />
           </View>
-          <View className="mt-4">
-            <Text style={styles.label} allowFontScaling={false}>
-              Email Address
-            </Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Example@email.com"
-              placeholderTextColor={"#DFDFDF"}
-              allowFontScaling={false}
-              value={email}
-              onChangeText={setEmail}
-            />
-          </View>
+          {showEmailSection && (
+            <Animatable.View
+              animation={"fadeIn"}
+              duration={600}
+              className="mt-4"
+            >
+              <Text style={styles.label} allowFontScaling={false}>
+                Email Address
+              </Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="e.g johndoe@email.com"
+                placeholderTextColor={"#BABFC3"}
+                allowFontScaling={false}
+                value={email}
+                onChangeText={handleEmailChange}
+              />
+            </Animatable.View>
+          )}
 
-          <View className="mt-4">
-            <Text style={styles.label} allowFontScaling={false}>
-              Phone Number
-            </Text>
-            <View style={styles.inputContainer}>
-              <TouchableOpacity
-                style={{ flexDirection: "row", alignItems: "center" }}
-              >
-                <Image
-                  source={require("../../../assets/images/flag-for-nigeria.png")}
-                  alt=""
-                  className="w-6 h-6"
+          {showPhoneSection && (
+            <Animatable.View
+              animation={"fadeIn"}
+              duration={600}
+              className="mt-4"
+            >
+              <Text style={styles.label} allowFontScaling={false}>
+                Phone Number
+              </Text>
+              <View style={styles.inputContainer}>
+                <TouchableOpacity
+                  style={{ flexDirection: "row", alignItems: "center" }}
+                >
+                  <Image
+                    source={require("../../../assets/images/flag-for-nigeria.png")}
+                    alt=""
+                    className="w-6 h-6"
+                  />
+                  <View>
+                    <Text style={styles.numberText} allowFontScaling={false}>
+                      {" "}
+                      +234{" "}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+                <View style={styles.vertical} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="8038929383"
+                  placeholderTextColor="#BABFC3"
+                  keyboardType="numeric"
+                  allowFontScaling={false}
+                  value={phoneNumber}
+                  onChangeText={handlePhoneNumberChange}
                 />
-                <View>
-                  <Text style={styles.numberText} allowFontScaling={false}>
-                    {" "}
-                    +234{" "}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-              <View style={styles.vertical} />
-              <TextInput
-                style={styles.input}
-                placeholder="8038929383"
-                placeholderTextColor="#BABFC3"
-                keyboardType="numeric"
-                allowFontScaling={false}
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
-              />
-            </View>
-          </View>
-          <View className="mt-4">
-            <Text style={styles.label} allowFontScaling={false}>
-              Create Password
-            </Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                placeholderTextColor="#BABFC3"
-                allowFontScaling={false}
-                value={password}
-                onChangeText={(value) => {
-                  setPassword(value);
-                  setShowRequirements(true);
-
-                  const newMetRequirements = new Set<number>();
-                  passwordRequirements.forEach((req, index) => {
-                    if (req.regex.test(value)) {
-                      newMetRequirements.add(index);
-                    }
-                  });
-                  setMetRequirements(newMetRequirements);
-
-                  if (validatePassword(value)) {
-                    setPasswordError("");
-                    // Don't hide requirements immediately, let them stay green for a moment
-                    setTimeout(() => setShowRequirements(false), 1000);
-                  } else {
-                    setPasswordError("Password does not meet all requirements");
-                  }
-                }}
-                secureTextEntry={showPassword}
-              />
-              <TouchableOpacity onPress={togglePasswordVisibility}>
-                {showPassword ? (
-                  <EyeSlash color="#000" size={20} />
-                ) : (
-                  <Eye color="#000" size={20} />
-                )}
-              </TouchableOpacity>
-            </View>
-
-            <View>
+              </View>
+            </Animatable.View>
+          )}
+          {showPasswordSection && (
+            <Animatable.View
+              animation={"fadeIn"}
+              duration={600}
+              className="mt-4"
+            >
+              <Text style={styles.label} allowFontScaling={false}>
+                Create Password
+              </Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  placeholderTextColor="#BABFC3"
+                  allowFontScaling={false}
+                  value={password}
+                  onChangeText={handlePasswordChange}
+                  secureTextEntry={showPassword}
+                  autoComplete="off"
+                  textContentType="none"
+                />
+                <TouchableOpacity onPress={togglePasswordVisibility}>
+                  {showPassword ? (
+                    <EyeSlash color="#000" size={20} />
+                  ) : (
+                    <Eye color="#000" size={20} />
+                  )}
+                </TouchableOpacity>
+              </View>
               {showRequirements && (
                 <View style={styles.requirementsContainer}>
                   {passwordRequirements.map((requirement, index) => (
@@ -285,34 +363,41 @@ const CreateAccountScreen: React.FC<{
                   ))}
                 </View>
               )}
-            </View>
-          </View>
+            </Animatable.View>
+          )}
 
-          <View className="mt-4">
-            <Text style={styles.label} allowFontScaling={false}>
-              Confirm Password
-            </Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Confirm Password"
-                secureTextEntry={showPassword}
-                value={confirmPassword}
-                onChangeText={handleConfirmPasswordChange}
-                allowFontScaling={false}
-              />
-              <TouchableOpacity onPress={togglePasswordVisibility}>
-                {showPassword ? (
-                  <EyeSlash color="#000" size={20} />
-                ) : (
-                  <Eye color="#000" size={20} />
-                )}
-              </TouchableOpacity>
-            </View>
-            {confirmPasswordError ? (
-              <Text style={styles.errorText}>{confirmPasswordError}</Text>
-            ) : null}
-          </View>
+          {showConfirmPasswordSection && (
+            <Animatable.View
+              animation={"fadeIn"}
+              duration={600}
+              className="mt-4"
+            >
+              <Text style={styles.label} allowFontScaling={false}>
+                Re-type Password
+              </Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Confirm Password"
+                  placeholderTextColor={"#BABFC3"}
+                  secureTextEntry={showPassword}
+                  value={confirmPassword}
+                  onChangeText={handleConfirmPasswordChange}
+                  allowFontScaling={false}
+                />
+                <TouchableOpacity onPress={togglePasswordVisibility}>
+                  {showPassword ? (
+                    <EyeSlash color="#000" size={20} />
+                  ) : (
+                    <Eye color="#000" size={20} />
+                  )}
+                </TouchableOpacity>
+              </View>
+              {confirmPasswordError ? (
+                <Text style={styles.errorText}>{confirmPasswordError}</Text>
+              ) : null}
+            </Animatable.View>
+          )}
 
           <View className="mt-4">
             <Text style={styles.label} allowFontScaling={false}>
@@ -321,7 +406,7 @@ const CreateAccountScreen: React.FC<{
             <TextInput
               style={styles.textInput}
               placeholder="Referral (Optional)"
-              placeholderTextColor={"#DFDFDF"}
+              placeholderTextColor={"#BABFC3"}
               allowFontScaling={false}
             />
           </View>
@@ -359,11 +444,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: "#DFDFDF",
     padding: SPACING * 1.5,
+    fontSize: RFValue(10),
+    fontFamily: "Outfit-Medium",
   },
   label: {
-    fontFamily: "Outfit-Regular",
+    fontFamily: "Outfit-Medium",
     marginBottom: 10,
-    fontSize: RFValue(12),
+    fontSize: RFValue(10),
   },
   vertical: {
     backgroundColor: COLORS.black100,
@@ -384,8 +471,8 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: "100%",
-    fontSize: RFValue(12),
-    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(10),
+    fontFamily: "Outfit-Medium",
   },
   numberText: {
     fontFamily: "Outfit-Regular",
