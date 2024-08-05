@@ -10,7 +10,7 @@ const SuccessfulScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const handleButtonClick = () => {
-    navigation.navigate("LoginScreen");
+    navigation.navigate("AppStack");
   };
 
   return (
