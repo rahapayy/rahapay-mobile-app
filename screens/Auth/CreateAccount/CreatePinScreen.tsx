@@ -129,10 +129,20 @@ const CreatePinScreen: React.FC<{
     }
   };
 
+  const handleBackPress = () => {
+    if (step === "confirm") {
+      setStep("create");
+      setConfirmBoxes(["", "", "", ""]); // Clear confirmation boxes when going back to create step
+      boxRefs.current[0]?.focus(); // Focus on the first box of the create step
+    } else {
+      navigation.goBack();
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ padding: 16 }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={handleBackPress}>
           <ArrowLeft color="#000" />
         </TouchableOpacity>
 
@@ -208,7 +218,7 @@ const CreatePinScreen: React.FC<{
           title={step === "create" ? "Continue" : "Confirm"}
           onPress={step === "create" ? handleCreatePin : handleConfirmPin}
           isLoading={loading}
-          style={{ marginTop: 16 }}
+          style={{ marginTop: SPACING * 4 }}
           textColor="#fff"
         />
       </View>
@@ -234,7 +244,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: SPACING * 2,
-    borderRadius: 15,
+    borderRadius: 10,
+    backgroundColor: COLORS.white,
+    marginTop: SPACING * 4,
   },
   inputRow: {
     flexDirection: "row",
@@ -243,12 +255,13 @@ const styles = StyleSheet.create({
     gap: SPACING,
   },
   inputBox: {
-    flex: 1,
+    width: 60,
+    height: 60,
     textAlign: "center",
-    paddingVertical: SPACING * 2,
-    paddingHorizontal: SPACING,
+    paddingVertical: SPACING / 2,
+    paddingHorizontal: SPACING / 2,
     borderRadius: 10,
-    margin: SPACING,
+    margin: SPACING / 2,
     borderWidth: 1,
     borderColor: "#DFDFDF",
     fontSize: RFValue(19),
