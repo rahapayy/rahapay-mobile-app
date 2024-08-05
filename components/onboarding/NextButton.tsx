@@ -14,30 +14,53 @@ const { height: windowHeight, width: windowWidth } = Dimensions.get("window");
 
 interface NextButtonProps {
   scrollTo: () => void;
+  onLoginPress: () => void;
+  onCreateAccountPress: () => void;
 }
 
-const NextButton: FC<NextButtonProps> = ({ scrollTo }) => {
+const NextButton: FC<NextButtonProps> = ({
+  scrollTo,
+  onLoginPress,
+  onCreateAccountPress,
+}) => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
   // Adjust these styles according to screen width and height
-  const buttonWidth = screenWidth * 0.85;
+  const buttonWidth = screenWidth * 0.89;
   const buttonHeight = screenHeight * 0.06;
   const buttonBottomMargin = screenHeight * 0.1;
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        onPress={scrollTo}
-        style={{
-          width: buttonWidth,
-          height: buttonHeight,
-          backgroundColor: COLORS.violet400,
-          borderRadius: 8,
-          justifyContent: "center",
-          alignItems: "center",
-          marginBottom: buttonBottomMargin,
-        }}
+        onPress={onCreateAccountPress}
+        style={[
+          styles.button,
+          {
+            width: buttonWidth,
+            height: buttonHeight,
+            backgroundColor: COLORS.violet400,
+            marginBottom: 10,
+          },
+        ]}
       >
-        <Text style={styles.buttonText}>Continue</Text>
+        <Text style={styles.buttonText}>Create an Account</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={onLoginPress}
+        style={[
+          styles.button,
+          {
+            width: buttonWidth,
+            height: buttonHeight,
+            borderColor: COLORS.violet300,
+            borderWidth: 1,
+            marginBottom: buttonBottomMargin,
+          },
+        ]}
+      >
+        <Text style={[styles.buttonText, {color: COLORS.black400}]}>Login</Text>
       </TouchableOpacity>
     </View>
   );
@@ -51,14 +74,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  buttonContainer: {
-    width: 0.85 * windowWidth,
-    height: 0.06 * windowHeight,
-    backgroundColor: COLORS.violet400,
+  button: {
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 15,
   },
   buttonText: {
     color: "#fff",

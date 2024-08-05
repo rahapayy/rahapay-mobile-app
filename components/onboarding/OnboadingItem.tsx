@@ -22,12 +22,13 @@ interface OnboardingItemProps {
 }
 
 const OnboardingItem: React.FC<OnboardingItemProps> = ({ item }) => {
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const animation = useRef(null);
+  const bottomPosition = height * 0.-10;
 
   return (
     <SafeAreaView style={styles.contain}>
-      <View style={[styles.container, { width }]}>
+      <View style={[styles.container, { width, bottom: bottomPosition }]}>
         <Image
           source={item.image}
           style={[styles.image, { width, resizeMode: "contain" }]}

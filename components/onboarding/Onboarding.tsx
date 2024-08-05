@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState } from "react";
+import React, { FC, useRef, useState, useEffect } from "react";
 import { View, StyleSheet, FlatList, Animated, ViewToken } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -21,14 +21,32 @@ const Onboarding: React.FC<{
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollx = useRef(new Animated.Value(0)).current;
   const slidesRef = useRef<FlatList<Slide> | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const scrollTo = async () => {
-    if (currentIndex < slides.length - 1 && slidesRef.current) {
-      slidesRef.current.scrollToIndex({ index: currentIndex + 1 });
+  const autoScroll = async () => {
+    if (slidesRef.current) {
+      if (currentIndex < slides.length - 1) {
+        slidesRef.current.scrollToIndex({ index: currentIndex + 1 });
+      } else {
+        slidesRef.current.scrollToIndex({ index: 0 });
+      }
+    }
+  };
+
+  const next = async () => {
+    if (currentIndex < slides.length - 1) {
+      if (slidesRef.current) {
+        slidesRef.current.scrollToIndex({ index: currentIndex + 1 });
+      }
     } else {
       await setItem("onboarded", "1");
       navigation.navigate("WelcomeScreen");
     }
+  };
+
+  const skip = async () => {
+    await setItem("onboarded", "1");
+    navigation.navigate("WelcomeScreen");
   };
 
   const viewableItemsChanged = useRef(
@@ -44,6 +62,28 @@ const Onboarding: React.FC<{
   ).current;
 
   const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
+
+  useEffect(() => {
+    // Start automatic sliding
+    intervalRef.current = setInterval(() => {
+      autoScroll();
+    }, 4000); // Change slide every 3 seconds
+
+    return () => {
+      // Clear the interval when the component unmounts
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [currentIndex]);
+
+  const onCreateAccountPress = () => {
+    navigation.navigate("CreateAccountScreen");
+  };
+
+  const onLoginPress = () => {
+    navigation.navigate("LoginScreen");
+  };
 
   return (
     <View style={styles.container}>
@@ -70,7 +110,11 @@ const Onboarding: React.FC<{
       </View>
 
       <Paginator data={slides} scrollx={scrollx} />
-      <NextButton scrollTo={scrollTo} />
+      <NextButton
+        scrollTo={next}
+        onCreateAccountPress={onCreateAccountPress}
+        onLoginPress={onLoginPress}
+      />
     </View>
   );
 };
