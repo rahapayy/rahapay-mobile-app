@@ -188,7 +188,8 @@ const CreatePinScreen: React.FC<{
                 ]}
                 keyboardType="numeric"
                 allowFontScaling={false}
-                value={value ? "*" : ""}
+                value={value}
+                secureTextEntry
                 onChangeText={(text) =>
                   handleInput(text, index, step === "confirm")
                 }

@@ -180,7 +180,8 @@ const VerifyEmailScreen: React.FC<{
                     boxIsFocused[index] && styles.inputBoxFocused,
                   ]}
                   keyboardType="numeric"
-                  value={value ? "*" : ""}
+                  value={value}
+                  secureTextEntry
                   allowFontScaling={false}
                   onChangeText={(text) => {
                     if (text.length > 1) {
