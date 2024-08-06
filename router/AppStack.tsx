@@ -33,6 +33,7 @@ import ReviewElectricitySummaryScreen from "../screens/ServiceReviewScreens/Revi
 import { RootStackParamList } from "../navigation/RootStackParams";
 import EducationServiceType from "../screens/Services/Education/EducationServiceType";
 import EducationDetailsScreen from "../screens/Services/Education/EducationDetailsScreen";
+import ReviewEducationSummaryScreen from "../screens/ServiceReviewScreens/ReviewEducationSummaryScreem";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -199,6 +200,11 @@ const AppStack = () => {
       <Stack.Screen
         name="EducationDetailsScreen"
         component={EducationDetailsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ReviewEducationSummaryScreen"
+        component={ReviewEducationSummaryScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

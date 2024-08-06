@@ -86,7 +86,7 @@ export type RootStackParamList = {
     amount: string;
     phoneNumber: string;
   };
-  ReviewEducationSummaryScreem: {
+  ReviewEducationSummaryScreen: {
     exam: string;
     plan_id: string;
     amount: string;

@@ -31,7 +31,7 @@ const EducationDetailsScreen: React.FC<EducationDetailsScreenProps> = ({
   const isButtonDisabled = !phoneNumber;
 
   const handleSubmit = () => {
-    navigation.navigate("ReviewEducationSummaryScreem", {
+    navigation.navigate("ReviewEducationSummaryScreen", {
       exam,
       plan_id,
       amount,
