@@ -25,11 +25,12 @@ const EducationScreen: React.FC<{
   const { data, error, isLoading } = useSWR(`/exam/`);
   console.log(data);
 
-  const handleExamSelect = (exam: string, plan_id: string) => {
+  const handleExamSelect = (exam: string, plan_id: string, amount: string) => {
     setSelectedExam(exam);
     navigation.navigate("EducationServiceType", {
       exam,
       plan_id,
+      amount,
     });
   };
 
@@ -75,7 +76,11 @@ const EducationScreen: React.FC<{
             <View style={styles.examContainer}>
               {Array.isArray(data.plan) &&
                 data.plan.map(
-                  (item: { exam_name: string; plan_id: string }) => (
+                  (item: {
+                    exam_name: string;
+                    plan_id: string;
+                    amount: string;
+                  }) => (
                     <TouchableOpacity
                       key={item.plan_id}
                       style={[
@@ -83,7 +88,11 @@ const EducationScreen: React.FC<{
                         selectedExam === item.exam_name && styles.selectedBox,
                       ]}
                       onPress={() =>
-                        handleExamSelect(item.exam_name, item.plan_id)
+                        handleExamSelect(
+                          item.exam_name,
+                          item.plan_id,
+                          item.amount
+                        )
                       }
                     >
                       <Text style={styles.examText} allowFontScaling={false}>

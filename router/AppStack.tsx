@@ -31,6 +31,8 @@ import MeterTypeScreen from "../screens/Services/Electricity/MeterTypeScreen";
 import ElectricityDetailsScreen from "../screens/Services/Electricity/ElectricityDetailsScreen";
 import ReviewElectricitySummaryScreen from "../screens/ServiceReviewScreens/ReviewElectricitySummaryScreen";
 import { RootStackParamList } from "../navigation/RootStackParams";
+import EducationServiceType from "../screens/Services/Education/EducationServiceType";
+import EducationDetailsScreen from "../screens/Services/Education/EducationDetailsScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -187,6 +189,16 @@ const AppStack = () => {
       <Stack.Screen
         name="ReviewElectricitySummaryScreen"
         component={ReviewElectricitySummaryScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EducationServiceType"
+        component={EducationServiceType}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EducationDetailsScreen"
+        component={EducationDetailsScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

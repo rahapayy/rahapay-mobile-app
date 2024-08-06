@@ -67,7 +67,17 @@ export type RootStackParamList = {
     planId: string;
     meterType: string;
   };
-  EducationServiceType: undefined;
+  EducationServiceType: {
+    exam: string;
+    plan_id: string;
+    amount: string;
+  };
+  EducationDetailsScreen: {
+    exam: string;
+    plan_id: string;
+    serviceType: string;
+    amount: string;
+  };
   ReviewElectricitySummaryScreen: {
     disco: string;
     planId: string;
