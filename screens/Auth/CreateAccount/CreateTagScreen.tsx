@@ -74,7 +74,7 @@ const CreateTagScreen: React.FC<{
   }, [suggestedTagsResponse]);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="p-4">
           <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -88,73 +88,68 @@ const CreateTagScreen: React.FC<{
               Send and receive money from your loved ones with your RahaPay tag
             </Text>
           </View>
-          <KeyboardAwareScrollView
-            contentContainerStyle={{ flexGrow: 1 }}
-            enableOnAndroid={true}
-            extraScrollHeight={Platform.OS === "ios" ? 20 : 0}
-          >
-            <View className="mt-6">
-              <View>
-                <Text style={styles.label} allowFontScaling={false}>
-                  Set Username
-                </Text>
-              </View>
-              <View style={styles.inputContainer}>
-                <Text style={{}} allowFontScaling={false}>
-                  @{" "}
-                </Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="eg. john"
-                  placeholderTextColor="#BABFC3"
-                  allowFontScaling={false}
-                  value={tag}
-                  onChangeText={setTag}
-                />
-              </View>
-            </View>
-            {/* Suggested availble usertags */}
-            <View className="flex-row gap-2 w-full flex-wrap mt-3">
-              {suggestedTags?.length > 0 &&
-                suggestedTags?.map((suggestedTag, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={{
-                      paddingHorizontal: SPACING,
-                      paddingVertical: 5,
-                      borderRadius: 5,
-                      width: "auto",
-                      backgroundColor: "#C9C1EC",
-                      marginTop: SPACING,
-                    }}
-                    onPress={() => setTag(suggestedTag)}
-                  >
-                    <Text
-                      style={{
-                        color: "#5136C1",
-                        fontSize: FONT_SIZE.extraSmall,
-                      }}
-                      allowFontScaling={false}
-                    >
-                      {suggestedTag}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-            </View>
 
-            <Button
-              title="Set My Tag"
-              onPress={handleSetTag}
-              isLoading={loading}
-              style={[
-                styles.proceedButton,
-                // If the form is not complete, add styles.proceedButtonDisabled
-                !isFormComplete && styles.proceedButtonDisabled,
-              ]}
-              textColor={COLORS.white}
-              disabled={!isFormComplete || isLoading}
-            />
-          </KeyboardAwareScrollView>
+          <View className="mt-6">
+            <View>
+              <Text style={styles.label} allowFontScaling={false}>
+                Set Username
+              </Text>
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={{}} allowFontScaling={false}>
+                @{" "}
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="eg. john"
+                placeholderTextColor="#BABFC3"
+                allowFontScaling={false}
+                value={tag}
+                onChangeText={setTag}
+              />
+            </View>
+          </View>
+          {/* Suggested availble usertags */}
+          <View className="flex-row gap-2 w-full flex-wrap mt-3">
+            {suggestedTags?.length > 0 &&
+              suggestedTags?.map((suggestedTag, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={{
+                    paddingHorizontal: SPACING,
+                    paddingVertical: 5,
+                    borderRadius: 5,
+                    width: "auto",
+                    backgroundColor: "#C9C1EC",
+                    marginTop: SPACING,
+                  }}
+                  onPress={() => setTag(suggestedTag)}
+                >
+                  <Text
+                    style={{
+                      color: "#5136C1",
+                      fontSize: FONT_SIZE.extraSmall,
+                    }}
+                    allowFontScaling={false}
+                  >
+                    {suggestedTag}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+          </View>
+
+          <Button
+            title="Set My Tag"
+            onPress={handleSetTag}
+            isLoading={loading}
+            style={[
+              styles.proceedButton,
+              // If the form is not complete, add styles.proceedButtonDisabled
+              !isFormComplete && styles.proceedButtonDisabled,
+            ]}
+            textColor={COLORS.white}
+            disabled={!isFormComplete || isLoading}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
