@@ -9,7 +9,6 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  ActivityIndicator,
 } from "react-native";
 import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -19,7 +18,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { AuthContext } from "../../../context/AuthContext";
-import { logError } from "../../../utils/errorLogger"; 
+import { logError } from "../../../utils/errorLogger";
 
 const LoginScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -28,12 +27,37 @@ const LoginScreen: React.FC<{
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // State to manage focus of each input
+  const [isIdFocused, setIsIdFocused] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   const { login } = useContext(AuthContext);
 
+  // Utility functions
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const isValidPhoneNumber = (phoneNumber: string) => {
+    const phoneNumberRegex = /^[0-9]{10}$/; // Adjust this regex based on your phone number format requirements
+    return phoneNumberRegex.test(phoneNumber);
+  };
+
   const handleLogin = async () => {
+    const isEmail = isValidEmail(id);
+    const isPhoneNumber = isValidPhoneNumber(id);
+
+    if (!isEmail && !isPhoneNumber) {
+      setErrorMessage("Please enter a valid email or phone number.");
+      return;
+    }
+
+    setErrorMessage(null); // Clear any previous error messages
     setIsLoading(true);
     try {
       await login(id, password);
@@ -44,16 +68,25 @@ const LoginScreen: React.FC<{
       navigation.navigate("AppStack");
     } catch (error) {
       const err = error as {
-        response?: { data?: { message?: string } };
+        status?: number;
         message: string;
       };
-      const errorMessage =
-        err.response?.data?.message || "An error occurred. Please try again.";
+
+      let errorMessage = "An error occurred. Please try again.";
+
+      if (err.status === 404) {
+        errorMessage = "User not found. Please check your credentials.";
+      } else if (err.status === 401) {
+        errorMessage = "Incorrect password. Please try again.";
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+
       handleShowFlash({
         message: errorMessage,
         type: "danger",
       });
-      logError(err); // Log the error using your custom error logger
+      logError(err); // Log the error for debugging
     } finally {
       setIsLoading(false);
     }
@@ -89,21 +122,36 @@ const LoginScreen: React.FC<{
                 Email or Phone Number
               </Text>
               <TextInput
-                style={styles.textInput}
+                style={[
+                  styles.textInput,
+                  isIdFocused && styles.focusedInput, // Apply focus style if focused
+                ]}
                 placeholder="Email or Phone Number"
                 placeholderTextColor={"#DFDFDF"}
                 allowFontScaling={false}
                 value={id}
                 onChangeText={setId}
                 autoCapitalize="none"
+                onFocus={() => setIsIdFocused(true)}
+                onBlur={() => setIsIdFocused(false)}
               />
+              {errorMessage && (
+                <Text style={styles.errorText} allowFontScaling={false}>
+                  {errorMessage}
+                </Text>
+              )}
             </View>
 
             <View className="mt-4">
               <Text style={styles.label} allowFontScaling={false}>
                 Password
               </Text>
-              <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.inputContainer,
+                  isPasswordFocused && styles.focusedInput, // Apply focus style if focused
+                ]}
+              >
                 <TextInput
                   style={styles.input}
                   placeholder="Password"
@@ -112,6 +160,8 @@ const LoginScreen: React.FC<{
                   secureTextEntry={showPassword}
                   value={password}
                   onChangeText={setPassword}
+                  onFocus={() => setIsPasswordFocused(true)}
+                  onBlur={() => setIsPasswordFocused(false)}
                 />
                 <TouchableOpacity onPress={togglePasswordVisibility}>
                   {showPassword ? (
@@ -194,6 +244,9 @@ const styles = StyleSheet.create({
     height: "100%",
     fontSize: RFValue(12),
   },
+  focusedInput: {
+    borderColor: COLORS.violet600, // Change border color when focused
+  },
   proceedButton: {
     marginTop: SPACING * 4,
   },
@@ -201,5 +254,11 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: COLORS.violet600,
     fontSize: RFValue(12),
+  },
+  errorText: {
+    color: COLORS.red300,
+    fontSize: RFValue(10),
+    marginTop: 5,
+    fontFamily: "Outfit-Regular",
   },
 });
