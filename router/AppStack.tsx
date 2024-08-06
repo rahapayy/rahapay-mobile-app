@@ -22,7 +22,7 @@ import ReviewAirtimeSummaryScreen from "../screens/ServiceReviewScreens/ReviewAi
 import ReviewDataSummaryScreen from "../screens/ServiceReviewScreens/ReviewDataSummaryScreen";
 import BettingScreen from "../screens/Services/BettingScreen";
 import TransferScreen from "../screens/Services/TransferScreen";
-import EducationScreen from "../screens/Services/EducationScreen";
+import EducationScreen from "../screens/Services/Education/EducationScreen";
 import CustomerCareScreen from "../screens/CustomerCareScreen";
 import ServiceDetailsScreen from "../screens/Services/CableTv/CableServiceDetailsScreen";
 import CardDetailsScreen from "../screens/Services/CableTv/CardDetailsScreen";

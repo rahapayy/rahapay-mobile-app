@@ -3,6 +3,9 @@ export type RootStackParamList = {
   AirtimeScreen: undefined;
   DataScreen: undefined;
   ElectricityScreen: undefined;
+  BettingScreen: undefined;
+  TransferScreen: undefined;
+  EducationScreen: undefined;
   TransferToUserScreen: undefined;
   TvSubscriptionScreen: undefined;
   TransactionHistoryScreen: undefined;
@@ -43,9 +46,7 @@ export type RootStackParamList = {
   TransactionStatusScreen: {
     status: "pending" | "failed" | "successful";
   };
-  BettingScreen: undefined;
-  TransferScreen: undefined;
-  EducationScreen: undefined;
+
   CustomerCareScreen: undefined;
   CableServiceDetailsScreen: undefined;
   CardDetailsScreen: undefined;
@@ -66,6 +67,7 @@ export type RootStackParamList = {
     planId: string;
     meterType: string;
   };
+  EducationServiceType: undefined;
   ReviewElectricitySummaryScreen: {
     disco: string;
     planId: string;
