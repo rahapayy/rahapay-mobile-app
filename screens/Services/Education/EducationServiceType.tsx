@@ -57,7 +57,7 @@ const EducationServiceType: React.FC<EducationServiceTypeProps> = ({
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
             <Text style={[styles.headerText]} allowFontScaling={false}>
-              Select Meter Type
+              {exam}
             </Text>
           </View>
 
