@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -54,22 +55,9 @@ const TvSubscriptionScreen: React.FC<{
 
   if (isLoading) {
     return (
-      <SafeAreaView
-        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-      >
-        <Animatable.View
-          animation="pulse"
-          iterationCount="infinite"
-          // style={{
-          //   backgroundColor: "#fff",
-          //   flex: 1,
-          //   justifyContent: "center",
-          //   alignItems: "center",
-          // }}
-        >
-          <LoadingLogo />
-        </Animatable.View>
-      </SafeAreaView>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator color={COLORS.violet300} size={"large"} />
+      </View>
     );
   }
 
