@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -16,7 +17,6 @@ import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../config/colors";
 import useSWR from "swr";
 import * as Animatable from "react-native-animatable";
-import LoadingLogo from "../../../assets/svg/loadingLogo.svg";
 
 const ElectricityScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -45,13 +45,9 @@ const ElectricityScreen: React.FC<{
 
   if (isLoading || !data) {
     return (
-      <SafeAreaView
-        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-      >
-        <Animatable.View animation="pulse" iterationCount="infinite">
-          <LoadingLogo />
-        </Animatable.View>
-      </SafeAreaView>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator color={COLORS.violet300} size={"large"} />
+      </View>
     );
   }
 
@@ -90,6 +86,9 @@ const ElectricityScreen: React.FC<{
                         handleDiscoSelect(item.disco_name, item.plan_id)
                       }
                     >
+                      {/* <View className="w-12 h-12 bg-[#E5E1F6] justify-center items-center rounded-full mb-2">
+                        
+                      </View> */}
                       <Text style={styles.discoText} allowFontScaling={false}>
                         {item.disco_name}
                       </Text>
