@@ -196,13 +196,13 @@ const styles = StyleSheet.create({
   virtualText: {
     fontFamily: "Outfit-Regular",
     color: "#fff",
-    fontSize: FONT_SIZE.small,
+    fontSize: RFValue(13),
     marginBottom: SPACING,
   },
   bankName: {
     fontFamily: "Outfit-Medium",
     color: "#fff",
-    fontSize: FONT_SIZE.medium,
+    fontSize: RFValue(12),
     marginBottom: SPACING,
   },
   copyContainer: {
@@ -226,13 +226,13 @@ const styles = StyleSheet.create({
   accountNumber: {
     fontFamily: "Outfit-Medium",
     color: "#fff",
-    fontSize: FONT_SIZE.large,
+    fontSize: RFValue(18),
     marginBottom: 5,
     marginRight: 5,
   },
   accountName: {
     fontFamily: "Outfit-Medium",
-    fontSize: FONT_SIZE.medium,
+    fontSize: FONT_SIZE.small,
     color: "#fff",
   },
 });
