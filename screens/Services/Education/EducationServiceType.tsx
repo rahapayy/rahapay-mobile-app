@@ -68,7 +68,7 @@ const EducationServiceType: React.FC<EducationServiceTypeProps> = ({
           <View style={styles.optionsContainer}>
             <TouchableOpacity
               style={styles.option}
-              onPress={() => handleServiceTypeSelect("Result")}
+              onPress={() => handleServiceTypeSelect("Result checker PIN")}
             >
               <View className="flex-row items-center">
                 <Text style={styles.optionText} allowFontScaling={false}>
@@ -81,7 +81,7 @@ const EducationServiceType: React.FC<EducationServiceTypeProps> = ({
                   {amount}
                 </Text>
               </View>
-              {selectedServiceType === "Result" && (
+              {selectedServiceType === "Result checker PIN" && (
                 <View style={styles.radioSelected}>
                   <View style={styles.radioSelectedSmall} />
                 </View>

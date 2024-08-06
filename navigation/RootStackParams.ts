@@ -86,6 +86,13 @@ export type RootStackParamList = {
     amount: string;
     phoneNumber: string;
   };
+  ReviewEducationSummaryScreem: {
+    exam: string;
+    plan_id: string;
+    amount: string;
+    serviceType: string;
+    phoneNumber: string;
+  };
   Onboarding: undefined;
   WelcomeScreen: undefined;
   ServicesScreen: undefined;
