@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useContext } from "react";
 import { createTheme, ThemeProvider } from "@rneui/themed";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useFonts } from "expo-font";
@@ -9,6 +9,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { QueryClient, QueryClientProvider } from "react-query";
 import FlashMessageComponent from "./components/FlashMessageComponent";
 import FlashMessage from "react-native-flash-message";
+import { NotificationProvider } from "./hooks/NotificationContext";
 
 const queryClient = new QueryClient();
 
@@ -45,14 +46,16 @@ export default function App() {
       <ThemeProvider theme={theme}>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <QueryClientProvider client={queryClient}>
-            <StatusBar barStyle={"default"} />
-            <Router />
+            <NotificationProvider>
+              <StatusBar barStyle={"default"} />
+              <Router />
+              <FlashMessage
+                statusBarHeight={StatusBar.currentHeight || 0}
+                position="top"
+                MessageComponent={FlashMessageComponent}
+              />
+            </NotificationProvider>
           </QueryClientProvider>
-          <FlashMessage
-            statusBarHeight={StatusBar.currentHeight || 0}
-            position="top"
-            MessageComponent={FlashMessageComponent}
-          />
         </GestureHandlerRootView>
       </ThemeProvider>
     </AuthProvider>
