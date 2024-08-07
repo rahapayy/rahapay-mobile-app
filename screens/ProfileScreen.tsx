@@ -28,17 +28,19 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import BiometricModal from "../components/modals/BiometricModal";
 import CloseAccountModal from "../components/modals/CloseAccountModal";
 import { AuthContext } from "../context/AuthContext";
+import LogOutModal from "../components/modals/LogoutModal";
 
 const ProfileScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  // const { userInfo, logout } = useContext(AuthContext);
   const { userDetails, logout } = useContext(AuthContext);
 
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [biometricModalVisible, setBiometricModalVisible] = useState(false);
   const [isCloseAccountModalVisible, setIsCloseAccountModalVisible] =
     useState(false);
+
+  const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
 
   const toggleBiometricSwitch = () => {
     setBiometricModalVisible(true);
@@ -51,6 +53,14 @@ const ProfileScreen: React.FC<{
   const handleToggleBiometrics = () => {
     setIsBiometricEnabled(!isBiometricEnabled);
     setBiometricModalVisible(false);
+  };
+
+  const handleToggleLogout = () => {
+    setIsLogoutModalVisible(true);
+  };
+
+  const handleCloseLogout = () => {
+    setIsLogoutModalVisible(false);
   };
 
   const handleOpenCloseAccountModal = () => {
@@ -217,7 +227,7 @@ const ProfileScreen: React.FC<{
 
             {/* Logout */}
             <TouchableOpacity
-              onPress={handleLogout}
+              onPress={handleToggleLogout}
               style={styles.logoutContainer}
             >
               <Text style={styles.logoutButton} allowFontScaling={false}>
@@ -238,6 +248,11 @@ const ProfileScreen: React.FC<{
         visible={isCloseAccountModalVisible}
         onClose={handleCloseAccountModalClose}
         onConfirm={handleConfirmCloseAccount}
+      />
+      <LogOutModal
+        visible={isLogoutModalVisible}
+        onToggle={handleToggleLogout}
+        onClose={handleCloseLogout}
       />
     </SafeAreaView>
   );
