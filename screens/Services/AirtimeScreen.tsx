@@ -22,6 +22,8 @@ import Eti from "../../assets/svg/eti.svg";
 import Glo from "../../assets/svg/glo.svg";
 import Button from "../../components/Button";
 import ComingSoon from "../../assets/svg/Coming Soon.svg";
+import useApi from "../../utils/api";
+
 
 const AirtimeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -30,6 +32,7 @@ const AirtimeScreen: React.FC<{
   const [amount, setAmount] = useState("");
   const [selectedOperator, setSelectedOperator] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const { mutateAsync} = useApi.post("/beneficiary/me?service=airtime");
 
   const amounts = [50, 100, 200, 500, 1000, 2000, 3000, 5000];
 

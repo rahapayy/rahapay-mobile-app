@@ -8,26 +8,42 @@ import {
   View,
   Platform,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, Notification, SmsNotification } from "iconsax-react-native";
 import SPACING from "../../config/SPACING";
 import FONT_SIZE from "../../config/font-size";
 import COLORS from "../../config/colors";
 import { RFValue } from "react-native-responsive-fontsize";
+import { NotificationContext } from "../../hooks/NotificationContext";
 
 const EnableNotificationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [isPushNotificationEnabled, setIsPushNotificationEnabled] =
-    useState(false);
+    useState(true);
   const [isSmsNotificationEnabled, setIsSmsNotificationEnabled] =
     useState(false);
 
-  const togglePushNotificationSwitch = () => {
-    setIsPushNotificationEnabled((previousState) => !previousState);
-  };
+  const { expoPushToken, notification, setExpoPushToken } =
+    useContext(NotificationContext);
 
+  // Toggle switches for push and sms notifications
+  const togglePushNotificationSwitch = async () => {
+    const newState = !isPushNotificationEnabled;
+    setIsPushNotificationEnabled(newState);
+
+    if (newState) {
+      // Logic to enable push notifications - register and get new token
+      // As registerForPushNotificationsAsync is defined in the NotificationContext we should ensure it's imported to use here
+      const newToken = await registerForPushNotificationsAsync();
+      setExpoPushToken(newToken);
+    } else {
+      // Logic to disable push notifications
+      // This might involve informing your backend server to not send notifications anymore or disabling them in some other way
+      setExpoPushToken(""); // Clear the push token
+    }
+  };
   const toggleSmsNotificationSwitch = () => {
     setIsSmsNotificationEnabled((previousState) => !previousState);
   };
@@ -137,3 +153,6 @@ const styles = StyleSheet.create({
     marginLeft: SPACING,
   },
 });
+function registerForPushNotificationsAsync() {
+  throw new Error("Function not implemented.");
+}
