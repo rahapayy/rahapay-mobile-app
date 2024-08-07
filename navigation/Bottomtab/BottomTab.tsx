@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, TextProps } from "react-native";
+import { StyleSheet, Text, TextProps, View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   Home,
@@ -12,12 +12,7 @@ import HomeScreen from "../../screens/HomeScreen";
 import ServicesScreen from "../../screens/ServicesScreen";
 import WalletScreen from "../../screens/WalletScreen";
 import ProfileScreen from "../../screens/ProfileScreen";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withTiming,
-} from "react-native-reanimated";
+import * as Animatable from 'react-native-animatable';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,21 +28,10 @@ interface TabBarLabelProps extends TextProps {
 }
 
 const TabBarLabel: React.FC<TabBarLabelProps> = ({ focused, title }) => {
-  const translateY = useSharedValue(focused ? 0 : 10);
-  const opacity = useSharedValue(focused ? 1 : 0);
-
-  React.useEffect(() => {
-    translateY.value = withTiming(focused ? 0 : 10, { duration: 300 });
-    opacity.value = withTiming(focused ? 1 : 0, { duration: 300 });
-  }, [focused]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-    opacity: opacity.value,
-  }));
-
   return (
-    <Animated.Text
+    <Animatable.Text
+      animation={focused ? "fadeInUp" : "fadeOutDown"}
+      duration={300}
       style={[
         styles.tabBarLabel,
         {
@@ -55,14 +39,13 @@ const TabBarLabel: React.FC<TabBarLabelProps> = ({ focused, title }) => {
             ? customColors.activeTintColor
             : customColors.inactiveTintColor,
         },
-        animatedStyle,
       ]}
       numberOfLines={1}
       ellipsizeMode="tail"
       allowFontScaling={false}
     >
       {title}
-    </Animated.Text>
+    </Animatable.Text>
   );
 };
 
@@ -75,18 +58,12 @@ const AnimatedIcon: React.FC<AnimatedIconProps> = ({
   focused,
   IconComponent,
 }) => {
-  const scale = useSharedValue(1);
-
-  React.useEffect(() => {
-    scale.value = withSpring(focused ? 1.2 : 1, { damping: 15, stiffness: 90 });
-  }, [focused]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
   return (
-    <Animated.View style={animatedStyle}>
+    <Animatable.View
+      animation={focused ? "pulse" : undefined}
+      iterationCount={focused ? "infinite" : 1}
+      duration={1000}
+    >
       <IconComponent
         size={27}
         color={
@@ -96,7 +73,7 @@ const AnimatedIcon: React.FC<AnimatedIconProps> = ({
         }
         variant={focused ? "Bold" : "Linear"}
       />
-    </Animated.View>
+    </Animatable.View>
   );
 };
 
@@ -152,18 +129,6 @@ const BottomTab: React.FC = () => {
           headerShown: false,
         }}
       />
-      {/* <Tab.Screen
-        name="Cards"
-        component={CardsScreen}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <AnimatedIcon focused={focused} IconComponent={Cards} />
-          ),
-          tabBarLabel: ({ focused }) =>
-            focused ? <TabBarLabel focused={focused} title="Cards" /> : null,
-          headerShown: false,
-        }}
-      /> */}
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
