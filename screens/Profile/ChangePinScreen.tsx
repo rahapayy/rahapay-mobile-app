@@ -16,6 +16,7 @@ import SPACING from "../../config/SPACING";
 import FONT_SIZE from "../../config/font-size";
 import COLORS from "../../config/colors";
 import { RFValue } from "react-native-responsive-fontsize";
+import Button from "../../components/Button";
 
 const ChangePinScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -29,7 +30,7 @@ const ChangePinScreen: React.FC<{
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
-        <View>
+        <View className="p-4">
           <View style={styles.header}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
@@ -42,7 +43,7 @@ const ChangePinScreen: React.FC<{
             </Text>
           </View>
 
-          <View className="p-6">
+          <View className="">
             <View>
               <Text style={styles.label} allowFontScaling={false}>
                 Current Pin
@@ -103,6 +104,12 @@ const ChangePinScreen: React.FC<{
                 </TouchableOpacity>
               </View>
             </View>
+            <Button
+              title={"Save Changes"}
+              // onPress={handleButtonClick}
+              style={styles.proceedButton}
+              textColor="#fff"
+            />
           </View>
         </View>
       </ScrollView>
@@ -116,7 +123,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: SPACING * 2,
     paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
     paddingBottom: SPACING * 3,
   },
@@ -205,5 +211,8 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     marginBottom: 10,
     fontSize: RFValue(12),
+  },
+  proceedButton: {
+    marginTop: SPACING * 4,
   },
 });
