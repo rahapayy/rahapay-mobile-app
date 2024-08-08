@@ -34,6 +34,7 @@ import { RootStackParamList } from "../navigation/RootStackParams";
 import EducationServiceType from "../screens/Services/Education/EducationServiceType";
 import EducationDetailsScreen from "../screens/Services/Education/EducationDetailsScreen";
 import ReviewEducationSummaryScreen from "../screens/ServiceReviewScreens/ReviewEducationSummaryScreem";
+import EditTagScreen from "../screens/Profile/EditTagScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -205,6 +206,11 @@ const AppStack = () => {
       <Stack.Screen
         name="ReviewEducationSummaryScreen"
         component={ReviewEducationSummaryScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EditTagScreen"
+        component={EditTagScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

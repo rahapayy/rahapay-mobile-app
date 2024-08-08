@@ -19,6 +19,7 @@ import {
   Notification,
   People,
   Profile,
+  Tag,
   Verify,
 } from "iconsax-react-native";
 import COLORS from "../config/colors";
@@ -129,6 +130,15 @@ const ProfileScreen: React.FC<{
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
+                onPress={() => navigation.navigate("EditTagScreen")}
+                style={styles.settingsItem}
+              >
+                <Tag variant="Bold" color={COLORS.violet400} size={24} />
+                <Text style={styles.titleText} allowFontScaling={false}>
+                  Edit Tag
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => navigation.navigate("ReferralScreen")}
                 style={styles.settingsItem}
               >
@@ -227,7 +237,7 @@ const ProfileScreen: React.FC<{
 
             {/* Logout */}
             <TouchableOpacity
-              onPress={handleToggleLogout}
+              onPress={handleLogout}
               style={styles.logoutContainer}
             >
               <Text style={styles.logoutButton} allowFontScaling={false}>

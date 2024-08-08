@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../../config/SPACING";
@@ -18,10 +18,13 @@ import FONT_SIZE from "../../config/font-size";
 import COLORS from "../../config/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../components/Button";
+import { AuthContext } from "../../context/AuthContext";
 
 const PersonalInformationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const { userDetails } = useContext(AuthContext);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
@@ -45,7 +48,7 @@ const PersonalInformationScreen: React.FC<{
             className="w-16 h-16"
           />
           <Text style={styles.nameText} allowFontScaling={false}>
-            John Doe
+            {userDetails.fullName}
           </Text>
         </View>
 
@@ -109,6 +112,7 @@ const PersonalInformationScreen: React.FC<{
               title={"Save Changes"}
               // onPress={handleButtonClick}
               style={styles.proceedButton}
+              textColor="#fff"
             />
           </KeyboardAvoidingView>
         </View>
