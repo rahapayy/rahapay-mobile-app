@@ -15,35 +15,23 @@ import SPACING from "../../config/SPACING";
 import FONT_SIZE from "../../config/font-size";
 import COLORS from "../../config/colors";
 import { RFValue } from "react-native-responsive-fontsize";
-import { NotificationContext } from "../../hooks/NotificationContext";
+import { NotificationContext } from "../../context/NotificationContext";
 
 const EnableNotificationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const { notificationsEnabled, setNotificationsEnabled } =
+    useContext(NotificationContext);
+
+  const togglePushNotificationSwitch = () => {
+    setNotificationsEnabled((previousState: any) => !previousState);
+  };
+
   const [isPushNotificationEnabled, setIsPushNotificationEnabled] =
-    useState(true);
+    useState(false);
   const [isSmsNotificationEnabled, setIsSmsNotificationEnabled] =
     useState(false);
 
-  const { expoPushToken, notification, setExpoPushToken } =
-    useContext(NotificationContext);
-
-  // Toggle switches for push and sms notifications
-  const togglePushNotificationSwitch = async () => {
-    const newState = !isPushNotificationEnabled;
-    setIsPushNotificationEnabled(newState);
-
-    if (newState) {
-      // Logic to enable push notifications - register and get new token
-      // As registerForPushNotificationsAsync is defined in the NotificationContext we should ensure it's imported to use here
-      const newToken = await registerForPushNotificationsAsync();
-      setExpoPushToken(newToken);
-    } else {
-      // Logic to disable push notifications
-      // This might involve informing your backend server to not send notifications anymore or disabling them in some other way
-      setExpoPushToken(""); // Clear the push token
-    }
-  };
   const toggleSmsNotificationSwitch = () => {
     setIsSmsNotificationEnabled((previousState) => !previousState);
   };
@@ -82,7 +70,7 @@ const EnableNotificationScreen: React.FC<{
                   false: COLORS.black100,
                   true: COLORS.violet400,
                 }}
-                value={isPushNotificationEnabled}
+                value={notificationsEnabled}
                 onValueChange={togglePushNotificationSwitch}
               />
             </View>
@@ -153,6 +141,3 @@ const styles = StyleSheet.create({
     marginLeft: SPACING,
   },
 });
-function registerForPushNotificationsAsync() {
-  throw new Error("Function not implemented.");
-}

@@ -18,40 +18,49 @@ Notifications.setNotificationHandler({
 export const NotificationProvider = ({ children }) => {
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(null);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
-  const { mutateAsync: sendDeviceToken } = useApi.post("/notification/device-token");
+  const { mutateAsync: sendDeviceToken } = useApi.post(
+    "/notification/device-token"
+  );
 
   useEffect(() => {
-    registerForPushNotificationsAsync().then((token) => {
-      if (token) {
-        setExpoPushToken(token);
-        console.log("Expo Push Token:", token);
+    if (notificationsEnabled) {
+      registerForPushNotificationsAsync().then((token) => {
+        if (token) {
+          setExpoPushToken(token);
+          console.log("Expo Push Token:", token);
 
-        // Send the token to the backend
-        sendDeviceTokenToBackend(token);
-      }
-    });
-
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification);
-        // Custom handling of the notification in the foreground
-        console.log("Notification received in foreground:", notification);
+          // Send the token to the backend
+          sendDeviceTokenToBackend(token);
+        }
       });
 
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log("Notification response received:", response);
-      });
+      notificationListener.current =
+        Notifications.addNotificationReceivedListener((notification) => {
+          setNotification(notification);
+          // Custom handling of the notification in the foreground
+          console.log("Notification received in foreground:", notification);
+        });
+
+      responseListener.current =
+        Notifications.addNotificationResponseReceivedListener((response) => {
+          console.log("Notification response received:", response);
+        });
+    }
 
     return () => {
-      Notifications.removeNotificationSubscription(
-        notificationListener.current
-      );
-      Notifications.removeNotificationSubscription(responseListener.current);
+      if (notificationListener.current) {
+        Notifications.removeNotificationSubscription(
+          notificationListener.current
+        );
+      }
+      if (responseListener.current) {
+        Notifications.removeNotificationSubscription(responseListener.current);
+      }
     };
-  }, []);
+  }, [notificationsEnabled]);
 
   const sendDeviceTokenToBackend = async (token) => {
     try {
@@ -96,7 +105,14 @@ export const NotificationProvider = ({ children }) => {
   }
 
   return (
-    <NotificationContext.Provider value={{ expoPushToken, notification }}>
+    <NotificationContext.Provider
+      value={{
+        expoPushToken,
+        notification,
+        notificationsEnabled,
+        setNotificationsEnabled,
+      }}
+    >
       {children}
     </NotificationContext.Provider>
   );

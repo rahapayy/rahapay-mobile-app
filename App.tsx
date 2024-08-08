@@ -9,7 +9,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { QueryClient, QueryClientProvider } from "react-query";
 import FlashMessageComponent from "./components/FlashMessageComponent";
 import FlashMessage from "react-native-flash-message";
-import { NotificationProvider } from "./hooks/NotificationContext";
+import { NotificationProvider } from "./context/NotificationContext";
 
 const queryClient = new QueryClient();
 
