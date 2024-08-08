@@ -1,12 +1,12 @@
 import React, { createContext, useState, useEffect, useRef } from "react";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
-import { Platform } from "react-native";
+import { Platform, Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import useApi from "../utils/api";
 
 export const NotificationContext = createContext();
 
-// Set up the notification handler for foreground notifications
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -19,6 +19,7 @@ export const NotificationProvider = ({ children }) => {
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [hasAskedForPermission, setHasAskedForPermission] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
   const { mutateAsync: sendDeviceToken } = useApi.post(
@@ -26,13 +27,12 @@ export const NotificationProvider = ({ children }) => {
   );
 
   useEffect(() => {
+    checkIfPermissionRequested();
+
     if (notificationsEnabled) {
       registerForPushNotificationsAsync().then((token) => {
         if (token) {
           setExpoPushToken(token);
-          console.log("Expo Push Token:", token);
-
-          // Send the token to the backend
           sendDeviceTokenToBackend(token);
         }
       });
@@ -40,7 +40,6 @@ export const NotificationProvider = ({ children }) => {
       notificationListener.current =
         Notifications.addNotificationReceivedListener((notification) => {
           setNotification(notification);
-          // Custom handling of the notification in the foreground
           console.log("Notification received in foreground:", notification);
         });
 
@@ -61,6 +60,41 @@ export const NotificationProvider = ({ children }) => {
       }
     };
   }, [notificationsEnabled]);
+
+  const checkIfPermissionRequested = async () => {
+    const value = await AsyncStorage.getItem("hasAskedForPermission");
+    if (value === null) {
+      showPermissionAlert();
+    } else {
+      setHasAskedForPermission(true);
+    }
+  };
+
+  const showPermissionAlert = () => {
+    Alert.alert(
+      "Enable Notifications",
+      "Would you like to enable push notifications to stay updated?",
+      [
+        {
+          text: "No",
+          onPress: () => {
+            AsyncStorage.setItem("hasAskedForPermission", "true");
+            setHasAskedForPermission(true);
+          },
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: () => {
+            AsyncStorage.setItem("hasAskedForPermission", "true");
+            setHasAskedForPermission(true);
+            setNotificationsEnabled(true);
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
 
   const sendDeviceTokenToBackend = async (token) => {
     try {
@@ -111,6 +145,7 @@ export const NotificationProvider = ({ children }) => {
         notification,
         notificationsEnabled,
         setNotificationsEnabled,
+        hasAskedForPermission,
       }}
     >
       {children}
