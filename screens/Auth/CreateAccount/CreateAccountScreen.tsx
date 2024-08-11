@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
     borderColor: "#DFDFDF",
     padding: SPACING * 1.5,
     fontSize: RFValue(10),
-    fontFamily: "Outfit-Medium",
+    fontFamily: "Outfit-Regular",
   },
   label: {
     fontFamily: "Outfit-Medium",

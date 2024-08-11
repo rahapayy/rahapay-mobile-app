@@ -45,7 +45,7 @@ const WelcomeScreen: React.FC<{
           onPress={() => navigation.navigate("LoginScreen")}
           style={{
             backgroundColor: COLORS.violet400,
-            marginTop: SPACING * 2,
+            marginBottom: 10,
           }}
           textColor="#fff"
         />
@@ -56,7 +56,6 @@ const WelcomeScreen: React.FC<{
             borderWidth: 1,
             borderColor: COLORS.violet400,
             backgroundColor: "transparent",
-            marginTop: SPACING * 2,
           }}
           textColor="#000"
         />

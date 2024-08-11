@@ -96,8 +96,10 @@ const LoginScreen: React.FC<{
     navigation.navigate("CreateAccountScreen");
   };
 
+  const isFormComplete = id.trim && password.trim;
+
   return (
-    <SafeAreaView>
+    <SafeAreaView className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="p-4">
           <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -185,20 +187,24 @@ const LoginScreen: React.FC<{
             <Button
               title={"Log in"}
               onPress={handleLogin}
-              style={styles.proceedButton}
-              textColor="#fff"
               isLoading={isLoading} // Show loading indicator when logging in
-              disabled={!id || !password || isLoading} // Disable button if id or password is empty or logging in
-            />
-            <Button
-              title={"Create another account"}
-              onPress={handleCreateAccount}
-              style={{
-                backgroundColor: COLORS.violet200,
-                marginTop: SPACING * 2,
-              }}
+              style={[
+                styles.proceedButton,
+                !isFormComplete && styles.proceedButtonDisabled,
+              ]}
               textColor="#fff"
+              disabled={!isFormComplete || isLoading}
             />
+            <View className="flex-row justify-center items-center mt-6">
+              <Text style={styles.dont} allowFontScaling={false}>
+                Don't have an account?{" "}
+              </Text>
+              <TouchableOpacity onPress={handleCreateAccount}>
+                <Text style={styles.signup} allowFontScaling={false}>
+                  Sign up Here
+                </Text>
+              </TouchableOpacity>
+            </View>
           </KeyboardAvoidingView>
         </View>
       </ScrollView>
@@ -222,19 +228,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     borderColor: "#DFDFDF",
-    padding: 18,
+    padding: SPACING * 1.5,
+    fontSize: RFValue(10),
+    fontFamily: "Outfit-Regular",
   },
   label: {
-    fontFamily: "Outfit-Regular",
+    fontFamily: "Outfit-Medium",
     marginBottom: 10,
-    fontSize: RFValue(12),
+    fontSize: RFValue(10),
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    fontSize: RFValue(14),
+    fontSize: RFValue(12),
     borderRadius: 10,
-    padding: 18,
+    padding: SPACING * 1.3,
     width: "100%",
     borderWidth: 1,
     borderColor: "#DFDFDF",
@@ -242,7 +250,8 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: "100%",
-    fontSize: RFValue(12),
+    fontSize: RFValue(10),
+    fontFamily: "Outfit-Regular",
   },
   focusedInput: {
     borderColor: COLORS.violet600, // Change border color when focused
@@ -251,7 +260,7 @@ const styles = StyleSheet.create({
     marginTop: SPACING * 4,
   },
   forgotPasswordText: {
-    fontFamily: "Outfit-Regular",
+    fontFamily: "Outfit-Medium",
     color: COLORS.violet600,
     fontSize: RFValue(12),
   },
@@ -260,5 +269,17 @@ const styles = StyleSheet.create({
     fontSize: RFValue(10),
     marginTop: 5,
     fontFamily: "Outfit-Regular",
+  },
+  proceedButtonDisabled: {
+    backgroundColor: COLORS.violet200,
+  },
+  dont: {
+    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(12),
+  },
+  signup: {
+    fontFamily: "Outfit-Medium",
+    fontSize: RFValue(12),
+    color: COLORS.violet600,
   },
 });
