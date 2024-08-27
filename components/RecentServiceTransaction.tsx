@@ -15,12 +15,12 @@ import useWallet from "../hooks/use-wallet";
 const RecentServiceTransaction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { serviceTransactions, isLoading } = useWallet();
+  const { transactions, isLoading } = useWallet();
   const [hasTransaction, setHasTransaction] = useState(false);
 
   useEffect(() => {
-    setHasTransaction(serviceTransactions.length > 0);
-  }, [serviceTransactions]);
+    setHasTransaction(transactions.length > 0);
+  }, [transactions]);
 
   return (
     <View style={styles.container}>
@@ -47,7 +47,7 @@ const RecentServiceTransaction: React.FC<{
             <Text style={styles.loadingText}>Loading transactions...</Text>
           </View>
         ) : hasTransaction ? (
-          serviceTransactions.map(
+          transactions.map(
             (transaction: {
               id: React.Key | null | undefined;
               tranxType: string;

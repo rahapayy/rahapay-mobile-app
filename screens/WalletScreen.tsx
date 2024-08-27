@@ -12,7 +12,7 @@ import { DocumentText, WalletAdd1 } from "iconsax-react-native";
 import COLORS from "../config/colors";
 import WalletCard from "../components/WalletCard";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import RecentWalletTransaction from "../components/ResentWalletTransactions";
+import RecentWalletTransaction from "../components/RecentWalletTransactions";
 
 const WalletScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;

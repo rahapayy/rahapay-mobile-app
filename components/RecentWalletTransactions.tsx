@@ -18,13 +18,13 @@ import SPACING from "../config/SPACING";
 const RecentWalletTransaction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { walletTransactions, isLoading } = useWallet();
+  const { transactions, isLoading } = useWallet();
   const [hasTransaction, setHasTransaction] = useState(false);
   const today = new Date().toLocaleDateString();
 
   useEffect(() => {
-    setHasTransaction(walletTransactions.length > 0);
-  }, [walletTransactions]);
+    setHasTransaction(transactions.length > 0);
+  }, [transactions]);
 
   return (
     <View style={styles.container}>
@@ -57,7 +57,7 @@ const RecentWalletTransaction: React.FC<{
           <Text style={styles.loadingText}>Loading transactions...</Text>
         </View>
       ) : hasTransaction ? (
-        walletTransactions.map(
+        transactions.map(
           (transaction: {
             id: React.Key | null | undefined;
             tranxType: string;

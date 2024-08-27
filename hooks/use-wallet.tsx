@@ -23,7 +23,7 @@ const useWallet = () => {
   // The reserved accounts information will now come from dashboardData
   const account = dashboardData?.wallet || {};
 
-  // Mapping transactions to required fields and categorizing
+  // Mapping transactions to required fields without categorization
   const formattedTransactions = transactions.map(
     (trx: {
       amountPaid: any;
@@ -47,21 +47,11 @@ const useWallet = () => {
     })
   );
 
-  // Categorize transactions
-  const walletTransactions = formattedTransactions.filter(
-    (trx: { tranxType: string }) =>
-      trx.tranxType !== "funding" && trx.tranxType !== "debit"
-  );
-  const serviceTransactions = formattedTransactions.filter(
-    (trx: { tranxType: string }) =>
-      trx.tranxType === "funding" || trx.tranxType === "debit"
-  );
-
+  // Return the plain transactions without categorization
   return {
     balance,
     account,
-    walletTransactions,
-    serviceTransactions,
+    transactions: formattedTransactions, // Return plain transactions
     isLoading,
   };
 };

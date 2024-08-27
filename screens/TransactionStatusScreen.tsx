@@ -63,9 +63,10 @@ const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
   };
 
   const { headText, subText, animation, icon } = getStatusProps();
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ flex: 1, justifyContent: "space-between" }}>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
         <View style={styles.circleContain}>
           <Animatable.View
             animation={animation}
@@ -75,7 +76,7 @@ const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
             {icon}
           </Animatable.View>
         </View>
-        <View style={{ alignItems: "center", marginTop: 8 }}>
+        <View style={styles.textContainer}>
           <Text style={styles.headText} allowFontScaling={false}>
             {headText}
           </Text>
@@ -101,9 +102,18 @@ const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
   );
 };
 
-export default TransactionStatusScreen;
-
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: SPACING,
+  },
   circleContain: {
     backgroundColor: COLORS.violet200,
     width: 250,
@@ -111,6 +121,11 @@ const styles = StyleSheet.create({
     borderRadius: SPACING * 15,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: SPACING * 2,
+  },
+  textContainer: {
+    alignItems: "center",
+    marginBottom: SPACING * 2,
   },
   headText: {
     fontFamily: "Outfit-Medium",
@@ -122,11 +137,15 @@ const styles = StyleSheet.create({
     fontSize: RFValue(14),
   },
   buttonContainer: {
+    justifyContent: "center",
     paddingHorizontal: SPACING,
     paddingBottom: SPACING * 2,
+    width: "100%",
   },
   inactiveButton: {
     backgroundColor: COLORS.violet200,
     marginTop: SPACING,
   },
 });
+
+export default TransactionStatusScreen;
