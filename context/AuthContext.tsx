@@ -122,9 +122,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUserInfo(userInfo);
       AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
       AsyncStorage.setItem("access_token", userInfo.data.accessToken);
-
       setIsAuthenticated(true);
+
+      await fetchUserDetails(userInfo.data.accessToken);
+
       setIsLoading(false);
+      return userInfo;
     } catch (error) {
       setIsLoading(false);
     }

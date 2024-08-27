@@ -26,7 +26,7 @@ const NextButton: FC<NextButtonProps> = ({
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
   // Adjust these styles according to screen width and height
-  const buttonWidth = screenWidth * 0.89;
+  const buttonWidth = screenWidth * 0.92;
   const buttonHeight = screenHeight * 0.06;
   const buttonBottomMargin = screenHeight * 0.1;
 

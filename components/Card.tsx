@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   ImageBackground,
   SafeAreaView,
@@ -23,15 +23,18 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthContext } from "../context/AuthContext";
 import useWallet from "../hooks/use-wallet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import NetInfo from "@react-native-community/netinfo";
+import SPACING from "../config/SPACING";
 
-const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
+const { height: screenHeight } = Dimensions.get("window");
 
 const Card: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [showBalance, setShowBalance] = useState(true);
+  const [isConnected, setIsConnected] = useState<boolean | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const getBalanceVisibility = async () => {
       const balanceVisibility = await AsyncStorage.getItem("showBalance");
       if (balanceVisibility !== null) {
@@ -39,26 +42,28 @@ const Card: React.FC<{
       }
     };
     getBalanceVisibility();
+
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const toggleBalanceVisibility = async () => {
-    // Toggle the state
     setShowBalance((prev) => {
       const newVisibility = !prev;
-      // Store the new state in AsyncStorage
       AsyncStorage.setItem("showBalance", String(newVisibility));
       return newVisibility;
     });
   };
 
-  const { userDetails, userInfo } = useContext(AuthContext);
+  const { userDetails } = useContext(AuthContext);
 
-  const fullName = userDetails?.fullName || "User";
+  const fullName = userDetails?.fullName || "";
   const firstName = fullName.split(" ")[0];
 
-  // console.log("userDetails in Card:", userDetails);
   const { balance } = useWallet();
-  // console.log(balance);
 
   return (
     <ImageBackground
@@ -116,15 +121,26 @@ const Card: React.FC<{
           </View>
 
           <View style={styles.balanceValueContainer}>
-            {showBalance ? (
-              <Text style={styles.balanceValue} allowFontScaling={false}>
-                ₦{" "}
-                {balance.toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                })}
-              </Text>
+            {isConnected ? (
+              showBalance ? (
+                <Text style={styles.balanceValue} allowFontScaling={false}>
+                  ₦{" "}
+                  {balance.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                  })}
+                </Text>
+              ) : (
+                <Text style={styles.balanceValue}>********</Text>
+              )
             ) : (
-              <Text style={styles.balanceValue}>********</Text>
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText} allowFontScaling={false}>
+                  Service Unavailable
+                </Text>
+                <Text style={styles.errorSubText} allowFontScaling={false}>
+                  Please check your internet connection and try again.
+                </Text>
+              </View>
             )}
           </View>
 
@@ -222,5 +238,20 @@ const styles = StyleSheet.create({
     color: COLORS.violet400,
     marginLeft: 4,
     fontSize: RFValue(14),
+  },
+  errorContainer: {
+    marginTop: SPACING,
+    marginBottom: SPACING,
+  },
+  errorText: {
+    fontFamily: "Outfit-SemiBold",
+    color: "#fff",
+    fontSize: RFValue(14),
+  },
+  errorSubText: {
+    fontFamily: "Outfit-Regular",
+    color: "#fff",
+    fontSize: RFValue(10),
+    marginTop: 5,
   },
 });

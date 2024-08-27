@@ -18,7 +18,7 @@ import CreateTransactionPinScreen from "../screens/Auth/CreateAccount/CreatePinS
 const Stack = createNativeStackNavigator();
 
 const AuthRoute = () => {
-  const [showOnboarding, setShowOnboarding] = useState<any>(null);
+  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
   useEffect(() => {
     checkIfAlreadyOnboarded();
   }, []);
@@ -50,15 +50,15 @@ const AuthRoute = () => {
 
   return (
     <Stack.Navigator>
-      {showOnboarding && (
-        <>
-          <Stack.Screen
-            name="Onboarding"
-            component={Onboarding}
-            options={{ headerShown: false }}
-          />
-        </>
-      )}
+      {/* {showOnboarding && (
+        <> */}
+      <Stack.Screen
+        name="Onboarding"
+        component={Onboarding}
+        options={{ headerShown: false }}
+      />
+      {/* </>
+      )} */}
       <Stack.Screen
         name="WelcomeScreen"
         component={WelcomeScreen}

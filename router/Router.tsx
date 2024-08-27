@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useContext } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AppStack from "./AppStack";
@@ -6,7 +6,7 @@ import AuthRoute from "./AuthRouter";
 import { ActivityIndicator, View } from "react-native";
 import COLORS from "../config/colors";
 import { AuthContext } from "../context/AuthContext";
-import LoadingLogo from "../assets/svg/loadingLogo.svg";
+import SplashScreen from "../components/SplashScreen"; 
 
 const Stack = createNativeStackNavigator();
 
@@ -26,18 +26,6 @@ const Router = () => {
       >
         <ActivityIndicator size="large" color={COLORS.violet600} />
       </View>
-      //    <Animatable.View
-      //    animation="pulse"
-      //    iterationCount="infinite"
-      //    style={{
-      //      backgroundColor: "#fff",
-      //      flex: 1,
-      //      justifyContent: "center",
-      //      alignItems: "center",
-      //    }}
-      //  >
-      //    <LoadingLogo />
-      //  </Animatable.View>
     );
   }
 
