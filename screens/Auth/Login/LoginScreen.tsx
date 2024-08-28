@@ -44,7 +44,7 @@ const LoginScreen: React.FC<{
   };
 
   const isValidPhoneNumber = (phoneNumber: string) => {
-    const phoneNumberRegex = /^[0-9]{10}$/; // Adjust this regex based on your phone number format requirements
+    const phoneNumberRegex = /^[0-9]{10}$/;
     return phoneNumberRegex.test(phoneNumber);
   };
 
@@ -126,7 +126,7 @@ const LoginScreen: React.FC<{
               <TextInput
                 style={[
                   styles.textInput,
-                  isIdFocused && styles.focusedInput, // Apply focus style if focused
+                  isIdFocused && styles.focusedInput, 
                 ]}
                 placeholder="Email or Phone Number"
                 placeholderTextColor={"#DFDFDF"}
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
   },
   focusedInput: {
-    borderColor: COLORS.violet600, // Change border color when focused
+    borderColor: COLORS.violet600,
   },
   proceedButton: {
     marginTop: SPACING * 4,

@@ -11,7 +11,8 @@
       "backgroundColor": "#5136C1"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/6c9dcd70-fdd4-4f28-a0d5-e1d1a6680543"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -19,7 +20,8 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.app.rahapay",
-      "scheme": "rahapay"
+      "scheme": "rahapay",
+      "runtimeVersion": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
@@ -27,7 +29,10 @@
         "backgroundColor": "#5136C1"
       },
       "package": "com.app.rahapay",
-      "scheme": "rahapay"
+      "scheme": "rahapay",
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

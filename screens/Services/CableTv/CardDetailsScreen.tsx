@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   textInput: {
-    backgroundColor: "#ECEEFA",
+    backgroundColor: "#EBEBEB",
     borderRadius: 10,
     borderColor: "#DFDFDF",
     padding: SPACING * 1.5,

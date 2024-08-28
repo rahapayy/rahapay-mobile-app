@@ -43,19 +43,22 @@ const SwipeButton: React.FC<SwipeButtonProps> = ({ onConfirm }) => {
       translationX = translationX < 0 ? 0 : translationX;
       const confirmed = translationX > maxTranslateX * 0.7;
 
-      Animated.spring(translateX, {
-        toValue: confirmed ? maxTranslateX : 0,
-        bounciness: 10,
-        useNativeDriver: true,
-      }).start(() => {
-        if (confirmed && !isConfirmed) {
-          setIsConfirmed(true);
-          onConfirm(() => {
-            setIsConfirmed(false);
-            translateX.setValue(0);
-          });
-        }
-      });
+      if (confirmed && !isConfirmed) {
+        // Set translateX to max immediately
+        translateX.setValue(maxTranslateX);
+        setIsConfirmed(true);
+        onConfirm(() => {
+          setIsConfirmed(false);
+          translateX.setValue(0);
+        });
+      } else {
+        // Animate back to the start if not confirmed
+        Animated.spring(translateX, {
+          toValue: 0,
+          bounciness: 10,
+          useNativeDriver: true,
+        }).start();
+      }
     }
   };
 
@@ -140,7 +143,7 @@ const styles = StyleSheet.create({
     height: 50,
     position: "absolute",
     left: 10,
-    borderRadius: 10,
+    borderRadius: 13,
     justifyContent: "center",
     alignItems: "center",
     zIndex: 1,
@@ -155,7 +158,7 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   slideText: {
-    fontSize: RFValue(14),
+    fontSize: RFValue(13),
     fontWeight: "500",
     color: "#333",
     fontFamily: "Outfit-Regular",
