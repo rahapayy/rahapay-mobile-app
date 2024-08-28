@@ -11,28 +11,21 @@
       "backgroundColor": "#5136C1"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/6c9dcd70-fdd4-4f28-a0d5-e1d1a6680543"
+      "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.app.rahapay",
-      "scheme": "rahapay",
-      "runtimeVersion": "1.0.0"
+      "bundleIdentifier": "com.app.rahapay"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#5136C1"
       },
-      "package": "com.app.rahapay",
-      "scheme": "rahapay",
-      "runtimeVersion": {
-        "policy": "appVersion"
-      }
+      "package": "com.app.rahapay"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -44,10 +37,7 @@
         "expo-notifications",
         {
           "icon": "./assets/images/small-logo.png",
-          "color": "#5136C1",
-          "sounds": [
-            "./assets/notification-sound.wav"
-          ]
+          "color": "#5136C1"
         }
       ]
     ],
