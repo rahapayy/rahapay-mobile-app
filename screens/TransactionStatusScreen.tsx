@@ -1,4 +1,10 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React from "react";
 import COLORS from "../config/colors";
 import SPACING from "../config/SPACING";
@@ -67,23 +73,31 @@ const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <View style={styles.circleContain}>
-          <Animatable.View
-            animation={animation}
-            duration={2000}
-            iterationCount="infinite"
-          >
-            {icon}
-          </Animatable.View>
+        <View className=" justify-center items-center">
+          <View style={styles.circleContain}>
+            <Animatable.View
+              animation={animation}
+              duration={2000}
+              iterationCount="infinite"
+            >
+              {icon}
+            </Animatable.View>
+          </View>
+          <View style={styles.textContainer}>
+            <Text style={styles.headText} allowFontScaling={false}>
+              {headText}
+            </Text>
+            <Text style={styles.subText} allowFontScaling={false}>
+              {subText}
+            </Text>
+          </View>
+          <TouchableOpacity className="mt-2">
+            <Text style={styles.viewReciptText} allowFontScaling={false}>
+              View Receipt
+            </Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.textContainer}>
-          <Text style={styles.headText} allowFontScaling={false}>
-            {headText}
-          </Text>
-          <Text style={styles.subText} allowFontScaling={false}>
-            {subText}
-          </Text>
-        </View>
+
         <View style={styles.buttonContainer}>
           <Button
             title={"Done"}
@@ -110,7 +124,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
     padding: SPACING,
   },
@@ -121,11 +135,11 @@ const styles = StyleSheet.create({
     borderRadius: SPACING * 15,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: SPACING * 2,
+    marginTop: SPACING * 5,
   },
   textContainer: {
     alignItems: "center",
-    marginBottom: SPACING * 2,
+    marginTop: SPACING * 2,
   },
   headText: {
     fontFamily: "Outfit-Medium",
@@ -137,14 +151,16 @@ const styles = StyleSheet.create({
     fontSize: RFValue(14),
   },
   buttonContainer: {
-    justifyContent: "center",
-    paddingHorizontal: SPACING,
-    paddingBottom: SPACING * 2,
     width: "100%",
+    justifyContent: "flex-end", // Align buttons to the bottom
   },
   inactiveButton: {
     backgroundColor: COLORS.violet200,
     marginTop: SPACING,
+  },
+  viewReciptText: {
+    fontFamily: "Outfit-Medium",
+    color: COLORS.violet300,
   },
 });
 
