@@ -1,7 +1,17 @@
 import React, { useState } from "react";
 import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -89,11 +99,14 @@ const CreateNewPasswordScreen: React.FC<{
                 <TextInput
                   style={styles.input}
                   placeholder="Enter new password"
-                  placeholderTextColor={"#DFDFDF"}
+                  placeholderTextColor={"#BABFC3"}
                   secureTextEntry={showPassword}
                   allowFontScaling={false}
                   value={password}
                   onChangeText={setPassword}
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  autoCorrect={false}
                 />
                 <TouchableOpacity onPress={togglePasswordVisibility}>
                   {showPassword ? (
@@ -112,11 +125,14 @@ const CreateNewPasswordScreen: React.FC<{
                   <TextInput
                     style={styles.input}
                     placeholder="Confirm new password"
-                    placeholderTextColor={"#DFDFDF"}
+                    placeholderTextColor={"#BABFC3"}
                     secureTextEntry={showPassword2}
                     allowFontScaling={false}
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    autoCorrect={false}
                   />
                   <TouchableOpacity onPress={togglePasswordVisibility2}>
                     {showPassword2 ? (
@@ -131,7 +147,7 @@ const CreateNewPasswordScreen: React.FC<{
             <Button
               title={"Reset Password"}
               onPress={handleButtonClick}
-              className="mt-4"
+              className="mt-6"
               textColor="#fff"
               isLoading={isSubmitting}
               disabled={isSubmitting || !password || !confirmPassword}
@@ -174,16 +190,16 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    fontSize: RFValue(14),
+    fontSize: RFValue(12),
     borderRadius: 10,
-    padding: 18,
+    paddingHorizontal: SPACING,
+    paddingVertical: Platform.OS === "ios" ? 14 : 10,
     width: "100%",
     borderWidth: 1,
     borderColor: "#DFDFDF",
   },
   input: {
     flex: 1,
-    height: "100%",
     fontSize: RFValue(12),
   },
   numberText: {

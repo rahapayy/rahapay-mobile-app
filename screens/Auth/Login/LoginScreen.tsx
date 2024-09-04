@@ -124,18 +124,17 @@ const LoginScreen: React.FC<{
                 Email or Phone Number
               </Text>
               <TextInput
-                style={[
-                  styles.textInput,
-                  isIdFocused && styles.focusedInput, 
-                ]}
+                style={[styles.textInput, isIdFocused && styles.focusedInput]}
                 placeholder="Email or Phone Number"
-                placeholderTextColor={"#DFDFDF"}
+                placeholderTextColor={"#BABFC3"}
                 allowFontScaling={false}
                 value={id}
                 onChangeText={setId}
                 autoCapitalize="none"
                 onFocus={() => setIsIdFocused(true)}
                 onBlur={() => setIsIdFocused(false)}
+                autoComplete="off"
+                autoCorrect={false}
               />
               {errorMessage && (
                 <Text style={styles.errorText} allowFontScaling={false}>
@@ -164,6 +163,9 @@ const LoginScreen: React.FC<{
                   onChangeText={setPassword}
                   onFocus={() => setIsPasswordFocused(true)}
                   onBlur={() => setIsPasswordFocused(false)}
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  autoCorrect={false}
                 />
                 <TouchableOpacity onPress={togglePasswordVisibility}>
                   {showPassword ? (
@@ -224,33 +226,34 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-ExtraLight",
     fontSize: RFValue(13),
   },
-  textInput: {
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: "#DFDFDF",
-    padding: SPACING * 1.5,
-    fontSize: RFValue(10),
-    fontFamily: "Outfit-Regular",
-  },
   label: {
     fontFamily: "Outfit-Medium",
     marginBottom: 10,
     fontSize: RFValue(10),
+  },
+  textInput: {
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: "#DFDFDF",
+    paddingHorizontal: SPACING,
+    paddingVertical: Platform.OS === "ios" ? 14 : 10,
+    fontSize: RFValue(10),
+    fontFamily: "Outfit-Regular",
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     fontSize: RFValue(12),
     borderRadius: 10,
-    padding: SPACING * 1.3,
+    paddingHorizontal: SPACING,
+    paddingVertical: Platform.OS === "ios" ? 14 : 10,
     width: "100%",
     borderWidth: 1,
     borderColor: "#DFDFDF",
   },
   input: {
     flex: 1,
-    height: "100%",
-    fontSize: RFValue(10),
+    fontSize: RFValue(12),
     fontFamily: "Outfit-Regular",
   },
   focusedInput: {

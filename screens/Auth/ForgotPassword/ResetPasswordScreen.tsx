@@ -87,10 +87,13 @@ const ResetPasswordScreen: React.FC<{
               <TextInput
                 style={styles.textInput}
                 placeholder="Enter your email address"
-                placeholderTextColor={"#DFDFDF"}
+                placeholderTextColor={"#BABFC3"}
                 allowFontScaling={false}
                 value={email}
                 onChangeText={setEmail}
+                autoComplete="off"
+                autoCapitalize="none"
+                autoCorrect={false}
               />
             </View>
 
@@ -124,12 +127,6 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-ExtraLight",
     fontSize: RFValue(13),
   },
-  textInput: {
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: "#DFDFDF",
-    padding: SPACING * 1.5,
-  },
   label: {
     fontFamily: "Outfit-Regular",
     marginBottom: 10,
@@ -141,26 +138,35 @@ const styles = StyleSheet.create({
     height: "100%",
     marginHorizontal: SPACING,
   },
+  textInput: {
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: "#DFDFDF",
+    paddingHorizontal: SPACING,
+    paddingVertical: Platform.OS === "ios" ? 14 : 10,
+    fontSize: RFValue(10),
+    fontFamily: "Outfit-Regular",
+  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    fontSize: RFValue(14),
+    fontSize: RFValue(12),
     borderRadius: 10,
-    padding: SPACING * 1.5,
+    paddingHorizontal: SPACING,
+    paddingVertical: Platform.OS === "ios" ? 14 : 10,
     width: "100%",
     borderWidth: 1,
     borderColor: "#DFDFDF",
   },
   input: {
     flex: 1,
-    height: "100%",
     fontSize: RFValue(14),
   },
   numberText: {
     fontFamily: "Outfit-Regular",
   },
   proceedButton: {
-    marginTop: SPACING * 4,
+    marginTop: SPACING * 2,
   },
   proceedButtonText: {
     fontFamily: "Outfit-Regular",

@@ -130,7 +130,8 @@ const EnterCodeScreen: React.FC<{
                     boxIsFocused[index] && styles.inputBoxFocused,
                   ]}
                   keyboardType="numeric"
-                  value={value ? "*" : ""}
+                  value={value}
+                  secureTextEntry
                   allowFontScaling={false}
                   onChangeText={(text) => handleInput(text, index)}
                   onFocus={() =>

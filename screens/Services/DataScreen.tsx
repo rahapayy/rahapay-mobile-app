@@ -142,6 +142,9 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                         setPhoneNumber(text);
                         detectOperator(text);
                       }}
+                      autoComplete="off"
+                      autoCapitalize="none"
+                      autoCorrect={false}
                     />
                     <TouchableOpacity>
                       <ProfileCircle color={COLORS.violet400} />
@@ -374,15 +377,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     fontSize: RFValue(12),
     borderRadius: 10,
-    padding: 14,
+    paddingHorizontal: SPACING,
+    paddingVertical: Platform.OS === "ios" ? 10 : 8,
     width: "100%",
     borderWidth: 1,
     borderColor: "#DFDFDF",
   },
   input: {
     flex: 1,
-    // height: "100%",
     fontSize: RFValue(12),
+    height: Platform.OS === "ios" ? 30 : 33,
     fontFamily: "Outfit-Regular",
   },
   topupText: {

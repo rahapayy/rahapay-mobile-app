@@ -24,7 +24,6 @@ import Button from "../../components/Button";
 import ComingSoon from "../../assets/svg/Coming Soon.svg";
 import useApi from "../../utils/api";
 
-
 const AirtimeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
@@ -32,7 +31,7 @@ const AirtimeScreen: React.FC<{
   const [amount, setAmount] = useState("");
   const [selectedOperator, setSelectedOperator] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const { mutateAsync} = useApi.post("/beneficiary/me?service=airtime");
+  const { mutateAsync } = useApi.post("/beneficiary/me?service=airtime");
 
   const amounts = [50, 100, 200, 500, 1000, 2000, 3000, 5000];
 
@@ -180,6 +179,9 @@ const AirtimeScreen: React.FC<{
                           setPhoneNumber(text);
                           detectOperator(text);
                         }}
+                        autoComplete="off"
+                        autoCapitalize="none"
+                        autoCorrect={false}
                       />
                       <TouchableOpacity>
                         <ProfileCircle color={COLORS.violet400} />
@@ -295,7 +297,9 @@ const AirtimeScreen: React.FC<{
                         Amount
                       </Text>
                       <View style={styles.inputContainer}>
-                        <Text>₦ </Text>
+                        <Text style={styles.naira} allowFontScaling={false}>
+                          ₦{" "}
+                        </Text>
                         <TextInput
                           style={styles.input}
                           placeholder="Amount"
@@ -304,6 +308,9 @@ const AirtimeScreen: React.FC<{
                           value={amount}
                           keyboardType="numeric"
                           onChangeText={(text) => setAmount(text)}
+                          autoComplete="off"
+                          autoCapitalize="none"
+                          autoCorrect={false}
                         />
                       </View>
                     </View>
@@ -475,15 +482,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     fontSize: RFValue(12),
     borderRadius: 10,
-    padding: 18,
+    paddingHorizontal: SPACING,
+    paddingVertical: Platform.OS === "ios" ? 10 : 8,
     width: "100%",
     borderWidth: 1,
     borderColor: "#DFDFDF",
   },
   input: {
     flex: 1,
-    height: "100%",
     fontSize: RFValue(12),
+    height: Platform.OS === "ios" ? 30 : 33,
     fontFamily: "Outfit-Regular",
   },
   topupText: {
@@ -503,5 +511,9 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     fontSize: FONT_SIZE.medium,
     textAlign: "center",
+  },
+  naira: {
+    fontFamily: "Outfit-Medium",
+    fontSize: FONT_SIZE.small,
   },
 });
