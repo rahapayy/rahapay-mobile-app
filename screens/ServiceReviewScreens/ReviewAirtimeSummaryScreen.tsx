@@ -52,7 +52,9 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
         phoneNumber,
       });
 
-      if (response.data.success) {
+      console.log("Full API response:", response.data);
+
+      if (response.data.status === "success") {
         navigation.navigate("TransactionStatusScreen", {
           status: "successful",
         });
@@ -63,25 +65,14 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
       console.error("Error occurred:", err);
 
       if (err instanceof Error) {
-        if (err.message.includes("Network")) {
-          handleShowFlash({
-            message:
-              "Network error. Please check your connection and try again.",
-            type: "danger",
-          });
-        } else if (err.message.includes("Timeout")) {
-          handleShowFlash({
-            message: "Request timed out. Please try again later.",
-            type: "danger",
-          });
-        } else {
-          handleShowFlash({
-            message: "An unexpected error occurred. Please try again.",
-            type: "danger",
-          });
-        }
-      } else if (err instanceof Object && "response" in err) {
+        // Handle known error types
+        handleShowFlash({
+          message: "An unexpected error occurred. Please try again.",
+          type: "danger",
+        });
+      } else if (typeof err === "object" && err !== null && "response" in err) {
         const response = (err as any).response;
+        console.error("API Response Error:", response); // Log the response
         if (response?.status === 503) {
           handleShowFlash({
             message:

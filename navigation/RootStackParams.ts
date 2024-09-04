@@ -11,6 +11,10 @@ export type RootStackParamList = {
   TransactionHistoryScreen: undefined;
   TransactionSummaryScreen: {
     transaction: {
+      network: string;
+      phone_number: string;
+      transid: ReactNode;
+      metadata: any;
       purpose: string;
       amount: number;
       created_at: number;

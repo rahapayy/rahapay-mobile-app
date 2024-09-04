@@ -15,10 +15,8 @@ import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/Button";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import FONT_SIZE from "../../../config/font-size";
 
 const CreateTagScreen: React.FC<{

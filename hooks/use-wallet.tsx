@@ -8,10 +8,16 @@ const useWallet = () => {
   // Fetch data from both endpoints
   const { data: dashboardData, isValidating: isDashboardLoading } =
     useSWR(`user/dashboard/me/`);
+
   const {
     data: reservedAccountsData,
     isValidating: isReservedAccountsLoading,
   } = useSWR(`user/reserved-accounts`);
+
+  const { data: allTransactionsData, isValidating: isAllTransactionsLoading } =
+    useSWR(`transaction/all`);
+
+  // console.log(allTransactionsData); 
 
   const isLoading = isDashboardLoading || isReservedAccountsLoading;
 
@@ -22,6 +28,13 @@ const useWallet = () => {
 
   // The reserved accounts information will now come from dashboardData
   const account = dashboardData?.wallet || {};
+
+  const getAllTransactions = () => {
+    return {
+      transactions: allTransactionsData || [], // Return all transactions
+      isLoading: isAllTransactionsLoading,
+    };
+  };
 
   // Mapping transactions to required fields without categorization
   const formattedTransactions = transactions.map(
@@ -51,8 +64,9 @@ const useWallet = () => {
   return {
     balance,
     account,
-    transactions: formattedTransactions, // Return plain transactions
+    transactions: formattedTransactions,
     isLoading,
+    getAllTransactions,
   };
 };
 

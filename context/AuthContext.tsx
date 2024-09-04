@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axios } from "../utils/api";
 import { Alert, AppState, AppStateStatus, Linking } from "react-native";
@@ -6,9 +6,6 @@ import * as BackgroundFetch from "expo-background-fetch";
 import * as TaskManager from "expo-task-manager";
 import SWR from "./Swr";
 import * as Constants from "expo-constants";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "react-native-screens/lib/typescript/native-stack/types";
-import ExistingUserScreen from "../screens/Auth/Login/ExistingUserScreen";
 
 // Define UserInfoType
 interface UserInfoType {
@@ -46,6 +43,12 @@ export const AuthContext = createContext<{
   isAuthenticated: boolean;
   userDetails: any;
   fetchUserDetails: (token: any) => Promise<void>;
+  showPinScreen: boolean;
+  setShowPinScreen: (show: boolean) => void;
+  refreshAccessToken: (pinOrPassword?: {
+    pin?: string;
+    password?: string;
+  }) => Promise<void>;
 }>({
   isLoading: false,
   userInfo: null,
@@ -59,6 +62,9 @@ export const AuthContext = createContext<{
   isAppReady: false,
   userDetails: null,
   fetchUserDetails: async () => {},
+  showPinScreen: false,
+  setShowPinScreen: () => {},
+  refreshAccessToken: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -331,16 +337,68 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     })();
   }, []);
 
-  if (showPinScreen) {
-    return (
-      <ExistingUserScreen
-        onCorrectPin={() => {
-          setShowPinScreen(false);
-          // Optionally refresh the user session here
-        }}
-      />
-    );
-  }
+  const refreshAccessToken = useCallback(
+    async (pinOrPassword?: { pin?: string | number; password?: string }) => {
+      try {
+        setIsLoading(true);
+
+        // Convert pin to string if it's a number
+        const payload = pinOrPassword
+          ? {
+              ...pinOrPassword,
+              pin: pinOrPassword.pin ? pinOrPassword.pin.toString() : undefined,
+            }
+          : undefined;
+
+        // Log the request payload for debugging
+        console.log("Re-authentication request payload:", payload);
+
+        const response = await axios.post("/auth/re-authenticate", payload);
+
+        // Log the successful response for debugging
+        console.log("Re-authentication response:", response.data);
+
+        const newUserInfo = {
+          ...userInfo,
+          access_token: response.data.access_token,
+          expires_at: Date.now() / 1000 + response.data.expires_in,
+        };
+        setUserInfo(newUserInfo);
+        await AsyncStorage.setItem("userInfo", JSON.stringify(newUserInfo));
+        await AsyncStorage.setItem("access_token", newUserInfo.access_token);
+        setIsAuthenticated(true);
+        setShowPinScreen(false);
+      } catch (error: any) {
+        console.error("Re-authentication failed:", error);
+
+        // Log more details about the error
+        if (error.response) {
+          console.error("Error response data:", error.response.data);
+          console.error("Error response status:", error.response.status);
+          console.error("Error response headers:", error.response.headers);
+        } else if (error.request) {
+          console.error("Error request:", error.request);
+        } else {
+          console.error("Error message:", error.message);
+        }
+
+        let errorMessage = "Failed to re-authenticate. Please try again.";
+
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.message
+        ) {
+          errorMessage = error.response.data.message;
+        }
+
+        Alert.alert("Authentication Error", errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [userInfo]
+  );
 
   return (
     <AuthContext.Provider
@@ -357,6 +415,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isLoggedIn,
         isAppReady,
         isAuthenticated,
+        showPinScreen,
+        setShowPinScreen,
+        refreshAccessToken,
       }}
     >
       <SWR logOut={authLogout}>{children}</SWR>

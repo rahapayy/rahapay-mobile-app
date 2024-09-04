@@ -104,7 +104,7 @@ const ProfileScreen: React.FC<{
             </View>
           </View>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() =>
               navigation.navigate("AgentAccountVerificationScreen")
             }
@@ -114,7 +114,7 @@ const ProfileScreen: React.FC<{
             <Text style={styles.verifyText} allowFontScaling={false}>
               Become an agent
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           {/* Settings Section */}
           <View>

@@ -6,12 +6,12 @@ import AuthRoute from "./AuthRouter";
 import { ActivityIndicator, View } from "react-native";
 import COLORS from "../config/colors";
 import { AuthContext } from "../context/AuthContext";
-import SplashScreen from "../components/SplashScreen"; 
+import ExistingUserScreen from "../screens/Auth/Login/ExistingUserScreen";
 
 const Stack = createNativeStackNavigator();
 
 const Router = () => {
-  const { isAuthenticated, isAppReady } = useContext(AuthContext);
+  const { isAuthenticated, isAppReady, userInfo, showPinScreen } = useContext(AuthContext);
 
   if (!isAppReady) {
     // Loading indicator screen
@@ -32,11 +32,22 @@ const Router = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {/* This conditional will determine which stack to display based on `isAuthenticated` */}
-        {isAuthenticated ? (
+        {showPinScreen ? (
+          <Stack.Screen
+            name="ExistingUser"
+            component={ExistingUserScreen}
+            options={{ headerShown: false }}
+          />
+        ) : isAuthenticated ? (
           <Stack.Screen
             name="AppStack"
             component={AppStack}
+            options={{ headerShown: false }}
+          />
+        ) : userInfo ? (
+          <Stack.Screen
+            name="ExistingUser"
+            component={ExistingUserScreen}
             options={{ headerShown: false }}
           />
         ) : (

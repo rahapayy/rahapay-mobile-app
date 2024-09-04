@@ -1,9 +1,16 @@
-import React, { createContext, useState, useEffect, useRef } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+} from "react";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { Platform, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useApi from "../utils/api";
+import { AuthContext } from "./AuthContext"; 
 
 export const NotificationContext = createContext();
 
@@ -25,28 +32,17 @@ export const NotificationProvider = ({ children }) => {
   const { mutateAsync: sendDeviceToken } = useApi.post(
     "/notification/device-token"
   );
+  const { isAuthenticated } = useContext(AuthContext); // Use AuthContext to check authentication status
 
   useEffect(() => {
-    checkIfPermissionRequested();
+    if (isAuthenticated) {
+      checkIfPermissionRequested();
+    }
+  }, [isAuthenticated]);
 
+  useEffect(() => {
     if (notificationsEnabled) {
-      registerForPushNotificationsAsync().then((token) => {
-        if (token) {
-          setExpoPushToken(token);
-          sendDeviceTokenToBackend(token);
-        }
-      });
-
-      notificationListener.current =
-        Notifications.addNotificationReceivedListener((notification) => {
-          setNotification(notification);
-          console.log("Notification received in foreground:", notification);
-        });
-
-      responseListener.current =
-        Notifications.addNotificationResponseReceivedListener((response) => {
-          console.log("Notification response received:", response);
-        });
+      setupNotifications();
     }
 
     return () => {
@@ -60,6 +56,25 @@ export const NotificationProvider = ({ children }) => {
       }
     };
   }, [notificationsEnabled]);
+
+  const setupNotifications = async () => {
+    const token = await registerForPushNotificationsAsync();
+    if (token) {
+      setExpoPushToken(token);
+      sendDeviceTokenToBackend(token);
+    }
+
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification);
+        console.log("Notification received in foreground:", notification);
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log("Notification response received:", response);
+      });
+  };
 
   const checkIfPermissionRequested = async () => {
     const value = await AsyncStorage.getItem("hasAskedForPermission");
@@ -138,6 +153,13 @@ export const NotificationProvider = ({ children }) => {
     return token;
   }
 
+  // New function to request permissions after authentication
+  const requestNotificationPermissions = () => {
+    if (isAuthenticated && !hasAskedForPermission) {
+      showPermissionAlert();
+    }
+  };
+
   return (
     <NotificationContext.Provider
       value={{
@@ -146,6 +168,7 @@ export const NotificationProvider = ({ children }) => {
         notificationsEnabled,
         setNotificationsEnabled,
         hasAskedForPermission,
+        requestNotificationPermissions, // Expose this new function
       }}
     >
       {children}

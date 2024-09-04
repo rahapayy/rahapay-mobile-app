@@ -28,7 +28,9 @@ const RecentServiceTransaction: React.FC<{
         <Text style={styles.rtText} allowFontScaling={false}>
           Recent Transactions
         </Text>
-        <TouchableOpacity onPress={() => console.log("View More tapped")}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("TransactionHistoryScreen")}
+        >
           <Text style={styles.viewmoreText} allowFontScaling={false}>
             View More
           </Text>

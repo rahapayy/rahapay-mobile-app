@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import FaceId from "../../../assets/svg/mingcute_faceid-line.svg";
 import COLORS from "../../../config/colors";
@@ -6,12 +6,15 @@ import SPACING from "../../../config/SPACING";
 import Backspace from "../../../assets/svg/solar_backspace-linear.svg";
 import { authenticateWithBiometrics } from "../../../context/Biometrics";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { AuthContext } from "../../../context/AuthContext";
 
-const ExistingUserScreen: React.FC<{
+type ExistingUserScreenProps = {
   navigation: NativeStackNavigationProp<any>;
-  onCorrectPin: () => void;
-}> = ({ onCorrectPin, navigation }) => {
+};
+
+const ExistingUserScreen: React.FC<ExistingUserScreenProps> = ({ navigation }) => {
   const [pin, setPin] = useState<string>("");
+  const { refreshAccessToken, userDetails } = useContext(AuthContext);
 
   const handlePinPress = (value: string) => {
     if (pin.length < 4) {
@@ -39,13 +42,24 @@ const ExistingUserScreen: React.FC<{
   const handleBiometricAuth = async () => {
     const success = await authenticateWithBiometrics();
     if (success) {
-      onCorrectPin();
+      await refreshAccessToken();
+    }
+  };
+
+  const handlePinSubmit = async () => {
+    if (pin.length === 4) {
+      await refreshAccessToken({ pin });
     }
   };
 
   useEffect(() => {
-    pin.length === 4 && onCorrectPin;
+    if (pin.length === 4) {
+      handlePinSubmit();
+    }
   }, [pin]);
+
+  const fullName = userDetails?.fullName || "";
+  const firstName = fullName.split(" ")[0];
 
   return (
     <View style={styles.container}>
@@ -53,7 +67,7 @@ const ExistingUserScreen: React.FC<{
         source={require("../../../assets/images/avatar.png")}
         style={styles.logo}
       />
-      <Text style={styles.welcomeText}>Welcome back Shedrach!</Text>
+      <Text style={styles.welcomeText}>Welcome back {firstName}!</Text>
       <Text style={styles.subText}>
         Enter the pin associated with your account
       </Text>

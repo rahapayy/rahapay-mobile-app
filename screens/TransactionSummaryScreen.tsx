@@ -1,6 +1,5 @@
+import React from "react";
 import {
-  Image,
-  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -8,14 +7,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { ArrowLeft, DocumentDownload, WalletAdd1 } from "iconsax-react-native";
 import SPACING from "../config/SPACING";
 import FONT_SIZE from "../config/font-size";
 import COLORS from "../config/colors";
-import Airtel from "../assets/svg/airtel.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 import { RootStackParamList } from "../navigation/RootStackParams";
 
@@ -27,6 +24,11 @@ type TransactionSummaryRouteParams = {
     status: string;
     tranxType: string;
     referenceId: string;
+    metadata?: {
+      sender?: string;
+      recipient?: string;
+      package?: string;
+    };
   };
 };
 
@@ -43,7 +45,57 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
   route,
 }) => {
   const { transaction } = route.params;
-  const isWalletFunding = transaction.tranxType === "WALLET_FUNDING";
+
+  const renderTransactionDetails = () => {
+    switch (transaction.tranxType) {
+      case "WALLET_TRANSFER":
+        return (
+          <>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Sender</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.metadata?.sender}
+              </Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Recipient</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.metadata?.recipient}
+              </Text>
+            </View>
+          </>
+        );
+      case "AIRTIME_PURCHASE":
+        return (
+          <>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Paid with</Text>
+              <Text style={styles.descriptionText}>{transaction.purpose}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Recipient</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.metadata?.recipient}
+              </Text>
+            </View>
+          </>
+        );
+      case "WALLET_FUNDING":
+        return (
+          <>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Funding Source</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.purpose || "Unknown Source"}
+              </Text>
+            </View>
+          </>
+        );
+      // Add more cases for other transaction types
+      default:
+        return null;
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -61,86 +113,46 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
             </Text>
           </View>
 
-          <View className="justify-center items-center mt-10">
-            {/* Image */}
-            {isWalletFunding ? (
+          <View style={styles.iconWrapper}>
+            {transaction.tranxType === "WALLET_FUNDING" ? (
               <View style={styles.iconContainer}>
                 <WalletAdd1 color={COLORS.violet400} size={40} />
               </View>
-            ) : (
-              <View></View>
-            )}
+            ) : null}
             <Text style={styles.itemText} allowFontScaling={false}>
-              {transaction.tranxType}
+              {transaction.tranxType.replace("_", " ")}
             </Text>
           </View>
+
           <View className="p-4">
             <View style={styles.container}>
               <Text style={styles.headText} allowFontScaling={false}>
-                Transaction summary
+                Transaction Summary
               </Text>
-              <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText} allowFontScaling={false}>
-                  Transaction ID
-                </Text>
-                <Text style={styles.descriptionText} allowFontScaling={false}>
-                  {transaction.referenceId}
-                </Text>
-              </View>
-              <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText} allowFontScaling={false}>
-                  Amount
-                </Text>
-                <Text style={styles.descriptionText} allowFontScaling={false}>
+
+              <View style={styles.row}>
+                <Text style={styles.titleText}>Amount</Text>
+                <Text style={styles.descriptionText}>
                   ₦{" "}
                   {transaction.amount.toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                   })}
                 </Text>
               </View>
-              {!isWalletFunding && (
-                <>
-                  <View className="justify-between items-center flex-row">
-                    <Text style={styles.titleText} allowFontScaling={false}>
-                      Package
-                    </Text>
-                    <Text
-                      style={styles.descriptionText}
-                      allowFontScaling={false}
-                    >
-                      AIRTEL - 1GB - Monthly
-                    </Text>
-                  </View>
-                  <View className="justify-between items-center flex-row">
-                    <Text style={styles.titleText} allowFontScaling={false}>
-                      Recipient
-                    </Text>
-                    <Text
-                      style={styles.descriptionText}
-                      allowFontScaling={false}
-                    >
-                      +23480123456789
-                    </Text>
-                  </View>
-                </>
-              )}
-              <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText} allowFontScaling={false}>
-                  Date
-                </Text>
-                <Text style={styles.descriptionText} allowFontScaling={false}>
+              <View style={styles.row}>
+                <Text style={styles.titleText}>Date</Text>
+                <Text style={styles.descriptionText}>
                   {transaction.created_at}
                 </Text>
               </View>
 
-              <View className="justify-between items-center flex-row">
-                <Text style={styles.titleText} allowFontScaling={false}>
-                  Status
-                </Text>
-                {/* Transaction status */}
-                <View className="p-2 bg-[#E6F9F1] rounded-2xl">
-                  <Text style={styles.completedText} allowFontScaling={false}>
-                    {transaction.status}
+              {renderTransactionDetails()}
+
+              <View style={styles.row}>
+                <Text style={styles.titleText}>Status</Text>
+                <View style={styles.statusContainer}>
+                  <Text style={styles.completedText}>
+                    {transaction.status.toUpperCase()}
                   </Text>
                 </View>
               </View>
@@ -166,7 +178,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: SPACING * 2,
-    paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
+    paddingTop: SPACING * 2,
     paddingBottom: SPACING * 3,
   },
   leftIcon: {
@@ -178,6 +190,11 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     flex: 1,
   },
+  iconWrapper: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
   iconContainer: {
     width: 70,
     height: 70,
@@ -186,14 +203,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.violet100,
     justifyContent: "center",
     alignItems: "center",
-  },
-  headerTextDark: {
-    color: COLORS.white,
-  },
-  headTextContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
   },
   itemText: {
     fontSize: FONT_SIZE.medium,
@@ -215,12 +224,23 @@ const styles = StyleSheet.create({
   titleText: {
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(14),
-    paddingVertical: SPACING,
+    paddingVertical: 5,
   },
   descriptionText: {
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(12),
     color: "#9BA1A8",
+  },
+  row: {
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+    marginBottom: SPACING,
+  },
+  statusContainer: {
+    padding: 5,
+    backgroundColor: "#E6F9F1",
+    borderRadius: 10,
   },
   completedText: {
     fontFamily: "Outfit-Regular",
