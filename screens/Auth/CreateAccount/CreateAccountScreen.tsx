@@ -27,6 +27,7 @@ const CreateAccountScreen: React.FC<{
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [referral, setReferral] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(true);
   const countryCode = "+234";
@@ -87,6 +88,7 @@ const CreateAccountScreen: React.FC<{
           phoneNumber: phoneNumber.trim(),
           countryCode,
           password: password.trim(),
+          referral: referral.trim(),
         });
 
         // handleShowFlash({
@@ -202,6 +204,10 @@ const CreateAccountScreen: React.FC<{
     } else {
       setShowConfirmPasswordSection(false);
     }
+  };
+
+  const handleReferralChange = (value: string) => {
+    setReferral(value);
   };
 
   const { mutateAsync } = useApi.post("/auth/onboarding");
@@ -421,6 +427,8 @@ const CreateAccountScreen: React.FC<{
               placeholder="Referral (Optional)"
               placeholderTextColor={"#BABFC3"}
               allowFontScaling={false}
+              value={referral}
+              onChangeText={handleReferralChange}
               autoComplete="off"
               autoCapitalize="none"
               autoCorrect={false}

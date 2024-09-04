@@ -33,7 +33,8 @@ export const AuthContext = createContext<{
     password: string,
     countryCode: string,
     fullName: string,
-    phoneNumber: string
+    phoneNumber: string,
+    referral: string
   ) => void;
   verifyEmail: (verificationCode: string) => void;
   login: (email: string, password: string) => void;
@@ -112,7 +113,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     password: string,
     countryCode: string,
     fullName: string,
-    phoneNumber: string
+    phoneNumber: string,
+    referral: string
   ) => {
     setIsLoading(true);
     try {
@@ -122,6 +124,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         countryCode,
         fullName,
         phoneNumber,
+        referral,
       });
       let userInfo = res.data;
       console.log({ userInfo });
