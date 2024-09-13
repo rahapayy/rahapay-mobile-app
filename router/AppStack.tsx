@@ -35,6 +35,7 @@ import EducationServiceType from "../screens/Services/Education/EducationService
 import EducationDetailsScreen from "../screens/Services/Education/EducationDetailsScreen";
 import ReviewEducationSummaryScreen from "../screens/ServiceReviewScreens/ReviewEducationSummaryScreem";
 import EditTagScreen from "../screens/Profile/EditTagScreen";
+import SelectPinChangeScreen from "../screens/Profile/SelectPinChangeScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -106,6 +107,11 @@ const AppStack = () => {
       <Stack.Screen
         name="ChangePinScreen"
         component={ChangePinScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="SelectPinChangeScreen"
+        component={SelectPinChangeScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

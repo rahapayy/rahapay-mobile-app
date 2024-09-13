@@ -17,16 +17,72 @@ import FONT_SIZE from "../../config/font-size";
 import COLORS from "../../config/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../components/Button";
+import { handleShowFlash } from "../../components/FlashMessageComponent";
+import useApi from "../../utils/api";
+import { RouteProp, useRoute } from "@react-navigation/native";
 
 const ChangePinScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [showBalance, setShowBalance] = useState(true);
-  const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
+  const route =
+    useRoute<
+      RouteProp<
+        { params: { type: "transactionPin" | "securityPin" } },
+        "params"
+      >
+    >();
+  const pinType = route.params.type;
 
-  const handleButtonClick = () => {
-    navigation.navigate("VerifyEmailScreen");
-  };
+  const [showPin, setShowPin] = useState(true);
+  const togglePinVisibility = () => setShowPin((prev) => !prev);
+  const [formValues, setFormValues] = useState({
+    currPin: "",
+    newPin: "",
+    confirmPin: "",
+  });
+
+  const { mutateAsync: updatePin, isLoading } = useApi.patch(
+    "/user/update/credentials"
+  );
+
+  function handleInputChange(value: string, fieldKey: keyof typeof formValues) {
+    setFormValues({ ...formValues, [fieldKey]: value });
+  }
+
+  async function handleButtonClick() {
+    if (formValues.newPin !== formValues.confirmPin) {
+      handleShowFlash({
+        message: "New pin must match confirmation pin",
+        type: "danger",
+      });
+    } else {
+      updatePin({
+        type: pinType,
+        current: formValues.currPin,
+        new: formValues.newPin,
+      })
+        .then(() => {
+          handleShowFlash({
+            message: "Transaction pin changed successfully!",
+            type: "success",
+          });
+          navigation.goBack();
+        })
+        .catch((error) => {
+          const err = error as {
+            response?: { data?: { message?: string } };
+            message: string;
+          };
+          const errorMessage =
+            err.response?.data?.message || err.message || "An error occurred";
+
+          handleShowFlash({
+            message: errorMessage,
+            type: "danger",
+          });
+        });
+    }
+  }
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
@@ -39,7 +95,8 @@ const ChangePinScreen: React.FC<{
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
             <Text style={[styles.headerText]} allowFontScaling={false}>
-              Change Pin
+              Change {pinType === "transactionPin" ? "Transaction" : "Security"}{" "}
+              Pin
             </Text>
           </View>
 
@@ -51,12 +108,15 @@ const ChangePinScreen: React.FC<{
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                  placeholder="Password"
+                  placeholder="Enter current pin"
                   placeholderTextColor="#BABFC3"
                   allowFontScaling={false}
+                  secureTextEntry={!showPin}
+                  value={formValues.currPin}
+                  onChangeText={(value) => handleInputChange(value, "currPin")}
                 />
-                <TouchableOpacity onPress={toggleBalanceVisibility}>
-                  {showBalance ? (
+                <TouchableOpacity onPress={togglePinVisibility}>
+                  {showPin ? (
                     <Eye color="#000" size={20} />
                   ) : (
                     <EyeSlash color="#000" size={20} />
@@ -71,12 +131,15 @@ const ChangePinScreen: React.FC<{
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                  placeholder="Password"
+                  placeholder="Enter new pin"
                   placeholderTextColor="#BABFC3"
                   allowFontScaling={false}
+                  secureTextEntry={!showPin}
+                  value={formValues.newPin}
+                  onChangeText={(value) => handleInputChange(value, "newPin")}
                 />
-                <TouchableOpacity onPress={toggleBalanceVisibility}>
-                  {showBalance ? (
+                <TouchableOpacity onPress={togglePinVisibility}>
+                  {showPin ? (
                     <Eye color="#000" size={20} />
                   ) : (
                     <EyeSlash color="#000" size={20} />
@@ -91,12 +154,17 @@ const ChangePinScreen: React.FC<{
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                  placeholder="Password"
+                  placeholder="Enter confirmation pin"
                   placeholderTextColor="#BABFC3"
                   allowFontScaling={false}
+                  secureTextEntry={!showPin}
+                  value={formValues.confirmPin}
+                  onChangeText={(value) =>
+                    handleInputChange(value, "confirmPin")
+                  }
                 />
-                <TouchableOpacity onPress={toggleBalanceVisibility}>
-                  {showBalance ? (
+                <TouchableOpacity onPress={togglePinVisibility}>
+                  {showPin ? (
                     <Eye color="#000" size={20} />
                   ) : (
                     <EyeSlash color="#000" size={20} />
@@ -106,7 +174,13 @@ const ChangePinScreen: React.FC<{
             </View>
             <Button
               title={"Save Changes"}
-              // onPress={handleButtonClick}
+              isLoading={isLoading}
+              disabled={
+                !formValues.confirmPin ||
+                !formValues.newPin ||
+                !formValues.currPin
+              }
+              onPress={handleButtonClick}
               style={styles.proceedButton}
               textColor="#fff"
             />

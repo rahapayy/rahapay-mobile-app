@@ -26,6 +26,7 @@ const Button: React.FC<ButtonProps> = ({
   style,
   textColor = "black",
   isLoading = false,
+  disabled,
   ...rest
 }) => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -37,7 +38,7 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <TouchableOpacity
-      style={[styles.button, style]}
+      style={[styles.button, style, disabled && { opacity: 0.5 }]}
       onPress={onPress}
       {...rest}
     >

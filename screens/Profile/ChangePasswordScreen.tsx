@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
 import SPACING from "../../config/SPACING";
@@ -17,16 +17,64 @@ import FONT_SIZE from "../../config/font-size";
 import COLORS from "../../config/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../components/Button";
+import useApi from "../../utils/api";
+import { handleShowFlash } from "../../components/FlashMessageComponent";
 
 const ChangePasswordScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [showBalance, setShowBalance] = useState(true);
-  const toggleBalanceVisibility = () => setShowBalance((prev) => !prev);
+  const [showPassword, setShowPassword] = useState(true);
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  const [formValues, setFormValues] = useState({
+    currPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
-  const handleButtonClick = () => {
-    navigation.navigate("VerifyEmailScreen");
-  };
+  const {
+    mutateAsync: updatePassword,
+    isLoading,
+    error,
+  } = useApi.patch("/user/update/credentials");
+
+  function handleInputChange(value: string, fieldKey: keyof typeof formValues) {
+    setFormValues({ ...formValues, [fieldKey]: value });
+  }
+
+  async function handleButtonClick() {
+    if (formValues.newPassword !== formValues.confirmPassword) {
+      handleShowFlash({
+        message: "New password must match confirmation password",
+        type: "danger",
+      });
+    } else {
+      updatePassword({
+        type: "password",
+        current: formValues.currPassword,
+        new: formValues.newPassword,
+      })
+        .then(() => {
+          handleShowFlash({
+            message: "Password updated successfully!",
+            type: "success",
+          });
+          navigation.goBack();
+        })
+        .catch((error) => {
+          const err = error as {
+            response?: { data?: { message?: string } };
+            message: string;
+          };
+          const errorMessage =
+            err.response?.data?.message || err.message || "An error occurred";
+
+          handleShowFlash({
+            message: errorMessage,
+            type: "danger",
+          });
+        });
+    }
+  }
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
@@ -54,9 +102,14 @@ const ChangePasswordScreen: React.FC<{
                   placeholder="Password"
                   placeholderTextColor="#BABFC3"
                   allowFontScaling={false}
+                  value={formValues.currPassword}
+                  secureTextEntry={!showPassword}
+                  onChangeText={(value) =>
+                    handleInputChange(value, "currPassword")
+                  }
                 />
-                <TouchableOpacity onPress={toggleBalanceVisibility}>
-                  {showBalance ? (
+                <TouchableOpacity onPress={togglePasswordVisibility}>
+                  {showPassword ? (
                     <Eye color="#000" size={20} />
                   ) : (
                     <EyeSlash color="#000" size={20} />
@@ -74,9 +127,14 @@ const ChangePasswordScreen: React.FC<{
                   placeholder="Password"
                   placeholderTextColor="#BABFC3"
                   allowFontScaling={false}
+                  secureTextEntry={!showPassword}
+                  value={formValues.newPassword}
+                  onChangeText={(value) =>
+                    handleInputChange(value, "newPassword")
+                  }
                 />
-                <TouchableOpacity onPress={toggleBalanceVisibility}>
-                  {showBalance ? (
+                <TouchableOpacity onPress={togglePasswordVisibility}>
+                  {showPassword ? (
                     <Eye color="#000" size={20} />
                   ) : (
                     <EyeSlash color="#000" size={20} />
@@ -94,9 +152,14 @@ const ChangePasswordScreen: React.FC<{
                   placeholder="Password"
                   placeholderTextColor="#BABFC3"
                   allowFontScaling={false}
+                  secureTextEntry={!showPassword}
+                  value={formValues.confirmPassword}
+                  onChangeText={(value) =>
+                    handleInputChange(value, "confirmPassword")
+                  }
                 />
-                <TouchableOpacity onPress={toggleBalanceVisibility}>
-                  {showBalance ? (
+                <TouchableOpacity onPress={togglePasswordVisibility}>
+                  {showPassword ? (
                     <Eye color="#000" size={20} />
                   ) : (
                     <EyeSlash color="#000" size={20} />
@@ -106,8 +169,14 @@ const ChangePasswordScreen: React.FC<{
             </View>
             <Button
               title={"Save Changes"}
-              // onPress={handleButtonClick}
+              onPress={handleButtonClick}
               style={styles.proceedButton}
+              isLoading={isLoading}
+              disabled={
+                !formValues.confirmPassword ||
+                !formValues.newPassword ||
+                !formValues.currPassword
+              }
               textColor="#fff"
             />
           </View>

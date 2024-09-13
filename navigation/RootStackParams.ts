@@ -28,6 +28,7 @@ export type RootStackParamList = {
   AgentAccountVerificationScreen: undefined;
   ChangePasswordScreen: undefined;
   ChangePinScreen: undefined;
+  SelectPinChangeScreen: undefined;
   EnableNotificationScreen: undefined;
   HelpAndSupportScreen: undefined;
   PersonalInformationScreen: undefined;

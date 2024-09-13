@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../../config/SPACING";
@@ -19,15 +19,62 @@ import COLORS from "../../config/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../components/Button";
 import { AuthContext } from "../../context/AuthContext";
+import useApi from "../../utils/api";
+import { handleShowFlash } from "../../components/FlashMessageComponent";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const PersonalInformationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { userDetails } = useContext(AuthContext);
+  const { userDetails, fetchUserDetails } = useContext(AuthContext);
+  const { mutateAsync: updateUser, isLoading } = useApi.patch(
+    "/user/update/profile"
+  );
+  const [formValues, setFormValues] = useState({
+    fullName: userDetails?.fullName,
+    phone: userDetails?.phone,
+    email: userDetails?.email,
+  });
 
+  function handleInputChange(value: string, fieldKey: keyof typeof formValues) {
+    setFormValues({ ...formValues, [fieldKey]: value });
+  }
+  function handleButtonClick() {
+    updateUser({
+      fullName: formValues.fullName,
+      phoneNumber: formValues.phone,
+      email: formValues.email,
+    })
+      .then(() => {
+        handleShowFlash({
+          message: "Profile updated successfully!",
+          type: "success",
+        });
+        navigation.goBack();
+        AsyncStorage.getItem("access_token").then((token) => {
+          if (token) {
+            fetchUserDetails(token);
+          }
+        });
+      })
+      .catch((error) => {
+        const err = error as {
+          response?: { data?: { message?: string } };
+          message: string;
+        };
+        const errorMessage =
+          err.response?.data?.message || err.message || "An error occurred";
+
+        handleShowFlash({
+          message: errorMessage,
+          type: "danger",
+        });
+      });
+  }
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView>
+      <KeyboardAwareScrollView>
         <View>
           <View style={styles.header}>
             <TouchableOpacity
@@ -67,6 +114,8 @@ const PersonalInformationScreen: React.FC<{
                 placeholder="First & Last name"
                 allowFontScaling={false}
                 placeholderTextColor={"#DFDFDF"}
+                onChangeText={(value) => handleInputChange(value, "fullName")}
+                defaultValue={userDetails?.fullName}
               />
             </View>
 
@@ -93,6 +142,8 @@ const PersonalInformationScreen: React.FC<{
                   placeholderTextColor="#BABFC3"
                   keyboardType="numeric"
                   allowFontScaling={false}
+                  onChangeText={(value) => handleInputChange(value, "phone")}
+                  defaultValue={userDetails?.phoneNumber}
                 />
               </View>
             </View>
@@ -106,17 +157,25 @@ const PersonalInformationScreen: React.FC<{
                 placeholder="Example@email.com"
                 placeholderTextColor={"#DFDFDF"}
                 allowFontScaling={false}
+                onChangeText={(value) => handleInputChange(value, "email")}
+                defaultValue={userDetails?.email}
               />
             </View>
             <Button
               title={"Save Changes"}
-              // onPress={handleButtonClick}
+              onPress={handleButtonClick}
+              isLoading={isLoading}
+              disabled={
+                userDetails?.fullName === formValues.fullName &&
+                userDetails?.phone === formValues.phone &&
+                userDetails?.email === formValues.email
+              }
               style={styles.proceedButton}
               textColor="#fff"
             />
           </KeyboardAvoidingView>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };

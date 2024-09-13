@@ -18,6 +18,7 @@ import Button from "../../../components/Button";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import FONT_SIZE from "../../../config/font-size";
+import { getItem } from "../../../utils/ayncStorage";
 
 const CreateTagScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -30,8 +31,11 @@ const CreateTagScreen: React.FC<{
   const isFormComplete = tag;
 
   // const { mutateAsync: updateTagMutateAsync } = useApi.patch("/auth/username");
-  const { data: suggestedTagsResponse } = useApi.get(
-    "/auth/suggest-username?numberOfSuggestions=7"
+  const { data: suggestedTagsResponse, refetch: fetchUsernames } = useApi.get(
+    "/auth/suggest-username?numberOfSuggestions=7",
+    {
+      enabled: false,
+    }
   );
 
   const updateTagMutation = useApi.patch<{ userName: string }, Error>(
@@ -60,6 +64,16 @@ const CreateTagScreen: React.FC<{
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    getItem("access_token").then((value) => {
+      console.log("access token found");
+      console.log({ value });
+      if (value) {
+        fetchUsernames();
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (

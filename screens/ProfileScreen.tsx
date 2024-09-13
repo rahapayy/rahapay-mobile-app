@@ -163,7 +163,7 @@ const ProfileScreen: React.FC<{
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("ChangePinScreen")}
+                  onPress={() => navigation.navigate("SelectPinChangeScreen")}
                   style={styles.settingsItem}
                 >
                   <Lock variant="Bold" color={COLORS.violet400} size={24} />

@@ -40,9 +40,9 @@ axiosInstance.interceptors.response.use(
 axiosInstance.interceptors.request.use(async (config) => {
   const accessToken = await getItem("access_token");
   if (accessToken) {
+    console.log({ accessToken });
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
-
   return config;
 });
 
@@ -72,8 +72,6 @@ const makeRequest = async (method: MethodTypes, url: string, data?: any) => {
     data,
   });
 
-  console.log({ response: response.data.data });
-
   return response;
 };
 
@@ -90,8 +88,8 @@ export default {
     useMutation((data: any) => makeRequest("PUT", url, data)),
   delete: (url: string) => useMutation(() => makeRequest("DELETE", url)),
   patch: <TData, TError>(path: string) => {
-    return useMutation<TData, TError, TData>((data) =>
-      axiosInstance.patch(path, data)
+    return useMutation<any, any, any>((data) =>
+      makeRequest("PATCH", path, data)
     );
   },
 };

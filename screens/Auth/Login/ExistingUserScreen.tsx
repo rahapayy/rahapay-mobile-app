@@ -12,7 +12,9 @@ type ExistingUserScreenProps = {
   navigation: NativeStackNavigationProp<any>;
 };
 
-const ExistingUserScreen: React.FC<ExistingUserScreenProps> = ({ navigation }) => {
+const ExistingUserScreen: React.FC<ExistingUserScreenProps> = ({
+  navigation,
+}) => {
   const [pin, setPin] = useState<string>("");
   const { refreshAccessToken, userDetails } = useContext(AuthContext);
 

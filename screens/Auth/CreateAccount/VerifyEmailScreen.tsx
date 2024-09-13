@@ -102,11 +102,12 @@ const VerifyEmailScreen: React.FC<{
           message: "Email verified successfully!",
           type: "success",
         });
-        await AsyncStorage.setItem(
+        AsyncStorage.setItem(
           "access_token",
           response.data.data.accessToken
-        );
-        navigation.navigate("CreateTagScreen");
+        ).then(() => {
+          navigation.navigate("CreateTagScreen");
+        });
       } catch (error) {
         const err = error as {
           response?: { data?: { message?: string } };

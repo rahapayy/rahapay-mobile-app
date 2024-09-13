@@ -78,6 +78,7 @@ const Onboarding: React.FC<{
   }, [currentIndex]);
 
   const onCreateAccountPress = () => {
+    // navigation.navigate("CreateTagScreen");
     navigation.navigate("CreateAccountScreen");
   };
 

@@ -33,7 +33,7 @@ const ResetPasswordScreen: React.FC<{
       const response = await mutateAsync({ email });
 
       handleShowFlash({
-        message: "Password reset link sent to your email",
+        message: "Password reset otp sent to your email",
         type: "success",
       });
 
