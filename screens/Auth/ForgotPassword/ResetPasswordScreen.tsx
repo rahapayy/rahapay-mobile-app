@@ -40,11 +40,26 @@ const ResetPasswordScreen: React.FC<{
       navigation.navigate("EnterCodeScreen", { email });
     } catch (error) {
       const err = error as {
-        response?: { data?: { message?: string } };
+        response?: {
+          data?: { message?: string; errors?: Record<string, string[]> };
+          status?: number;
+        };
         message: string;
       };
-      const errorMessage =
-        err.response?.data?.message || err.message || "An error occurred";
+      let errorMessage = "An error occurred";
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.response?.data?.errors) {
+        const errors = err.response.data.errors;
+        errorMessage = Object.values(errors).flat().join(", ");
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+
+      if (err.response?.status === 400) {
+        errorMessage = "User not found";
+      }
+
       console.error("API Error:", err.response?.data || err.message);
       handleShowFlash({
         message: errorMessage,

@@ -30,6 +30,7 @@ const CreateAccountScreen: React.FC<{
   const [referral, setReferral] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(true);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(true);
   const countryCode = "+234";
   const [isLoading, setIsLoading] = useState(false);
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
@@ -68,6 +69,7 @@ const CreateAccountScreen: React.FC<{
     countryCode;
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword((prev) => !prev);
 
   const handleButtonClick = async () => {
     if (isFormComplete) {
@@ -396,7 +398,7 @@ const CreateAccountScreen: React.FC<{
                   style={styles.input}
                   placeholder="Confirm Password"
                   placeholderTextColor={"#BABFC3"}
-                  secureTextEntry={showPassword}
+                  secureTextEntry={showConfirmPassword}
                   value={confirmPassword}
                   onChangeText={handleConfirmPasswordChange}
                   allowFontScaling={false}
@@ -404,8 +406,8 @@ const CreateAccountScreen: React.FC<{
                   autoCapitalize="none"
                   autoCorrect={false}
                 />
-                <TouchableOpacity onPress={togglePasswordVisibility}>
-                  {showPassword ? (
+                <TouchableOpacity onPress={toggleConfirmPasswordVisibility}>
+                  {showConfirmPassword ? (
                     <EyeSlash color="#000" size={20} />
                   ) : (
                     <Eye color="#000" size={20} />
