@@ -102,23 +102,32 @@ const VerifyEmailScreen: React.FC<{
           message: "Email verified successfully!",
           type: "success",
         });
-        AsyncStorage.setItem(
-          "access_token",
-          response.data.data.accessToken
-        ).then(() => {
+        const accessToken = response.data?.data?.accessToken;
+        if (accessToken) {
+          await AsyncStorage.setItem("access_token", accessToken);
           navigation.navigate("CreateTagScreen");
-        });
+        } else {
+          throw new Error("Access token is missing in the response");
+        }
       } catch (error) {
         const err = error as {
-          response?: { data?: { message?: string } };
+          response?: { data?: { message?: string; code?: string } };
           message: string;
         };
         const errorMessage =
           err.response?.data?.message || err.message || "An error occurred";
-        handleShowFlash({
-          message: errorMessage,
-          type: "danger",
-        });
+        
+        if (err.response?.data?.code === "INVALID_OTP") {
+          handleShowFlash({
+            message: "The OTP you entered is incorrect. Please try again.",
+            type: "danger",
+          });
+        } else {
+          handleShowFlash({
+            message: errorMessage,
+            type: "danger",
+          });
+        }
       } finally {
         setIsSubmitting(false);
         setIsLoading(false);
