@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { getItem } from "../utils/ayncStorage";
+import { getItem, setItem } from "../utils/ayncStorage";
 import { ActivityIndicator, View } from "react-native";
 import COLORS from "../config/colors";
 import WelcomeScreen from "../screens/WelcomeScreen";
@@ -26,9 +26,10 @@ const AuthRoute = () => {
   const checkIfAlreadyOnboarded = async () => {
     let onboarded = await getItem("onboarded");
     if (onboarded == "1") {
-      return setShowOnboarding(false);
+      setShowOnboarding(false);
     } else {
       setShowOnboarding(true);
+      await setItem("onboarded", "1");
     }
   };
 

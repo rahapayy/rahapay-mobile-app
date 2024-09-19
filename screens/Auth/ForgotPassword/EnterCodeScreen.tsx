@@ -103,7 +103,7 @@ const EnterCodeScreen: React.FC<{
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView className="flex-1">
       <ScrollView>
         <View className="p-4">
           <TouchableOpacity onPress={() => navigation.goBack()}>

@@ -130,7 +130,7 @@ const Card: React.FC<{
                   })}
                 </Text>
               ) : (
-                <Text style={styles.balanceValue}>********</Text>
+                <Text style={styles.balanceValue}>🙈🙈🙈🙈🙈</Text>
               )
             ) : (
               <View style={styles.errorContainer}>
