@@ -107,7 +107,7 @@ const VerifyEmailScreen: React.FC<{
           await AsyncStorage.setItem("access_token", accessToken);
           navigation.navigate("CreateTagScreen");
         } else {
-          throw new Error("Access token is missing in the response");
+          throw new Error("Invalid Token");
         }
       } catch (error) {
         const err = error as {

@@ -41,23 +41,18 @@ const WelcomeScreen: React.FC<{
       </View>
       <View style={styles.buttonContainer}>
         <Button
-          title={"Log in"}
-          onPress={() => navigation.navigate("LoginScreen")}
+          title={"Create an account"}
+          onPress={() => navigation.navigate("CreateAccountScreen")}
           style={{
-            backgroundColor: COLORS.violet400,
             marginBottom: 10,
           }}
           textColor="#fff"
         />
         <Button
-          title={"Create an account"}
-          onPress={() => navigation.navigate("CreateAccountScreen")}
-          style={{
-            borderWidth: 1,
-            borderColor: COLORS.violet400,
-            backgroundColor: "transparent",
-          }}
-          textColor="#000"
+          title={"Log In"}
+          onPress={() => navigation.navigate("LoginScreen")}
+          borderOnly
+          textColor={COLORS.violet400}
         />
       </View>
     </SafeAreaView>

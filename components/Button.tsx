@@ -18,6 +18,8 @@ interface ButtonProps extends TouchableOpacityProps {
   title: string;
   textColor?: string;
   isLoading?: boolean;
+  borderOnly?: boolean;
+  subBrand?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -27,6 +29,8 @@ const Button: React.FC<ButtonProps> = ({
   textColor = "black",
   isLoading = false,
   disabled,
+  borderOnly = false,
+  subBrand = false, // Default value for new prop
   ...rest
 }) => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -38,7 +42,13 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <TouchableOpacity
-      style={[styles.button, style, disabled && { opacity: 0.5 }]}
+      style={[
+        styles.button,
+        borderOnly && styles.borderOnlyButton,
+        subBrand && styles.subBrandButton,
+        style,
+        disabled && { opacity: 0.5 },
+      ]}
       onPress={onPress}
       {...rest}
     >
@@ -67,6 +77,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
+  },
+  borderOnlyButton: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: COLORS.violet400,
+  },
+  subBrandButton: {
+    backgroundColor: COLORS.violet200,
   },
   buttonText: {
     fontSize: RFValue(12),
