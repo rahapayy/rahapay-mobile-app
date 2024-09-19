@@ -98,16 +98,24 @@ const VerifyEmailScreen: React.FC<{
       setIsSubmitting(true);
       try {
         const response = await verifyOtp({ otp, email });
-        handleShowFlash({
-          message: "Email verified successfully!",
-          type: "success",
-        });
-        AsyncStorage.setItem(
-          "access_token",
-          response.data.data.accessToken
-        ).then(() => {
-          navigation.navigate("CreateTagScreen");
-        });
+        if (response?.data?.message !== "Invalid OTP") {
+          handleShowFlash({
+            message: "Email verified successfully!",
+            type: "success",
+          });
+
+          AsyncStorage.setItem(
+            "access_token",
+            response.data?.data?.accessToken
+          ).then(() => {
+            navigation.navigate("CreatePinScreen");
+          });
+        } else {
+          handleShowFlash({
+            message: "Invalid OTP",
+            type: "danger",
+          });
+        }
       } catch (error) {
         const err = error as {
           response?: { data?: { message?: string } };

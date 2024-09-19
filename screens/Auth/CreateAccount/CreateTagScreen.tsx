@@ -19,6 +19,7 @@ import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import FONT_SIZE from "../../../config/font-size";
 import { getItem } from "../../../utils/ayncStorage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CreateTagScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -66,10 +67,10 @@ const CreateTagScreen: React.FC<{
   };
 
   useEffect(() => {
-    getItem("access_token").then((value) => {
+    AsyncStorage.getItem("access_token").then((value) => {
       console.log("access token found");
-      console.log({ value });
       if (value) {
+        console.log({ value });
         fetchUsernames();
       }
     });

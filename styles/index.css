@@ -1,0 +1,8 @@
+@font-face {
+  font-family: "outfit-regular";
+  src: url("../assets/fonts/Outfit-Regular.ttf");
+}
+
+.outfit-regular {
+  @apply font-outfit-regular;
+}

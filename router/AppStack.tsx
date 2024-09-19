@@ -20,7 +20,7 @@ import ReferralScreen from "../screens/Profile/ReferralScreen";
 import TransactionStatusScreen from "../screens/TransactionStatusScreen";
 import ReviewAirtimeSummaryScreen from "../screens/ServiceReviewScreens/ReviewAirtimeSummaryScreen";
 import ReviewDataSummaryScreen from "../screens/ServiceReviewScreens/ReviewDataSummaryScreen";
-import BettingScreen from "../screens/Services/BettingScreen";
+import BettingScreen from "../screens/Services/Betting/BettingScreen";
 import TransferScreen from "../screens/Services/TransferScreen";
 import EducationScreen from "../screens/Services/Education/EducationScreen";
 import CustomerCareScreen from "../screens/CustomerCareScreen";
@@ -36,6 +36,7 @@ import EducationDetailsScreen from "../screens/Services/Education/EducationDetai
 import ReviewEducationSummaryScreen from "../screens/ServiceReviewScreens/ReviewEducationSummaryScreem";
 import EditTagScreen from "../screens/Profile/EditTagScreen";
 import SelectPinChangeScreen from "../screens/Profile/SelectPinChangeScreen";
+import BettingSuccess from "../screens/Services/Betting/BettingSuccess";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -152,6 +153,11 @@ const AppStack = () => {
       <Stack.Screen
         name="BettingScreen"
         component={BettingScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="BettingSuccessScreen"
+        component={BettingSuccess}
         options={{ headerShown: false }}
       />
       <Stack.Screen

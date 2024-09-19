@@ -62,6 +62,7 @@ const COLORS = {
   info: "#17a2b8", // Blue for info messages
   default: "#6c757d", // Gray for default messages
   error: "#dc3545", // Red for error messages
+  brand: "#5136C1",
 };
 
 export default COLORS;

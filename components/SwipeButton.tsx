@@ -18,9 +18,10 @@ const maxTranslateX = sliderWidth - knobWidth - 20;
 
 interface SwipeButtonProps {
   onConfirm: (reset: () => void) => void;
+  buttonText?: string;
 }
 
-const SwipeButton: React.FC<SwipeButtonProps> = ({ onConfirm }) => {
+const SwipeButton: React.FC<SwipeButtonProps> = ({ onConfirm, buttonText }) => {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const translateX = useRef(new Animated.Value(0)).current;
 
@@ -107,7 +108,7 @@ const SwipeButton: React.FC<SwipeButtonProps> = ({ onConfirm }) => {
                 ]}
               >
                 <Text style={styles.slideText} allowFontScaling={false}>
-                  Slide to Confirm
+                  {buttonText || "Slide to Confirm"}
                 </Text>
               </Animated.View>
             </>

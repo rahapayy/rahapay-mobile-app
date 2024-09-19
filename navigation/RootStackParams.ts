@@ -1,9 +1,12 @@
+import { ReactNode } from "react";
+
 export type RootStackParamList = {
   HomeScreen: undefined;
   AirtimeScreen: undefined;
   DataScreen: undefined;
   ElectricityScreen: undefined;
   BettingScreen: undefined;
+  BettingSuccessScreen: undefined;
   TransferScreen: undefined;
   EducationScreen: undefined;
   TransferToUserScreen: undefined;
