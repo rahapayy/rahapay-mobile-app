@@ -20,6 +20,7 @@ import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as Animatable from "react-native-animatable";
 import { AuthContext } from "../../../context/AuthContext";
+import { AxiosError } from "axios";
 
 const CreateAccountScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -88,7 +89,7 @@ const CreateAccountScreen: React.FC<{
 
       setIsLoading(true);
       try {
-        const response = await onboarding(
+        const userInfo = await onboarding(
           email.trim(),
           password.trim(),
           countryCode,
@@ -96,18 +97,41 @@ const CreateAccountScreen: React.FC<{
           phoneNumber.trim(),
           referral.trim()
         );
+  
+  
+        // Get the user ID from the response
+        const userId = userInfo?.data?.id;
+        console.log("User ID:", userId);
 
         navigation.navigate("VerifyEmailScreen", {
           email,
-          // id: response.data.user.id,
+          id: userId,
         });
-      } catch (error) {
+      } catch (error: unknown) {
         console.error("Onboarding Error:", error);
 
-        handleShowFlash({
-          message: "An error occurred during account creation.",
-          type: "danger",
-        });
+        if (error instanceof AxiosError) {
+          // Server responded with a status other than 2xx
+          const errorMessage =
+            error.response?.data?.message ||
+            "An error occurred during account creation.";
+          handleShowFlash({
+            message: errorMessage,
+            type: "danger",
+          });
+        } else if (error instanceof Error) {
+          // Generic error
+          handleShowFlash({
+            message: "An unexpected error occurred: " + error.message,
+            type: "danger",
+          });
+        } else {
+          // Catch-all for unexpected error types
+          handleShowFlash({
+            message: "An unexpected error occurred. Please try again.",
+            type: "danger",
+          });
+        }
       } finally {
         setIsLoading(false);
       }
@@ -204,8 +228,6 @@ const CreateAccountScreen: React.FC<{
   const handleReferralChange = (value: string) => {
     setReferral(value);
   };
-
-  const { mutateAsync } = useApi.post("/auth/onboarding");
 
   return (
     <SafeAreaView className="flex-1">

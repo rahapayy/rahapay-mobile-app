@@ -134,7 +134,7 @@ const VerifyEmailScreen: React.FC<{
 
   const handleResendOTP = async () => {
     try {
-      await resendOtp(id); // Use resendOtp from AuthContext
+      await resendOtp(id); // Pass id directly as a string
       handleShowFlash({
         message: "OTP resent successfully!",
         type: "success",

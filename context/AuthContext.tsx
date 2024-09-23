@@ -14,8 +14,9 @@ interface UserInfoType {
   fullName: string;
   phoneNumber: string;
   data: {
-    user: any;
-    token: string;
+    id: string; // The ID returned in the response
+    user?: any;
+    token?: string;
   };
   access_token: string;
   refresh_token: string;
@@ -130,23 +131,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         phoneNumber,
         referral,
       });
-      let userInfo = res.data;
+  
+      // Define and store the userInfo correctly from the response
+      const userInfo = res.data; // Assuming `res.data` is the correct response structure
       console.log({ userInfo });
+      
+      // Set the userInfo state
       setUserInfo(userInfo);
-      AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
-      // if (userInfo.data && userInfo.data.accessToken) {
-      //   AsyncStorage.setItem("access_token", userInfo.data.accessToken);
-      // } else {
-      //   console.warn("Access token is undefined.");
-      // }
-
+  
+      // Store user info in AsyncStorage
+      await AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
+  
+      // You may also store the user id in AsyncStorage if needed
+      const userId = userInfo.data.id;
+      await AsyncStorage.setItem("userId", userId);
+  
       setIsLoading(false);
       return userInfo;
     } catch (error) {
       setIsLoading(false);
+      throw error;
     }
   };
-
+  
   const verifyEmail = async (otp: string) => {
     setIsLoading(true);
     try {
@@ -186,18 +193,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       return userInfo;
     } catch (error) {
-      throw new Error("Incorrect email or password");
+      throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
   const createPin = async (pin: string) => {
+    setIsLoading(true);
     try {
-      const res = await axios.post(`/auth/create-pin`, { pin });
-      return res.data;
+      // Get the access token from userInfo
+      const accessToken = userInfo?.data?.access_token;
+
+      // Make the POST request to create the pin
+      const response = await axios.post(
+        `/auth/create-pin`,
+        { securityPin: pin },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      // Return the response data
+      return response.data;
     } catch (error) {
+      console.error("Failed to create pin:", error);
+      Alert.alert("Error", "Failed to create pin. Please try again.");
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 

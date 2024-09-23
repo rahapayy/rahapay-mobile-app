@@ -7,30 +7,30 @@ import {
   View,
   TextInput,
 } from "react-native";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../config/SPACING";
 import COLORS from "../../../config/colors";
 import Button from "../../../components/Button";
 import { ArrowLeft } from "iconsax-react-native";
-import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
+import { AuthContext } from "../../../context/AuthContext";
 
 const CreatePinScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [boxes, setBoxes] = useState(["", "", "", ""]);
-  const [confirmBoxes, setConfirmBoxes] = useState(["", "", "", ""]);
+  const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
+  const [confirmBoxes, setConfirmBoxes] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"create" | "confirm">("create");
 
-  const boxRefs = useRef<Array<TextInput | null>>(new Array(4).fill(null));
+  const boxRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
   const confirmBoxRefs = useRef<Array<TextInput | null>>(
-    new Array(4).fill(null)
+    new Array(6).fill(null)
   );
 
-  const [boxIsFocused, setBoxIsFocused] = useState(new Array(4).fill(false));
+  const [boxIsFocused, setBoxIsFocused] = useState(new Array(6).fill(false));
 
   useEffect(() => {
     if (step === "confirm") {
@@ -62,7 +62,7 @@ const CreatePinScreen: React.FC<{
     } else if (/^\d{0,1}$/.test(text)) {
       newBoxes[index] = text;
       setCurrentBoxes(newBoxes);
-      if (index < 3 && text !== "") {
+      if (index < 5 && text !== "") {
         confirm
           ? confirmBoxRefs.current[index + 1]?.focus()
           : boxRefs.current[index + 1]?.focus();
@@ -87,7 +87,7 @@ const CreatePinScreen: React.FC<{
     }
   };
 
-  const createPinMutation = useApi.post("/auth/create-pin");
+  const { createPin } = useContext(AuthContext);
 
   const handleCreatePin = () => {
     setStep("confirm");
@@ -108,10 +108,7 @@ const CreatePinScreen: React.FC<{
     }
 
     try {
-      const response = await createPinMutation.mutateAsync({
-        securityPin: parseInt(pin, 10),
-        transactionPin: parseInt(pin, 10),
-      });
+      const response = await createPin(pin);
       console.log("API response:", response);
       handleShowFlash({
         message: "Pins created successfully!",
@@ -132,7 +129,7 @@ const CreatePinScreen: React.FC<{
   const handleBackPress = () => {
     if (step === "confirm") {
       setStep("create");
-      setConfirmBoxes(["", "", "", ""]); // Clear confirmation boxes when going back to create step
+      setConfirmBoxes(["", "", "", "", "", ""]); // Clear confirmation boxes when going back to create step
       boxRefs.current[0]?.focus(); // Focus on the first box of the create step
     } else {
       navigation.goBack();
@@ -154,7 +151,7 @@ const CreatePinScreen: React.FC<{
           }}
         >
           <View style={styles.topContain}>
-            {[...Array(4)].map((_, i) => (
+            {[...Array(6)].map((_, i) => (
               <Image
                 key={i}
                 source={require("../../../assets/images/star.png")}

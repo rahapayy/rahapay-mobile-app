@@ -19,6 +19,7 @@ import Button from "../../../components/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { AuthContext } from "../../../context/AuthContext";
 import { logError } from "../../../utils/errorLogger";
+import { AxiosError } from "axios";
 
 const LoginScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -66,27 +67,36 @@ const LoginScreen: React.FC<{
         type: "success",
       });
       // navigation.navigate("AppStack");
-    } catch (error) {
-      const err = error as {
-        status?: number;
-        message: string;
-      };
+    } catch (error: unknown) {
+      console.error("Login Error:", error); // Log for debugging
 
       let errorMessage = "An error occurred. Please try again.";
 
-      if (err.status === 404) {
-        errorMessage = "User not found. Please check your credentials.";
-      } else if (err.status === 401) {
-        errorMessage = "Incorrect password. Please try again.";
-      } else if (err.message) {
-        errorMessage = err.message;
+      if (error instanceof AxiosError) {
+        // Handle Axios errors specifically
+        if (error.response) {
+          const status = error.response.status;
+          if (status === 404) {
+            errorMessage = "User not found. Please check your credentials.";
+          } else if (status === 401) {
+            errorMessage = "Incorrect password. Please try again.";
+          } else if (status >= 500) {
+            errorMessage = "A server error occurred. Please try again later.";
+          } else {
+            errorMessage = "An unexpected error occurred. Please try again.";
+          }
+        } else {
+          errorMessage = "An unexpected error occurred. Please try again.";
+        }
+      } else if (error instanceof Error) {
+        errorMessage = "An unexpected error occurred. Please try again.";
       }
 
       handleShowFlash({
         message: errorMessage,
         type: "danger",
       });
-      logError(err); // Log the error for debugging
+      logError(error); // Log the error for debugging
     } finally {
       setIsLoading(false);
     }
@@ -243,7 +253,6 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    fontSize: RFValue(12),
     borderRadius: 10,
     paddingHorizontal: SPACING,
     paddingVertical: Platform.OS === "ios" ? 14 : 10,
@@ -253,7 +262,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: RFValue(12),
+    fontSize: RFValue(10),
     fontFamily: "Outfit-Regular",
   },
   focusedInput: {
