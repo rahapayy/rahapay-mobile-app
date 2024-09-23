@@ -37,9 +37,11 @@ export const AuthContext = createContext<{
     referral: string
   ) => void;
   verifyEmail: (verificationCode: string) => void;
+  resendOtp: (id: string) => void;
   login: (email: string, password: string) => void;
   logout: () => void;
   isLoggedIn: () => boolean;
+  createPin: (pin: string) => void;
   isAppReady: boolean;
   isAuthenticated: boolean;
   userDetails: any;
@@ -56,9 +58,11 @@ export const AuthContext = createContext<{
   setUserInfo: (userInfo: any) => {},
   onboarding: () => {},
   verifyEmail: () => {},
+  resendOtp: () => {},
   login: () => {},
   logout: () => {},
   isLoggedIn: () => false,
+  createPin: () => {},
   isAuthenticated: false,
   isAppReady: false,
   userDetails: null,
@@ -142,17 +146,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const verifyEmail = async (verificationCode: string) => {
+  const verifyEmail = async (otp: string) => {
     setIsLoading(true);
     try {
-      const response = await axios.post(`/auth/verify-email`, {
-        verificationCode,
-      });
+      const response = await axios.post(`/auth/verify-email`, { otp });
+      return response.data;
+    } catch (error) {
+      throw error; // Re-throw the error to handle it in the component
+    } finally {
       setIsLoading(false);
-      return true;
-    } catch (error: any) {
+    }
+  };
+
+  const resendOtp = async ({ id }: { id: string }) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(`/auth/resend-otp`, { id });
+      return response.data;
+    } catch (error) {
+      throw error; // Re-throw the error to handle it in the component
+    } finally {
       setIsLoading(false);
-      throw error;
     }
   };
 
@@ -174,6 +188,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       throw new Error("Incorrect email or password");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const createPin = async (pin: string) => {
+    try {
+      const res = await axios.post(`/auth/create-pin`, { pin });
+      return res.data;
+    } catch (error) {
+      throw error;
     }
   };
 
@@ -411,6 +434,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUserInfo,
         onboarding,
         verifyEmail,
+        resendOtp: (id: string) => resendOtp({ id }),
+        createPin,
         userDetails,
         fetchUserDetails,
         login,

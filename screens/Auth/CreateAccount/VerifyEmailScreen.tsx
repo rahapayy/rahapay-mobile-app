@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -15,9 +15,8 @@ import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../config/SPACING";
 import COLORS from "../../../config/colors";
 import Button from "../../../components/Button";
-import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthContext } from "../../../context/AuthContext";
 
 type VerifyEmailScreenRouteParams = {
   email: string;
@@ -39,8 +38,7 @@ const VerifyEmailScreen: React.FC<{
   const [isInputFilled, setIsInputFilled] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(60);
   const [isLoading, setIsLoading] = useState(false);
-  const { mutateAsync: verifyOtp } = useApi.post("/auth/verify-email");
-  const { mutateAsync: resendOtp } = useApi.post("/auth/resend-otp");
+  const { verifyEmail, resendOtp } = useContext(AuthContext);
 
   useEffect(() => {
     setIsInputFilled(boxes.every((box) => box !== ""));
@@ -97,18 +95,12 @@ const VerifyEmailScreen: React.FC<{
     if (otp.length === 6) {
       setIsSubmitting(true);
       try {
-        const response = await verifyOtp({ otp, email });
+        await verifyEmail(otp); // Use verifyEmail from AuthContext
         handleShowFlash({
           message: "Email verified successfully!",
           type: "success",
         });
-        const accessToken = response.data?.data?.accessToken;
-        if (accessToken) {
-          await AsyncStorage.setItem("access_token", accessToken);
-          navigation.navigate("CreateTagScreen");
-        } else {
-          throw new Error("Invalid Token");
-        }
+        navigation.navigate("CreatePinScreen");
       } catch (error) {
         const err = error as {
           response?: { data?: { message?: string; code?: string } };
@@ -140,9 +132,9 @@ const VerifyEmailScreen: React.FC<{
     }
   };
 
-  const resendOTP = async () => {
+  const handleResendOTP = async () => {
     try {
-      await resendOtp({ id });
+      await resendOtp(id); // Use resendOtp from AuthContext
       handleShowFlash({
         message: "OTP resent successfully!",
         type: "success",
@@ -241,7 +233,7 @@ const VerifyEmailScreen: React.FC<{
             </Text>
 
             <TouchableOpacity
-              onPress={resendOTP}
+              onPress={handleResendOTP}
               disabled={resendCountdown > 0}
             >
               <View style={styles.countdownContainer}>
