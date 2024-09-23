@@ -34,7 +34,8 @@ import LogOutModal from "../components/modals/LogoutModal";
 const ProfileScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { userDetails, logout } = useContext(AuthContext);
+  const { userDetails, logout, userInfo } = useContext(AuthContext);
+  console.log(userInfo);
 
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [biometricModalVisible, setBiometricModalVisible] = useState(false);
@@ -130,7 +131,7 @@ const ProfileScreen: React.FC<{
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => navigation.navigate("EditTagScreen")}
+                onPress={() => navigation.navigate("CreateTagScreen")}
                 style={styles.settingsItem}
               >
                 <Tag variant="Bold" color={COLORS.violet400} size={24} />

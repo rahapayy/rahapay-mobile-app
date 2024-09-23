@@ -65,7 +65,6 @@ const LoginScreen: React.FC<{
         message: "Logged in successfully!",
         type: "success",
       });
-      navigation.navigate("CreateTagScreen");
       // navigation.navigate("AppStack");
     } catch (error) {
       const err = error as {

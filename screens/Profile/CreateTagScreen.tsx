@@ -11,14 +11,13 @@ import {
 import React, { useEffect, useState } from "react";
 import { ArrowLeft } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import COLORS from "../../../config/colors";
-import SPACING from "../../../config/SPACING";
+import COLORS from "../../config/colors";
+import SPACING from "../../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import Button from "../../../components/Button";
-import useApi from "../../../utils/api";
-import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import FONT_SIZE from "../../../config/font-size";
-import { getItem } from "../../../utils/ayncStorage";
+import Button from "../../components/Button";
+import useApi from "../../utils/api";
+import { handleShowFlash } from "../../components/FlashMessageComponent";
+import FONT_SIZE from "../../config/font-size";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CreateTagScreen: React.FC<{
@@ -33,21 +32,21 @@ const CreateTagScreen: React.FC<{
 
   // const { mutateAsync: updateTagMutateAsync } = useApi.patch("/auth/username");
   const { data: suggestedTagsResponse, refetch: fetchUsernames } = useApi.get(
-    "/auth/suggest-username?numberOfSuggestions=7",
+    "/user/suggest-username?numberOfSuggestions=7",
     {
       enabled: false,
     }
   );
 
   const updateTagMutation = useApi.patch<{ userName: string }, Error>(
-    "/auth/username"
+    "/user/username"
   );
 
   const handleSetTag = async () => {
     setLoading(true);
     try {
       await updateTagMutation.mutateAsync({ userName: tag });
-      navigation.navigate("CreatePinScreen");
+      navigation.navigate("HomeScreen");
       handleShowFlash({
         message: "Tag updated successfully!",
         type: "success",

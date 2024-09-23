@@ -12,7 +12,6 @@ import EnterCodeScreen from "../screens/Auth/ForgotPassword/EnterCodeScreen";
 import CreateNewPasswordScreen from "../screens/Auth/ForgotPassword/CreateNewPasswordScreen";
 import LoginScreen from "../screens/Auth/Login/LoginScreen";
 import SuccessfulScreen from "../screens/Auth/CreateAccount/SuccessfulScreen";
-import CreateTagScreen from "../screens/Auth/CreateAccount/CreateTagScreen";
 import CreateTransactionPinScreen from "../screens/Auth/CreateAccount/CreatePinScreen";
 
 const Stack = createNativeStackNavigator();
@@ -75,11 +74,6 @@ const AuthRoute = () => {
       <Stack.Screen
         name="VerifyEmailScreen"
         component={VerifyEmailScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="CreateTagScreen"
-        component={CreateTagScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

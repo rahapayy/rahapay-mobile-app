@@ -179,7 +179,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchUserDetails = async (token: any) => {
     try {
-      const res = await axios.get(`/user/me`, {
+      const res = await axios.get(`/user/dashboard/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUserDetails(res.data.data);

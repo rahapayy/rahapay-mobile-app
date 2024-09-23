@@ -108,4 +108,5 @@ export type RootStackParamList = {
   CardScreen: undefined;
   ProfileScreen: undefined;
   EditTagScreen: undefined;
+  CreateTagScreen: undefined;
 };
