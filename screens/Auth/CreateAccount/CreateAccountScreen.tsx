@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../config/colors";
@@ -19,6 +19,7 @@ import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as Animatable from "react-native-animatable";
+import { AuthContext } from "../../../context/AuthContext";
 
 const CreateAccountScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -39,6 +40,8 @@ const CreateAccountScreen: React.FC<{
   const [metRequirements, setMetRequirements] = useState<Set<number>>(
     new Set()
   );
+
+  const { onboarding } = useContext(AuthContext);
 
   const [showEmailSection, setShowEmailSection] = useState(false);
   const [showPhoneSection, setShowPhoneSection] = useState(false);
@@ -69,7 +72,8 @@ const CreateAccountScreen: React.FC<{
     countryCode;
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
-  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword((prev) => !prev);
+  const toggleConfirmPasswordVisibility = () =>
+    setShowConfirmPassword((prev) => !prev);
 
   const handleButtonClick = async () => {
     if (isFormComplete) {
@@ -84,35 +88,24 @@ const CreateAccountScreen: React.FC<{
 
       setIsLoading(true);
       try {
-        const response = await mutateAsync({
-          fullName: fullName.trim(),
-          email: email.trim(),
-          phoneNumber: phoneNumber.trim(),
+        const response = await onboarding(
+          email.trim(),
+          password.trim(),
           countryCode,
-          password: password.trim(),
-          referral: referral.trim(),
-        });
-
-        // handleShowFlash({
-        //   message: "Account created successfully! Please check your email to verify your account.",
-        //   type: "success",
-        // });
+          fullName.trim(),
+          phoneNumber.trim(),
+          referral.trim()
+        );
 
         navigation.navigate("VerifyEmailScreen", {
           email,
-          id: response.data.data.id,
+          // id: response.data.user.id,
         });
       } catch (error) {
-        const err = error as {
-          response?: { data?: { message?: string } };
-          message: string;
-        };
-        const errorMessage =
-          err.response?.data?.message || err.message || "An error occurred";
-        console.error("API Error:", err.response?.data || err.message);
+        console.error("Onboarding Error:", error);
 
         handleShowFlash({
-          message: errorMessage,
+          message: "An error occurred during account creation.",
           type: "danger",
         });
       } finally {

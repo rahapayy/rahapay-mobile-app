@@ -11,7 +11,8 @@ import ExistingUserScreen from "../screens/Auth/Login/ExistingUserScreen";
 const Stack = createNativeStackNavigator();
 
 const Router = () => {
-  const { isAuthenticated, isAppReady, userInfo, showPinScreen } = useContext(AuthContext);
+  const { isAuthenticated, isAppReady, userInfo, showPinScreen } =
+    useContext(AuthContext);
 
   if (!isAppReady) {
     // Loading indicator screen
@@ -32,22 +33,10 @@ const Router = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {showPinScreen ? (
-          <Stack.Screen
-            name="ExistingUser"
-            component={ExistingUserScreen}
-            options={{ headerShown: false }}
-          />
-        ) : isAuthenticated ? (
+        {isAuthenticated ? (
           <Stack.Screen
             name="AppStack"
             component={AppStack}
-            options={{ headerShown: false }}
-          />
-        ) : userInfo ? (
-          <Stack.Screen
-            name="ExistingUser"
-            component={ExistingUserScreen}
             options={{ headerShown: false }}
           />
         ) : (

@@ -134,10 +134,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log({ userInfo });
       setUserInfo(userInfo);
       AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
-      AsyncStorage.setItem("access_token", userInfo.data.accessToken);
-      setIsAuthenticated(true);
-
-      await fetchUserDetails(userInfo.data.accessToken);
+      // if (userInfo.data && userInfo.data.accessToken) {
+      //   AsyncStorage.setItem("access_token", userInfo.data.accessToken);
+      // } else {
+      //   console.warn("Access token is undefined.");
+      // }
 
       setIsLoading(false);
       return userInfo;
