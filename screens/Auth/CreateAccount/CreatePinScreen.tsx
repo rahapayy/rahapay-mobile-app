@@ -23,7 +23,6 @@ const CreatePinScreen: React.FC<{
   const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
   const [confirmBoxes, setConfirmBoxes] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<"create" | "confirm">("create");
 
   const boxRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
   const confirmBoxRefs = useRef<Array<TextInput | null>>(
@@ -31,14 +30,11 @@ const CreatePinScreen: React.FC<{
   );
 
   const [boxIsFocused, setBoxIsFocused] = useState(new Array(6).fill(false));
+  const [confirmBoxIsFocused, setConfirmBoxIsFocused] = useState(
+    new Array(6).fill(false)
+  );
 
-  useEffect(() => {
-    if (step === "confirm") {
-      confirmBoxRefs.current[0]?.focus();
-    } else {
-      boxRefs.current[0]?.focus();
-    }
-  }, [step]);
+  const { createPin } = useContext(AuthContext);
 
   const handleInput = (
     text: string,
@@ -87,12 +83,6 @@ const CreatePinScreen: React.FC<{
     }
   };
 
-  const { createPin } = useContext(AuthContext);
-
-  const handleCreatePin = () => {
-    setStep("confirm");
-  };
-
   const handleConfirmPin = async () => {
     setLoading(true);
     const pin = boxes.join("");
@@ -127,13 +117,7 @@ const CreatePinScreen: React.FC<{
   };
 
   const handleBackPress = () => {
-    if (step === "confirm") {
-      setStep("create");
-      setConfirmBoxes(["", "", "", "", "", ""]); // Clear confirmation boxes when going back to create step
-      boxRefs.current[0]?.focus(); // Focus on the first box of the create step
-    } else {
-      navigation.goBack();
-    }
+    navigation.goBack();
   };
 
   return (
@@ -146,23 +130,10 @@ const CreatePinScreen: React.FC<{
         <View
           style={{
             marginTop: 16,
-            justifyContent: "center",
-            alignItems: "center",
           }}
         >
-          <View style={styles.topContain}>
-            {[...Array(6)].map((_, i) => (
-              <Image
-                key={i}
-                source={require("../../../assets/images/star.png")}
-                style={{ width: 12, height: 12 }}
-              />
-            ))}
-          </View>
           <Text style={styles.headText} allowFontScaling={false}>
-            {step === "create"
-              ? "Create Your Security PIN"
-              : "Confirm Your Security PIN"}
+            Create Your Security PIN
           </Text>
           <Text style={styles.subText} allowFontScaling={false}>
             Use this pin to process your transactions
@@ -170,15 +141,16 @@ const CreatePinScreen: React.FC<{
         </View>
 
         <View style={styles.inputContainer}>
+          <View>
+            <Text style={styles.titleText} allowFontScaling={false}>
+              Enter Security PIN
+            </Text>
+          </View>
           <View style={styles.inputRow}>
-            {(step === "create" ? boxes : confirmBoxes).map((value, index) => (
+            {boxes.map((value, index) => (
               <TextInput
                 key={index}
-                ref={(ref) =>
-                  step === "create"
-                    ? (boxRefs.current[index] = ref)
-                    : (confirmBoxRefs.current[index] = ref)
-                }
+                ref={(ref) => (boxRefs.current[index] = ref)}
                 style={[
                   styles.inputBox,
                   boxIsFocused[index] && styles.inputBoxFocused,
@@ -187,12 +159,8 @@ const CreatePinScreen: React.FC<{
                 allowFontScaling={false}
                 value={value}
                 secureTextEntry
-                onChangeText={(text) =>
-                  handleInput(text, index, step === "confirm")
-                }
-                onKeyPress={(event) =>
-                  handleKeyPress(event, index, step === "confirm")
-                }
+                onChangeText={(text) => handleInput(text, index)}
+                onKeyPress={(event) => handleKeyPress(event, index)}
                 onFocus={() =>
                   setBoxIsFocused((prevState) => [
                     ...prevState.slice(0, index),
@@ -212,9 +180,49 @@ const CreatePinScreen: React.FC<{
           </View>
         </View>
 
+        <View style={styles.inputContainer}>
+          <View>
+            <Text style={styles.titleText} allowFontScaling={false}>
+              Confirm Security PIN
+            </Text>
+          </View>
+          <View style={styles.inputRow}>
+            {confirmBoxes.map((value, index) => (
+              <TextInput
+                key={index}
+                ref={(ref) => (confirmBoxRefs.current[index] = ref)}
+                style={[
+                  styles.inputBox,
+                  confirmBoxIsFocused[index] && styles.inputBoxFocused,
+                ]}
+                keyboardType="numeric"
+                allowFontScaling={false}
+                value={value}
+                secureTextEntry
+                onChangeText={(text) => handleInput(text, index, true)}
+                onKeyPress={(event) => handleKeyPress(event, index, true)}
+                onFocus={() =>
+                  setConfirmBoxIsFocused((prevState) => [
+                    ...prevState.slice(0, index),
+                    true,
+                    ...prevState.slice(index + 1),
+                  ])
+                }
+                onBlur={() =>
+                  setConfirmBoxIsFocused((prevState) => [
+                    ...prevState.slice(0, index),
+                    false,
+                    ...prevState.slice(index + 1),
+                  ])
+                }
+              />
+            ))}
+          </View>
+        </View>
+
         <Button
-          title={step === "create" ? "Continue" : "Confirm"}
-          onPress={step === "create" ? handleCreatePin : handleConfirmPin}
+          title="Confirm"
+          onPress={handleConfirmPin}
           isLoading={loading}
           style={{ marginTop: SPACING * 4 }}
           textColor="#fff"
@@ -229,13 +237,18 @@ export default CreatePinScreen;
 const styles = StyleSheet.create({
   headText: {
     fontFamily: "Outfit-Medium",
-    fontSize: RFValue(20),
-    marginBottom: 10,
+    fontSize: RFValue(18),
+    marginBottom: 6,
   },
   subText: {
+    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(10),
+    color: "#0000008F",
+  },
+  titleText: {
     fontFamily: "Outfit-ExtraLight",
-    fontSize: RFValue(13),
-    textAlign: "center",
+    fontSize: RFValue(10),
+    marginBottom: SPACING / 2,
   },
   inputContainer: {
     flexDirection: "column",
@@ -244,7 +257,7 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING * 2,
     borderRadius: 10,
     backgroundColor: COLORS.white,
-    marginTop: SPACING * 4,
+    marginTop: SPACING * 2,
   },
   inputRow: {
     flexDirection: "row",
@@ -253,16 +266,14 @@ const styles = StyleSheet.create({
     gap: SPACING,
   },
   inputBox: {
-    width: 60,
-    height: 60,
+    width: 40,
+    height: 40,
     textAlign: "center",
-    paddingVertical: SPACING / 2,
-    paddingHorizontal: SPACING / 2,
     borderRadius: 10,
-    margin: SPACING / 2,
+    margin: SPACING / 6,
     borderWidth: 1,
     borderColor: "#DFDFDF",
-    fontSize: RFValue(19),
+    fontSize: RFValue(10),
     fontWeight: "bold",
   },
   inputBoxFocused: {

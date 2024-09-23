@@ -256,12 +256,13 @@ export default VerifyEmailScreen;
 const styles = StyleSheet.create({
   headText: {
     fontFamily: "Outfit-Medium",
-    fontSize: RFValue(20),
-    marginBottom: 10,
+    fontSize: RFValue(18),
+    marginBottom: 6,
   },
   subText: {
-    fontFamily: "Outfit-ExtraLight",
-    fontSize: RFValue(13),
+    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(10),
+    color: "#0000008F",
   },
   inputContainer: {
     flexDirection: "column",
@@ -286,7 +287,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     width: 50,
     height: 56,
-    borderRadius: 10,
+    borderRadius: 8,
     margin: SPACING / 2,
     borderWidth: 1,
     borderColor: "#DFDFDF",

@@ -97,8 +97,7 @@ const CreateAccountScreen: React.FC<{
           phoneNumber.trim(),
           referral.trim()
         );
-  
-  
+
         // Get the user ID from the response
         const userId = userInfo?.data?.id;
         console.log("User ID:", userId);
@@ -473,12 +472,13 @@ export default CreateAccountScreen;
 const styles = StyleSheet.create({
   headText: {
     fontFamily: "Outfit-Medium",
-    fontSize: RFValue(20),
-    marginBottom: 10,
+    fontSize: RFValue(18),
+    marginBottom: 6,
   },
   subText: {
-    fontFamily: "Outfit-ExtraLight",
-    fontSize: RFValue(13),
+    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(10),
+    color: "#0000008F",
   },
   label: {
     fontFamily: "Outfit-Medium",

@@ -253,6 +253,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
+    fontSize: RFValue(12),
     borderRadius: 10,
     paddingHorizontal: SPACING,
     paddingVertical: Platform.OS === "ios" ? 14 : 10,
