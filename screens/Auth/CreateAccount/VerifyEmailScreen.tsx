@@ -17,6 +17,7 @@ import COLORS from "../../../config/colors";
 import Button from "../../../components/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { AuthContext } from "../../../context/AuthContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type VerifyEmailScreenRouteParams = {
   email: string;
@@ -95,7 +96,7 @@ const VerifyEmailScreen: React.FC<{
     if (otp.length === 6) {
       setIsSubmitting(true);
       try {
-        await verifyEmail(otp); // Use verifyEmail from AuthContext
+        const userInfo = await verifyEmail(otp); // Use verifyEmail from AuthContext
         handleShowFlash({
           message: "Email verified successfully!",
           type: "success",

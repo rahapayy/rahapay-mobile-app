@@ -16,6 +16,7 @@ import Button from "../../../components/Button";
 import { ArrowLeft } from "iconsax-react-native";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { AuthContext } from "../../../context/AuthContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CreatePinScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -98,15 +99,18 @@ const CreatePinScreen: React.FC<{
     }
 
     try {
-      const response = await createPin(pin);
-      console.log("API response:", response);
+      const accessToken = await AsyncStorage.getItem("access_token"); // Retrieve access token
+      console.log("Access Token:", accessToken); // Log the access token
+      await createPin(pin); // Pass token
+
       handleShowFlash({
         message: "Pins created successfully!",
         type: "success",
       });
+
       navigation.navigate("SuccessfulScreen");
     } catch (error) {
-      console.error("Error creating PIN:", error);
+      console.error("Error creating PIN:", error.response ? error.response.data : error);
       handleShowFlash({
         message: "Failed to create pins. Please try again.",
         type: "danger",

@@ -15,7 +15,6 @@ import COLORS from "../../../config/colors";
 import SPACING from "../../../config/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/Button";
-import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as Animatable from "react-native-animatable";

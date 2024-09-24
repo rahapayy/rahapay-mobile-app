@@ -34,8 +34,7 @@ import LogOutModal from "../components/modals/LogoutModal";
 const ProfileScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { userDetails, logout, userInfo } = useContext(AuthContext);
-  console.log(userInfo);
+  const { userDetails, logout} = useContext(AuthContext);
 
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [biometricModalVisible, setBiometricModalVisible] = useState(false);

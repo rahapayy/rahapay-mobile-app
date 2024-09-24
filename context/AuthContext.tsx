@@ -131,21 +131,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         phoneNumber,
         referral,
       });
-  
+
       // Define and store the userInfo correctly from the response
       const userInfo = res.data; // Assuming `res.data` is the correct response structure
       console.log({ userInfo });
-      
+
       // Set the userInfo state
       setUserInfo(userInfo);
-  
+
       // Store user info in AsyncStorage
       await AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
-  
+
       // You may also store the user id in AsyncStorage if needed
       const userId = userInfo.data.id;
       await AsyncStorage.setItem("userId", userId);
-  
+
       setIsLoading(false);
       return userInfo;
     } catch (error) {
@@ -153,7 +153,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       throw error;
     }
   };
-  
+
   const verifyEmail = async (otp: string) => {
     setIsLoading(true);
     try {
@@ -202,19 +202,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const createPin = async (pin: string) => {
     setIsLoading(true);
     try {
-      // Get the access token from userInfo
-      const accessToken = userInfo?.data?.access_token;
-
       // Make the POST request to create the pin
-      const response = await axios.post(
-        `/auth/create-pin`,
-        { securityPin: pin },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const response = await axios.post(`/auth/create-pin`, {
+        securityPin: pin,
+      });
 
       // Return the response data
       return response.data;

@@ -5,8 +5,7 @@ export const setItem = async (key: string, value: string): Promise<void> => {
   try {
     await AsyncStorage.setItem(key, value);
   } catch (error) {
-    console.log(`Error storing value for key "${key}": `, error);
-    // You can handle the error more specifically if needed
+    console.error(`Error storing value for key "${key}": `, error);
   }
 };
 
@@ -14,9 +13,9 @@ export const setItem = async (key: string, value: string): Promise<void> => {
 export const getItem = async (key: string, defaultValue: string | null = null): Promise<string | null> => {
   try {
     const value = await AsyncStorage.getItem(key);
-    return value != null ? value : defaultValue;
+    return value !== null ? value : defaultValue;
   } catch (error) {
-    console.log(`Error retrieving value for key "${key}": `, error);
+    console.error(`Error retrieving value for key "${key}": `, error);
     return defaultValue;
   }
 };
@@ -31,22 +30,22 @@ export const removeItem = async (key: string): Promise<void> => {
 };
 
 // Store an object or array in AsyncStorage (stored as JSON)
-export const setObject = async (key: string, value: object): Promise<void> => {
+export const setObject = async (key: string, value: Record<string, unknown>): Promise<void> => {
   try {
     const jsonValue = JSON.stringify(value);
     await AsyncStorage.setItem(key, jsonValue);
   } catch (error) {
-    console.log(`Error storing object for key "${key}": `, error);
+    console.error(`Error storing object for key "${key}": `, error);
   }
 };
 
 // Retrieve an object or array from AsyncStorage (parsed from JSON)
-export const getObject = async (key: string, defaultValue: object | null = null): Promise<object | null> => {
+export const getObject = async (key: string, defaultValue: Record<string, unknown> | null = null): Promise<Record<string, unknown> | null> => {
   try {
     const jsonValue = await AsyncStorage.getItem(key);
-    return jsonValue != null ? JSON.parse(jsonValue) : defaultValue;
+    return jsonValue !== null ? JSON.parse(jsonValue) : defaultValue;
   } catch (error) {
-    console.log(`Error retrieving object for key "${key}": `, error);
+    console.error(`Error retrieving object for key "${key}": `, error);
     return defaultValue;
   }
 };
@@ -56,7 +55,7 @@ export const clearStorage = async (): Promise<void> => {
   try {
     await AsyncStorage.clear();
   } catch (error) {
-    console.log("Error clearing AsyncStorage: ", error);
+    console.error("Error clearing AsyncStorage: ", error);
   }
 };
 
@@ -66,7 +65,7 @@ export const getAllKeys = async (): Promise<string[]> => {
     const keys = await AsyncStorage.getAllKeys();
     return [...keys]; // Convert readonly array to mutable array
   } catch (error) {
-    console.log("Error retrieving all keys: ", error);
+    console.error("Error retrieving all keys: ", error);
     return [];
   }
 };

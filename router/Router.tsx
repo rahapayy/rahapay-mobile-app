@@ -11,7 +11,7 @@ import ExistingUserScreen from "../screens/Auth/Login/ExistingUserScreen";
 const Stack = createNativeStackNavigator();
 
 const Router = () => {
-  const { isAuthenticated, isAppReady, userInfo, showPinScreen } =
+  const { isAuthenticated, isAppReady } =
     useContext(AuthContext);
 
   if (!isAppReady) {
