@@ -268,8 +268,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(true);
     try {
       // Call the logout endpoint
-      await axios.post('/auth/logout');
-      
+      await axios.post("/auth/logout");
+
       setUserInfo(null);
       setIsAuthenticated(false);
       setUserDetails(null);
