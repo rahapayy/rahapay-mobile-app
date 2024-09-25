@@ -99,10 +99,7 @@ const CreatePinScreen: React.FC<{
     }
 
     try {
-      const accessToken = await AsyncStorage.getItem("access_token"); // Retrieve access token
-      console.log("Access Token:", accessToken); // Log the access token
-      await createPin(pin); // Pass token
-
+      await createPin(pin);
       handleShowFlash({
         message: "Pins created successfully!",
         type: "success",
@@ -110,7 +107,7 @@ const CreatePinScreen: React.FC<{
 
       navigation.navigate("SuccessfulScreen");
     } catch (error) {
-      console.error("Error creating PIN:", error.response ? error.response.data : error);
+      console.error("Error creating PIN:", error);
       handleShowFlash({
         message: "Failed to create pins. Please try again.",
         type: "danger",
@@ -145,82 +142,82 @@ const CreatePinScreen: React.FC<{
         </View>
 
         <View style={styles.inputContainer}>
-          <View>
-            <Text style={styles.titleText} allowFontScaling={false}>
-              Enter Security PIN
-            </Text>
-          </View>
-          <View style={styles.inputRow}>
-            {boxes.map((value, index) => (
-              <TextInput
-                key={index}
-                ref={(ref) => (boxRefs.current[index] = ref)}
-                style={[
-                  styles.inputBox,
-                  boxIsFocused[index] && styles.inputBoxFocused,
-                ]}
-                keyboardType="numeric"
-                allowFontScaling={false}
-                value={value}
-                secureTextEntry
-                onChangeText={(text) => handleInput(text, index)}
-                onKeyPress={(event) => handleKeyPress(event, index)}
-                onFocus={() =>
-                  setBoxIsFocused((prevState) => [
-                    ...prevState.slice(0, index),
-                    true,
-                    ...prevState.slice(index + 1),
-                  ])
-                }
-                onBlur={() =>
-                  setBoxIsFocused((prevState) => [
-                    ...prevState.slice(0, index),
-                    false,
-                    ...prevState.slice(index + 1),
-                  ])
-                }
-              />
-            ))}
+          <Text style={styles.titleText} allowFontScaling={false}>
+            Enter Security PIN
+          </Text>
+          <View className="justify-center items-center">
+            <View style={styles.inputRow}>
+              {boxes.map((value, index) => (
+                <TextInput
+                  key={index}
+                  ref={(ref) => (boxRefs.current[index] = ref)}
+                  style={[
+                    styles.inputBox,
+                    boxIsFocused[index] && styles.inputBoxFocused,
+                  ]}
+                  keyboardType="numeric"
+                  allowFontScaling={false}
+                  value={value}
+                  secureTextEntry
+                  onChangeText={(text) => handleInput(text, index)}
+                  onKeyPress={(event) => handleKeyPress(event, index)}
+                  onFocus={() =>
+                    setBoxIsFocused((prevState) => [
+                      ...prevState.slice(0, index),
+                      true,
+                      ...prevState.slice(index + 1),
+                    ])
+                  }
+                  onBlur={() =>
+                    setBoxIsFocused((prevState) => [
+                      ...prevState.slice(0, index),
+                      false,
+                      ...prevState.slice(index + 1),
+                    ])
+                  }
+                />
+              ))}
+            </View>
           </View>
         </View>
 
         <View style={styles.inputContainer}>
-          <View>
-            <Text style={styles.titleText} allowFontScaling={false}>
-              Confirm Security PIN
-            </Text>
-          </View>
-          <View style={styles.inputRow}>
-            {confirmBoxes.map((value, index) => (
-              <TextInput
-                key={index}
-                ref={(ref) => (confirmBoxRefs.current[index] = ref)}
-                style={[
-                  styles.inputBox,
-                  confirmBoxIsFocused[index] && styles.inputBoxFocused,
-                ]}
-                keyboardType="numeric"
-                allowFontScaling={false}
-                value={value}
-                secureTextEntry
-                onChangeText={(text) => handleInput(text, index, true)}
-                onKeyPress={(event) => handleKeyPress(event, index, true)}
-                onFocus={() =>
-                  setConfirmBoxIsFocused((prevState) => [
-                    ...prevState.slice(0, index),
-                    true,
-                    ...prevState.slice(index + 1),
-                  ])
-                }
-                onBlur={() =>
-                  setConfirmBoxIsFocused((prevState) => [
-                    ...prevState.slice(0, index),
-                    false,
-                    ...prevState.slice(index + 1),
-                  ])
-                }
-              />
-            ))}
+          <Text style={styles.titleText} allowFontScaling={false}>
+            Confirm Security PIN
+          </Text>
+          <View className="justify-center items-center">
+            <View style={styles.inputRow}>
+              {confirmBoxes.map((value, index) => (
+                <TextInput
+                  key={index}
+                  ref={(ref) => (confirmBoxRefs.current[index] = ref)}
+                  style={[
+                    styles.inputBox,
+                    confirmBoxIsFocused[index] && styles.inputBoxFocused,
+                  ]}
+                  keyboardType="numeric"
+                  allowFontScaling={false}
+                  value={value}
+                  secureTextEntry
+                  onChangeText={(text) => handleInput(text, index, true)}
+                  onKeyPress={(event) => handleKeyPress(event, index, true)}
+                  onFocus={() =>
+                    setConfirmBoxIsFocused((prevState) => [
+                      ...prevState.slice(0, index),
+                      true,
+                      ...prevState.slice(index + 1),
+                    ])
+                  }
+                  onBlur={() =>
+                    setConfirmBoxIsFocused((prevState) => [
+                      ...prevState.slice(0, index),
+                      false,
+                      ...prevState.slice(index + 1),
+                    ])
+                  }
+                />
+              ))}
+            </View>
           </View>
         </View>
 
@@ -250,14 +247,16 @@ const styles = StyleSheet.create({
     color: "#0000008F",
   },
   titleText: {
-    fontFamily: "Outfit-ExtraLight",
+    fontFamily: "Outfit-Regular",
     fontSize: RFValue(10),
     marginBottom: SPACING / 2,
+    color: "#0000008F",
+    paddingHorizontal: SPACING * 2,
   },
   inputContainer: {
     flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
+    // justifyContent: "center",
+    // alignItems: "center",
     paddingVertical: SPACING * 2,
     borderRadius: 10,
     backgroundColor: COLORS.white,
@@ -274,7 +273,7 @@ const styles = StyleSheet.create({
     height: 40,
     textAlign: "center",
     borderRadius: 10,
-    margin: SPACING / 6,
+    margin: SPACING / 3,
     borderWidth: 1,
     borderColor: "#DFDFDF",
     fontSize: RFValue(10),

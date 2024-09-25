@@ -11,10 +11,7 @@ const SuccessfulScreen: React.FC<{
 }> = ({ navigation }) => {
   const handleButtonClick = () => {
     // Navigate directly to the AppStack
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "AppStack" }],
-    });
+    navigation.navigate("AppStack");
   };
 
   return (

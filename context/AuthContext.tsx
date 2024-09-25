@@ -14,9 +14,10 @@ interface UserInfoType {
   fullName: string;
   phoneNumber: string;
   data: {
-    id: string; // The ID returned in the response
+    id: string;
     user?: any;
-    token?: string;
+    accessToken?: string;
+    refreshToken?: string;
   };
   access_token: string;
   refresh_token: string;
@@ -25,10 +26,23 @@ interface UserInfoType {
 
 const BACKGROUND_FETCH_TASK = "background-logout";
 
+TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
+  await AsyncStorage.multiRemove(["userInfo", "access_token", "userDetails"]);
+  return BackgroundFetch.BackgroundFetchResult.NewData;
+});
+
+async function registerBackgroundFetchAsync() {
+  return BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
+    minimumInterval: 60 * 15, // 15 minutes
+    stopOnTerminate: false,
+    startOnBoot: true,
+  });
+}
+
 export const AuthContext = createContext<{
   isLoading: boolean;
   userInfo: UserInfoType | null;
-  setUserInfo: (userInfo: any) => void;
+  setUserInfo: (userInfo: UserInfoType | null) => void;
   onboarding: (
     email: string,
     password: string,
@@ -36,51 +50,43 @@ export const AuthContext = createContext<{
     fullName: string,
     phoneNumber: string,
     referral: string
-  ) => void;
-  verifyEmail: (verificationCode: string) => void;
-  resendOtp: (id: string) => void;
-  login: (email: string, password: string) => void;
-  logout: () => void;
+  ) => Promise<UserInfoType>;
+  verifyEmail: (verificationCode: string) => Promise<any>;
+  resendOtp: (id: string) => Promise<any>;
+  login: (id: string, password: string) => Promise<UserInfoType>;
+  logout: () => Promise<void>;
   isLoggedIn: () => boolean;
-  createPin: (pin: string) => void;
+  createPin: (pin: string) => Promise<any>;
   isAppReady: boolean;
   isAuthenticated: boolean;
   userDetails: any;
-  fetchUserDetails: (token: any) => Promise<void>;
-  showPinScreen: boolean;
-  setShowPinScreen: (show: boolean) => void;
-  refreshAccessToken: (pinOrPassword?: {
-    pin?: string;
-    password?: string;
-  }) => Promise<void>;
+  fetchUserDetails: (token: string) => Promise<void>;
+  refreshAccessToken: (refreshToken: string) => Promise<string>;
 }>({
   isLoading: false,
   userInfo: null,
-  setUserInfo: (userInfo: any) => {},
-  onboarding: () => {},
-  verifyEmail: () => {},
-  resendOtp: () => {},
-  login: () => {},
-  logout: () => {},
+  setUserInfo: () => {},
+  onboarding: async () => ({} as UserInfoType),
+  verifyEmail: async () => {},
+  resendOtp: async () => {},
+  login: async () => ({} as UserInfoType),
+  logout: async () => {},
   isLoggedIn: () => false,
-  createPin: () => {},
+  createPin: async () => {},
   isAuthenticated: false,
   isAppReady: false,
   userDetails: null,
   fetchUserDetails: async () => {},
-  showPinScreen: false,
-  setShowPinScreen: () => {},
-  refreshAccessToken: async () => {},
+  refreshAccessToken: async () => "",
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [userInfo, setUserInfo] = useState<UserInfoType | any>(null);
+  const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
   const [userDetails, setUserDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [idleStartTime, setIdleStartTime] = useState<number | null>(null);
   const [isAppReady, setIsAppReady] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showPinScreen, setShowPinScreen] = useState(false);
   const [appState, setAppState] = useState<AppStateStatus>(
     AppState.currentState
   );
@@ -88,16 +94,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const storedUserInfo = await AsyncStorage.getItem("userInfo");
-        const storedAccessToken = await AsyncStorage.getItem("access_token");
-        const storedUserDetails = await AsyncStorage.getItem("userDetails");
-        if (storedUserInfo) {
-          const parsedUserInfo = JSON.parse(storedUserInfo);
+        const [storedUserInfo, storedAccessToken, storedUserDetails] =
+          await AsyncStorage.multiGet([
+            "userInfo",
+            "access_token",
+            "userDetails",
+          ]);
+
+        if (storedUserInfo[1]) {
+          const parsedUserInfo = JSON.parse(storedUserInfo[1]);
           setUserInfo(parsedUserInfo);
           setIsAuthenticated(true);
 
-          if (storedAccessToken && storedUserDetails) {
-            setUserDetails(JSON.parse(storedUserDetails));
+          if (storedAccessToken[1] && storedUserDetails[1]) {
+            setUserDetails(JSON.parse(storedUserDetails[1]));
           } else {
             await fetchUserDetails(parsedUserInfo.data.accessToken);
           }
@@ -120,7 +130,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     fullName: string,
     phoneNumber: string,
     referral: string
-  ) => {
+  ): Promise<UserInfoType> => {
     setIsLoading(true);
     try {
       const res = await axios.post(`/auth/onboarding`, {
@@ -132,25 +142,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         referral,
       });
 
-      // Define and store the userInfo correctly from the response
-      const userInfo = res.data; // Assuming `res.data` is the correct response structure
-      console.log({ userInfo });
-
-      // Set the userInfo state
+      const userInfo: UserInfoType = res.data;
       setUserInfo(userInfo);
 
-      // Store user info in AsyncStorage
-      await AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
+      await AsyncStorage.setItem("userId", userInfo.data.id);
 
-      // You may also store the user id in AsyncStorage if needed
-      const userId = userInfo.data.id;
-      await AsyncStorage.setItem("userId", userId);
-
-      setIsLoading(false);
       return userInfo;
     } catch (error) {
-      setIsLoading(false);
+      console.error("Onboarding error:", error);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -160,39 +162,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const response = await axios.post(`/auth/verify-email`, { otp });
       return response.data;
     } catch (error) {
-      throw error; // Re-throw the error to handle it in the component
+      console.error("Email verification error:", error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const resendOtp = async ({ id }: { id: string }) => {
+  const resendOtp = async (id: string) => {
     setIsLoading(true);
     try {
       const response = await axios.post(`/auth/resend-otp`, { id });
       return response.data;
     } catch (error) {
-      throw error; // Re-throw the error to handle it in the component
+      console.error("Resend OTP error:", error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const login = async (id: any, password: any) => {
+  const login = async (id: string, password: string): Promise<UserInfoType> => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
       const res = await axios.post(`/auth/login`, { id, password });
-      let userInfo = res.data;
+      const userInfo: UserInfoType = res.data;
       setUserInfo(userInfo);
-      AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
-      AsyncStorage.setItem("access_token", userInfo.data.accessToken);
       setIsAuthenticated(true);
 
-      // Fetch user details
-      await fetchUserDetails(userInfo.data.accessToken);
+      await AsyncStorage.multiSet([
+        ["userInfo", JSON.stringify(userInfo)],
+        ["access_token", userInfo.data.accessToken || ""],
+      ]);
+
+      await fetchUserDetails(userInfo.data.accessToken || "");
 
       return userInfo;
     } catch (error) {
+      console.error("Login error:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -202,12 +209,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const createPin = async (pin: string) => {
     setIsLoading(true);
     try {
-      // Make the POST request to create the pin
       const response = await axios.post(`/auth/create-pin`, {
         securityPin: pin,
       });
-
-      // Return the response data
       return response.data;
     } catch (error) {
       console.error("Failed to create pin:", error);
@@ -218,44 +222,78 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const fetchUserDetails = async (token: any) => {
+  const refreshAccessToken = async (refreshToken: string): Promise<string> => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(`/auth/refresh-token`, {
+        refreshToken,
+      });
+      const newAccessToken = response.data.accessToken;
+      const newExpiresAt = response.data.expiresAt;
+
+      setUserInfo((prevUserInfo: UserInfoType | null) =>
+        prevUserInfo
+          ? {
+              ...prevUserInfo,
+              access_token: newAccessToken,
+              expires_at: newExpiresAt,
+            }
+          : null
+      );
+
+      await AsyncStorage.setItem("access_token", newAccessToken);
+
+      return newAccessToken;
+    } catch (error) {
+      console.error("Failed to refresh access token:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchUserDetails = async (token: string) => {
     try {
       const res = await axios.get(`/user/dashboard/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUserDetails(res.data.data);
-      AsyncStorage.setItem("userDetails", JSON.stringify(res.data.data));
+      await AsyncStorage.setItem("userDetails", JSON.stringify(res.data.data));
     } catch (error) {
       console.error("Failed to fetch user details:", error);
     }
   };
 
-  const authLogout = React.useCallback(() => {
-    setIsLoading(false);
-    setIsAuthenticated(false);
-    AsyncStorage.removeItem("access_token");
-    AsyncStorage.removeItem("userDetails"); // Clear userDetails on logout
-  }, []);
-
-  const logout = () => {
-    setIsLoading(false);
-    setUserInfo(null);
-    setIsAuthenticated(false);
-    setUserDetails(null); // Clear userDetails on logout
-    AsyncStorage.removeItem("userInfo");
-    AsyncStorage.removeItem("access_token");
-    AsyncStorage.removeItem("userDetails");
+  const logout = async () => {
+    setIsLoading(true);
+    try {
+      // Call the logout endpoint
+      await axios.post('/auth/logout');
+      
+      setUserInfo(null);
+      setIsAuthenticated(false);
+      setUserDetails(null);
+      await AsyncStorage.multiRemove([
+        "userInfo",
+        "access_token",
+        "userDetails",
+      ]);
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const isLoggedIn = React.useMemo(() => {
+  const isLoggedIn = () => {
     return (
       isAuthenticated &&
-      userInfo &&
-      userInfo.access_token &&
-      userInfo.refresh_token &&
+      userInfo !== null &&
+      userInfo.access_token !== undefined &&
+      userInfo.refresh_token !== undefined &&
       userInfo.expires_at > Date.now() / 1000
     );
-  }, [userInfo]);
+  };
 
   useEffect(() => {
     const handleAppStateChange = async (nextAppState: AppStateStatus) => {
@@ -263,23 +301,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         nextAppState === "active" &&
         (appState === "inactive" || appState === "background")
       ) {
-        const idleTime =
-          Number((await AsyncStorage.getItem("idleStartTime")) || 0) ||
-          idleStartTime;
+        const idleTime = await AsyncStorage.getItem("idleStartTime");
         const storedUserInfo = await AsyncStorage.getItem("userInfo");
         if (
           idleTime &&
-          Date.now() - idleTime > 2 * 60 * 1000 &&
+          Date.now() - parseInt(idleTime) > 2 * 60 * 1000 &&
           storedUserInfo
         ) {
           setIdleStartTime(null);
-          AsyncStorage.removeItem("idleStartTime");
-          setShowPinScreen(true);
-          // navigation.navigate("WelcomeBackScreen");
+          await AsyncStorage.removeItem("idleStartTime");
+          // Consider implementing a re-authentication flow here
         }
 
         if (!storedUserInfo) {
-          authLogout();
+          await logout();
         } else {
           const parsedUserInfo = JSON.parse(storedUserInfo);
           setUserInfo(parsedUserInfo);
@@ -297,152 +332,69 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         (appState === "active" && nextAppState === "background") ||
         nextAppState === "inactive"
       ) {
-        setIdleStartTime(Date.now());
-        AsyncStorage.setItem("idleStartTime", Date.now().toString());
+        const currentTime = Date.now();
+        setIdleStartTime(currentTime);
+        await AsyncStorage.setItem("idleStartTime", currentTime.toString());
       }
 
       setAppState(nextAppState);
     };
 
-    const unsubscribe = AppState.addEventListener(
+    const subscription = AppState.addEventListener(
       "change",
       handleAppStateChange
     );
 
     return () => {
-      unsubscribe.remove();
+      subscription.remove();
     };
-  }, [appState, idleStartTime]);
+  }, [appState]);
 
-  const checkIfHasNewVersion = React.useCallback(async () => {
-    try {
-      const { data } = await axios.get("/settings/app-version");
-      const updateData: { id: string; isRequired: boolean; version: string } =
-        data.data;
-      const appVersion = Constants.default.expoConfig?.version;
-      if (appVersion && updateData?.version) {
-        const appVersionNumber = parseFloat(appVersion.replace(/\./g, ""));
-        const updateVersionNumber = parseFloat(
-          updateData.version.replace(/\./g, "")
-        );
-        if (updateVersionNumber > appVersionNumber) {
-          // console.log("has new version");
-          Alert.alert(
-            "New Version Available",
-            `There is a new version of the app available. Please update to the latest version to continue using the app.`,
-            [
-              {
-                text: "Update",
-                onPress: () => {
-                  Linking.openURL("");
-                },
-              },
-              {
-                text: "Cancel",
-                onPress: () => {
-                  if (updateData.isRequired) {
-                    checkIfHasNewVersion();
-                  }
-                },
-              },
-            ]
-          );
-        }
-      }
-    } catch (error: any) {
-      // console.log({ ...error });
-    }
-  }, []);
+  const checkIfHasNewVersion = async () => {
+    // try {
+    //   const { data } = await axios.get("/settings/app-version");
+    //   const updateData: { id: string; isRequired: boolean; version: string } = data.data;
+    //   const appVersion = Constants.default.expoConfig?.version;
+    //   if (appVersion && updateData?.version) {
+    //     const appVersionNumber = parseFloat(appVersion.replace(/\./g, ""));
+    //     const updateVersionNumber = parseFloat(updateData.version.replace(/\./g, ""));
+    //     if (updateVersionNumber > appVersionNumber) {
+    //       Alert.alert(
+    //         "New Version Available",
+    //         `There is a new version of the app available. Please update to the latest version to continue using the app.`,
+    //         [
+    //           {
+    //             text: "Update",
+    //             onPress: () => {
+    //               Linking.openURL(""); // Add your app store URL here
+    //             },
+    //           },
+    //           {
+    //             text: "Cancel",
+    //             onPress: () => {
+    //               if (updateData.isRequired) {
+    //                 checkIfHasNewVersion();
+    //               }
+    //             },
+    //           },
+    //         ]
+    //       );
+    //     }
+    //   }
+    // } catch (error) {
+    //   console.error("Failed to check for new version:", error);
+    // }
+  };
 
   useEffect(() => {
     checkIfHasNewVersion();
   }, []);
 
-  const [isRegistered, setIsRegistered] = React.useState(false);
-  const [status, setStatus] =
-    React.useState<BackgroundFetch.BackgroundFetchStatus | null>(null);
-
-  React.useEffect(() => {
-    checkStatusAsync();
-  }, []);
-
-  const checkStatusAsync = async () => {
-    const status = await BackgroundFetch.getStatusAsync();
-    const isRegistered = await TaskManager.isTaskRegisteredAsync(
-      BACKGROUND_FETCH_TASK
-    );
-    setStatus(status);
-    setIsRegistered(isRegistered);
-  };
-
-  React.useEffect(() => {
+  useEffect(() => {
     (async () => {
       await registerBackgroundFetchAsync();
     })();
   }, []);
-
-  const refreshAccessToken = useCallback(
-    async (pinOrPassword?: { pin?: string | number; password?: string }) => {
-      try {
-        setIsLoading(true);
-
-        // Convert pin to string if it's a number
-        const payload = pinOrPassword
-          ? {
-              ...pinOrPassword,
-              pin: pinOrPassword.pin ? pinOrPassword.pin.toString() : undefined,
-            }
-          : undefined;
-
-        // Log the request payload for debugging
-        console.log("Re-authentication request payload:", payload);
-
-        const response = await axios.post("/auth/re-authenticate", payload);
-
-        // Log the successful response for debugging
-        console.log("Re-authentication response:", response.data);
-
-        const newUserInfo = {
-          ...userInfo,
-          access_token: response.data.access_token,
-          expires_at: Date.now() / 1000 + response.data.expires_in,
-        };
-        setUserInfo(newUserInfo);
-        await AsyncStorage.setItem("userInfo", JSON.stringify(newUserInfo));
-        await AsyncStorage.setItem("access_token", newUserInfo.access_token);
-        setIsAuthenticated(true);
-        setShowPinScreen(false);
-      } catch (error: any) {
-        console.error("Re-authentication failed:", error);
-
-        // Log more details about the error
-        if (error.response) {
-          console.error("Error response data:", error.response.data);
-          console.error("Error response status:", error.response.status);
-          console.error("Error response headers:", error.response.headers);
-        } else if (error.request) {
-          console.error("Error request:", error.request);
-        } else {
-          console.error("Error message:", error.message);
-        }
-
-        let errorMessage = "Failed to re-authenticate. Please try again.";
-
-        if (
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
-          errorMessage = error.response.data.message;
-        }
-
-        Alert.alert("Authentication Error", errorMessage);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [userInfo]
-  );
 
   return (
     <AuthContext.Provider
@@ -452,7 +404,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUserInfo,
         onboarding,
         verifyEmail,
-        resendOtp: (id: string) => resendOtp({ id }),
+        resendOtp,
         createPin,
         userDetails,
         fetchUserDetails,
@@ -461,27 +413,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isLoggedIn,
         isAppReady,
         isAuthenticated,
-        showPinScreen,
-        setShowPinScreen,
         refreshAccessToken,
       }}
     >
-      <SWR logOut={authLogout}>{children}</SWR>
+      <SWR logOut={logout}>{children}</SWR>
     </AuthContext.Provider>
   );
 };
-
-TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
-  AsyncStorage.removeItem("userInfo");
-  AsyncStorage.removeItem("access_token");
-  AsyncStorage.removeItem("userDetails");
-  return BackgroundFetch.BackgroundFetchResult.NewData;
-});
-
-async function registerBackgroundFetchAsync() {
-  return BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
-    minimumInterval: 60,
-    stopOnTerminate: false,
-    startOnBoot: true,
-  });
-}
