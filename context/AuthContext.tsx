@@ -94,20 +94,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const [storedUserInfo, storedAccessToken, storedUserDetails] =
-          await AsyncStorage.multiGet([
-            "userInfo",
-            "access_token",
-            "userDetails",
-          ]);
-
-        if (storedUserInfo[1]) {
-          const parsedUserInfo = JSON.parse(storedUserInfo[1]);
+        const storedUserInfo = await AsyncStorage.getItem("userInfo");
+        const storedAccessToken = await AsyncStorage.getItem("access_token");
+        const storedUserDetails = await AsyncStorage.getItem("userDetails");
+        if (storedUserInfo) {
+          const parsedUserInfo = JSON.parse(storedUserInfo);
           setUserInfo(parsedUserInfo);
           setIsAuthenticated(true);
 
-          if (storedAccessToken[1] && storedUserDetails[1]) {
-            setUserDetails(JSON.parse(storedUserDetails[1]));
+          if (storedAccessToken && storedUserDetails) {
+            setUserDetails(JSON.parse(storedUserDetails));
           } else {
             await fetchUserDetails(parsedUserInfo.data.accessToken);
           }
@@ -122,6 +118,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     checkLoginStatus();
   }, []);
+  
 
   const onboarding = async (
     email: string,
@@ -252,17 +249,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const fetchUserDetails = async (token: string) => {
+  const fetchUserDetails = async (token: any) => {
     try {
-      const res = await axios.get(`/user/dashboard/me`, {
+      const res = await axios.get(`/user/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUserDetails(res.data.data);
-      await AsyncStorage.setItem("userDetails", JSON.stringify(res.data.data));
+      AsyncStorage.setItem("userDetails", JSON.stringify(res.data.data));
     } catch (error) {
       console.error("Failed to fetch user details:", error);
     }
   };
+  
 
   const logout = async () => {
     setIsLoading(true);
