@@ -58,8 +58,7 @@ const Card: React.FC<{
     });
   };
 
-  const { userDetails, userInfo } = useContext(AuthContext);
-  console.log(userInfo);
+  const { userDetails } = useContext(AuthContext);
 
   const fullName = userDetails?.fullName || "";
   const firstName = fullName.split(" ")[0];

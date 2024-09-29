@@ -18,7 +18,7 @@ export const COLORS = {
   },
   error: {
     primary: "#E94242",
-    secondary: "#C31B23",
+    secondary: "#FF2E2E",
   },
   text: {
     dark: "#102B3A",

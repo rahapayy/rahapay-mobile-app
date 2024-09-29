@@ -19,11 +19,14 @@ import Button from "../../../components/Button";
 import FONT_SIZE from "../../../constants/font-size";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
+import { RootStackParamList } from "../../../types/RootStackParams";
 
-const CreateNewPasswordScreen: React.FC<{
-  navigation: NativeStackNavigationProp<any, "">;
+type CreateNewPasswordScreenProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, "CreateNewPasswordScreen">;
   route: { params: { resetToken: string } };
-}> = ({ navigation, route }) => {
+};
+
+const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({ navigation, route }) => {
   const { resetToken } = route.params;
 
   const [showPassword, setShowPassword] = useState(true);

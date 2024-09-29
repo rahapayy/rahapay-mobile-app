@@ -1,11 +1,10 @@
 import React, { createContext, useCallback, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axios } from "../utils/api";
-import { Alert, AppState, AppStateStatus, Linking } from "react-native";
+import { Alert, AppState, AppStateStatus } from "react-native";
 import * as BackgroundFetch from "expo-background-fetch";
 import * as TaskManager from "expo-task-manager";
 import SWR from "./Swr";
-import * as Constants from "expo-constants";
 
 // Define UserInfoType
 interface UserInfoType {
@@ -62,6 +61,7 @@ export const AuthContext = createContext<{
   userDetails: any;
   fetchUserDetails: (token: string) => Promise<void>;
   refreshAccessToken: (refreshToken: string) => Promise<string>;
+  reauthenticate: (pin: string) => Promise<any>;
 }>({
   isLoading: false,
   userInfo: null,
@@ -78,6 +78,7 @@ export const AuthContext = createContext<{
   userDetails: null,
   fetchUserDetails: async () => {},
   refreshAccessToken: async () => "",
+  reauthenticate: async (pin: string) => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -118,7 +119,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     checkLoginStatus();
   }, []);
-  
 
   const onboarding = async (
     email: string,
@@ -249,6 +249,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const reauthenticate = async (pin: string) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post("/auth/reauthenticate", { pin });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to reauthenticate:", error);
+      throw error;
+    }
+  };
+
   const fetchUserDetails = async (token: any) => {
     try {
       const res = await axios.get(`/user/me`, {
@@ -260,7 +271,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error("Failed to fetch user details:", error);
     }
   };
-  
 
   const logout = async () => {
     setIsLoading(true);
@@ -412,6 +422,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isAppReady,
         isAuthenticated,
         refreshAccessToken,
+        reauthenticate,
       }}
     >
       <SWR logOut={logout}>{children}</SWR>

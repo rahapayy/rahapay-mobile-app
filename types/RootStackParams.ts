@@ -109,4 +109,15 @@ export type RootStackParamList = {
   ProfileScreen: undefined;
   EditTagScreen: undefined;
   CreateTagScreen: undefined;
+  CreateAccountScreen: undefined;
+  VerifyEmailScreen: undefined;
+  ExistingUserScreen: undefined;
+  ForgotPasswordScreen: undefined;
+  CreateNewPasswordScreen: { resetToken: string };
+  VerifyOtpScreen: undefined;
+  ResetPasswordScreen: undefined;
+  LoginScreen: undefined;
+  CreatePinScreen: undefined;
+  SuccessfulScreen: undefined;
+  EnterCodeScreen: undefined;
 };
