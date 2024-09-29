@@ -6,7 +6,7 @@ import {
   View,
 } from "react-native";
 import React, { useState } from "react";
-import { RootStackParamList } from "../../../navigation/RootStackParams";
+import { RootStackParamList } from "../../../types/RootStackParams";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";

@@ -80,11 +80,14 @@ const Card: React.FC<{
         <View style={styles.container}>
           <View style={styles.header}>
             <View style={styles.headerContent}>
-              <View style={styles.avatar}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("PersonalInformationScreen")}
+                style={styles.avatar}
+              >
                 <BoldText color="white" size="medium">
                   {initials}
                 </BoldText>
-              </View>
+              </TouchableOpacity>
               <View>
                 <Text style={styles.greetingText} allowFontScaling={false}>
                   Hello, {firstName} 👋

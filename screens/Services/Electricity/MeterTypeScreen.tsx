@@ -13,7 +13,7 @@ import FONT_SIZE from "../../../constants/font-size";
 import COLORS from "../../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../../components/Button";
-import { RootStackParamList } from "../../../navigation/RootStackParams";
+import { RootStackParamList } from "../../../types/RootStackParams";
 
 type MeterTypeScreenProps = NativeStackScreenProps<
   RootStackParamList,

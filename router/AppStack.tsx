@@ -1,6 +1,6 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import BottomTab from "../navigation/Bottomtab/BottomTab";
+import BottomTab from "../components/BottomTab";
 import AirtimeScreen from "../screens/Services/AirtimeScreen";
 import DataScreen from "../screens/Services/DataScreen";
 import ElectricityScreen from "../screens/Services/Electricity/ElectricityScreen";
@@ -30,7 +30,7 @@ import ReviewCableTvSummaryScreen from "../screens/ServiceReviewScreens/ReviewCa
 import MeterTypeScreen from "../screens/Services/Electricity/MeterTypeScreen";
 import ElectricityDetailsScreen from "../screens/Services/Electricity/ElectricityDetailsScreen";
 import ReviewElectricitySummaryScreen from "../screens/ServiceReviewScreens/ReviewElectricitySummaryScreen";
-import { RootStackParamList } from "../navigation/RootStackParams";
+import { RootStackParamList } from "../types/RootStackParams";
 import EducationServiceType from "../screens/Services/Education/EducationServiceType";
 import EducationDetailsScreen from "../screens/Services/Education/EducationDetailsScreen";
 import ReviewEducationSummaryScreen from "../screens/ServiceReviewScreens/ReviewEducationSummaryScreem";

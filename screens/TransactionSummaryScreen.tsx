@@ -14,7 +14,7 @@ import SPACING from "../constants/SPACING";
 import FONT_SIZE from "../constants/font-size";
 import COLORS from "../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
-import { RootStackParamList } from "../navigation/RootStackParams";
+import { RootStackParamList } from "../types/RootStackParams";
 
 type TransactionSummaryRouteParams = {
   transaction: {

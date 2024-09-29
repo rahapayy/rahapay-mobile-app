@@ -20,7 +20,7 @@ import SwipeButton from "../../components/SwipeButton";
 import { RFValue } from "react-native-responsive-fontsize";
 import useApi from "../../utils/api";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
-import { RootStackParamList } from "../../navigation/RootStackParams";
+import { RootStackParamList } from "../../types/RootStackParams";
 
 type ReviewCableTvSummaryScreenProps = NativeStackScreenProps<
   RootStackParamList,

@@ -14,7 +14,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import Button from "../components/Button";
 import { ReceiptText, Timer, Warning2 } from "iconsax-react-native";
-import { RootStackParamList } from "../navigation/RootStackParams";
+import { RootStackParamList } from "../types/RootStackParams";
 
 type TransactionStatusScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
