@@ -13,6 +13,7 @@ import CreateNewPasswordScreen from "../screens/Auth/ForgotPassword/CreateNewPas
 import LoginScreen from "../screens/Auth/Login/LoginScreen";
 import SuccessfulScreen from "../screens/Auth/CreateAccount/SuccessfulScreen";
 import CreateTransactionPinScreen from "../screens/Auth/CreateAccount/CreatePinScreen";
+import ExistingUserScreen from "../screens/Auth/Login/ExistingUserScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -104,6 +105,11 @@ const AuthRoute = () => {
       <Stack.Screen
         name="SuccessfulScreen"
         component={SuccessfulScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ExistingUserScreen"
+        component={ExistingUserScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

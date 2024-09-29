@@ -4,7 +4,6 @@ import FaceId from "../../../assets/svg/mingcute_faceid-line.svg";
 import COLORS from "../../../constants/colors";
 import SPACING from "../../../constants/SPACING";
 import Backspace from "../../../assets/svg/solar_backspace-linear.svg";
-import { authenticateWithBiometrics } from "../../../context/Biometrics";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthContext } from "../../../context/AuthContext";
 
@@ -16,7 +15,7 @@ const ExistingUserScreen: React.FC<ExistingUserScreenProps> = ({
   navigation,
 }) => {
   const [pin, setPin] = useState<string>("");
-  const { refreshAccessToken, userDetails } = useContext(AuthContext);
+  const { userDetails } = useContext(AuthContext);
 
   const handlePinPress = (value: string) => {
     if (pin.length < 4) {
@@ -42,16 +41,11 @@ const ExistingUserScreen: React.FC<ExistingUserScreenProps> = ({
   };
 
   const handleBiometricAuth = async () => {
-    const success = await authenticateWithBiometrics();
-    if (success) {
-      await refreshAccessToken();
-    }
+  
   };
 
   const handlePinSubmit = async () => {
-    if (pin.length === 4) {
-      await refreshAccessToken({ pin });
-    }
+  
   };
 
   useEffect(() => {
