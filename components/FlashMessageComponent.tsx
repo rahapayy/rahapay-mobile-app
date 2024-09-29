@@ -1,7 +1,7 @@
-import { View, Text } from "react-native";
-import React from "react";
-import SPACING from "../config/SPACING";
-import COLORS from "../config/colors";
+import { View, Text, Animated } from "react-native";
+import React, { useRef, useEffect } from "react";
+import SPACING from "../constants/SPACING";
+import COLORS from "../constants/colors";
 import {
   Message,
   MessageComponentProps,
@@ -11,13 +11,44 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 
 const FlashMessageComponent = ({ message }: MessageComponentProps) => {
+  const slideAnim = useRef(new Animated.Value(-100)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    const timer = setTimeout(() => {
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: -100,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, 2700);
+
+    return () => clearTimeout(timer);
+  }, [slideAnim, fadeAnim]);
+
   return (
-    <View
-      style={{
-        paddingHorizontal: SPACING,
-      }}
-    >
-      <View
+    <View style={{ paddingHorizontal: SPACING }}>
+      <Animated.View
         style={{
           marginTop: SPACING * 5,
           paddingHorizontal: SPACING,
@@ -32,6 +63,8 @@ const FlashMessageComponent = ({ message }: MessageComponentProps) => {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "center",
+          transform: [{ translateY: slideAnim }],
+          opacity: fadeAnim,
         }}
       >
         <Text
@@ -39,14 +72,14 @@ const FlashMessageComponent = ({ message }: MessageComponentProps) => {
           style={{
             fontSize: RFValue(12),
             color: COLORS.white,
-            marginLeft: SPACING,
+            // marginLeft: SPACING,
             fontFamily: "Outfit-Regular",
-            textAlign: "center",
+            // textAlign: "center",
           }}
         >
           {message.message || "An error occurred."}
         </Text>
-      </View>
+      </Animated.View>
     </View>
   );
 };
@@ -62,7 +95,6 @@ export const handleShowFlash = ({
     animationDuration: 500,
     autoHide: true,
     duration: 3000,
-
     description: description || "Something went wrong",
     type: type || "default",
   });

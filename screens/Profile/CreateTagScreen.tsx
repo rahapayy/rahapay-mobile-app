@@ -11,13 +11,13 @@ import {
 import React, { useEffect, useState } from "react";
 import { ArrowLeft } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import COLORS from "../../config/colors";
-import SPACING from "../../config/SPACING";
+import COLORS from "../../constants/colors";
+import SPACING from "../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../components/Button";
 import useApi from "../../utils/api";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
-import FONT_SIZE from "../../config/font-size";
+import FONT_SIZE from "../../constants/font-size";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CreateTagScreen: React.FC<{

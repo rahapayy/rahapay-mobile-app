@@ -7,7 +7,7 @@ import {
   useWindowDimensions,
   SafeAreaView,
 } from "react-native";
-import COLORS from "../../config/colors";
+import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 
 interface Slide {
@@ -24,7 +24,7 @@ interface OnboardingItemProps {
 const OnboardingItem: React.FC<OnboardingItemProps> = ({ item }) => {
   const { width, height } = useWindowDimensions();
   const animation = useRef(null);
-  const bottomPosition = height * 0.-10;
+  const bottomPosition = height * 0 - 10;
 
   return (
     <SafeAreaView style={styles.contain}>

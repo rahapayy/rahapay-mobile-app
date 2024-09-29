@@ -14,11 +14,11 @@ import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useRoute } from "@react-navigation/native";
 import { ArrowLeft } from "iconsax-react-native";
-import SPACING from "../../../config/SPACING";
-import FONT_SIZE from "../../../config/font-size";
+import SPACING from "../../../constants/SPACING";
+import FONT_SIZE from "../../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../../components/Button";
-import COLORS from "../../../config/colors";
+import COLORS from "../../../constants/colors";
 
 const CardDetailsScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;

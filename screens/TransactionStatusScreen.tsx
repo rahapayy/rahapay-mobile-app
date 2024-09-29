@@ -6,8 +6,8 @@ import {
   View,
 } from "react-native";
 import React from "react";
-import COLORS from "../config/colors";
-import SPACING from "../config/SPACING";
+import COLORS from "../constants/colors";
+import SPACING from "../constants/SPACING";
 import { RFValue } from "react-native-responsive-fontsize";
 import * as Animatable from "react-native-animatable";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";

@@ -9,10 +9,10 @@ import {
 import React, { useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/RootStackParams";
-import SPACING from "../../../config/SPACING";
-import FONT_SIZE from "../../../config/font-size";
+import SPACING from "../../../constants/SPACING";
+import FONT_SIZE from "../../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
-import COLORS from "../../../config/colors";
+import COLORS from "../../../constants/colors";
 import Button from "../../../components/Button";
 import { ArrowLeft } from "iconsax-react-native";
 

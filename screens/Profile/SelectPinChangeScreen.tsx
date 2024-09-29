@@ -10,9 +10,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import SPACING from "../../config/SPACING";
-import FONT_SIZE from "../../config/font-size";
-import COLORS from "../../config/colors";
+import SPACING from "../../constants/SPACING";
+import FONT_SIZE from "../../constants/font-size";
+import COLORS from "../../constants/colors";
 import { ArrowLeft, ArrowRight2 } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 

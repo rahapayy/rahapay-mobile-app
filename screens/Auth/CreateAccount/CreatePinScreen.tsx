@@ -10,8 +10,8 @@ import {
 import React, { useRef, useState, useEffect, useContext } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RFValue } from "react-native-responsive-fontsize";
-import SPACING from "../../../config/SPACING";
-import COLORS from "../../../config/colors";
+import SPACING from "../../../constants/SPACING";
+import COLORS from "../../../constants/colors";
 import Button from "../../../components/Button";
 import { ArrowLeft } from "iconsax-react-native";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";

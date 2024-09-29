@@ -10,9 +10,9 @@ import {
 import React, { useContext } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, Copy, People, Send2 } from "iconsax-react-native";
-import SPACING from "../../config/SPACING";
-import FONT_SIZE from "../../config/font-size";
-import COLORS from "../../config/colors";
+import SPACING from "../../constants/SPACING";
+import FONT_SIZE from "../../constants/font-size";
+import COLORS from "../../constants/colors";
 import ReferImg from "../../assets/svg/refer.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 import Money from "../../assets/svg/money-earn-svgrepo-com 1.svg";

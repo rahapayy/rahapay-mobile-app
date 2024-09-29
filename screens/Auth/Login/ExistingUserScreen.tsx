@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import FaceId from "../../../assets/svg/mingcute_faceid-line.svg";
-import COLORS from "../../../config/colors";
-import SPACING from "../../../config/SPACING";
+import COLORS from "../../../constants/colors";
+import SPACING from "../../../constants/SPACING";
 import Backspace from "../../../assets/svg/solar_backspace-linear.svg";
 import { authenticateWithBiometrics } from "../../../context/Biometrics";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";

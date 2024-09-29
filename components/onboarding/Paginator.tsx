@@ -1,6 +1,6 @@
 import { View, Animated, useWindowDimensions, StyleSheet } from "react-native";
 import React, { FC } from "react";
-import COLORS from "../../config/colors";
+import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 
 interface PaginationProps {
@@ -10,7 +10,7 @@ interface PaginationProps {
 
 const Paginator: FC<PaginationProps> = ({ data, scrollx }) => {
   const { width, height } = useWindowDimensions();
-  const bottomPosition = height * 0.10;
+  const bottomPosition = height * 0.1;
 
   return (
     <View style={{ flexDirection: "row", bottom: bottomPosition }}>

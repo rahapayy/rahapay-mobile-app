@@ -11,8 +11,8 @@ import {
 import React, { useEffect, useState } from "react";
 import { ArrowLeft, DocumentText } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import SPACING from "../config/SPACING";
-import FONT_SIZE from "../config/font-size";
+import SPACING from "../constants/SPACING";
+import FONT_SIZE from "../constants/font-size";
 import LottieView from "lottie-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import useWallet from "../hooks/use-wallet";

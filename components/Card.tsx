@@ -6,7 +6,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Image,
   Dimensions,
 } from "react-native";
 import {
@@ -18,13 +17,14 @@ import {
   WalletAdd1,
 } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import COLORS from "../config/colors";
+import COLORS from "../constants/colors";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthContext } from "../context/AuthContext";
 import useWallet from "../hooks/use-wallet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
-import SPACING from "../config/SPACING";
+import SPACING from "../constants/SPACING";
+import { BoldText, MediumText } from "./common/Text";
 
 const { height: screenHeight } = Dimensions.get("window");
 
@@ -63,6 +63,11 @@ const Card: React.FC<{
 
   const fullName = userDetails?.fullName || "";
   const firstName = fullName.split(" ")[0];
+  const initials = fullName
+    .split(" ")
+    .map((n: any[]) => n[0])
+    .join("")
+    .toUpperCase();
 
   const { balance } = useWallet();
 
@@ -75,10 +80,11 @@ const Card: React.FC<{
         <View style={styles.container}>
           <View style={styles.header}>
             <View style={styles.headerContent}>
-              <Image
-                source={require("../assets/images/avatar.png")}
-                style={styles.avatar}
-              />
+              <View style={styles.avatar}>
+                <BoldText color="white" size="medium">
+                  {initials}
+                </BoldText>
+              </View>
               <View>
                 <Text style={styles.greetingText} allowFontScaling={false}>
                   Hello, {firstName} 👋
@@ -188,9 +194,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   avatar: {
-    width: 50,
-    height: 50,
+    width: 45,
+    height: 45,
+    borderRadius: 25,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 8,
+  },
+  avatarText: {
+    fontFamily: "Outfit-SemiBold",
+    color: "#fff",
+    fontSize: RFValue(16),
   },
   greetingText: {
     fontFamily: "Outfit-SemiBold",

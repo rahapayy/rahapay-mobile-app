@@ -12,11 +12,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import COLORS from "../../../config/colors";
-import SPACING from "../../../config/SPACING";
+import COLORS from "../../../constants/colors";
+import SPACING from "../../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/Button";
-import FONT_SIZE from "../../../config/font-size";
+import FONT_SIZE from "../../../constants/font-size";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 

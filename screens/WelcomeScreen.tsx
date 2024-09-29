@@ -9,8 +9,8 @@ import {
 import React from "react";
 import LottieView from "lottie-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import COLORS from "../config/colors";
-import SPACING from "../config/SPACING";
+import COLORS from "../constants/colors";
+import SPACING from "../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../components/Button";
 

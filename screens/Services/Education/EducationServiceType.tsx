@@ -8,10 +8,10 @@ import {
 import React, { useState } from "react";
 import { RootStackParamList } from "../../../navigation/RootStackParams";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import SPACING from "../../../config/SPACING";
-import COLORS from "../../../config/colors";
+import SPACING from "../../../constants/SPACING";
+import COLORS from "../../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
-import FONT_SIZE from "../../../config/font-size";
+import FONT_SIZE from "../../../constants/font-size";
 import { ArrowLeft } from "iconsax-react-native";
 import Button from "../../../components/Button";
 

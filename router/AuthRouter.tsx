@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { getItem, setItem } from "../utils/ayncStorage";
 import { ActivityIndicator, View } from "react-native";
-import COLORS from "../config/colors";
+import COLORS from "../constants/colors";
 import WelcomeScreen from "../screens/WelcomeScreen";
 import Onboarding from "../components/onboarding/Onboarding";
 import CreateAccountScreen from "../screens/Auth/CreateAccount/CreateAccountScreen";

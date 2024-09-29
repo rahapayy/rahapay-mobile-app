@@ -1,6 +1,6 @@
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import React from "react";
-import FONT_SIZE from "../config/font-size";
+import FONT_SIZE from "../constants/font-size";
 import ComingSoon from "../assets/svg/Coming Soon.svg";
 
 const CardsScreen = () => {

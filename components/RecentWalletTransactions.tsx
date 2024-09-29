@@ -11,9 +11,9 @@ import { RFValue } from "react-native-responsive-fontsize";
 import LottieView from "lottie-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import useWallet from "../hooks/use-wallet";
-import COLORS from "../config/colors";
+import COLORS from "../constants/colors";
 import { WalletMinus, WalletAdd1 } from "iconsax-react-native";
-import SPACING from "../config/SPACING";
+import SPACING from "../constants/SPACING";
 
 const RecentWalletTransaction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;

@@ -11,10 +11,10 @@ import {
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useRoute } from "@react-navigation/native";
 import { ArrowLeft } from "iconsax-react-native";
-import SPACING from "../../../config/SPACING";
+import SPACING from "../../../constants/SPACING";
 import { RFValue } from "react-native-responsive-fontsize";
-import COLORS from "../../../config/colors";
-import FONT_SIZE from "../../../config/font-size";
+import COLORS from "../../../constants/colors";
+import FONT_SIZE from "../../../constants/font-size";
 
 const CableServiceDetailsScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -22,12 +22,16 @@ const CableServiceDetailsScreen: React.FC<{
   const route = useRoute();
   const { service, plans } = route.params as { service: string; plans: any[] };
 
-  const handlePlanSelect = (plan: { plan_id: string; plan_price: number, plan_name: string }) => {
+  const handlePlanSelect = (plan: {
+    plan_id: string;
+    plan_price: number;
+    plan_name: string;
+  }) => {
     navigation.navigate("CardDetailsScreen", {
       service,
       planId: plan.plan_id,
       planPrice: plan.plan_price,
-      planName: plan.plan_name
+      planName: plan.plan_name,
     });
   };
 
@@ -56,9 +60,7 @@ const CableServiceDetailsScreen: React.FC<{
               {plans.map((plan: any) => (
                 <TouchableOpacity
                   key={plan.plan_id}
-                  style={[
-                    styles.planBox,
-                  ]}
+                  style={[styles.planBox]}
                   onPress={() => handlePlanSelect(plan)}
                 >
                   <Text style={styles.planName} allowFontScaling={false}>

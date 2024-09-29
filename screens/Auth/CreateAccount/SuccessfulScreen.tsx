@@ -3,8 +3,8 @@ import React from "react";
 import LottieView from "lottie-react-native";
 import Button from "../../../components/Button";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import FONT_SIZE from "../../../config/font-size";
-import SPACING from "../../../config/SPACING";
+import FONT_SIZE from "../../../constants/font-size";
+import SPACING from "../../../constants/SPACING";
 
 const SuccessfulScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;

@@ -12,11 +12,11 @@ import {
 import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowDown2, ArrowLeft } from "iconsax-react-native";
-import SPACING from "../../../config/SPACING";
-import FONT_SIZE from "../../../config/font-size";
+import SPACING from "../../../constants/SPACING";
+import FONT_SIZE from "../../../constants/font-size";
 import BettingProvidersBottomSheet from "../../../components/bottom-sheet/BettingProvidersBottomSheet";
 import Button from "../../../components/Button";
-import COLORS from "../../../config/colors";
+import COLORS from "../../../constants/colors";
 import BetSummaryBottomSheet from "../../../components/bottom-sheet/BetSummaryBottomSheet";
 
 const BettingScreen: React.FC<{
@@ -133,6 +133,26 @@ const BettingScreen: React.FC<{
                 </View>
               </View>
             </View>
+
+            <View className="rounded-lg py-3 px-4 flex-row flex-wrap bg-[#7165E3]/10 gap-y-[9px]">
+              {amounts.map((value, index) => (
+                <TouchableOpacity key={index}>
+                  <View className="bg-white px-[17px] py-2 rounded-[5.4px] mr-[11px]">
+                    <Text style={styles.text}>₦{value}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <View>
+              <Button
+                title="Proceed"
+                onPress={() => {
+                  setShowBetSummary(!showBetSummary);
+                }}
+                textColor="white"
+              />
+            </View>
+
             <View className="px-5 py-[17px] bg-white rounded-lg">
               <View className="flex-row items-center justify-between gap-x-5">
                 <View className="flex-col col-span-1 gap-y-3 w-24 items-center">
@@ -199,24 +219,6 @@ const BettingScreen: React.FC<{
                 </View>
               </View>
             </View>
-            <View className="rounded-lg py-3 px-4 flex-row flex-wrap bg-[#7165E3]/10 gap-y-[9px]">
-              {amounts.map((value, index) => (
-                <TouchableOpacity key={index}>
-                  <View className="bg-white px-[17px] py-2 rounded-[5.4px] mr-[11px]">
-                    <Text style={styles.text}>₦{value}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <View>
-              <Button
-                title="Proceed"
-                onPress={() => {
-                  setShowBetSummary(!showBetSummary);
-                }}
-                textColor="white"
-              />
-            </View>
           </View>
           <BettingProvidersBottomSheet
             isOpen={showProvider}
@@ -242,8 +244,6 @@ export default BettingScreen;
 const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: SPACING * 2,
     paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
     paddingBottom: SPACING * 3,
   },

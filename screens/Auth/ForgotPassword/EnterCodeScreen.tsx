@@ -12,8 +12,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import SPACING from "../../../config/SPACING";
-import COLORS from "../../../config/colors";
+import SPACING from "../../../constants/SPACING";
+import COLORS from "../../../constants/colors";
 import Button from "../../../components/Button";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";

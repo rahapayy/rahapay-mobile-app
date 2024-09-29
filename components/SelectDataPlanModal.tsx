@@ -8,13 +8,13 @@ import {
   Dimensions,
   FlatList,
 } from "react-native";
-import COLORS from "../config/colors";
+import COLORS from "../constants/colors";
 import useSWR from "swr";
 import Airtel from "../assets/svg/airtelbig.svg";
 import Mtn from "../assets/svg/mtnbig.svg";
 import Eti from "../assets/svg/9mobilebig.svg";
 import Glo from "../assets/svg/globig.svg";
-import SPACING from "../config/SPACING";
+import SPACING from "../constants/SPACING";
 import { FontAwesome6 } from "@expo/vector-icons";
 
 const { height } = Dimensions.get("window");

@@ -11,8 +11,8 @@ import {
 import React, { useState } from "react";
 import { ArrowLeft } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import COLORS from "../../../config/colors";
-import SPACING from "../../../config/SPACING";
+import COLORS from "../../../constants/colors";
+import SPACING from "../../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/Button";
 import useApi from "../../../utils/api";

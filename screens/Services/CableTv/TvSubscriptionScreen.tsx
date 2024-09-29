@@ -11,13 +11,13 @@ import {
 import React, { useContext, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft } from "iconsax-react-native";
-import SPACING from "../../../config/SPACING";
-import FONT_SIZE from "../../../config/font-size";
+import SPACING from "../../../constants/SPACING";
+import FONT_SIZE from "../../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
 import Dstv from "../../../assets/svg/dstv.svg";
 import Gotv from "../../../assets/svg/gotv.svg";
 import Startimes from "../../../assets/svg/startimes.svg";
-import COLORS from "../../../config/colors";
+import COLORS from "../../../constants/colors";
 import useSWR from "swr";
 import * as Animatable from "react-native-animatable";
 import LoadingLogo from "../../../assets/svg/loadingLogo.svg";

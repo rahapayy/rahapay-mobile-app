@@ -4,15 +4,14 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AppStack from "./AppStack";
 import AuthRoute from "./AuthRouter";
 import { ActivityIndicator, View } from "react-native";
-import COLORS from "../config/colors";
+import COLORS from "../constants/colors";
 import { AuthContext } from "../context/AuthContext";
 import ExistingUserScreen from "../screens/Auth/Login/ExistingUserScreen";
 
 const Stack = createNativeStackNavigator();
 
 const Router = () => {
-  const { isAuthenticated, isAppReady } =
-    useContext(AuthContext);
+  const { isAuthenticated, isAppReady } = useContext(AuthContext);
 
   if (!isAppReady) {
     // Loading indicator screen
