@@ -8,10 +8,10 @@ import {
   WalletAdd1,
   Cards,
 } from "iconsax-react-native";
-import HomeScreen from "../../screens/HomeScreen";
-import ServicesScreen from "../../screens/ServicesScreen";
-import WalletScreen from "../../screens/WalletScreen";
-import ProfileScreen from "../../screens/ProfileScreen";
+import HomeScreen from "../screens/HomeScreen";
+import ServicesScreen from "../screens/ServicesScreen";
+import WalletScreen from "../screens/WalletScreen";
+import ProfileScreen from "../screens/ProfileScreen";
 import * as Animatable from 'react-native-animatable';
 
 const Tab = createBottomTabNavigator();
