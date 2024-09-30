@@ -55,7 +55,7 @@ const ReviewElectricitySummaryScreen: React.FC<
         navigation.navigate("TransactionStatusScreen", { status: "failed" });
       }
     } catch (err: unknown) {
-      console.error("Error processing electricity payment:", err.response.data);
+      console.error("Error processing electricity payment:", err);
 
       // Handling different types of errors
       if (err instanceof Error) {

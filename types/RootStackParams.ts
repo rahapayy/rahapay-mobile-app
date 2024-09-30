@@ -54,7 +54,6 @@ export type RootStackParamList = {
   TransactionStatusScreen: {
     status: "pending" | "failed" | "successful";
   };
-
   CustomerCareScreen: undefined;
   CableServiceDetailsScreen: undefined;
   CardDetailsScreen: undefined;
@@ -64,16 +63,6 @@ export type RootStackParamList = {
     planPrice: number;
     cardNumber: string;
     planName: string;
-  };
-  MeterTypeScreen: {
-    disco: string;
-    planId: string;
-    meterType: string;
-  };
-  ElectricityDetailsScreen: {
-    disco: string;
-    planId: string;
-    meterType: string;
   };
   EducationServiceType: {
     exam: string;

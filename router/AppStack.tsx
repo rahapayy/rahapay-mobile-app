@@ -25,8 +25,6 @@ import TransferScreen from "../screens/Services/TransferScreen";
 import EducationScreen from "../screens/Services/Education/EducationScreen";
 import CustomerCareScreen from "../screens/CustomerCareScreen";
 import ReviewCableTvSummaryScreen from "../screens/ServiceReviewScreens/ReviewCableTvSummaryScreen";
-import MeterTypeScreen from "../screens/Services/Electricity/MeterTypeScreen";
-import ElectricityDetailsScreen from "../screens/Services/Electricity/ElectricityDetailsScreen";
 import ReviewElectricitySummaryScreen from "../screens/ServiceReviewScreens/ReviewElectricitySummaryScreen";
 import { RootStackParamList } from "../types/RootStackParams";
 import EducationServiceType from "../screens/Services/Education/EducationServiceType";
@@ -177,16 +175,6 @@ const AppStack = () => {
       <Stack.Screen
         name="ReviewCableTvSummaryScreen"
         component={ReviewCableTvSummaryScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="MeterTypeScreen"
-        component={MeterTypeScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ElectricityDetailsScreen"
-        component={ElectricityDetailsScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
