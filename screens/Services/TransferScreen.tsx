@@ -11,8 +11,8 @@ import {
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft } from "iconsax-react-native";
-import SPACING from "../../config/SPACING";
-import FONT_SIZE from "../../config/font-size";
+import SPACING from "../../constants/SPACING";
+import FONT_SIZE from "../../constants/font-size";
 
 const TransferScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;

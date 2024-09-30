@@ -8,14 +8,14 @@ import {
 } from "react-native";
 import React from "react";
 import { RFValue } from "react-native-responsive-fontsize";
-import COLORS from "../config/colors";
+import COLORS from "../constants/colors";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Airtime from "../assets/svg/smartphone-rotate-angle_svgrepo.com.svg";
 import Tv from "../assets/svg/tv_svgrepo.com.svg";
 import Electricity from "../assets/svg/electricity_svgrepo.com.svg";
 import Data from "../assets/svg/signal_svgrepo.com.svg";
 import { More } from "iconsax-react-native";
-import SPACING from "../config/SPACING";
+import SPACING from "../constants/SPACING";
 
 interface ActionItem {
   icon: React.ElementType;

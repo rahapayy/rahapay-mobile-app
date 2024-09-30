@@ -12,9 +12,9 @@ import {
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, ProfileCircle, TickCircle } from "iconsax-react-native";
-import SPACING from "../../config/SPACING";
-import FONT_SIZE from "../../config/font-size";
-import COLORS from "../../config/colors";
+import SPACING from "../../constants/SPACING";
+import FONT_SIZE from "../../constants/font-size";
+import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Airtel from "../../assets/svg/air.svg";
 import Mtn from "../../assets/svg/mtn.svg";

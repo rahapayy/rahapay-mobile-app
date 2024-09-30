@@ -54,7 +54,6 @@ export type RootStackParamList = {
   TransactionStatusScreen: {
     status: "pending" | "failed" | "successful";
   };
-
   CustomerCareScreen: undefined;
   CableServiceDetailsScreen: undefined;
   CardDetailsScreen: undefined;
@@ -64,16 +63,6 @@ export type RootStackParamList = {
     planPrice: number;
     cardNumber: string;
     planName: string;
-  };
-  MeterTypeScreen: {
-    disco: string;
-    planId: string;
-    meterType: string;
-  };
-  ElectricityDetailsScreen: {
-    disco: string;
-    planId: string;
-    meterType: string;
   };
   EducationServiceType: {
     exam: string;
@@ -89,6 +78,7 @@ export type RootStackParamList = {
   ReviewElectricitySummaryScreen: {
     disco: string;
     planId: string;
+    planName: string;
     meterType: string;
     meterNumber: string;
     amount: string;
@@ -100,6 +90,7 @@ export type RootStackParamList = {
     amount: string;
     serviceType: string;
     phoneNumber: string;
+    quantity: number;
   };
   Onboarding: undefined;
   WelcomeScreen: undefined;
@@ -109,4 +100,15 @@ export type RootStackParamList = {
   ProfileScreen: undefined;
   EditTagScreen: undefined;
   CreateTagScreen: undefined;
+  CreateAccountScreen: undefined;
+  VerifyEmailScreen: undefined;
+  ExistingUserScreen: undefined;
+  ForgotPasswordScreen: undefined;
+  CreateNewPasswordScreen: { resetToken: string };
+  VerifyOtpScreen: undefined;
+  ResetPasswordScreen: undefined;
+  LoginScreen: undefined;
+  CreatePinScreen: undefined;
+  SuccessfulScreen: undefined;
+  EnterCodeScreen: undefined;
 };

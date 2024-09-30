@@ -7,9 +7,9 @@ import {
   View,
 } from "react-native";
 import React from "react";
-import FONT_SIZE from "../config/font-size";
+import FONT_SIZE from "../constants/font-size";
 import { DocumentText, WalletAdd1 } from "iconsax-react-native";
-import COLORS from "../config/colors";
+import COLORS from "../constants/colors";
 import WalletCard from "../components/WalletCard";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import RecentWalletTransaction from "../components/RecentWalletTransactions";

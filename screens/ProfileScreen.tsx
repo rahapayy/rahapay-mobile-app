@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   View,
   Switch,
-  Image,
-  Platform,
 } from "react-native";
 import React, { useContext, useState } from "react";
-import FONT_SIZE from "../config/font-size";
+import FONT_SIZE from "../constants/font-size";
 import {
   FingerScan,
+  I24Support,
+  Key,
   Lock,
   Logout,
   Message2,
@@ -20,21 +20,21 @@ import {
   People,
   Profile,
   Tag,
-  Verify,
 } from "iconsax-react-native";
-import COLORS from "../config/colors";
+import COLORS from "../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
-import SPACING from "../config/SPACING";
+import SPACING from "../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import BiometricModal from "../components/modals/BiometricModal";
 import CloseAccountModal from "../components/modals/CloseAccountModal";
 import { AuthContext } from "../context/AuthContext";
 import LogOutModal from "../components/modals/LogoutModal";
+import { LightText, MediumText } from "../components/common/Text";
 
 const ProfileScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { userDetails, logout} = useContext(AuthContext);
+  const { userDetails, logout } = useContext(AuthContext);
 
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [biometricModalVisible, setBiometricModalVisible] = useState(false);
@@ -89,21 +89,6 @@ const ProfileScreen: React.FC<{
             Profile
           </Text>
 
-          <View style={styles.profileContainer}>
-            <Image
-              source={require("../assets/images/avatar.png")}
-              style={styles.avatar}
-            />
-            <View>
-              <Text style={styles.name} allowFontScaling={false}>
-                {userDetails?.fullName}
-              </Text>
-              <Text style={styles.subName} allowFontScaling={false}>
-                {userDetails?.userName}
-              </Text>
-            </View>
-          </View>
-
           {/* <TouchableOpacity
             onPress={() =>
               navigation.navigate("AgentAccountVerificationScreen")
@@ -124,28 +109,22 @@ const ProfileScreen: React.FC<{
                 onPress={() => navigation.navigate("PersonalInformationScreen")}
                 style={styles.settingsItem}
               >
-                <Profile variant="Bold" color={COLORS.violet400} size={24} />
-                <Text style={styles.titleText} allowFontScaling={false}>
-                  Personal Information
-                </Text>
+                <Profile variant="Bold" color={COLORS.violet400} size={24} style={{marginRight: SPACING}} />
+                <LightText color="black">Personal Information</LightText>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => navigation.navigate("CreateTagScreen")}
                 style={styles.settingsItem}
               >
-                <Tag variant="Bold" color={COLORS.violet400} size={24} />
-                <Text style={styles.titleText} allowFontScaling={false}>
-                  Edit Tag
-                </Text>
+                <Tag variant="Bold" color={COLORS.violet400} size={24} style={{marginRight: SPACING}} />
+                <LightText color="black">Raha Tag</LightText>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => navigation.navigate("ReferralScreen")}
                 style={styles.settingsItem}
               >
-                <People variant="Bold" color={COLORS.violet400} size={24} />
-                <Text style={styles.titleText} allowFontScaling={false}>
-                  Referrals
-                </Text>
+                <People variant="Bold" color={COLORS.violet400} size={24} style={{marginRight: SPACING}} />
+                <LightText color="black">Referrals</LightText>
               </TouchableOpacity>
             </View>
 
@@ -157,19 +136,15 @@ const ProfileScreen: React.FC<{
                   onPress={() => navigation.navigate("ChangePasswordScreen")}
                   style={styles.settingsItem}
                 >
-                  <Lock variant="Bold" color={COLORS.violet400} size={24} />
-                  <Text style={styles.titleText} allowFontScaling={false}>
-                    Change Password
-                  </Text>
+                  <Key variant="Bold" color={COLORS.violet400} size={24} style={{marginRight: SPACING}} />
+                  <LightText color="black">Change Password</LightText>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => navigation.navigate("SelectPinChangeScreen")}
                   style={styles.settingsItem}
                 >
-                  <Lock variant="Bold" color={COLORS.violet400} size={24} />
-                  <Text style={styles.titleText} allowFontScaling={false}>
-                    Change Pin
-                  </Text>
+                  <Lock variant="Bold" color={COLORS.violet400} size={24} style={{marginRight: SPACING}} />
+                  <LightText color="black">Change Pin</LightText>
                 </TouchableOpacity>
                 <View style={styles.switchContainer}>
                   <View style={styles.switchLabel}>
@@ -177,10 +152,9 @@ const ProfileScreen: React.FC<{
                       variant="Bold"
                       color={COLORS.violet400}
                       size={24}
+                      style={{marginRight: SPACING}}
                     />
-                    <Text style={styles.titleText} allowFontScaling={false}>
-                      Biometrics
-                    </Text>
+                    <LightText color="black">Biometrics</LightText>
                   </View>
                   <Switch
                     thumbColor={COLORS.white}
@@ -209,28 +183,28 @@ const ProfileScreen: React.FC<{
                     variant="Bold"
                     color={COLORS.violet400}
                     size={24}
+                    style={{marginRight: SPACING}}
                   />
-                  <Text style={styles.titleText} allowFontScaling={false}>
-                    Notification
-                  </Text>
+                  <LightText color="black">Notification</LightText>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => navigation.navigate("HelpAndSupportScreen")}
                   style={styles.settingsItem}
                 >
-                  <Lock variant="Bold" color={COLORS.violet400} size={24} />
-                  <Text style={styles.titleText} allowFontScaling={false}>
-                    Help & Support
-                  </Text>
+                  <I24Support
+                    variant="Bold"
+                    color={COLORS.violet400}
+                    size={24}
+                    style={{marginRight: SPACING}}
+                  />
+                  <LightText color="black">Help & Support</LightText>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={handleOpenCloseAccountModal}
                   style={styles.settingsItem}
                 >
-                  <Message2 variant="Bold" color={COLORS.violet400} size={24} />
-                  <Text style={styles.titleText} allowFontScaling={false}>
-                    Close Account
-                  </Text>
+                  <Message2 variant="Bold" color={COLORS.violet400} size={24} style={{marginRight: SPACING}} />
+                  <LightText color="black">Close Account</LightText>
                 </TouchableOpacity>
               </View>
             </View>
@@ -240,10 +214,10 @@ const ProfileScreen: React.FC<{
               onPress={handleLogout}
               style={styles.logoutContainer}
             >
-              <Text style={styles.logoutButton} allowFontScaling={false}>
+              <MediumText color="error" size="large">
                 Logout
-              </Text>
-              <Logout color="#FF2E2E" />
+              </MediumText>
+              <Logout color="#FF2E2E" style={{marginLeft: SPACING}} />
             </TouchableOpacity>
           </View>
         </View>
@@ -324,6 +298,7 @@ const styles = StyleSheet.create({
     padding: SPACING,
     borderRadius: SPACING,
     marginTop: SPACING,
+    gap: SPACING,
   },
   settingsItem: {
     flexDirection: "row",
@@ -332,7 +307,7 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
+    fontSize: RFValue(12),
     marginLeft: SPACING,
   },
   switchContainer: {

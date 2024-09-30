@@ -12,9 +12,9 @@ import {
 import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
-import SPACING from "../../config/SPACING";
-import FONT_SIZE from "../../config/font-size";
-import COLORS from "../../config/colors";
+import SPACING from "../../constants/SPACING";
+import FONT_SIZE from "../../constants/font-size";
+import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../components/Button";
 import { handleShowFlash } from "../../components/FlashMessageComponent";

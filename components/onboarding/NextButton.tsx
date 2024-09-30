@@ -7,7 +7,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import React, { FC } from "react";
-import COLORS from "../../config/colors";
+import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const { height: windowHeight, width: windowWidth } = Dimensions.get("window");
@@ -60,7 +60,9 @@ const NextButton: FC<NextButtonProps> = ({
           },
         ]}
       >
-        <Text style={[styles.buttonText, {color: COLORS.black400}]}>Login</Text>
+        <Text style={[styles.buttonText, { color: COLORS.black400 }]}>
+          Login
+        </Text>
       </TouchableOpacity>
     </View>
   );

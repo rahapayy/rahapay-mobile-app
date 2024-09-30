@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { getItem, setItem } from "../utils/ayncStorage";
-import { ActivityIndicator, View } from "react-native";
-import COLORS from "../config/colors";
+import LoadingIndicator from "../components/LoadingIndicator";
 import WelcomeScreen from "../screens/WelcomeScreen";
 import Onboarding from "../components/onboarding/Onboarding";
 import CreateAccountScreen from "../screens/Auth/CreateAccount/CreateAccountScreen";
@@ -13,8 +12,10 @@ import CreateNewPasswordScreen from "../screens/Auth/ForgotPassword/CreateNewPas
 import LoginScreen from "../screens/Auth/Login/LoginScreen";
 import SuccessfulScreen from "../screens/Auth/CreateAccount/SuccessfulScreen";
 import CreateTransactionPinScreen from "../screens/Auth/CreateAccount/CreatePinScreen";
+import ExistingUserScreen from "../screens/Auth/Login/ExistingUserScreen";
+import { RootStackParamList } from "../types/RootStackParams";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AuthRoute = () => {
   const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
@@ -33,19 +34,7 @@ const AuthRoute = () => {
   };
 
   if (showOnboarding === null) {
-    return (
-      <View
-        style={{
-          backgroundColor: "#fff",
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <ActivityIndicator size="large" color={COLORS.violet600} />
-      </View>
-    );
+    return <LoadingIndicator />;
   }
 
   return (
@@ -104,6 +93,11 @@ const AuthRoute = () => {
       <Stack.Screen
         name="SuccessfulScreen"
         component={SuccessfulScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ExistingUserScreen"
+        component={ExistingUserScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

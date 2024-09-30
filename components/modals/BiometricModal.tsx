@@ -1,9 +1,9 @@
 import React from "react";
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import COLORS from "../../config/colors";
-import FONT_SIZE from "../../config/font-size";
+import COLORS from "../../constants/colors";
+import FONT_SIZE from "../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
-import SPACING from "../../config/SPACING";
+import SPACING from "../../constants/SPACING";
 
 const BiometricModal: React.FC<{
   visible: boolean;

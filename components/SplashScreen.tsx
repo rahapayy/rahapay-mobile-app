@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import * as Animatable from "react-native-animatable";
-import COLORS from "../config/colors";
+import COLORS from "../constants/colors";
 
 const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
   useEffect(() => {

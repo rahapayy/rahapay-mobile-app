@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import COLORS from "../../config/colors";
-import FONT_SIZE from "../../config/font-size";
+import COLORS from "../../constants/colors";
+import FONT_SIZE from "../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
-import SPACING from "../../config/SPACING";
+import SPACING from "../../constants/SPACING";
 import { AuthContext } from "../../context/AuthContext";
 
 const LogOutModal: React.FC<{
@@ -30,7 +30,10 @@ const LogOutModal: React.FC<{
               Are you sure you want to Log out of RahaPay?
             </Text>
             <View className="flex-row gap-4">
-              <TouchableOpacity style={styles.modalButton} onPress={handleLogout}>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={handleLogout}
+              >
                 <Text style={styles.modalButtonText} allowFontScaling={false}>
                   Yes
                 </Text>

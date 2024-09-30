@@ -3,31 +3,16 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AppStack from "./AppStack";
 import AuthRoute from "./AuthRouter";
-import { ActivityIndicator, View } from "react-native";
-import COLORS from "../config/colors";
+import LoadingIndicator from "../components/LoadingIndicator";
 import { AuthContext } from "../context/AuthContext";
-import ExistingUserScreen from "../screens/Auth/Login/ExistingUserScreen";
 
 const Stack = createNativeStackNavigator();
 
 const Router = () => {
-  const { isAuthenticated, isAppReady } =
-    useContext(AuthContext);
+  const { isAuthenticated, isAppReady } = useContext(AuthContext);
 
   if (!isAppReady) {
-    // Loading indicator screen
-    return (
-      <View
-        style={{
-          backgroundColor: "#fff",
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <ActivityIndicator size="large" color={COLORS.violet600} />
-      </View>
-    );
+    return <LoadingIndicator />;
   }
 
   return (

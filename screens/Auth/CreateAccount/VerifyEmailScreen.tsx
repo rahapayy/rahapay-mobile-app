@@ -7,13 +7,14 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Keyboard,
 } from "react-native";
 import { ArrowLeft } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RFValue } from "react-native-responsive-fontsize";
-import SPACING from "../../../config/SPACING";
-import COLORS from "../../../config/colors";
+import SPACING from "../../../constants/SPACING";
+import COLORS from "../../../constants/colors";
 import Button from "../../../components/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { AuthContext } from "../../../context/AuthContext";
@@ -55,6 +56,11 @@ const VerifyEmailScreen: React.FC<{
 
     return () => clearTimeout(timer);
   }, [resendCountdown]);
+
+  useEffect(() => {
+    // Focus on the first input box and show keyboard when component mounts
+    boxRefs.current[0]?.focus();
+  }, []);
 
   const handleInput = (text: string, index: number) => {
     if (/^\d{0,1}$/.test(text)) {
@@ -239,7 +245,7 @@ const VerifyEmailScreen: React.FC<{
 
           <View className="justify-center items-center mt-6">
             <Text style={styles.otpText} allowFontScaling={false}>
-              Didn’t receive an OTP?
+              Didn't receive an OTP?
             </Text>
 
             <TouchableOpacity

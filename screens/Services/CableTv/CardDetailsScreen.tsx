@@ -14,30 +14,46 @@ import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useRoute } from "@react-navigation/native";
 import { ArrowLeft } from "iconsax-react-native";
-import SPACING from "../../../config/SPACING";
-import FONT_SIZE from "../../../config/font-size";
+import SPACING from "../../../constants/SPACING";
+import FONT_SIZE from "../../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../../components/Button";
-import COLORS from "../../../config/colors";
+import COLORS from "../../../constants/colors";
+import PlanSelectionModal from "../../../components/modals/CableTv/PlanSelectionModal";
 
 const CardDetailsScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const route = useRoute();
-  const { service, planId, planPrice, planName } = route.params as {
+  const { service, planId, planPrice, planName, plans } = route.params as {
     service: string;
     planId: string;
     planPrice: number;
     planName: string;
+    plans: { plan_id: string; plan_price: number; plan_name: string }[];
   };
 
   const [cardNumber, setCardNumber] = useState<string>("");
+  const [modalVisible, setModalVisible] = useState<boolean>(false); // State for modal visibility
+  const [selectedPlan, setSelectedPlan] = useState<{
+    plan_id: string;
+    plan_price: number;
+    plan_name: string;
+  } | null>(null);
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
 
   const isCardNumberValid = cardNumber.length === 10;
+
+  const handlePlanSelect = (plan: {
+    plan_id: string;
+    plan_price: number;
+    plan_name: string;
+  }) => {
+    setSelectedPlan(plan);
+  };
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
@@ -57,6 +73,19 @@ const CardDetailsScreen: React.FC<{
 
           <View className="py-4 justify-center p-4">
             <View className="bg-white rounded-lg p-4 mb-2">
+              <View className="mb-4">
+                <Text style={styles.label} allowFontScaling={false}>
+                  Select a Plan
+                </Text>
+                <TouchableOpacity
+                  style={styles.textInput}
+                  onPress={() => setModalVisible(true)}
+                >
+                  <Text>
+                    {selectedPlan ? selectedPlan.plan_name : "Select a plan"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
               <View className="mb-4">
                 <Text style={styles.label} allowFontScaling={false}>
                   Smartcard Number
@@ -87,10 +116,9 @@ const CardDetailsScreen: React.FC<{
                   Amount
                 </Text>
                 <View style={styles.textInput}>
-                  <Text
-                    style={styles.price}
-                    allowFontScaling={false}
-                  >{`₦${planPrice}`}</Text>
+                  <Text style={styles.price} allowFontScaling={false}>{`₦${
+                    selectedPlan ? selectedPlan.plan_price : 0
+                  }`}</Text>
                 </View>
               </View>
             </View>
@@ -104,23 +132,30 @@ const CardDetailsScreen: React.FC<{
             <Button
               style={[
                 styles.proceedButton,
-                !isCardNumberValid && styles.disabledButton,
+                (!isCardNumberValid || !selectedPlan) && styles.disabledButton,
               ]}
               title={"Proceed"}
               textColor="#fff"
-              disabled={!isCardNumberValid}
+              disabled={!isCardNumberValid || !selectedPlan}
               onPress={() =>
                 navigation.navigate("ReviewCableTvSummaryScreen", {
                   service,
-                  planId,
-                  planPrice,
+                  planId: selectedPlan?.plan_id,
+                  planPrice: selectedPlan?.plan_price,
                   cardNumber,
-                  planName,
+                  planName: selectedPlan?.plan_name,
                 })
               }
             />
           </View>
         </ScrollView>
+
+        <PlanSelectionModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          plans={plans}
+          onSelectPlan={handlePlanSelect}
+        />
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

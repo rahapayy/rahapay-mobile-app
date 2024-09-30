@@ -8,15 +8,15 @@ import {
   View,
 } from "react-native";
 import React from "react";
-import FONT_SIZE from "../config/font-size";
+import FONT_SIZE from "../constants/font-size";
 import Airtime from "../assets/svg/smartphone-rotate-angle_svgrepo.com.svg";
 import Tv from "../assets/svg/tv_svgrepo.com.svg";
 import Electricity from "../assets/svg/electricity_svgrepo.com.svg";
 import Data from "../assets/svg/signal_svgrepo.com.svg";
-import SPACING from "../config/SPACING";
+import SPACING from "../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Ionicons, Octicons } from "@expo/vector-icons";
-import COLORS from "../config/colors";
+import COLORS from "../constants/colors";
 
 const ServicesScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;

@@ -11,9 +11,9 @@ import {
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ArrowLeft } from "iconsax-react-native";
-import SPACING from "../../config/SPACING";
-import FONT_SIZE from "../../config/font-size";
-import COLORS from "../../config/colors";
+import SPACING from "../../constants/SPACING";
+import FONT_SIZE from "../../constants/font-size";
+import COLORS from "../../constants/colors";
 import Airtel from "../../assets/svg/airtelbig.svg";
 import Mtn from "../../assets/svg/mtnbig.svg";
 import Eti from "../../assets/svg/9mobilebig.svg";
@@ -22,7 +22,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import SwipeButton from "../../components/SwipeButton";
 import useApi from "../../utils/api";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
-import { RootStackParamList } from "../../navigation/RootStackParams";
+import { RootStackParamList } from "../../types/RootStackParams";
 
 type ReviewDataSummaryScreenProps = NativeStackScreenProps<
   RootStackParamList,

@@ -1,6 +1,6 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import BottomTab from "../navigation/Bottomtab/BottomTab";
+import BottomTab from "../components/BottomTab";
 import AirtimeScreen from "../screens/Services/AirtimeScreen";
 import DataScreen from "../screens/Services/DataScreen";
 import ElectricityScreen from "../screens/Services/Electricity/ElectricityScreen";
@@ -24,13 +24,9 @@ import BettingScreen from "../screens/Services/Betting/BettingScreen";
 import TransferScreen from "../screens/Services/TransferScreen";
 import EducationScreen from "../screens/Services/Education/EducationScreen";
 import CustomerCareScreen from "../screens/CustomerCareScreen";
-import ServiceDetailsScreen from "../screens/Services/CableTv/CableServiceDetailsScreen";
-import CardDetailsScreen from "../screens/Services/CableTv/CardDetailsScreen";
 import ReviewCableTvSummaryScreen from "../screens/ServiceReviewScreens/ReviewCableTvSummaryScreen";
-import MeterTypeScreen from "../screens/Services/Electricity/MeterTypeScreen";
-import ElectricityDetailsScreen from "../screens/Services/Electricity/ElectricityDetailsScreen";
 import ReviewElectricitySummaryScreen from "../screens/ServiceReviewScreens/ReviewElectricitySummaryScreen";
-import { RootStackParamList } from "../navigation/RootStackParams";
+import { RootStackParamList } from "../types/RootStackParams";
 import EducationServiceType from "../screens/Services/Education/EducationServiceType";
 import EducationDetailsScreen from "../screens/Services/Education/EducationDetailsScreen";
 import ReviewEducationSummaryScreen from "../screens/ServiceReviewScreens/ReviewEducationSummaryScreem";
@@ -177,28 +173,8 @@ const AppStack = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="CableServiceDetailsScreen"
-        component={ServiceDetailsScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="CardDetailsScreen"
-        component={CardDetailsScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
         name="ReviewCableTvSummaryScreen"
         component={ReviewCableTvSummaryScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="MeterTypeScreen"
-        component={MeterTypeScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ElectricityDetailsScreen"
-        component={ElectricityDetailsScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

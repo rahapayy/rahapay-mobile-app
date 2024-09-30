@@ -12,10 +12,10 @@ import {
 } from "react-native";
 import React, { useContext, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft } from "iconsax-react-native";
-import SPACING from "../../config/SPACING";
-import FONT_SIZE from "../../config/font-size";
-import COLORS from "../../config/colors";
+import { ArrowLeft, Copy } from "iconsax-react-native";
+import SPACING from "../../constants/SPACING";
+import FONT_SIZE from "../../constants/font-size";
+import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../components/Button";
 import { AuthContext } from "../../context/AuthContext";
@@ -23,11 +23,21 @@ import useApi from "../../utils/api";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { BoldText, LightText, MediumText } from "../../components/common/Text";
+import useWallet from "../../hooks/use-wallet";
+import * as Clipboard from "expo-clipboard";
 
 const PersonalInformationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const { userDetails, fetchUserDetails } = useContext(AuthContext);
+  const { account } = useWallet();
+  const fullName = userDetails?.fullName || "";
+  const initials = fullName
+    .split(" ")
+    .map((n: any[]) => n[0])
+    .join("")
+    .toUpperCase();
   const { mutateAsync: updateUser, isLoading } = useApi.patch(
     "/user/update/profile"
   );
@@ -72,6 +82,15 @@ const PersonalInformationScreen: React.FC<{
         });
       });
   }
+
+  const copyToClipboard = async (textToCopy: string) => {
+    await Clipboard.setStringAsync(textToCopy);
+    handleShowFlash({
+      message: "Copied to clipboard!",
+      type: "success",
+    });
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAwareScrollView>
@@ -83,23 +102,189 @@ const PersonalInformationScreen: React.FC<{
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={[styles.headerText]} allowFontScaling={false}>
-              Edit Profile
-            </Text>
+          </View>
+        </View>
+        <View className="p-4 flex-row justify-between items-center">
+          <View style={styles.avatar}>
+            <BoldText color="white">{initials}</BoldText>
+          </View>
+          <View>
+            <BoldText color="dark" size="large" right>
+              {userDetails.fullName}
+            </BoldText>
+            <LightText color="light" size="base">
+              {userDetails.email}
+            </LightText>
           </View>
         </View>
 
-        <View className="justify-center items-center gap-4 mt-4">
-          <Image
-            source={require("../../assets/images/avatar.png")}
-            className="w-16 h-16"
-          />
+        <View className="p-4 mt-6">
+          <BoldText color="dark" size="small">
+            PERSONAL INFORMATION
+          </BoldText>
+
+          <View className="mt-4 bg-white p-4 rounded-lg shadow-md">
+            <View className="flex-row justify-between items-center mb-6">
+              <LightText color="light" size="small">
+                First Name
+              </LightText>
+              <MediumText color="dark" size="medium">
+                {userDetails.fullName.split(" ")[0]}
+              </MediumText>
+            </View>
+            <View className="flex-row justify-between items-center mb-6">
+              <LightText color="light" size="small">
+                Last Name
+              </LightText>
+              <MediumText color="dark" size="medium">
+                {userDetails.fullName.split(" ")[1]}
+              </MediumText>
+            </View>
+            {userDetails.userName && (
+              <View className="flex-row justify-between items-center mb-6">
+                <LightText color="light" size="small">
+                  RahaPay Tag
+                </LightText>
+                <View className="flex-row items-center">
+                  <MediumText color="dark" size="medium">
+                    {userDetails.userName}
+                  </MediumText>
+                  <TouchableOpacity
+                    onPress={() => copyToClipboard(userDetails.userName)}
+                    style={{ marginLeft: 8 }}
+                  >
+                    <Copy color={COLORS.violet400} size={20} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+            <View className="flex-row justify-between items-center mb-6">
+              <LightText color="light" size="small">
+                Phone Number
+              </LightText>
+              <MediumText color="dark" size="medium">
+                {userDetails.phoneNumber}
+              </MediumText>
+            </View>
+            <View className="flex-row justify-between items-center">
+              <LightText color="light" size="small">
+                RahaPay Account Number
+              </LightText>
+              <View className="flex-row items-center">
+                <MediumText color="dark" size="medium">
+                  {account.accountNumber}
+                </MediumText>
+                <TouchableOpacity
+                  onPress={() => copyToClipboard(account.accountNumber)}
+                  style={{ marginLeft: 8 }}
+                >
+                  <Copy color={COLORS.violet400} size={20} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+
+          {!userDetails.userName && (
+            <>
+              <View className="mt-4">
+                <BoldText color="dark" size="small">
+                  RAHAPAY TAG
+                </BoldText>
+              </View>
+              <View className="mt-4 bg-white p-4 rounded-lg shadow-md ">
+                <MediumText color="dark" size="medium">
+                  Your RahaPay Tag
+                </MediumText>
+                <View className="mb-2" />
+                <LightText color="light" size="small">
+                  Your RahaPay Tag enables easy transactions. Share to receive
+                  payments.
+                </LightText>
+                <Button
+                  title="Create RahaPay Tag"
+                  onPress={() => {
+                    navigation.navigate("CreateTagScreen");
+                  }}
+                  style={{
+                    width: "60%",
+                    alignSelf: "center",
+                    marginTop: 20,
+                  }}
+                  textColor="#fff"
+                />
+              </View>
+            </>
+          )}
+        </View>
+      </KeyboardAwareScrollView>
+    </SafeAreaView>
+  );
+};
+
+export default PersonalInformationScreen;
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: SPACING * 2,
+    paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
+    paddingBottom: SPACING * 3,
+  },
+  leftIcon: {
+    marginRight: SPACING,
+  },
+  headerText: {
+    color: "#000",
+    fontSize: FONT_SIZE.medium,
+    fontFamily: "Outfit-Regular",
+    flex: 1,
+  },
+  headerTextDark: {
+    color: COLORS.white,
+  },
+  headTextContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  itemText: {
+    fontSize: FONT_SIZE.medium,
+    fontFamily: "Outfit-Medium",
+    paddingVertical: SPACING * 2,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 25,
+    backgroundColor: COLORS.violet300,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 8,
+  },
+  avatarText: {
+    fontFamily: "Outfit-SemiBold",
+    color: "#fff",
+    fontSize: RFValue(14),
+  },
+});
+
+{
+  /* <View className="justify-center items-center gap-4 mt-4">
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{initials}</Text>
+          </View>
           <Text style={styles.nameText} allowFontScaling={false}>
             {userDetails.fullName}
           </Text>
-        </View>
+          <Text style={styles.nameText} allowFontScaling={false}>
+            {userDetails.email}
+          </Text>
+        </View> */
+}
 
-        <View className="p-4">
+{
+  /* <View className="p-4">
           <KeyboardAvoidingView
             style={{ flex: 1 }}
             behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -174,134 +359,5 @@ const PersonalInformationScreen: React.FC<{
               textColor="#fff"
             />
           </KeyboardAvoidingView>
-        </View>
-      </KeyboardAwareScrollView>
-    </SafeAreaView>
-  );
-};
-
-export default PersonalInformationScreen;
-
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: SPACING * 2,
-    paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
-    paddingBottom: SPACING * 3,
-  },
-  leftIcon: {
-    marginRight: SPACING,
-  },
-  headerText: {
-    color: "#000",
-    fontSize: FONT_SIZE.medium,
-    fontFamily: "Outfit-Regular",
-    flex: 1,
-  },
-  headerTextDark: {
-    color: COLORS.white,
-  },
-  headTextContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  itemText: {
-    fontSize: FONT_SIZE.medium,
-    fontFamily: "Outfit-Medium",
-    paddingVertical: SPACING * 2,
-  },
-  container: {
-    backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING,
-    paddingVertical: SPACING,
-    borderRadius: SPACING,
-    marginTop: SPACING * 4,
-  },
-  headText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(18),
-    marginBottom: SPACING,
-  },
-  titleText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(16),
-    paddingVertical: SPACING,
-  },
-  descriptionText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
-    color: "#9BA1A8",
-  },
-  completedText: {
-    fontFamily: "Outfit-Regular",
-    color: "#06C270",
-  },
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderStyle: "dotted",
-    borderColor: "#000",
-    paddingVertical: SPACING,
-    paddingHorizontal: SPACING * 3,
-    borderRadius: 8,
-    marginTop: SPACING * 2,
-  },
-  buttonText: {
-    marginLeft: SPACING,
-    color: "#000",
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.medium,
-  },
-  textInput: {
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: "#DFDFDF",
-    padding: 18,
-    fontSize: RFValue(12),
-  },
-  label: {
-    fontFamily: "Outfit-Regular",
-    marginBottom: 10,
-    fontSize: RFValue(12),
-  },
-  vertical: {
-    backgroundColor: COLORS.black100,
-    width: 1,
-    height: "100%",
-    marginHorizontal: SPACING,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    fontSize: RFValue(14),
-    borderRadius: 10,
-    padding: 18,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#DFDFDF",
-  },
-  input: {
-    flex: 1,
-    height: "100%",
-    fontSize: RFValue(12),
-  },
-  numberText: {
-    fontFamily: "Outfit-Regular",
-  },
-  proceedButton: {
-    marginTop: SPACING * 4,
-  },
-  proceedButtonText: {
-    fontFamily: "Outfit-Regular",
-    color: "#fff",
-    fontSize: RFValue(16),
-  },
-  nameText: {
-    fontFamily: "Outfit-Medium",
-    fontSize: RFValue(14),
-  },
-});
+        </View> */
+}

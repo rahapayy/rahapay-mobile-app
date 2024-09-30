@@ -1,11 +1,10 @@
 import React, { createContext, useCallback, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axios } from "../utils/api";
-import { Alert, AppState, AppStateStatus, Linking } from "react-native";
+import { Alert, AppState, AppStateStatus } from "react-native";
 import * as BackgroundFetch from "expo-background-fetch";
 import * as TaskManager from "expo-task-manager";
 import SWR from "./Swr";
-import * as Constants from "expo-constants";
 
 // Define UserInfoType
 interface UserInfoType {
@@ -62,6 +61,7 @@ export const AuthContext = createContext<{
   userDetails: any;
   fetchUserDetails: (token: string) => Promise<void>;
   refreshAccessToken: (refreshToken: string) => Promise<string>;
+  reauthenticate: (pin: string) => Promise<any>;
 }>({
   isLoading: false,
   userInfo: null,
@@ -78,6 +78,7 @@ export const AuthContext = createContext<{
   userDetails: null,
   fetchUserDetails: async () => {},
   refreshAccessToken: async () => "",
+  reauthenticate: async (pin: string) => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -118,7 +119,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     checkLoginStatus();
   }, []);
-  
 
   const onboarding = async (
     email: string,
@@ -212,7 +212,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return response.data;
     } catch (error) {
       console.error("Failed to create pin:", error);
-      Alert.alert("Error", "Failed to create pin. Please try again.");
       throw error;
     } finally {
       setIsLoading(false);
@@ -220,32 +219,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const refreshAccessToken = async (refreshToken: string): Promise<string> => {
-    setIsLoading(true);
     try {
       const response = await axios.post(`/auth/refresh-token`, {
         refreshToken,
       });
-      const newAccessToken = response.data.accessToken;
-      const newExpiresAt = response.data.expiresAt;
-
-      setUserInfo((prevUserInfo: UserInfoType | null) =>
-        prevUserInfo
-          ? {
-              ...prevUserInfo,
-              access_token: newAccessToken,
-              expires_at: newExpiresAt,
-            }
-          : null
-      );
-
-      await AsyncStorage.setItem("access_token", newAccessToken);
-
-      return newAccessToken;
+      return response.data;
     } catch (error) {
       console.error("Failed to refresh access token:", error);
       throw error;
-    } finally {
-      setIsLoading(false);
+    }
+  };
+
+  const reauthenticate = async (pin: string) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post("/auth/reauthenticate", { pin });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to reauthenticate:", error);
+      throw error;
     }
   };
 
@@ -260,13 +252,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error("Failed to fetch user details:", error);
     }
   };
-  
 
   const logout = async () => {
     setIsLoading(true);
     try {
       // Call the logout endpoint
-      await axios.post("/auth/logout");
+      // await axios.post("/auth/logout");
 
       setUserInfo(null);
       setIsAuthenticated(false);
@@ -412,6 +403,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isAppReady,
         isAuthenticated,
         refreshAccessToken,
+        reauthenticate,
       }}
     >
       <SWR logOut={logout}>{children}</SWR>
