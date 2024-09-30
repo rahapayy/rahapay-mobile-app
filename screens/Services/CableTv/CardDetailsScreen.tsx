@@ -1,72 +1,45 @@
 import {
-  ActivityIndicator,
   Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
-  View,
-  Keyboard,
   TouchableWithoutFeedback,
+  Keyboard,
+  View,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, ArrowRight2 } from "iconsax-react-native";
+import { useRoute } from "@react-navigation/native";
+import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../../../constants/SPACING";
 import FONT_SIZE from "../../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
-import Dstv from "../../../assets/svg/dstv.svg";
-
-import COLORS from "../../../constants/colors";
-import useSWR from "swr";
-import PlanSelectionModal from "../../../components/modals/CableTv/PlanSelectionModal";
 import Button from "../../../components/Button";
-import { TextInput } from "react-native";
-import ServiceSelectionModal from "../../../components/modals/CableTv/ServiceSelectionModal";
-import { MediumText } from "../../../components/common/Text";
+import COLORS from "../../../constants/colors";
+import PlanSelectionModal from "../../../components/modals/CableTv/PlanSelectionModal";
 
-const TvSubscriptionScreen: React.FC<{
+const CardDetailsScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [selectedService, setSelectedService] = useState<string>("Dstv");
-  const [selectedServiceIcon, setSelectedServiceIcon] = useState<JSX.Element>(
-    <Dstv width={32} height={32} />
-  );
+  const route = useRoute();
+  const { service, planId, planPrice, planName, plans } = route.params as {
+    service: string;
+    planId: string;
+    planPrice: number;
+    planName: string;
+    plans: { plan_id: string; plan_price: number; plan_name: string }[];
+  };
+
   const [cardNumber, setCardNumber] = useState<string>("");
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [serviceModalVisible, setServiceModalVisible] =
-    useState<boolean>(false);
+  const [modalVisible, setModalVisible] = useState<boolean>(false); // State for modal visibility
   const [selectedPlan, setSelectedPlan] = useState<{
     plan_id: string;
     plan_price: number;
     plan_name: string;
   } | null>(null);
-
-  const { data, error, isLoading } = useSWR(`/cable/`);
-
-  const handleServiceSelect = (service: string, icon: JSX.Element) => {
-    setSelectedService(service);
-    setSelectedServiceIcon(icon);
-  };
-
-  if (error) {
-    return (
-      <SafeAreaView
-        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-      >
-        <Text>Error loading data.</Text>
-      </SafeAreaView>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator color={COLORS.violet300} size={"large"} />
-      </View>
-    );
-  }
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -82,59 +55,24 @@ const TvSubscriptionScreen: React.FC<{
     setSelectedPlan(plan);
   };
 
-  const filteredPlans = data
-    ? data.filter(
-        (plan: { cable_name: string }) =>
-          plan.cable_name.toLowerCase() === selectedService?.toLowerCase()
-      )
-    : [];
-
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView className="flex-1">
         <ScrollView>
-          <View className="justify-center items-center">
-            <View style={styles.header}>
-              <TouchableOpacity
-                onPress={() => navigation.goBack()}
-                style={styles.leftIcon}
-              >
-                <ArrowLeft color={"#000"} size={24} />
-              </TouchableOpacity>
-              <Text style={[styles.headerText]} allowFontScaling={false}>
-                Cable TV Subscription
-              </Text>
-            </View>
+          <View style={styles.header}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.leftIcon}
+            >
+              <ArrowLeft color={"#000"} size={24} />
+            </TouchableOpacity>
+            <Text style={[styles.headerText]} allowFontScaling={false}>
+              Provide Card Details
+            </Text>
           </View>
 
-          <View className="justify-center px-4">
-            <View className="bg-white shadow-md rounded-lg py-4 px-4">
-              <Text style={styles.titleText} allowFontScaling={false}>
-                Select a service you need
-              </Text>
-
-              <TouchableOpacity onPress={() => setServiceModalVisible(true)}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <View style={{ marginRight: SPACING }}>
-                      {selectedServiceIcon}
-                    </View>
-                    <MediumText color="black">{selectedService}</MediumText>
-                  </View>
-                  <ArrowRight2 color={COLORS.black400} size={20} />
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View className="py-4 justify-center px-4">
-            <View className="bg-white shadow-md rounded-lg px-4 py-4 mb-2">
+          <View className="py-4 justify-center p-4">
+            <View className="bg-white rounded-lg p-4 mb-2">
               <View className="mb-4">
                 <Text style={styles.label} allowFontScaling={false}>
                   Select a Plan
@@ -143,7 +81,7 @@ const TvSubscriptionScreen: React.FC<{
                   style={styles.textInput}
                   onPress={() => setModalVisible(true)}
                 >
-                  <Text style={styles.planText} allowFontScaling={false}>
+                  <Text>
                     {selectedPlan ? selectedPlan.plan_name : "Select a plan"}
                   </Text>
                 </TouchableOpacity>
@@ -185,6 +123,12 @@ const TvSubscriptionScreen: React.FC<{
               </View>
             </View>
 
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Text style={styles.changePlan} allowFontScaling={false}>
+                Change Plan
+              </Text>
+            </TouchableOpacity>
+
             <Button
               style={[
                 styles.proceedButton,
@@ -195,7 +139,7 @@ const TvSubscriptionScreen: React.FC<{
               disabled={!isCardNumberValid || !selectedPlan}
               onPress={() =>
                 navigation.navigate("ReviewCableTvSummaryScreen", {
-                  service: selectedService,
+                  service,
                   planId: selectedPlan?.plan_id,
                   planPrice: selectedPlan?.plan_price,
                   cardNumber,
@@ -205,23 +149,19 @@ const TvSubscriptionScreen: React.FC<{
             />
           </View>
         </ScrollView>
+
         <PlanSelectionModal
           visible={modalVisible}
           onClose={() => setModalVisible(false)}
-          plans={filteredPlans}
+          plans={plans}
           onSelectPlan={handlePlanSelect}
-        />
-        <ServiceSelectionModal
-          visible={serviceModalVisible}
-          onClose={() => setServiceModalVisible(false)}
-          onSelectService={handleServiceSelect}
         />
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );
 };
 
-export default TvSubscriptionScreen;
+export default CardDetailsScreen;
 
 const styles = StyleSheet.create({
   header: {
@@ -240,41 +180,12 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     flex: 1,
   },
-  titleText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(12),
-    marginBottom: SPACING * 2,
-  },
-  serviceContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    flexWrap: "wrap",
-  },
-  boxSelect: {
-    backgroundColor: COLORS.white,
-    borderRadius: 8,
-    padding: SPACING * 2,
-    alignItems: "center",
-    marginBottom: SPACING,
-    flexBasis: "47%",
-    margin: SPACING / 2,
-  },
-  selectedBox: {
-    borderColor: COLORS.violet400,
-    borderWidth: 1,
-  },
-  serviceText: {
-    marginTop: SPACING,
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(10),
-  },
   textInput: {
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#EBEBEB",
     borderRadius: 10,
     borderColor: "#DFDFDF",
     padding: SPACING * 1.5,
     width: "100%",
-    fontFamily: "Outfit-Regular",
   },
   label: {
     fontFamily: "Outfit-Regular",
@@ -302,9 +213,5 @@ const styles = StyleSheet.create({
   },
   price: {
     fontFamily: "Outfit-Medium",
-  },
-  planText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(12),
   },
 });

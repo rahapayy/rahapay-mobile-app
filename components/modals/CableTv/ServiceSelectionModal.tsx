@@ -8,13 +8,13 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
-import SPACING from "../constants/SPACING";
-import COLORS from "../constants/colors";
+import SPACING from "../../../constants/SPACING";
+import COLORS from "../../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import { CloseCircle } from "iconsax-react-native";
-import Dstv from "../assets/svg/dstv.svg";
-import Gotv from "../assets/svg/gotv.svg";
-import Startimes from "../assets/svg/startimes.svg";
+import Dstv from "../../../assets/svg/dstv.svg";
+import Gotv from "../../../assets/svg/gotv.svg";
+import Startimes from "../../../assets/svg/startimes.svg";
 
 interface ServiceSelectionModalProps {
   visible: boolean;

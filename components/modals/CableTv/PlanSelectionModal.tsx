@@ -9,8 +9,8 @@ import {
   Dimensions,
   TextInput,
 } from "react-native";
-import SPACING from "../constants/SPACING";
-import COLORS from "../constants/colors";
+import SPACING from "../../../constants/SPACING";
+import COLORS from "../../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import { CloseCircle, SearchNormal1 } from "iconsax-react-native";
 
