@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   View,
   TextInput,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import React, { useRef, useState, useEffect, useContext } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -36,6 +38,11 @@ const CreatePinScreen: React.FC<{
   );
 
   const { createPin } = useContext(AuthContext);
+
+  useEffect(() => {
+    // Focus on the first input box when the component mounts
+    boxRefs.current[0]?.focus();
+  }, []);
 
   const handleInput = (
     text: string,
@@ -121,115 +128,121 @@ const CreatePinScreen: React.FC<{
     navigation.goBack();
   };
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ padding: 16 }}>
-        <TouchableOpacity onPress={handleBackPress}>
-          <ArrowLeft color="#000" />
-        </TouchableOpacity>
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ padding: 16 }}>
+          <TouchableOpacity onPress={handleBackPress}>
+            <ArrowLeft color="#000" />
+          </TouchableOpacity>
 
-        <View
-          style={{
-            marginTop: 16,
-          }}
-        >
-          <Text style={styles.headText} allowFontScaling={false}>
-            Create Your Security PIN
-          </Text>
-          <Text style={styles.subText} allowFontScaling={false}>
-            Use this pin to process your transactions
-          </Text>
-        </View>
+          <View
+            style={{
+              marginTop: 16,
+            }}
+          >
+            <Text style={styles.headText} allowFontScaling={false}>
+              Create Your Security PIN
+            </Text>
+            <Text style={styles.subText} allowFontScaling={false}>
+              Use this pin to process your transactions
+            </Text>
+          </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.titleText} allowFontScaling={false}>
-            Enter Security PIN
-          </Text>
-          <View className="justify-center items-center">
-            <View style={styles.inputRow}>
-              {boxes.map((value, index) => (
-                <TextInput
-                  key={index}
-                  ref={(ref) => (boxRefs.current[index] = ref)}
-                  style={[
-                    styles.inputBox,
-                    boxIsFocused[index] && styles.inputBoxFocused,
-                  ]}
-                  keyboardType="numeric"
-                  allowFontScaling={false}
-                  value={value}
-                  secureTextEntry
-                  onChangeText={(text) => handleInput(text, index)}
-                  onKeyPress={(event) => handleKeyPress(event, index)}
-                  onFocus={() =>
-                    setBoxIsFocused((prevState) => [
-                      ...prevState.slice(0, index),
-                      true,
-                      ...prevState.slice(index + 1),
-                    ])
-                  }
-                  onBlur={() =>
-                    setBoxIsFocused((prevState) => [
-                      ...prevState.slice(0, index),
-                      false,
-                      ...prevState.slice(index + 1),
-                    ])
-                  }
-                />
-              ))}
+          <View style={styles.inputContainer}>
+            <Text style={styles.titleText} allowFontScaling={false}>
+              Enter Security PIN
+            </Text>
+            <View className="justify-center items-center">
+              <View style={styles.inputRow}>
+                {boxes.map((value, index) => (
+                  <TextInput
+                    key={index}
+                    ref={(ref) => (boxRefs.current[index] = ref)}
+                    style={[
+                      styles.inputBox,
+                      boxIsFocused[index] && styles.inputBoxFocused,
+                    ]}
+                    keyboardType="numeric"
+                    allowFontScaling={false}
+                    value={value}
+                    secureTextEntry
+                    onChangeText={(text) => handleInput(text, index)}
+                    onKeyPress={(event) => handleKeyPress(event, index)}
+                    onFocus={() =>
+                      setBoxIsFocused((prevState) => [
+                        ...prevState.slice(0, index),
+                        true,
+                        ...prevState.slice(index + 1),
+                      ])
+                    }
+                    onBlur={() =>
+                      setBoxIsFocused((prevState) => [
+                        ...prevState.slice(0, index),
+                        false,
+                        ...prevState.slice(index + 1),
+                      ])
+                    }
+                  />
+                ))}
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.titleText} allowFontScaling={false}>
-            Confirm Security PIN
-          </Text>
-          <View className="justify-center items-center">
-            <View style={styles.inputRow}>
-              {confirmBoxes.map((value, index) => (
-                <TextInput
-                  key={index}
-                  ref={(ref) => (confirmBoxRefs.current[index] = ref)}
-                  style={[
-                    styles.inputBox,
-                    confirmBoxIsFocused[index] && styles.inputBoxFocused,
-                  ]}
-                  keyboardType="numeric"
-                  allowFontScaling={false}
-                  value={value}
-                  secureTextEntry
-                  onChangeText={(text) => handleInput(text, index, true)}
-                  onKeyPress={(event) => handleKeyPress(event, index, true)}
-                  onFocus={() =>
-                    setConfirmBoxIsFocused((prevState) => [
-                      ...prevState.slice(0, index),
-                      true,
-                      ...prevState.slice(index + 1),
-                    ])
-                  }
-                  onBlur={() =>
-                    setConfirmBoxIsFocused((prevState) => [
-                      ...prevState.slice(0, index),
-                      false,
-                      ...prevState.slice(index + 1),
-                    ])
-                  }
-                />
-              ))}
+          <View style={styles.inputContainer}>
+            <Text style={styles.titleText} allowFontScaling={false}>
+              Confirm Security PIN
+            </Text>
+            <View className="justify-center items-center">
+              <View style={styles.inputRow}>
+                {confirmBoxes.map((value, index) => (
+                  <TextInput
+                    key={index}
+                    ref={(ref) => (confirmBoxRefs.current[index] = ref)}
+                    style={[
+                      styles.inputBox,
+                      confirmBoxIsFocused[index] && styles.inputBoxFocused,
+                    ]}
+                    keyboardType="numeric"
+                    allowFontScaling={false}
+                    value={value}
+                    secureTextEntry
+                    onChangeText={(text) => handleInput(text, index, true)}
+                    onKeyPress={(event) => handleKeyPress(event, index, true)}
+                    onFocus={() =>
+                      setConfirmBoxIsFocused((prevState) => [
+                        ...prevState.slice(0, index),
+                        true,
+                        ...prevState.slice(index + 1),
+                      ])
+                    }
+                    onBlur={() =>
+                      setConfirmBoxIsFocused((prevState) => [
+                        ...prevState.slice(0, index),
+                        false,
+                        ...prevState.slice(index + 1),
+                      ])
+                    }
+                  />
+                ))}
+              </View>
             </View>
           </View>
-        </View>
 
-        <Button
-          title="Confirm"
-          onPress={handleConfirmPin}
-          isLoading={loading}
-          style={{ marginTop: SPACING * 4 }}
-          textColor="#fff"
-        />
-      </View>
-    </SafeAreaView>
+          <Button
+            title="Confirm"
+            onPress={handleConfirmPin}
+            isLoading={loading}
+            style={{ marginTop: SPACING * 4 }}
+            textColor="#fff"
+          />
+        </View>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 
