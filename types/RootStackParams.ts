@@ -90,6 +90,7 @@ export type RootStackParamList = {
     amount: string;
     serviceType: string;
     phoneNumber: string;
+    quantity: number;
   };
   Onboarding: undefined;
   WelcomeScreen: undefined;

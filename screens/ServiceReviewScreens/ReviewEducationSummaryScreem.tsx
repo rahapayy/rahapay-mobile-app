@@ -27,7 +27,8 @@ type ReviewEducationSummaryScreenProps = NativeStackScreenProps<
 const ReviewEducationSummaryScreen: React.FC<
   ReviewEducationSummaryScreenProps
 > = ({ navigation, route }) => {
-  const { exam, amount, phoneNumber, serviceType } = route.params;
+  const { exam, plan_id, amount, phoneNumber, serviceType, quantity } =
+    route.params;
 
   const { mutateAsync } = useApi.post("/exam/");
 
@@ -35,9 +36,8 @@ const ReviewEducationSummaryScreen: React.FC<
     try {
       // Making the API call
       const response = await mutateAsync({
-        exam,
-        phoneNumber,
-        amount,
+        examId: plan_id,
+        quantity,
       });
 
       console.log(response);
@@ -167,6 +167,20 @@ const ReviewEducationSummaryScreen: React.FC<
                 </Text>
                 <Text style={styles.descriptionText} allowFontScaling={false}>
                   {serviceType}
+                </Text>
+              </View>
+              <View
+                style={{
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexDirection: "row",
+                }}
+              >
+                <Text style={styles.titleText} allowFontScaling={false}>
+                  Quantity
+                </Text>
+                <Text style={styles.descriptionText} allowFontScaling={false}>
+                  {quantity}
                 </Text>
               </View>
               <View
