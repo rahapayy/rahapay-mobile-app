@@ -212,7 +212,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return response.data;
     } catch (error) {
       console.error("Failed to create pin:", error);
-      Alert.alert("Error", "Failed to create pin. Please try again.");
       throw error;
     } finally {
       setIsLoading(false);
@@ -220,32 +219,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const refreshAccessToken = async (refreshToken: string): Promise<string> => {
-    setIsLoading(true);
     try {
       const response = await axios.post(`/auth/refresh-token`, {
         refreshToken,
       });
-      const newAccessToken = response.data.accessToken;
-      const newExpiresAt = response.data.expiresAt;
-
-      setUserInfo((prevUserInfo: UserInfoType | null) =>
-        prevUserInfo
-          ? {
-              ...prevUserInfo,
-              access_token: newAccessToken,
-              expires_at: newExpiresAt,
-            }
-          : null
-      );
-
-      await AsyncStorage.setItem("access_token", newAccessToken);
-
-      return newAccessToken;
+      return response.data;
     } catch (error) {
       console.error("Failed to refresh access token:", error);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
