@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Keyboard,
 } from "react-native";
 import { ArrowLeft } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -54,6 +55,11 @@ const VerifyEmailScreen: React.FC<{
 
     return () => clearTimeout(timer);
   }, [resendCountdown]);
+
+  useEffect(() => {
+    // Focus on the first input box and show keyboard when component mounts
+    boxRefs.current[0]?.focus();
+  }, []);
 
   const handleInput = (text: string, index: number) => {
     if (/^\d{0,1}$/.test(text)) {
@@ -230,7 +236,7 @@ const VerifyEmailScreen: React.FC<{
 
           <View className="justify-center items-center mt-6">
             <Text style={styles.otpText} allowFontScaling={false}>
-              Didn’t receive an OTP?
+              Didn't receive an OTP?
             </Text>
 
             <TouchableOpacity
