@@ -39,7 +39,8 @@ const VerifyEmailScreen: React.FC<{
   const [isInputFilled, setIsInputFilled] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(60);
   const [isLoading, setIsLoading] = useState(false);
-  const { verifyEmail, resendOtp } = useContext(AuthContext);
+  const { verifyEmail, resendOtp, refreshAccessToken } =
+    useContext(AuthContext);
 
   useEffect(() => {
     setIsInputFilled(boxes.every((box) => box !== ""));
@@ -96,12 +97,20 @@ const VerifyEmailScreen: React.FC<{
     if (otp.length === 6) {
       setIsSubmitting(true);
       try {
-        const userInfo = await verifyEmail(otp); // Use verifyEmail from AuthContext
-        handleShowFlash({
-          message: "Email verified successfully!",
-          type: "success",
-        });
-        navigation.navigate("CreatePinScreen");
+        await verifyEmail(otp)
+          .then((response) => {
+            refreshAccessToken(response.data.refreshToken)
+              .then(async (response) => {
+                await AsyncStorage.setItem("access_token", response);
+                handleShowFlash({
+                  message: "Email verified successfully!",
+                  type: "success",
+                });
+                navigation.navigate("CreatePinScreen");
+              })
+              .catch((err) => console.log({ refreshError: err }));
+          })
+          .catch((err) => console.log({ verifyErr: err }));
       } catch (error) {
         const err = error as {
           response?: { data?: { message?: string; code?: string } };
