@@ -60,8 +60,11 @@ export const AuthContext = createContext<{
   isAuthenticated: boolean;
   userDetails: any;
   fetchUserDetails: (token: string) => Promise<void>;
-  refreshAccessToken: (refreshToken: string) => Promise<string>;
+  refreshAccessToken: (
+    refreshToken: string
+  ) => Promise<{ accessToken: string }>;
   reauthenticate: (pin: string) => Promise<any>;
+  setIsUserAuthenticated: (value: boolean) => void;
 }>({
   isLoading: false,
   userInfo: null,
@@ -77,8 +80,9 @@ export const AuthContext = createContext<{
   isAppReady: false,
   userDetails: null,
   fetchUserDetails: async () => {},
-  refreshAccessToken: async () => "",
+  refreshAccessToken: async () => ({} as { accessToken: string }),
   reauthenticate: async (pin: string) => {},
+  setIsUserAuthenticated: (value: boolean) => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -153,6 +157,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  function setIsUserAuthenticated(value: boolean) {
+    return setIsAuthenticated(value);
+  }
+
   const verifyEmail = async (otp: string) => {
     setIsLoading(true);
     try {
@@ -218,7 +226,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const refreshAccessToken = async (refreshToken: string): Promise<string> => {
+  const refreshAccessToken = async (
+    refreshToken: string
+  ): Promise<{ accessToken: string }> => {
     try {
       const response = await axios.post(`/auth/refresh-token`, {
         refreshToken,
@@ -404,6 +414,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isAuthenticated,
         refreshAccessToken,
         reauthenticate,
+        setIsUserAuthenticated,
       }}
     >
       <SWR logOut={logout}>{children}</SWR>

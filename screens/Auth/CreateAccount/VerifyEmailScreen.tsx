@@ -107,7 +107,10 @@ const VerifyEmailScreen: React.FC<{
           .then((response) => {
             refreshAccessToken(response.data.refreshToken)
               .then(async (response) => {
-                await AsyncStorage.setItem("access_token", response);
+                await AsyncStorage.setItem(
+                  "access_token",
+                  response.accessToken
+                );
                 handleShowFlash({
                   message: "Email verified successfully!",
                   type: "success",

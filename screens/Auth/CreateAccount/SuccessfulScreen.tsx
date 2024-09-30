@@ -1,17 +1,22 @@
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import LottieView from "lottie-react-native";
 import Button from "../../../components/Button";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import FONT_SIZE from "../../../constants/font-size";
 import SPACING from "../../../constants/SPACING";
+import { AuthContext } from "../../../context/AuthContext";
 
 const SuccessfulScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const { setIsUserAuthenticated } = useContext(AuthContext);
   const handleButtonClick = () => {
     // Navigate directly to the AppStack
-    navigation.navigate("AppStack");
+    setIsUserAuthenticated(true);
+    setTimeout(() => {
+      navigation.navigate("AppStack");
+    }, 0);
   };
 
   return (
