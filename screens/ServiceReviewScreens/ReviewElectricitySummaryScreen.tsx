@@ -27,7 +27,7 @@ type ReviewElectricitySummaryScreenProps = NativeStackScreenProps<
 const ReviewElectricitySummaryScreen: React.FC<
   ReviewElectricitySummaryScreenProps
 > = ({ navigation, route }) => {
-  const { disco, meterNumber, amount, phoneNumber, planId } = route.params;
+  const { disco, meterNumber, amount, planId, planName } = route.params;
 
   const { mutateAsync } = useApi.post("/electricity");
 
@@ -55,7 +55,7 @@ const ReviewElectricitySummaryScreen: React.FC<
         navigation.navigate("TransactionStatusScreen", { status: "failed" });
       }
     } catch (err: unknown) {
-      console.error("Error processing electricity payment:", err);
+      console.error("Error processing electricity payment:", err.response.data);
 
       // Handling different types of errors
       if (err instanceof Error) {
@@ -132,7 +132,7 @@ const ReviewElectricitySummaryScreen: React.FC<
             }}
           >
             <Text style={styles.itemText} allowFontScaling={false}>
-              {disco} Bill
+              {planName} Bill
             </Text>
           </View>
           <View style={{ padding: 16 }}>
@@ -167,20 +167,6 @@ const ReviewElectricitySummaryScreen: React.FC<
                 </Text>
                 <Text style={styles.descriptionText} allowFontScaling={false}>
                   {meterNumber}
-                </Text>
-              </View>
-              <View
-                style={{
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  flexDirection: "row",
-                }}
-              >
-                <Text style={styles.titleText} allowFontScaling={false}>
-                  Phone Number
-                </Text>
-                <Text style={styles.descriptionText} allowFontScaling={false}>
-                  {phoneNumber}
                 </Text>
               </View>
               <View

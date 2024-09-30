@@ -89,6 +89,7 @@ export type RootStackParamList = {
   ReviewElectricitySummaryScreen: {
     disco: string;
     planId: string;
+    planName: string;
     meterType: string;
     meterNumber: string;
     amount: string;
