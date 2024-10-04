@@ -111,4 +111,5 @@ export type RootStackParamList = {
   CreatePinScreen: undefined;
   SuccessfulScreen: undefined;
   EnterCodeScreen: undefined;
+  CreateTransactionPinScreen: undefined;
 };

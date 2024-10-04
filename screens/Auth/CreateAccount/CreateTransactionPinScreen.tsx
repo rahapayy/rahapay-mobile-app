@@ -1,5 +1,4 @@
 import {
-  Image,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -9,7 +8,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
-import React, { useRef, useState, useEffect, useContext } from "react";
+import React, { useRef, useState, useContext } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../constants/SPACING";
@@ -18,31 +17,25 @@ import Button from "../../../components/Button";
 import { ArrowLeft } from "iconsax-react-native";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { AuthContext } from "../../../context/AuthContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const CreatePinScreen: React.FC<{
+const CreateTransactionPinScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
-  const [confirmBoxes, setConfirmBoxes] = useState(["", "", "", "", "", ""]);
+  const [boxes, setBoxes] = useState(["", "", "", ""]);
+  const [confirmBoxes, setConfirmBoxes] = useState(["", "", "", ""]);
   const [loading, setLoading] = useState(false);
 
-  const boxRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
+  const boxRefs = useRef<Array<TextInput | null>>(new Array(4).fill(null));
   const confirmBoxRefs = useRef<Array<TextInput | null>>(
-    new Array(6).fill(null)
+    new Array(4).fill(null)
   );
 
-  const [boxIsFocused, setBoxIsFocused] = useState(new Array(6).fill(false));
+  const [boxIsFocused, setBoxIsFocused] = useState(new Array(4).fill(false));
   const [confirmBoxIsFocused, setConfirmBoxIsFocused] = useState(
-    new Array(6).fill(false)
+    new Array(4).fill(false)
   );
 
   const { createPin } = useContext(AuthContext);
-
-  useEffect(() => {
-    // Focus on the first input box when the component mounts
-    boxRefs.current[0]?.focus();
-  }, []);
 
   const handleInput = (
     text: string,
@@ -54,7 +47,6 @@ const CreatePinScreen: React.FC<{
 
     const newBoxes = [...currentBoxes];
 
-    // Handle input
     if (text === "") {
       newBoxes[index] = "";
       setCurrentBoxes(newBoxes);
@@ -66,27 +58,10 @@ const CreatePinScreen: React.FC<{
     } else if (/^\d{0,1}$/.test(text)) {
       newBoxes[index] = text;
       setCurrentBoxes(newBoxes);
-      if (index < 5 && text !== "") {
+      if (index < 3 && text !== "") {
         confirm
           ? confirmBoxRefs.current[index + 1]?.focus()
           : boxRefs.current[index + 1]?.focus();
-      }
-    }
-  };
-
-  const handleKeyPress = (
-    event: { nativeEvent: { key: string } },
-    index: number,
-    confirm: boolean = false
-  ) => {
-    const currentBoxes = confirm ? confirmBoxes : boxes;
-    const setCurrentBoxes = confirm ? setConfirmBoxes : setBoxes;
-
-    if (event.nativeEvent.key === "Backspace" && currentBoxes[index] === "") {
-      if (index > 0) {
-        confirm
-          ? confirmBoxRefs.current[index - 1]?.focus()
-          : boxRefs.current[index - 1]?.focus();
       }
     }
   };
@@ -106,19 +81,18 @@ const CreatePinScreen: React.FC<{
     }
 
     try {
-      // Call createPin only for the security pin
-      await createPin(pin);
+      // Call createPin only for the transaction pin
+      await createPin(pin); // Ensure this is the correct endpoint for transaction PIN
       handleShowFlash({
-        message: "Security PIN created successfully!",
+        message: "Transaction PIN created successfully!",
         type: "success",
       });
 
-      // Navigate to the transaction pin screen
-      navigation.navigate("SuccessfulScreen");
+      navigation.navigate("CreatePinScreen");
     } catch (error) {
-      console.error("Error creating security PIN:", error);
+      console.error("Error creating transaction PIN:", error);
       handleShowFlash({
-        message: "Failed to create security PIN. Please try again.",
+        message: "Failed to create transaction PIN. Please try again.",
         type: "danger",
       });
     } finally {
@@ -142,22 +116,18 @@ const CreatePinScreen: React.FC<{
             <ArrowLeft color="#000" />
           </TouchableOpacity>
 
-          <View
-            style={{
-              marginTop: 16,
-            }}
-          >
+          <View style={{ marginTop: 16 }}>
             <Text style={styles.headText} allowFontScaling={false}>
-              Create Your Security PIN
+              Create Your Transaction PIN
             </Text>
             <Text style={styles.subText} allowFontScaling={false}>
-              This PIN will be used to secure your account and authorize important actions
+              Use this pin for secure transactions
             </Text>
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.titleText} allowFontScaling={false}>
-              Enter Security PIN
+              Enter Transaction PIN
             </Text>
             <View className="justify-center items-center">
               <View style={styles.inputRow}>
@@ -174,21 +144,6 @@ const CreatePinScreen: React.FC<{
                     value={value}
                     secureTextEntry
                     onChangeText={(text) => handleInput(text, index)}
-                    onKeyPress={(event) => handleKeyPress(event, index)}
-                    onFocus={() =>
-                      setBoxIsFocused((prevState) => [
-                        ...prevState.slice(0, index),
-                        true,
-                        ...prevState.slice(index + 1),
-                      ])
-                    }
-                    onBlur={() =>
-                      setBoxIsFocused((prevState) => [
-                        ...prevState.slice(0, index),
-                        false,
-                        ...prevState.slice(index + 1),
-                      ])
-                    }
                   />
                 ))}
               </View>
@@ -197,7 +152,7 @@ const CreatePinScreen: React.FC<{
 
           <View style={styles.inputContainer}>
             <Text style={styles.titleText} allowFontScaling={false}>
-              Confirm Security PIN
+              Confirm Transaction PIN
             </Text>
             <View className="justify-center items-center">
               <View style={styles.inputRow}>
@@ -214,21 +169,6 @@ const CreatePinScreen: React.FC<{
                     value={value}
                     secureTextEntry
                     onChangeText={(text) => handleInput(text, index, true)}
-                    onKeyPress={(event) => handleKeyPress(event, index, true)}
-                    onFocus={() =>
-                      setConfirmBoxIsFocused((prevState) => [
-                        ...prevState.slice(0, index),
-                        true,
-                        ...prevState.slice(index + 1),
-                      ])
-                    }
-                    onBlur={() =>
-                      setConfirmBoxIsFocused((prevState) => [
-                        ...prevState.slice(0, index),
-                        false,
-                        ...prevState.slice(index + 1),
-                      ])
-                    }
                   />
                 ))}
               </View>
@@ -248,7 +188,7 @@ const CreatePinScreen: React.FC<{
   );
 };
 
-export default CreatePinScreen;
+export default CreateTransactionPinScreen;
 
 const styles = StyleSheet.create({
   headText: {
@@ -270,8 +210,6 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: "column",
-    // justifyContent: "center",
-    // alignItems: "center",
     paddingVertical: SPACING * 2,
     borderRadius: 10,
     backgroundColor: COLORS.white,
@@ -297,16 +235,5 @@ const styles = StyleSheet.create({
   inputBoxFocused: {
     borderColor: COLORS.violet400,
     borderWidth: 1,
-  },
-  topContain: {
-    flexDirection: "row",
-    gap: SPACING,
-    backgroundColor: COLORS.violet100,
-    paddingHorizontal: SPACING * 2,
-    paddingVertical: SPACING,
-    borderRadius: 4,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: SPACING * 2,
   },
 });

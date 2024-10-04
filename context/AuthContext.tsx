@@ -217,6 +217,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const response = await axios.post(`/auth/create-pin`, {
         securityPin: pin,
+        transactionPin: pin,
       });
       return response.data;
     } catch (error) {

@@ -11,7 +11,8 @@ import EnterCodeScreen from "../screens/Auth/ForgotPassword/EnterCodeScreen";
 import CreateNewPasswordScreen from "../screens/Auth/ForgotPassword/CreateNewPasswordScreen";
 import LoginScreen from "../screens/Auth/Login/LoginScreen";
 import SuccessfulScreen from "../screens/Auth/CreateAccount/SuccessfulScreen";
-import CreateTransactionPinScreen from "../screens/Auth/CreateAccount/CreatePinScreen";
+import CreatePinScreen from "../screens/Auth/CreateAccount/CreatePinScreen";
+import CreateTransactionPinScreen from "../screens/Auth/CreateAccount/CreateTransactionPinScreen";
 import ExistingUserScreen from "../screens/Auth/Login/ExistingUserScreen";
 import { RootStackParamList } from "../types/RootStackParams";
 
@@ -87,7 +88,7 @@ const AuthRoute = () => {
       />
       <Stack.Screen
         name="CreatePinScreen"
-        component={CreateTransactionPinScreen}
+        component={CreatePinScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -98,6 +99,11 @@ const AuthRoute = () => {
       <Stack.Screen
         name="ExistingUserScreen"
         component={ExistingUserScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CreateTransactionPinScreen"
+        component={CreateTransactionPinScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

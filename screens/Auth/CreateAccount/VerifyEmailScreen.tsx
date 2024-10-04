@@ -115,7 +115,7 @@ const VerifyEmailScreen: React.FC<{
                   message: "Email verified successfully!",
                   type: "success",
                 });
-                navigation.navigate("CreatePinScreen");
+                navigation.navigate("CreateTransactionPinScreen");
               })
               .catch((err) => console.log({ refreshError: err }));
           })
