@@ -13,10 +13,11 @@ const SuccessfulScreen: React.FC<{
   const { setIsUserAuthenticated } = useContext(AuthContext);
   const handleButtonClick = () => {
     // Navigate directly to the AppStack
-    setIsUserAuthenticated(true);
-    setTimeout(() => {
-      navigation.navigate("AppStack");
-    }, 0);
+    setIsUserAuthenticated(true).then(() => {
+      setTimeout(() => {
+        navigation.navigate("AppStack");
+      }, 0);
+    });
   };
 
   return (

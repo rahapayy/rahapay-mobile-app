@@ -64,7 +64,7 @@ export const AuthContext = createContext<{
     refreshToken: string
   ) => Promise<{ accessToken: string }>;
   reauthenticate: (pin: string) => Promise<any>;
-  setIsUserAuthenticated: (value: boolean) => void;
+  setIsUserAuthenticated: (value: boolean) => Promise<void>;
 }>({
   isLoading: false,
   userInfo: null,
@@ -82,7 +82,7 @@ export const AuthContext = createContext<{
   fetchUserDetails: async () => {},
   refreshAccessToken: async () => ({} as { accessToken: string }),
   reauthenticate: async (pin: string) => {},
-  setIsUserAuthenticated: (value: boolean) => {},
+  setIsUserAuthenticated: async (value: boolean) => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -157,8 +157,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  function setIsUserAuthenticated(value: boolean) {
-    return setIsAuthenticated(value);
+  async function setIsUserAuthenticated(value: boolean) {
+    await fetchUserDetails(userInfo?.data.accessToken ?? "");
+    setIsAuthenticated(value);
   }
 
   const verifyEmail = async (otp: string) => {
