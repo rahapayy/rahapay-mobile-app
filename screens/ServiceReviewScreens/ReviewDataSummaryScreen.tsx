@@ -62,7 +62,7 @@ const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
         navigation.navigate("TransactionStatusScreen", { status: "failed" });
       }
     } catch (err: unknown) {
-      console.error("Error topping up data:", err.response.data);
+      console.error("Error topping up data:", err);
       if (err instanceof Error && "response" in err) {
         const axiosError = err as AxiosError;
         if (axiosError.response?.status === 400) {
