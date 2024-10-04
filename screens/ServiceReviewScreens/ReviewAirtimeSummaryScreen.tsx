@@ -33,6 +33,9 @@ type ReviewAirtimeSummaryScreenProps = NativeStackScreenProps<
 interface AxiosError {
   response?: {
     status: number;
+    data?: {
+      message?: string;
+    };
   };
 }
 
@@ -64,26 +67,20 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
     } catch (err: unknown) {
       console.error("Error occurred:", err);
 
-      if (err instanceof Error) {
-        // Handle known error types
-        handleShowFlash({
-          message: "An unexpected error occurred. Please try again.",
-          type: "danger",
-        });
-      } else if (typeof err === "object" && err !== null && "response" in err) {
-        const response = (err as any).response;
-        console.error("API Response Error:", response); // Log the response
-        if (response?.status === 503) {
-          handleShowFlash({
-            message:
-              "The server is currently unavailable. Please try again later.",
-            type: "danger",
-          });
-        } else if (response?.status === 400) {
-          handleShowFlash({
-            message: "Bad request. Please check the input values.",
-            type: "danger",
-          });
+      if (err instanceof Error && 'response' in err) {
+        const axiosError = err as AxiosError;
+        if (axiosError.response?.status === 400) {
+          if (axiosError.response.data?.message === "Insufficient funds in wallet!") {
+            handleShowFlash({
+              message: "Insufficient funds. Please top up.",
+              type: "danger",
+            });
+          } else {
+            handleShowFlash({
+              message: "Bad request. Please check your input and try again.",
+              type: "danger",
+            });
+          }
         } else {
           handleShowFlash({
             message: "An error occurred. Please try again.",
@@ -125,7 +122,7 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
             {selectedOperator === "9Mobile" && <Eti width={100} height={100} />}
             {selectedOperator === "Glo" && <Glo width={100} height={100} />}
             <Text style={styles.itemText} allowFontScaling={false}>
-              {selectedOperator} Data Bundle
+              {selectedOperator} Airtime
             </Text>
           </View>
           <View style={styles.content}>

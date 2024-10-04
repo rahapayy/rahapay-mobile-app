@@ -29,6 +29,15 @@ type ReviewDataSummaryScreenProps = NativeStackScreenProps<
   "ReviewDataSummaryScreen"
 >;
 
+interface AxiosError {
+  response?: {
+    status: number;
+    data?: {
+      message?: string;
+    };
+  };
+}
+
 const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
   navigation,
   route,
@@ -53,40 +62,24 @@ const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
         navigation.navigate("TransactionStatusScreen", { status: "failed" });
       }
     } catch (err: unknown) {
-      console.error("Error topping up data:", err);
-      // Handling different types of errors
-      if (err instanceof Error) {
-        if (err.message.includes("Network")) {
-          handleShowFlash({
-            message:
-              "Network error. Please check your connection and try again.",
-            type: "danger",
-          });
-        } else if (err.message.includes("Timeout")) {
-          handleShowFlash({
-            message: "Request timed out. Please try again later.",
-            type: "danger",
-          });
-        } else {
-          handleShowFlash({
-            message: "An unexpected error occurred. Please try again.",
-            type: "danger",
-          });
-        }
-      } else if (err instanceof Object && "response" in err) {
-        // Handle specific status codes or response errors
-        const response = (err as any).response;
-        if (response?.status === 503) {
-          handleShowFlash({
-            message:
-              "The server is currently unavailable. Please try again later.",
-            type: "danger",
-          });
-        } else if (response?.status === 400) {
-          handleShowFlash({
-            message: "Bad request. Please check the input values.",
-            type: "danger",
-          });
+      console.error("Error topping up data:", err.response.data);
+      if (err instanceof Error && "response" in err) {
+        const axiosError = err as AxiosError;
+        if (axiosError.response?.status === 400) {
+          if (
+            axiosError.response.data?.message ===
+            "Insufficient funds in wallet!"
+          ) {
+            handleShowFlash({
+              message: "Insufficient funds. Please top up.",
+              type: "danger",
+            });
+          } else {
+            handleShowFlash({
+              message: "Bad request. Please check your input and try again.",
+              type: "danger",
+            });
+          }
         } else {
           handleShowFlash({
             message: "An error occurred. Please try again.",
@@ -100,7 +93,7 @@ const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
         });
       }
     } finally {
-      reset(); // Reset the swipe button state after the API call completes
+      reset();
     }
   };
 

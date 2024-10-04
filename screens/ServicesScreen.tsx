@@ -16,6 +16,7 @@ import Data from "../assets/svg/signal_svgrepo.com.svg";
 import SPACING from "../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Ionicons, Octicons } from "@expo/vector-icons";
+import { Ticket } from "iconsax-react-native";
 import COLORS from "../constants/colors";
 
 const ServicesScreen: React.FC<{
@@ -135,7 +136,7 @@ const ServicesScreen: React.FC<{
                   Education
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => navigation.navigate("BettingScreen")}
                 className="items-center mb-4 w-1/5"
               >
@@ -153,6 +154,23 @@ const ServicesScreen: React.FC<{
                   allowFontScaling={false}
                 >
                   Betting
+                </Text>
+              </TouchableOpacity> */}
+              <TouchableOpacity
+                onPress={() => navigation.navigate("TicketScreen")}
+                className="items-center mb-4 w-1/5"
+              >
+                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                  {/* <Ionicons name="ticket" size={24} color={COLORS.violet400} /> */}
+                  <Ticket size={24} color={COLORS.violet400} variant="Bold" />
+                </View>
+                <Text
+                  style={styles.titleText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  allowFontScaling={false}
+                >
+                  Ticket
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
