@@ -1,5 +1,4 @@
 import {
-  Image,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -9,15 +8,16 @@ import {
   View,
 } from "react-native";
 import React from "react";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft } from "iconsax-react-native";
-import SPACING from "../../constants/SPACING";
 import FONT_SIZE from "../../constants/font-size";
 import ComingSoon from "../../assets/svg/Coming Soon.svg";
+import SPACING from "../../constants/SPACING";
+import { ArrowLeft } from "iconsax-react-native";
 
-const TransferScreen: React.FC<{
-  navigation: NativeStackNavigationProp<any, "">;
-}> = ({ navigation }) => {
+interface Props {
+  navigation: any;
+}
+
+const TicketScreen: React.FunctionComponent<Props> = ({navigation}) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
@@ -34,6 +34,7 @@ const TransferScreen: React.FC<{
             </Text>
           </View>
         </View>
+
         <View className="justify-center items-center">
           <ComingSoon />
           <Text style={styles.comingsoonText}>
@@ -45,9 +46,18 @@ const TransferScreen: React.FC<{
   );
 };
 
-export default TransferScreen;
+export default TicketScreen;
 
 const styles = StyleSheet.create({
+  headText: {
+    fontFamily: "Outfit-Regular",
+    fontSize: FONT_SIZE.large,
+  },
+  comingsoonText: {
+    fontFamily: "Outfit-Regular",
+    fontSize: FONT_SIZE.medium,
+    textAlign: "center",
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -63,10 +73,5 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.medium,
     fontFamily: "Outfit-Regular",
     flex: 1,
-  },
-  comingsoonText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.medium,
-    textAlign: "center",
   },
 });
