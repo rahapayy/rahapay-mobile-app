@@ -10,9 +10,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, Copy } from "iconsax-react-native";
+import { ArrowLeft, Copy, Edit2 } from "iconsax-react-native";
 import SPACING from "../../constants/SPACING";
 import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
@@ -41,46 +41,74 @@ const PersonalInformationScreen: React.FC<{
   const { mutateAsync: updateUser, isLoading } = useApi.patch(
     "/user/update/profile"
   );
+  const [isEditing, setIsEditing] = useState(false);
   const [formValues, setFormValues] = useState({
     fullName: userDetails?.fullName,
-    phone: userDetails?.phone,
+    phone: userDetails?.phoneNumber,
     email: userDetails?.email,
   });
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      AsyncStorage.getItem("access_token").then((token) => {
+        if (token) {
+          fetchUserDetails(token);
+        }
+      });
+    });
+
+    return unsubscribe;
+  }, [navigation, fetchUserDetails]);
+
+  useEffect(() => {
+    setFormValues({
+      fullName: userDetails?.fullName,
+      phone: userDetails?.phoneNumber,
+      email: userDetails?.email,
+    });
+  }, [userDetails]);
 
   function handleInputChange(value: string, fieldKey: keyof typeof formValues) {
     setFormValues({ ...formValues, [fieldKey]: value });
   }
-  function handleButtonClick() {
-    updateUser({
-      fullName: formValues.fullName,
-      phoneNumber: formValues.phone,
-      email: formValues.email,
-    })
-      .then(() => {
-        handleShowFlash({
-          message: "Profile updated successfully!",
-          type: "success",
-        });
-        navigation.goBack();
-        AsyncStorage.getItem("access_token").then((token) => {
-          if (token) {
-            fetchUserDetails(token);
-          }
-        });
-      })
-      .catch((error) => {
-        const err = error as {
-          response?: { data?: { message?: string } };
-          message: string;
-        };
-        const errorMessage =
-          err.response?.data?.message || err.message || "An error occurred";
 
-        handleShowFlash({
-          message: errorMessage,
-          type: "danger",
-        });
+  function handleEditToggle() {
+    if (isEditing) {
+      handleSaveChanges();
+    } else {
+      setIsEditing(true);
+    }
+  }
+
+  async function handleSaveChanges() {
+    try {
+      await updateUser({
+        fullName: formValues.fullName,
+        phoneNumber: formValues.phone,
+        email: formValues.email,
       });
+      handleShowFlash({
+        message: "Profile updated successfully!",
+        type: "success",
+      });
+      setIsEditing(false);
+      const token = await AsyncStorage.getItem("access_token");
+      if (token) {
+        await fetchUserDetails(token);
+      }
+    } catch (error) {
+      const err = error as {
+        response?: { data?: { message?: string } };
+        message: string;
+      };
+      const errorMessage =
+        err.response?.data?.message || err.message || "An error occurred";
+
+      handleShowFlash({
+        message: errorMessage,
+        type: "danger",
+      });
+    }
   }
 
   const copyToClipboard = async (textToCopy: string) => {
@@ -101,6 +129,13 @@ const PersonalInformationScreen: React.FC<{
               style={styles.leftIcon}
             >
               <ArrowLeft color={"#000"} size={24} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleEditToggle} style={styles.editIcon}>
+              {isEditing ? (
+                <BoldText color="primary" size="small">Save</BoldText>
+              ) : (
+                <Edit2 color={COLORS.violet400} size={24} />
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -128,17 +163,33 @@ const PersonalInformationScreen: React.FC<{
               <LightText color="light" size="small">
                 First Name
               </LightText>
-              <MediumText color="dark" size="medium">
-                {userDetails.fullName.split(" ")[0]}
-              </MediumText>
+              {isEditing ? (
+                <TextInput
+                  style={styles.input}
+                  value={formValues.fullName.split(" ")[0]}
+                  onChangeText={(value) => handleInputChange(`${value} ${formValues.fullName.split(" ")[1]}`, "fullName")}
+                />
+              ) : (
+                <MediumText color="dark" size="medium">
+                  {userDetails.fullName.split(" ")[0]}
+                </MediumText>
+              )}
             </View>
             <View className="flex-row justify-between items-center mb-6">
               <LightText color="light" size="small">
                 Last Name
               </LightText>
-              <MediumText color="dark" size="medium">
-                {userDetails.fullName.split(" ")[1]}
-              </MediumText>
+              {isEditing ? (
+                <TextInput
+                  style={styles.input}
+                  value={formValues.fullName.split(" ")[1]}
+                  onChangeText={(value) => handleInputChange(`${formValues.fullName.split(" ")[0]} ${value}`, "fullName")}
+                />
+              ) : (
+                <MediumText color="dark" size="medium">
+                  {userDetails.fullName.split(" ")[1]}
+                </MediumText>
+              )}
             </View>
             {userDetails.userName && (
               <View className="flex-row justify-between items-center mb-6">
@@ -162,9 +213,18 @@ const PersonalInformationScreen: React.FC<{
               <LightText color="light" size="small">
                 Phone Number
               </LightText>
-              <MediumText color="dark" size="medium">
-                {userDetails.phoneNumber}
-              </MediumText>
+              {isEditing ? (
+                <TextInput
+                  style={styles.input}
+                  value={formValues.phone}
+                  onChangeText={(value) => handleInputChange(value, "phone")}
+                  keyboardType="phone-pad"
+                />
+              ) : (
+                <MediumText color="dark" size="medium">
+                  {userDetails.phoneNumber}
+                </MediumText>
+              )}
             </View>
             <View className="flex-row justify-between items-center">
               <LightText color="light" size="small">
@@ -184,7 +244,37 @@ const PersonalInformationScreen: React.FC<{
             </View>
           </View>
 
-          {!userDetails.userName && (
+          {userDetails.userName ? (
+            <>
+              <View className="mt-4">
+                <BoldText color="dark" size="small">
+                  RAHAPAY TAG
+                </BoldText>
+              </View>
+              <View className="mt-4 bg-white p-4 rounded-lg shadow-md ">
+                <MediumText color="dark" size="medium">
+                  Your RahaPay Tag
+                </MediumText>
+                <View className="mb-2" />
+                <LightText color="light" size="small">
+                  Your RahaPay Tag enables easy transactions. Share to receive
+                  payments.
+                </LightText>
+                <Button
+                  title="Edit RahaPay Tag"
+                  onPress={() => {
+                    navigation.navigate("EditTagScreen");
+                  }}
+                  style={{
+                    width: "60%",
+                    alignSelf: "center",
+                    marginTop: 20,
+                  }}
+                  textColor="#fff"
+                />
+              </View>
+            </>
+          ) : (
             <>
               <View className="mt-4">
                 <BoldText color="dark" size="small">
@@ -227,12 +317,16 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: SPACING * 2,
     paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
     paddingBottom: SPACING * 3,
   },
   leftIcon: {
     marginRight: SPACING,
+  },
+  editIcon: {
+    padding: SPACING,
   },
   headerText: {
     color: "#000",
@@ -266,6 +360,15 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-SemiBold",
     color: "#fff",
     fontSize: RFValue(14),
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: COLORS.violet200,
+    borderRadius: 5,
+    padding: 5,
+    fontSize: RFValue(12),
+    fontFamily: "Outfit-Regular",
+    // color: COLORS.dark,
   },
 });
 

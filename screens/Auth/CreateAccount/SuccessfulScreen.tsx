@@ -6,18 +6,26 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import FONT_SIZE from "../../../constants/font-size";
 import SPACING from "../../../constants/SPACING";
 import { AuthContext } from "../../../context/AuthContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SuccessfulScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { setIsUserAuthenticated } = useContext(AuthContext);
-  const handleButtonClick = () => {
+  const { setIsUserAuthenticated, userInfo } = useContext(AuthContext);
+  const handleButtonClick = async () => {
+    // Set user as authenticated
+    await setIsUserAuthenticated(true);
+    
+    // Store user info and access token in AsyncStorage
+    await AsyncStorage.multiSet([
+      ["userInfo", JSON.stringify(userInfo)],
+      ["access_token", userInfo?.data?.accessToken || ""],
+    ]);
+
     // Navigate directly to the AppStack
-    setIsUserAuthenticated(true).then(() => {
-      setTimeout(() => {
-        navigation.navigate("AppStack");
-      }, 0);
-    });
+    setTimeout(() => {
+      navigation.navigate("AppStack");
+    }, 0);
   };
 
   return (

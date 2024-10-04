@@ -112,13 +112,7 @@ const ProfileScreen: React.FC<{
                 <Profile variant="Bold" color={COLORS.violet400} size={24} style={{marginRight: SPACING}} />
                 <LightText color="black">Personal Information</LightText>
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("CreateTagScreen")}
-                style={styles.settingsItem}
-              >
-                <Tag variant="Bold" color={COLORS.violet400} size={24} style={{marginRight: SPACING}} />
-                <LightText color="black">Raha Tag</LightText>
-              </TouchableOpacity>
+            
               <TouchableOpacity
                 onPress={() => navigation.navigate("ReferralScreen")}
                 style={styles.settingsItem}
