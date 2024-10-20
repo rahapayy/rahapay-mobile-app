@@ -13,7 +13,7 @@ import SPACING from "../../../constants/SPACING";
 import FONT_SIZE from "../../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../constants/colors";
-import Button from "../../../components/Button";
+import Button from "../../../components/common/ui/buttons/Button";
 import { ArrowLeft } from "iconsax-react-native";
 
 type EducationDetailsScreenProps = NativeStackScreenProps<

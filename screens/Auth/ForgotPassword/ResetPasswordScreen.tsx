@@ -5,19 +5,24 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import React, { useState } from "react";
-import { ArrowLeft } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../constants/colors";
 import SPACING from "../../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import Button from "../../../components/Button";
+import Button from "../../../components/common/ui/buttons/Button";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import BackButton from "../../../components/common/ui/buttons/BackButton";
+import Label from "../../../components/common/ui/forms/Label";
+import {
+  LightText,
+  MediumText,
+  RegularText,
+} from "../../../components/common/Text";
 
 const ResetPasswordScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -78,17 +83,14 @@ const ResetPasswordScreen: React.FC<{
         extraScrollHeight={Platform.OS === "ios" ? 20 : 0}
       >
         <View className="p-4">
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <ArrowLeft color="#000" />
-          </TouchableOpacity>
-
+          <BackButton navigation={navigation} />
           <View className="mt-4">
-            <Text style={styles.headText} allowFontScaling={false}>
+            <MediumText color="black" size="xlarge" marginBottom={5}>
               Reset Password
-            </Text>
-            <Text style={styles.subText} allowFontScaling={false}>
+            </MediumText>
+            <LightText color="mediumGrey" size="base">
               Enter your email address to receive code
-            </Text>
+            </LightText>
           </View>
           <KeyboardAvoidingView
             style={{ flex: 1 }}
@@ -96,9 +98,7 @@ const ResetPasswordScreen: React.FC<{
             keyboardVerticalOffset={Platform.OS === "ios" ? -50 : 0}
           >
             <View className="mt-10">
-              <Text style={styles.label} allowFontScaling={false}>
-                Email Address
-              </Text>
+              <Label text="Email Address" marked={false} />
               <TextInput
                 style={styles.textInput}
                 placeholder="Enter your email address"
@@ -141,11 +141,6 @@ const styles = StyleSheet.create({
   subText: {
     fontFamily: "Outfit-ExtraLight",
     fontSize: RFValue(13),
-  },
-  label: {
-    fontFamily: "Outfit-Regular",
-    marginBottom: 10,
-    fontSize: RFValue(14),
   },
   vertical: {
     backgroundColor: COLORS.black100,

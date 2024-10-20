@@ -2,7 +2,6 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
   TextInput,
   Keyboard,
@@ -13,14 +12,19 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
-import Button from "../../../components/Button";
-import { ArrowLeft } from "iconsax-react-native";
+import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { AuthContext } from "../../../context/AuthContext";
+import BackButton from "../../../components/common/ui/buttons/BackButton";
+import { LightText, MediumText } from "../../../components/common/Text";
 
-const CreateTransactionPinScreen: React.FC<{
+interface CreateTransactionPinScreenProps {
   navigation: NativeStackNavigationProp<any, "">;
-}> = ({ navigation }) => {
+}
+
+const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
+  navigation,
+}) => {
   const [boxes, setBoxes] = useState(["", "", "", ""]);
   const [confirmBoxes, setConfirmBoxes] = useState(["", "", "", ""]);
   const [loading, setLoading] = useState(false);
@@ -81,8 +85,7 @@ const CreateTransactionPinScreen: React.FC<{
     }
 
     try {
-      // Call createPin only for the transaction pin
-      await createPin(pin); // Ensure this is the correct endpoint for transaction PIN
+      await createPin(pin);
       handleShowFlash({
         message: "Transaction PIN created successfully!",
         type: "success",
@@ -100,10 +103,6 @@ const CreateTransactionPinScreen: React.FC<{
     }
   };
 
-  const handleBackPress = () => {
-    navigation.goBack();
-  };
-
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
@@ -112,17 +111,15 @@ const CreateTransactionPinScreen: React.FC<{
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={{ flex: 1 }}>
         <View style={{ padding: 16 }}>
-          <TouchableOpacity onPress={handleBackPress}>
-            <ArrowLeft color="#000" />
-          </TouchableOpacity>
+          <BackButton navigation={navigation} />
 
           <View style={{ marginTop: 16 }}>
-            <Text style={styles.headText} allowFontScaling={false}>
+            <MediumText color="black" size="xlarge" marginBottom={5}>
               Create Your Transaction PIN
-            </Text>
-            <Text style={styles.subText} allowFontScaling={false}>
+            </MediumText>
+            <LightText color="mediumGrey" size="base">
               Use this pin for secure transactions
-            </Text>
+            </LightText>
           </View>
 
           <View style={styles.inputContainer}>
@@ -191,16 +188,6 @@ const CreateTransactionPinScreen: React.FC<{
 export default CreateTransactionPinScreen;
 
 const styles = StyleSheet.create({
-  headText: {
-    fontFamily: "Outfit-Medium",
-    fontSize: RFValue(18),
-    marginBottom: 6,
-  },
-  subText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(10),
-    color: "#0000008F",
-  },
   titleText: {
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(10),

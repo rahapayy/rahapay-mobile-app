@@ -12,7 +12,8 @@ import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../constants/colors";
 import SPACING from "../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import Button from "../components/Button";
+import Button from "../components/common/ui/buttons/Button";
+import { LightText, MediumText } from "../components/common/Text";
 
 const { height: screenHeight } = Dimensions.get("window");
 
@@ -31,13 +32,18 @@ const WelcomeScreen: React.FC<{
       </View>
 
       <View style={styles.textContainer}>
-        <Text style={styles.headText} allowFontScaling={false}>
+        <MediumText
+          color="primary"
+          size="xxlarge"
+          center
+          marginBottom={SPACING}
+        >
           Welcome to RahaPay!
-        </Text>
-        <Text style={styles.subText} allowFontScaling={false}>
+        </MediumText>
+        <LightText color="mediumGrey" center>
           Your one-stop solution for seamless online transactions. We aim to
           make financial operations simple and efficient.
-        </Text>
+        </LightText>
       </View>
       <View style={styles.buttonContainer}>
         <Button
@@ -75,7 +81,7 @@ const styles = StyleSheet.create({
     height: 500,
   },
   textContainer: {
-    paddingHorizontal: SPACING,
+    paddingHorizontal: SPACING * 2,
     marginBottom: SPACING * 3,
   },
   headText: {
@@ -90,7 +96,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     paddingHorizontal: SPACING,
-    marginBottom: SPACING,
+    marginBottom: SPACING * 3,
     justifyContent: "center",
     alignItems: "center",
   },

@@ -21,7 +21,7 @@ import Dstv from "../../../assets/svg/dstv.svg";
 import COLORS from "../../../constants/colors";
 import useSWR from "swr";
 import PlanSelectionModal from "../../../components/modals/CableTv/PlanSelectionModal";
-import Button from "../../../components/Button";
+import Button from "../../../components/common/ui/buttons/Button";
 import { TextInput } from "react-native";
 import ServiceSelectionModal from "../../../components/modals/CableTv/ServiceSelectionModal";
 import { MediumText } from "../../../components/common/Text";

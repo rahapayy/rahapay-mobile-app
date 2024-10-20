@@ -20,7 +20,7 @@ import Airtel from "../../assets/svg/air.svg";
 import Mtn from "../../assets/svg/mtn.svg";
 import Eti from "../../assets/svg/eti.svg";
 import Glo from "../../assets/svg/glo.svg";
-import Button from "../../components/Button";
+import Button from "../../components/common/ui/buttons/Button";
 import ComingSoon from "../../assets/svg/Coming Soon.svg";
 import useApi from "../../utils/api";
 

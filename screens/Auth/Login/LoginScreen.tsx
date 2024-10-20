@@ -6,39 +6,37 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../constants/colors";
 import SPACING from "../../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import Button from "../../../components/Button";
+import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { AuthContext } from "../../../context/AuthContext";
 import { logError } from "../../../utils/errorLogger";
 import { AxiosError } from "axios";
+import BackButton from "../../../components/common/ui/buttons/BackButton";
+import {
+  BoldText,
+  LightText,
+  MediumText,
+} from "../../../components/common/Text";
+import Label from "../../../components/common/ui/forms/Label";
+import BasicInput from "../../../components/common/ui/forms/BasicInput";
 
 const LoginScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [showPassword, setShowPassword] = useState(true);
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // State to manage focus of each input
-  const [isIdFocused, setIsIdFocused] = useState(false);
-  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-
-  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
-
   const { login } = useContext(AuthContext);
 
-  // Utility functions
   const isValidEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -58,7 +56,7 @@ const LoginScreen: React.FC<{
       return;
     }
 
-    setErrorMessage(null); // Clear any previous error messages
+    setErrorMessage(null);
     setIsLoading(true);
     try {
       await login(id, password);
@@ -66,14 +64,12 @@ const LoginScreen: React.FC<{
         message: "Logged in successfully!",
         type: "success",
       });
-      // navigation.navigate("AppStack");
     } catch (error: unknown) {
-      console.error("Login Error:", error); // Log for debugging
+      console.error("Login Error:", error);
 
       let errorMessage = "An error occurred. Please try again.";
 
       if (error instanceof AxiosError) {
-        // Handle Axios errors specifically
         if (error.response) {
           const status = error.response.status;
           if (status === 404) {
@@ -96,7 +92,7 @@ const LoginScreen: React.FC<{
         message: errorMessage,
         type: "danger",
       });
-      logError(error); // Log the error for debugging
+      logError(error);
     } finally {
       setIsLoading(false);
     }
@@ -106,23 +102,21 @@ const LoginScreen: React.FC<{
     navigation.navigate("CreateAccountScreen");
   };
 
-  const isFormComplete = id.trim && password.trim;
+  const isFormComplete = id.trim() && password.trim();
 
   return (
     <SafeAreaView className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="p-4">
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <ArrowLeft color="#000" />
-          </TouchableOpacity>
+          <BackButton navigation={navigation} />
 
-          <View className="mt-4">
-            <Text style={styles.headText} allowFontScaling={false}>
-              Log in
-            </Text>
-            <Text style={styles.subText} allowFontScaling={false}>
-              Welcome back, let’s sign in to your account!
-            </Text>
+          <View className="mt-8">
+            <MediumText color="black" size="xlarge" marginBottom={5}>
+              Login
+            </MediumText>
+            <LightText color="mediumGrey" size="base">
+              Welcome back, let's sign in to your account!
+            </LightText>
           </View>
           <KeyboardAvoidingView
             style={{ flex: 1 }}
@@ -130,19 +124,12 @@ const LoginScreen: React.FC<{
             keyboardVerticalOffset={Platform.OS === "ios" ? -50 : 0}
           >
             <View className="mt-10">
-              <Text style={styles.label} allowFontScaling={false}>
-                Email or Phone Number
-              </Text>
-              <TextInput
-                style={[styles.textInput, isIdFocused && styles.focusedInput]}
-                placeholder="Email or Phone Number"
-                placeholderTextColor={"#BABFC3"}
-                allowFontScaling={false}
+              <Label text="Email or Phone Number" marked={false} />
+              <BasicInput
                 value={id}
                 onChangeText={setId}
+                placeholder="Email or Phone Number"
                 autoCapitalize="none"
-                onFocus={() => setIsIdFocused(true)}
-                onBlur={() => setIsIdFocused(false)}
                 autoComplete="off"
                 autoCorrect={false}
               />
@@ -154,52 +141,31 @@ const LoginScreen: React.FC<{
             </View>
 
             <View className="mt-4">
-              <Text style={styles.label} allowFontScaling={false}>
-                Password
-              </Text>
-              <View
-                style={[
-                  styles.inputContainer,
-                  isPasswordFocused && styles.focusedInput, // Apply focus style if focused
-                ]}
-              >
-                <TextInput
-                  style={styles.input}
-                  placeholder="Password"
-                  placeholderTextColor="#BABFC3"
-                  allowFontScaling={false}
-                  secureTextEntry={showPassword}
-                  value={password}
-                  onChangeText={setPassword}
-                  onFocus={() => setIsPasswordFocused(true)}
-                  onBlur={() => setIsPasswordFocused(false)}
-                  autoComplete="off"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-                <TouchableOpacity onPress={togglePasswordVisibility}>
-                  {showPassword ? (
-                    <EyeSlash color="#000" size={20} />
-                  ) : (
-                    <Eye color="#000" size={20} />
-                  )}
-                </TouchableOpacity>
-              </View>
+              <Label text="Password" marked={false} />
+              <BasicInput
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Password"
+                secureTextEntry
+                autoCapitalize="none"
+                autoComplete="off"
+                autoCorrect={false}
+              />
             </View>
 
             <TouchableOpacity
               onPress={() => navigation.navigate("ResetPasswordScreen")}
-              className="mt-4"
+              className="mt-4 justify-center items-end"
             >
-              <Text style={styles.forgotPasswordText} allowFontScaling={false}>
+              <BoldText color="primary" size="base">
                 Forgot Password?
-              </Text>
+              </BoldText>
             </TouchableOpacity>
 
             <Button
-              title={"Log in"}
+              title={"Login"}
               onPress={handleLogin}
-              isLoading={isLoading} // Show loading indicator when logging in
+              isLoading={isLoading}
               style={[
                 styles.proceedButton,
                 !isFormComplete && styles.proceedButtonDisabled,
@@ -207,17 +173,18 @@ const LoginScreen: React.FC<{
               textColor="#fff"
               disabled={!isFormComplete || isLoading}
             />
-            <View className="flex-row justify-center items-center mt-6">
-              <Text style={styles.dont} allowFontScaling={false}>
-                Don't have an account?{" "}
-              </Text>
-              <TouchableOpacity onPress={handleCreateAccount}>
-                <Text style={styles.signup} allowFontScaling={false}>
-                  Sign up Here
-                </Text>
-              </TouchableOpacity>
-            </View>
           </KeyboardAvoidingView>
+
+          <View className="flex-row justify-center items-center mt-6">
+            <LightText color="mediumGrey" size="base">
+              Don't have an account?{" "}
+            </LightText>
+            <TouchableOpacity onPress={handleCreateAccount}>
+              <BoldText color="primary" size="base">
+                Create Account
+              </BoldText>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -227,55 +194,8 @@ const LoginScreen: React.FC<{
 export default LoginScreen;
 
 const styles = StyleSheet.create({
-  headText: {
-    fontFamily: "Outfit-Medium",
-    fontSize: RFValue(20),
-    marginBottom: 10,
-  },
-  subText: {
-    fontFamily: "Outfit-ExtraLight",
-    fontSize: RFValue(13),
-  },
-  label: {
-    fontFamily: "Outfit-Medium",
-    marginBottom: 10,
-    fontSize: RFValue(10),
-  },
-  textInput: {
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: "#DFDFDF",
-    paddingHorizontal: SPACING,
-    paddingVertical: Platform.OS === "ios" ? 14 : 10,
-    fontSize: RFValue(10),
-    fontFamily: "Outfit-Regular",
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    fontSize: RFValue(12),
-    borderRadius: 10,
-    paddingHorizontal: SPACING,
-    paddingVertical: Platform.OS === "ios" ? 14 : 10,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#DFDFDF",
-  },
-  input: {
-    flex: 1,
-    fontSize: RFValue(10),
-    fontFamily: "Outfit-Regular",
-  },
-  focusedInput: {
-    borderColor: COLORS.violet600,
-  },
   proceedButton: {
     marginTop: SPACING * 4,
-  },
-  forgotPasswordText: {
-    fontFamily: "Outfit-Medium",
-    color: COLORS.violet600,
-    fontSize: RFValue(12),
   },
   errorText: {
     color: COLORS.red300,
@@ -285,14 +205,5 @@ const styles = StyleSheet.create({
   },
   proceedButtonDisabled: {
     backgroundColor: COLORS.violet200,
-  },
-  dont: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(12),
-  },
-  signup: {
-    fontFamily: "Outfit-Medium",
-    fontSize: RFValue(12),
-    color: COLORS.violet600,
   },
 });

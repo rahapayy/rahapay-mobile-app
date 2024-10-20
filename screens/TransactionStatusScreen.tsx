@@ -12,7 +12,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import * as Animatable from "react-native-animatable";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
-import Button from "../components/Button";
+import Button from "../components/common/ui/buttons/Button";
 import { ReceiptText, Timer, Warning2 } from "iconsax-react-native";
 import { RootStackParamList } from "../types/RootStackParams";
 

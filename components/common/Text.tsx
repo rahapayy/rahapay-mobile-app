@@ -18,6 +18,7 @@ const fontColors = {
 const fontSize = {
   large: RFValue(16),
   xlarge: RFValue(20),
+  xxlarge: RFValue(24),
   base: RFValue(12),
   medium: RFValue(14),
   small: RFValue(10),
@@ -40,6 +41,7 @@ interface CustomTextProps extends TextProps {
   size?:
     | "large"
     | "xlarge"
+    | "xxlarge"
     | "base"
     | "small"
     | "xsmall"
@@ -48,7 +50,10 @@ interface CustomTextProps extends TextProps {
   center?: boolean;
   capitalize?: boolean;
   underline?: boolean;
-  right?: boolean;
+  marginTop?: number;
+  marginBottom?: number;
+  marginLeft?: number;
+  marginRight?: number;
 }
 
 export function MediumText({
@@ -58,17 +63,24 @@ export function MediumText({
   center,
   capitalize,
   underline,
-  right,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
 }: CustomTextProps) {
   return (
     <Text
       style={{
-        fontWeight: 500,
         fontFamily: "Outfit-Medium",
         color: fontColors[color],
-        textAlign: center ? "center" : right ? "right" : "left",
+        fontSize: fontSize[size],
+        textAlign: center ? "center" : "left",
         textTransform: capitalize ? "capitalize" : "none",
         textDecorationLine: underline ? "underline" : "none",
+        marginTop,
+        marginBottom,
+        marginLeft,
+        marginRight,
       }}
       allowFontScaling={false}
     >
@@ -83,17 +95,23 @@ export function LightText({
   size = "base",
   center,
   capitalize,
-  right,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
 }: CustomTextProps) {
   return (
     <Text
       style={{
-        fontWeight: 400,
         fontFamily: "Outfit-Light",
         color: fontColors[color],
         fontSize: fontSize[size],
-        textAlign: center ? "center" : right ? "right" : "left",
+        textAlign: center ? "center" : "left",
         textTransform: capitalize ? "capitalize" : "none",
+        marginTop,
+        marginBottom,
+        marginLeft,
+        marginRight,
       }}
       allowFontScaling={false}
     >
@@ -108,17 +126,23 @@ export function RegularText({
   size = "base",
   center,
   capitalize,
-  right,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
 }: CustomTextProps) {
   return (
     <Text
       style={{
-        fontWeight: 600,
         fontFamily: "Outfit-Regular",
         color: fontColors[color],
         fontSize: fontSize[size],
-        textAlign: center ? "center" : right ? "right" : "left",
+        textAlign: center ? "center" : "left",
         textTransform: capitalize ? "capitalize" : "none",
+        marginTop,
+        marginBottom,
+        marginLeft,
+        marginRight,
       }}
       allowFontScaling={false}
     >
@@ -133,17 +157,23 @@ export function BoldText({
   size = "base",
   center,
   capitalize,
-  right,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
 }: CustomTextProps) {
   return (
     <Text
       style={{
-        fontWeight: 700,
         fontFamily: "Outfit-Bold",
         color: fontColors[color],
         fontSize: fontSize[size],
-        textAlign: center ? "center" : right ? "right" : "left",
+        textAlign: center ? "center" : "left",
         textTransform: capitalize ? "capitalize" : "none",
+        marginTop,
+        marginBottom,
+        marginLeft,
+        marginRight,
       }}
       allowFontScaling={false}
     >
@@ -155,11 +185,22 @@ export function BoldText({
 interface HeadTextProps {
   title: string;
   description: string;
+  marginTop?: number;
+  marginBottom?: number;
+  marginLeft?: number;
+  marginRight?: number;
 }
 
-export function HeadText({ title, description }: HeadTextProps) {
+export function HeadText({
+  title,
+  description,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
+}: HeadTextProps) {
   return (
-    <View>
+    <View style={{ marginTop, marginBottom, marginLeft, marginRight }}>
       <BoldText color="black" size="xlarge">
         {title}
       </BoldText>

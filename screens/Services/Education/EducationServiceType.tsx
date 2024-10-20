@@ -13,7 +13,7 @@ import COLORS from "../../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import FONT_SIZE from "../../../constants/font-size";
 import { ArrowLeft } from "iconsax-react-native";
-import Button from "../../../components/Button";
+import Button from "../../../components/common/ui/buttons/Button";
 
 type EducationServiceTypeProps = NativeStackScreenProps<
   RootStackParamList,

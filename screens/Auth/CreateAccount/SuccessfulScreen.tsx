@@ -1,7 +1,7 @@
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import React, { useContext } from "react";
 import LottieView from "lottie-react-native";
-import Button from "../../../components/Button";
+import Button from "../../../components/common/ui/buttons/Button";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import FONT_SIZE from "../../../constants/font-size";
 import SPACING from "../../../constants/SPACING";
@@ -15,7 +15,7 @@ const SuccessfulScreen: React.FC<{
   const handleButtonClick = async () => {
     // Set user as authenticated
     await setIsUserAuthenticated(true);
-    
+
     // Store user info and access token in AsyncStorage
     await AsyncStorage.multiSet([
       ["userInfo", JSON.stringify(userInfo)],

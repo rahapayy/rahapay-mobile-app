@@ -7,27 +7,31 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Keyboard,
 } from "react-native";
-import { ArrowLeft } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
-import Button from "../../../components/Button";
+import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { AuthContext } from "../../../context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import BackButton from "../../../components/common/ui/buttons/BackButton";
+import { LightText, MediumText } from "../../../components/common/Text";
 
 type VerifyEmailScreenRouteParams = {
   email: string;
   id: string;
 };
 
-const VerifyEmailScreen: React.FC<{
+interface VerifyEmailScreenProps {
   navigation: NativeStackNavigationProp<any, "">;
-}> = ({ navigation }) => {
+}
+
+const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
+  navigation,
+}) => {
   const route =
     useRoute<RouteProp<{ params: VerifyEmailScreenRouteParams }, "params">>();
   const email = route.params.email;
@@ -58,7 +62,6 @@ const VerifyEmailScreen: React.FC<{
   }, [resendCountdown]);
 
   useEffect(() => {
-    // Focus on the first input box and show keyboard when component mounts
     boxRefs.current[0]?.focus();
   }, []);
 
@@ -153,14 +156,14 @@ const VerifyEmailScreen: React.FC<{
 
   const handleResendOTP = async () => {
     try {
-      await resendOtp(id); // Pass id directly as a string
+      await resendOtp(id);
       handleShowFlash({
         message: "OTP resent successfully!",
         type: "success",
       });
-      setResendCountdown(60); // Reset countdown timer
+      setResendCountdown(60);
     } catch (error) {
-      console.log("Resend OTP Error:", error); // Log the error object
+      console.log("Resend OTP Error:", error);
       const err = error as {
         response?: { data?: { message?: string } };
         message: string;
@@ -180,17 +183,15 @@ const VerifyEmailScreen: React.FC<{
     <SafeAreaView className="flex-1">
       <ScrollView>
         <View className="p-4">
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <ArrowLeft color="#000" />
-          </TouchableOpacity>
+          <BackButton navigation={navigation} />
 
           <View className="mt-4">
-            <Text style={styles.headText} allowFontScaling={false}>
+            <MediumText color="black" size="xlarge" marginBottom={5}>
               Verify Email Address
-            </Text>
-            <Text style={styles.subText} allowFontScaling={false}>
+            </MediumText>
+            <LightText color="mediumGrey" size="base">
               Enter the OTP sent to {email}
-            </Text>
+            </LightText>
           </View>
 
           <View style={styles.inputContainer}>
@@ -273,28 +274,12 @@ const VerifyEmailScreen: React.FC<{
 export default VerifyEmailScreen;
 
 const styles = StyleSheet.create({
-  headText: {
-    fontFamily: "Outfit-Medium",
-    fontSize: RFValue(18),
-    marginBottom: 6,
-  },
-  subText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(10),
-    color: "#0000008F",
-  },
   inputContainer: {
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: SPACING * 2,
     borderRadius: 15,
-  },
-  input: {
-    flex: 1,
-    height: "100%",
-    fontSize: RFValue(19),
-    fontWeight: "bold",
   },
   inputRow: {
     flexDirection: "row",

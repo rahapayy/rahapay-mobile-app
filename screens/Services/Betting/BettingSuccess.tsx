@@ -8,7 +8,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import Button from "../../../components/Button";
+import Button from "../../../components/common/ui/buttons/Button";
 
 const BettingSuccess: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;

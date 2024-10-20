@@ -17,7 +17,7 @@ import SPACING from "../../constants/SPACING";
 import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
-import Button from "../../components/Button";
+import Button from "../../components/common/ui/buttons/Button";
 import { AuthContext } from "../../context/AuthContext";
 import useApi from "../../utils/api";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
@@ -49,7 +49,7 @@ const PersonalInformationScreen: React.FC<{
   });
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
+    const unsubscribe = navigation.addListener("focus", () => {
       AsyncStorage.getItem("access_token").then((token) => {
         if (token) {
           fetchUserDetails(token);
@@ -130,9 +130,14 @@ const PersonalInformationScreen: React.FC<{
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleEditToggle} style={styles.editIcon}>
+            <TouchableOpacity
+              onPress={handleEditToggle}
+              style={styles.editIcon}
+            >
               {isEditing ? (
-                <BoldText color="primary" size="small">Save</BoldText>
+                <BoldText color="primary" size="small">
+                  Save
+                </BoldText>
               ) : (
                 <Edit2 color={COLORS.violet400} size={24} />
               )}
@@ -167,7 +172,12 @@ const PersonalInformationScreen: React.FC<{
                 <TextInput
                   style={styles.input}
                   value={formValues.fullName.split(" ")[0]}
-                  onChangeText={(value) => handleInputChange(`${value} ${formValues.fullName.split(" ")[1]}`, "fullName")}
+                  onChangeText={(value) =>
+                    handleInputChange(
+                      `${value} ${formValues.fullName.split(" ")[1]}`,
+                      "fullName"
+                    )
+                  }
                 />
               ) : (
                 <MediumText color="dark" size="medium">
@@ -183,7 +193,12 @@ const PersonalInformationScreen: React.FC<{
                 <TextInput
                   style={styles.input}
                   value={formValues.fullName.split(" ")[1]}
-                  onChangeText={(value) => handleInputChange(`${formValues.fullName.split(" ")[0]} ${value}`, "fullName")}
+                  onChangeText={(value) =>
+                    handleInputChange(
+                      `${formValues.fullName.split(" ")[0]} ${value}`,
+                      "fullName"
+                    )
+                  }
                 />
               ) : (
                 <MediumText color="dark" size="medium">

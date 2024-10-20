@@ -16,7 +16,7 @@ import SPACING from "../../constants/SPACING";
 import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
-import Button from "../../components/Button";
+import Button from "../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import useApi from "../../utils/api";
 import { RouteProp, useRoute } from "@react-navigation/native";

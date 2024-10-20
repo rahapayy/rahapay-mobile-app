@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React from "react";
-import COLORS from "../constants/colors";
+import COLORS from "../../../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const { height: windowHeight, width: windowWidth } = Dimensions.get("window");
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: RFValue(12),
-    fontFamily: "Outfit-Regular",
+    fontFamily: "Outfit-Medium",
   },
   contentContainer: {
     flexDirection: "row",

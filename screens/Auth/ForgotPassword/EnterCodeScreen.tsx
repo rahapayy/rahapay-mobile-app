@@ -14,9 +14,11 @@ import {
 } from "react-native";
 import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
-import Button from "../../../components/Button";
+import Button from "../../../components/common/ui/buttons/Button";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
+import BackButton from "../../../components/common/ui/buttons/BackButton";
+import { LightText, MediumText } from "../../../components/common/Text";
 
 type EnterCodeScreenRouteParams = {
   email: string;
@@ -106,17 +108,15 @@ const EnterCodeScreen: React.FC<{
     <SafeAreaView className="flex-1">
       <ScrollView>
         <View className="p-4">
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <ArrowLeft color="#000" />
-          </TouchableOpacity>
+          <BackButton navigation={navigation} />
 
           <View className="mt-4">
-            <Text style={styles.headText} allowFontScaling={false}>
+            <MediumText color="black" size="xlarge" marginBottom={5}>
               Enter Code
-            </Text>
-            <Text style={styles.subText} allowFontScaling={false}>
+            </MediumText>
+            <LightText color="mediumGrey" size="base">
               Enter the code sent to {email}
-            </Text>
+            </LightText>
           </View>
 
           <View style={styles.inputContainer}>

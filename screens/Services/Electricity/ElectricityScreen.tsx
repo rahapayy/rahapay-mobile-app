@@ -16,7 +16,7 @@ import SPACING from "../../../constants/SPACING";
 import FONT_SIZE from "../../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../constants/colors";
-import Button from "../../../components/Button";
+import Button from "../../../components/common/ui/buttons/Button";
 import { TextInput } from "react-native";
 import ServiceSelectionModal from "../../../components/modals/Electricity/ServiceSelectionModal";
 import { MediumText } from "../../../components/common/Text";
@@ -150,13 +150,13 @@ const ElectricityScreen: React.FC<{
                   Amount
                 </Text>
                 <TextInput
-                 style={styles.textInput}
-                 placeholder="Enter amount"
-                 allowFontScaling={false}
-                 placeholderTextColor={"#00000080"}
-                 value={amount}
-                 onChangeText={validateAmountInput}
-                 keyboardType="numeric"
+                  style={styles.textInput}
+                  placeholder="Enter amount"
+                  allowFontScaling={false}
+                  placeholderTextColor={"#00000080"}
+                  value={amount}
+                  onChangeText={validateAmountInput}
+                  keyboardType="numeric"
                 />
               </View>
             </View>

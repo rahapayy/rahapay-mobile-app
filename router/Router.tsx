@@ -11,9 +11,9 @@ const Stack = createNativeStackNavigator();
 const Router = () => {
   const { isAuthenticated, isAppReady } = useContext(AuthContext);
 
-  if (!isAppReady) {
-    return <LoadingIndicator />;
-  }
+  // if (!isAppReady) {
+  //   return <LoadingIndicator />;
+  // }
 
   return (
     <NavigationContainer>

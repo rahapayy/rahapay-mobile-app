@@ -15,7 +15,7 @@ import { ArrowDown2, ArrowLeft } from "iconsax-react-native";
 import SPACING from "../../../constants/SPACING";
 import FONT_SIZE from "../../../constants/font-size";
 import BettingProvidersBottomSheet from "../../../components/bottom-sheet/BettingProvidersBottomSheet";
-import Button from "../../../components/Button";
+import Button from "../../../components/common/ui/buttons/Button";
 import COLORS from "../../../constants/colors";
 import BetSummaryBottomSheet from "../../../components/bottom-sheet/BetSummaryBottomSheet";
 

@@ -15,18 +15,26 @@ import {
 import COLORS from "../../../constants/colors";
 import SPACING from "../../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import Button from "../../../components/Button";
+import Button from "../../../components/common/ui/buttons/Button";
 import FONT_SIZE from "../../../constants/font-size";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { RootStackParamList } from "../../../types/RootStackParams";
+import BackButton from "../../../components/common/ui/buttons/BackButton";
+import { LightText, MediumText } from "../../../components/common/Text";
 
 type CreateNewPasswordScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, "CreateNewPasswordScreen">;
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    "CreateNewPasswordScreen"
+  >;
   route: { params: { resetToken: string } };
 };
 
-const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({ navigation, route }) => {
+const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({
+  navigation,
+  route,
+}) => {
   const { resetToken } = route.params;
 
   const [showPassword, setShowPassword] = useState(true);
@@ -77,17 +85,17 @@ const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({ navig
     <SafeAreaView>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="p-4">
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <ArrowLeft color="#000" />
-          </TouchableOpacity>
+          <BackButton
+            navigation={navigation as NativeStackNavigationProp<any, "">}
+          />
 
           <View className="mt-4">
-            <Text style={styles.headText} allowFontScaling={false}>
+            <MediumText color="black" size="xlarge" marginBottom={5}>
               Create Password
-            </Text>
-            <Text style={styles.subText} allowFontScaling={false}>
+            </MediumText>
+            <LightText color="mediumGrey" size="base">
               Enter new password to recover account
-            </Text>
+            </LightText>
           </View>
           <KeyboardAvoidingView
             style={{ flex: 1 }}

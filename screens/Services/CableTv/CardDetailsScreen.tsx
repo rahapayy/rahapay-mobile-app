@@ -17,7 +17,7 @@ import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../../../constants/SPACING";
 import FONT_SIZE from "../../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
-import Button from "../../../components/Button";
+import Button from "../../../components/common/ui/buttons/Button";
 import COLORS from "../../../constants/colors";
 import PlanSelectionModal from "../../../components/modals/CableTv/PlanSelectionModal";
 

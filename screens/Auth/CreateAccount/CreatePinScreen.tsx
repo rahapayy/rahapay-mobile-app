@@ -14,11 +14,13 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
-import Button from "../../../components/Button";
+import Button from "../../../components/common/ui/buttons/Button";
 import { ArrowLeft } from "iconsax-react-native";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { AuthContext } from "../../../context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import BackButton from "../../../components/common/ui/buttons/BackButton";
+import { LightText, MediumText } from "../../../components/common/Text";
 
 const CreatePinScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -138,21 +140,20 @@ const CreatePinScreen: React.FC<{
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={{ flex: 1 }}>
         <View style={{ padding: 16 }}>
-          <TouchableOpacity onPress={handleBackPress}>
-            <ArrowLeft color="#000" />
-          </TouchableOpacity>
+          <BackButton navigation={navigation} />
 
           <View
             style={{
               marginTop: 16,
             }}
           >
-            <Text style={styles.headText} allowFontScaling={false}>
+            <MediumText color="black" size="xlarge" marginBottom={5}>
               Create Your Security PIN
-            </Text>
-            <Text style={styles.subText} allowFontScaling={false}>
-              This PIN will be used to secure your account and authorize important actions
-            </Text>
+            </MediumText>
+            <LightText color="mediumGrey" size="base">
+              This PIN will be used to secure your account and authorize
+              important actions
+            </LightText>
           </View>
 
           <View style={styles.inputContainer}>

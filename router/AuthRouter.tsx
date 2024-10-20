@@ -34,9 +34,9 @@ const AuthRoute = () => {
     }
   };
 
-  if (showOnboarding === null) {
-    return <LoadingIndicator />;
-  }
+  // if (showOnboarding === null) {
+  //   return <LoadingIndicator />;
+  // }
 
   return (
     <Stack.Navigator>
