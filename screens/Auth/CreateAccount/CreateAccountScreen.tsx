@@ -86,7 +86,13 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
   );
 
   const isFormComplete = useMemo(
-    () => Object.values(formData).every((value) => value.trim()) && countryCode,
+    () => 
+      formData.fullName.trim() !== "" &&
+      formData.email.trim() !== "" &&
+      formData.phoneNumber.trim() !== "" &&
+      formData.password.trim() !== "" &&
+      formData.confirmPassword.trim() !== "" &&
+      countryCode,
     [formData, countryCode]
   );
 
@@ -250,10 +256,11 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
       field: string,
       placeholder: string,
       keyboardType: string = "default",
-      secureTextEntry: boolean = false
+      secureTextEntry: boolean = false,
+      optional: boolean = false
     ) => (
       <View className="mt-4">
-        <Label text={label} marked={false} />
+        <Label text={label} marked={!optional} />
         <BasicInput
           value={formData[field as keyof typeof formData]}
           onChangeText={(value) =>
@@ -395,7 +402,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
             </Animatable.View>
           )}
 
-          {renderInputField("Referral", "referral", "Referral (Optional)")}
+          {renderInputField("Referral", "referral", "Referral (Optional)", "default", false, true)}
 
           <Button
             title="Proceed"
