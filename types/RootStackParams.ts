@@ -112,4 +112,5 @@ export type RootStackParamList = {
   SuccessfulScreen: undefined;
   EnterCodeScreen: undefined;
   CreateTransactionPinScreen: undefined;
+  TicketScreen: undefined;
 };
