@@ -13,43 +13,37 @@ import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../../constants/colors";
 import SPACING from "../../../../constants/SPACING";
 
-interface BasicInputProps {
+interface BasicPasswordInputProps {
   value: string;
   onChangeText: (text: string) => void;
-  placeholder: string;
-  secureTextEntry?: boolean;
-  autoCapitalize?: "none" | "sentences" | "words" | "characters";
-  autoComplete?: "off" | "password";
-  autoCorrect?: boolean;
-  keyboardType?: "default" | "numeric" | "email-address" | "phone-pad";
+  placeholder?: string;
   style?: ViewStyle;
   inputStyle?: TextStyle;
-  icon?: React.ReactNode;
+  error?: string;
 }
 
-const BasicInput: React.FC<BasicInputProps> = ({
+export const BasicPasswordInput: React.FC<BasicPasswordInputProps> = ({
   value,
   onChangeText,
-  placeholder,
-  secureTextEntry = false,
-  autoCapitalize = "none",
-  autoComplete = "off",
-  autoCorrect = false,
-  keyboardType = "default",
+  placeholder = "Password",
   style,
   inputStyle,
-  icon,
+  error,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [showPassword, setShowPassword] = useState(secureTextEntry);
+  const [showPassword, setShowPassword] = useState(true);
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   return (
     <View
-      style={[styles.inputContainer, isFocused && styles.focusedInput, style]}
+      style={[
+        styles.inputContainer,
+        isFocused ? styles.focusedInput : undefined,
+        error ? styles.errorInput : undefined,
+        style,
+      ]}
     >
-      {icon}
       <TextInput
         style={[styles.input, inputStyle]}
         placeholder={placeholder}
@@ -58,22 +52,19 @@ const BasicInput: React.FC<BasicInputProps> = ({
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={showPassword}
-        autoCapitalize={autoCapitalize}
-        autoComplete={autoComplete}
-        autoCorrect={autoCorrect}
-        keyboardType={keyboardType}
+        autoCapitalize="none"
+        autoComplete="off"
+        autoCorrect={false}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
       />
-      {secureTextEntry && (
-        <TouchableOpacity onPress={togglePasswordVisibility}>
-          {showPassword ? (
-            <EyeSlash color="#000" size={20} />
-          ) : (
-            <Eye color="#000" size={20} />
-          )}
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity onPress={togglePasswordVisibility}>
+        {showPassword ? (
+          <EyeSlash color="#000" size={20} />
+        ) : (
+          <Eye color="#000" size={20} />
+        )}
+      </TouchableOpacity>
     </View>
   );
 };
@@ -96,6 +87,7 @@ const styles = StyleSheet.create({
   focusedInput: {
     borderColor: COLORS.violet600,
   },
+  errorInput: {
+    borderColor: "red",
+  },
 });
-
-export default BasicInput;

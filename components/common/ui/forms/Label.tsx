@@ -10,7 +10,7 @@ interface Props {
 const Label: React.FunctionComponent<Props> = ({ text, marked }) => {
   return (
     <View style={styles.row}>
-      <MediumText color="black" size="small">
+      <MediumText color="mediumGrey" size="small">
         {text}
         {marked && <Text style={styles.requiredSymbol}> *</Text>}
       </MediumText>

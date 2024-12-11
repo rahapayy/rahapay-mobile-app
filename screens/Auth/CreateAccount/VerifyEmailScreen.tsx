@@ -19,6 +19,7 @@ import { AuthContext } from "../../../context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import { LightText, MediumText } from "../../../components/common/Text";
+import OtpInput from "../../../components/OtpInput";
 
 type VerifyEmailScreenRouteParams = {
   email: string;
@@ -194,46 +195,15 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
             </LightText>
           </View>
 
-          <View style={styles.inputContainer}>
-            <View style={styles.inputRow}>
-              {boxes.map((value, index) => (
-                <TextInput
-                  key={index}
-                  ref={(ref) => (boxRefs.current[index] = ref)}
-                  style={[
-                    styles.inputBox,
-                    boxIsFocused[index] && styles.inputBoxFocused,
-                  ]}
-                  keyboardType="numeric"
-                  value={value}
-                  secureTextEntry
-                  allowFontScaling={false}
-                  onChangeText={(text) => {
-                    if (text.length > 1) {
-                      handlePaste(text);
-                    } else {
-                      handleInput(text, index);
-                    }
-                  }}
-                  onFocus={() =>
-                    setBoxIsFocused((prevState) => [
-                      ...prevState.slice(0, index),
-                      true,
-                      ...prevState.slice(index + 1),
-                    ])
-                  }
-                  onBlur={() =>
-                    setBoxIsFocused((prevState) => [
-                      ...prevState.slice(0, index),
-                      false,
-                      ...prevState.slice(index + 1),
-                    ])
-                  }
-                  onKeyPress={(event) => handleKeyPress(index, event)}
-                />
-              ))}
-            </View>
-          </View>
+          <OtpInput
+            boxes={boxes}
+            boxRefs={boxRefs}
+            handleInput={handleInput}
+            handlePaste={handlePaste}
+            handleKeyPress={handleKeyPress}
+            boxIsFocused={boxIsFocused}
+            setBoxIsFocused={setBoxIsFocused}
+          />
 
           <Button
             title={"Verify Account"}

@@ -54,9 +54,11 @@ interface CustomTextProps extends TextProps {
   marginBottom?: number;
   marginLeft?: number;
   marginRight?: number;
+  lineHeight?: number;
+  numberOfLines?: number;
 }
 
-export function MediumText({
+export function BlackText({
   children,
   color,
   size = "base",
@@ -67,11 +69,13 @@ export function MediumText({
   marginBottom,
   marginLeft,
   marginRight,
+  lineHeight,
+  numberOfLines,
 }: CustomTextProps) {
   return (
     <Text
       style={{
-        fontFamily: "Outfit-Medium",
+        fontFamily: "Outfit-Black",
         color: fontColors[color],
         fontSize: fontSize[size],
         textAlign: center ? "center" : "left",
@@ -81,7 +85,79 @@ export function MediumText({
         marginBottom,
         marginLeft,
         marginRight,
+        lineHeight,
       }}
+      numberOfLines={numberOfLines}
+      allowFontScaling={false}
+    >
+      {children}
+    </Text>
+  );
+}
+
+export function ExtraLightText({
+  children,
+  color,
+  size = "base",
+  center,
+  capitalize,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
+  lineHeight,
+  numberOfLines,
+}: CustomTextProps) {
+  return (
+    <Text
+      style={{
+        fontFamily: "Outfit-ExtraLight",
+        color: fontColors[color],
+        fontSize: fontSize[size],
+        textAlign: center ? "center" : "left",
+        textTransform: capitalize ? "capitalize" : "none",
+        marginTop,
+        marginBottom,
+        marginLeft,
+        marginRight,
+        lineHeight,
+      }}
+      numberOfLines={numberOfLines}
+      allowFontScaling={false}
+    >
+      {children}
+    </Text>
+  );
+}
+
+export function ThinText({
+  children,
+  color,
+  size = "base",
+  center,
+  capitalize,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
+  lineHeight,
+  numberOfLines,
+}: CustomTextProps) {
+  return (
+    <Text
+      style={{
+        fontFamily: "Outfit-Thin",
+        color: fontColors[color],
+        fontSize: fontSize[size],
+        textAlign: center ? "center" : "left",
+        textTransform: capitalize ? "capitalize" : "none",
+        marginTop,
+        marginBottom,
+        marginLeft,
+        marginRight,
+        lineHeight,
+      }}
+      numberOfLines={numberOfLines}
       allowFontScaling={false}
     >
       {children}
@@ -99,6 +175,8 @@ export function LightText({
   marginBottom,
   marginLeft,
   marginRight,
+  lineHeight,
+  numberOfLines,
 }: CustomTextProps) {
   return (
     <Text
@@ -112,7 +190,9 @@ export function LightText({
         marginBottom,
         marginLeft,
         marginRight,
+        lineHeight,
       }}
+      numberOfLines={numberOfLines}
       allowFontScaling={false}
     >
       {children}
@@ -130,6 +210,8 @@ export function RegularText({
   marginBottom,
   marginLeft,
   marginRight,
+  lineHeight,
+  numberOfLines,
 }: CustomTextProps) {
   return (
     <Text
@@ -143,7 +225,79 @@ export function RegularText({
         marginBottom,
         marginLeft,
         marginRight,
+        lineHeight,
       }}
+      numberOfLines={numberOfLines}
+      allowFontScaling={false}
+    >
+      {children}
+    </Text>
+  );
+}
+
+export function MediumText({
+  children,
+  color,
+  size = "base",
+  center,
+  capitalize,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
+  lineHeight,
+  numberOfLines,
+}: CustomTextProps) {
+  return (
+    <Text
+      style={{
+        fontFamily: "Outfit-Medium",
+        color: fontColors[color],
+        fontSize: fontSize[size],
+        textAlign: center ? "center" : "left",
+        textTransform: capitalize ? "capitalize" : "none",
+        marginTop,
+        marginBottom,
+        marginLeft,
+        marginRight,
+        lineHeight,
+      }}
+      numberOfLines={numberOfLines}
+      allowFontScaling={false}
+    >
+      {children}
+    </Text>
+  );
+}
+
+export function SemiBoldText({
+  children,
+  color,
+  size = "base",
+  center,
+  capitalize,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
+  lineHeight,
+  numberOfLines,
+}: CustomTextProps) {
+  return (
+    <Text
+      style={{
+        fontFamily: "Outfit-SemiBold",
+        color: fontColors[color],
+        fontSize: fontSize[size],
+        textAlign: center ? "center" : "left",
+        textTransform: capitalize ? "capitalize" : "none",
+        marginTop,
+        marginBottom,
+        marginLeft,
+        marginRight,
+        lineHeight,
+      }}
+      numberOfLines={numberOfLines}
       allowFontScaling={false}
     >
       {children}
@@ -161,6 +315,8 @@ export function BoldText({
   marginBottom,
   marginLeft,
   marginRight,
+  lineHeight,
+  numberOfLines,
 }: CustomTextProps) {
   return (
     <Text
@@ -174,7 +330,44 @@ export function BoldText({
         marginBottom,
         marginLeft,
         marginRight,
+        lineHeight,
       }}
+      numberOfLines={numberOfLines}
+      allowFontScaling={false}
+    >
+      {children}
+    </Text>
+  );
+}
+
+export function ExtraBoldText({
+  children,
+  color,
+  size = "base",
+  center,
+  capitalize,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
+  lineHeight,
+  numberOfLines,
+}: CustomTextProps) {
+  return (
+    <Text
+      style={{
+        fontFamily: "Outfit-ExtraBold",
+        color: fontColors[color],
+        fontSize: fontSize[size],
+        textAlign: center ? "center" : "left",
+        textTransform: capitalize ? "capitalize" : "none",
+        marginTop,
+        marginBottom,
+        marginLeft,
+        marginRight,
+        lineHeight,
+      }}
+      numberOfLines={numberOfLines}
       allowFontScaling={false}
     >
       {children}

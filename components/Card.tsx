@@ -162,6 +162,17 @@ const Card: React.FC<{
               Fund Wallet
             </Text>
           </TouchableOpacity>
+          {/* <View className="flex-row justify-between items-center gap-4">
+            <TouchableOpacity
+              onPress={() => navigation.navigate("FundWalletScreen")}
+              style={styles.fundWalletButton}
+            >
+              <AddCircle variant="Bold" color="#573CC7" />
+              <Text style={styles.fundWalletText} allowFontScaling={false}>
+                Transfer
+              </Text>
+            </TouchableOpacity>
+          </View> */}
         </View>
       </SafeAreaView>
     </ImageBackground>
@@ -250,6 +261,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     flexDirection: "row",
+    // flex: 1,
   },
   fundWalletText: {
     fontFamily: "Outfit-Regular",

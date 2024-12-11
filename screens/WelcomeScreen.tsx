@@ -33,7 +33,7 @@ const WelcomeScreen: React.FC<{
 
       <View style={styles.textContainer}>
         <MediumText
-          color="primary"
+          color="black"
           size="xxlarge"
           center
           marginBottom={SPACING}

@@ -1,6 +1,5 @@
 import {
   Platform,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -26,41 +25,52 @@ import {
   MediumText,
 } from "../../../components/common/Text";
 import PhoneNumberInput from "../../../components/common/ui/forms/PhoneNumberInput";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import Checkbox from 'expo-checkbox';
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface CreateAccountScreenProps {
   navigation: NativeStackNavigationProp<any, "">;
 }
 
+const validationSchema = Yup.object().shape({
+  firstName: Yup.string().required("First name is required"),
+  lastName: Yup.string().required("Last name is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  phoneNumber: Yup.string().required("Phone number is required"),
+  password: Yup.string()
+    .min(8, "Password must be at least 8 characters")
+    .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .matches(/[a-z]/, "Password must contain at least one lowercase letter")
+    .matches(/[0-9]/, "Password must contain at least one number")
+    .matches(
+      /[!@#$%^&*(),.?":{}|<>]/,
+      "Password must contain at least one special character"
+    )
+    .required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Please confirm your password"),
+  referral: Yup.string(),
+});
+
 const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
   navigation,
 }) => {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phoneNumber: "",
-    password: "",
-    confirmPassword: "",
-    referral: "",
-  });
-  const countryCode = "+234";
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState({
-    confirmPassword: "",
-    password: "",
-  });
   const [showRequirements, setShowRequirements] = useState(false);
   const [metRequirements, setMetRequirements] = useState<Set<number>>(
     new Set()
   );
-
-  const { onboarding } = useContext(AuthContext);
-
   const [visibleSections, setVisibleSections] = useState({
     email: false,
     phone: false,
     password: false,
     confirmPassword: false,
   });
+  const countryCode = "+234";
+  const [isChecked, setChecked] = useState(false);
+  const { onboarding } = useContext(AuthContext);
 
   const passwordRequirements = useMemo(
     () => [
@@ -76,123 +86,9 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
     []
   );
 
-  const validatePassword = useCallback(
-    (password: string) => {
-      return passwordRequirements.every((requirement) =>
-        requirement.regex.test(password)
-      );
-    },
-    [passwordRequirements]
-  );
-
-  const isFormComplete = useMemo(
-    () => 
-      formData.fullName.trim() !== "" &&
-      formData.email.trim() !== "" &&
-      formData.phoneNumber.trim() !== "" &&
-      formData.password.trim() !== "" &&
-      formData.confirmPassword.trim() !== "" &&
-      countryCode,
-    [formData, countryCode]
-  );
-
-  const handleButtonClick = useCallback(async () => {
-    if (isFormComplete) {
-      if (!validatePassword(formData.password)) {
-        setErrors((prev) => ({
-          ...prev,
-          password: "Password does not meet all requirements",
-        }));
-        return;
-      }
-      if (formData.password !== formData.confirmPassword) {
-        setErrors((prev) => ({
-          ...prev,
-          confirmPassword: "Passwords do not match",
-        }));
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const userInfo = await onboarding(
-          formData.email.trim(),
-          formData.password.trim(),
-          countryCode,
-          formData.fullName.trim(),
-          formData.phoneNumber.trim(),
-          formData.referral.trim()
-        );
-
-        const userId = userInfo?.data?.id;
-        console.log("User ID:", userId);
-
-        navigation.navigate("VerifyEmailScreen", {
-          email: formData.email,
-          id: userId,
-        });
-      } catch (error: unknown) {
-        console.error("Onboarding Error:", error);
-
-        if (error instanceof AxiosError) {
-          const errorMessage =
-            error.response?.data?.message ||
-            "An error occurred during account creation.";
-          handleShowFlash({ message: errorMessage, type: "danger" });
-        } else if (error instanceof Error) {
-          handleShowFlash({
-            message: "An unexpected error occurred: " + error.message,
-            type: "danger",
-          });
-        } else {
-          handleShowFlash({
-            message: "An unexpected error occurred. Please try again.",
-            type: "danger",
-          });
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      handleShowFlash({
-        message: "Please fill in all required fields",
-        type: "warning",
-      });
-    }
-  }, [
-    isFormComplete,
-    formData,
-    validatePassword,
-    countryCode,
-    onboarding,
-    navigation,
-  ]);
-
-  const handleInputChange = useCallback(
-    (field: keyof typeof formData, value: string) => {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-
-      if (field === "fullName") {
-        setVisibleSections((prev) => ({ ...prev, email: value.trim() !== "" }));
-      } else if (field === "email") {
-        setVisibleSections((prev) => ({ ...prev, phone: value.trim() !== "" }));
-      } else if (field === "phoneNumber") {
-        setVisibleSections((prev) => ({
-          ...prev,
-          password: value.trim() !== "",
-        }));
-      } else if (field === "password") {
-        handlePasswordChange(value);
-      } else if (field === "confirmPassword") {
-        handleConfirmPasswordChange(value);
-      }
-    },
-    []
-  );
-
   const handlePasswordChange = useCallback(
-    (value: string) => {
-      setFormData((prev) => ({ ...prev, password: value }));
+    (value: string, setFieldValue: (field: string, value: any) => void) => {
+      setFieldValue("password", value);
 
       const newMetRequirements = new Set<number>();
       passwordRequirements.forEach((req, index) => {
@@ -201,53 +97,17 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
         }
       });
       setMetRequirements(newMetRequirements);
-
-      const allRequirementsMet = passwordRequirements.every((_, index) =>
-        newMetRequirements.has(index)
+      setShowRequirements(
+        value.length > 0 &&
+          newMetRequirements.size < passwordRequirements.length
       );
-      setShowRequirements(!allRequirementsMet && value.length > 0);
-
-      if (validatePassword(value)) {
-        setErrors((prev) => ({ ...prev, password: "" }));
-      } else {
-        setErrors((prev) => ({
-          ...prev,
-          password: "Password does not meet all requirements",
-        }));
-      }
 
       setVisibleSections((prev) => ({
         ...prev,
         confirmPassword: value !== "",
       }));
-
-      if (formData.confirmPassword) {
-        if (formData.confirmPassword !== value) {
-          setErrors((prev) => ({
-            ...prev,
-            confirmPassword: "Passwords do not match",
-          }));
-        } else {
-          setErrors((prev) => ({ ...prev, confirmPassword: "" }));
-        }
-      }
     },
-    [formData.confirmPassword, passwordRequirements, validatePassword]
-  );
-
-  const handleConfirmPasswordChange = useCallback(
-    (value: string) => {
-      setFormData((prev) => ({ ...prev, confirmPassword: value }));
-      if (formData.password !== value) {
-        setErrors((prev) => ({
-          ...prev,
-          confirmPassword: "Passwords do not match",
-        }));
-      } else {
-        setErrors((prev) => ({ ...prev, confirmPassword: "" }));
-      }
-    },
-    [formData.password]
+    [passwordRequirements]
   );
 
   const renderInputField = useCallback(
@@ -255,181 +115,288 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
       label: string,
       field: string,
       placeholder: string,
-      keyboardType: string = "default",
+      formikProps: any,
       secureTextEntry: boolean = false,
       optional: boolean = false
     ) => (
       <View className="mt-4">
         <Label text={label} marked={!optional} />
         <BasicInput
-          value={formData[field as keyof typeof formData]}
-          onChangeText={(value) =>
-            handleInputChange(field as keyof typeof formData, value)
-          }
+          value={formikProps.values[field]}
+          onChangeText={formikProps.handleChange(field)}
+          onBlur={formikProps.handleBlur(field)}
           placeholder={placeholder}
           secureTextEntry={secureTextEntry}
           autoCapitalize="none"
           autoComplete="off"
           autoCorrect={false}
         />
+        {formikProps.touched[field] && formikProps.errors[field] && (
+          <Text style={styles.errorText}>{formikProps.errors[field]}</Text>
+        )}
       </View>
     ),
-    [formData, handleInputChange]
+    []
   );
 
   return (
     <SafeAreaView className="flex-1">
-      <KeyboardAwareScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        enableOnAndroid={true}
-        extraScrollHeight={Platform.OS === "ios" ? 20 : 0}
+      <Formik
+        initialValues={{
+          firstName: "",
+          lastName: "",
+          email: "",
+          phoneNumber: "",
+          password: "",
+          confirmPassword: "",
+          referral: "",
+        }}
+        validationSchema={validationSchema}
+        onSubmit={async (values, { setSubmitting }) => {
+          try {
+            const fullName = `${values.firstName.trim()} ${values.lastName.trim()}`;
+            const userInfo = await onboarding(
+              values.email.trim(),
+              values.password.trim(),
+              countryCode,
+              fullName,
+              values.phoneNumber.trim(),
+              values.referral.trim()
+            );
+
+            const userId = userInfo?.data?.id;
+            navigation.navigate("VerifyEmailScreen", {
+              email: values.email,
+              id: userId,
+            });
+          } catch (error: unknown) {
+            console.error("Onboarding Error:", error);
+            if (error instanceof AxiosError) {
+              handleShowFlash({
+                message:
+                  error.response?.data?.message ||
+                  "An error occurred during account creation.",
+                type: "danger",
+              });
+            } else {
+              handleShowFlash({
+                message: "An unexpected error occurred. Please try again.",
+                type: "danger",
+              });
+            }
+          } finally {
+            setSubmitting(false);
+          }
+        }}
       >
-        <View className="flex-1 px-4">
-          <BackButton navigation={navigation} />
+        {(formikProps) => (
+          <View className="flex-1 px-4">
+            <BackButton navigation={navigation} />
 
-          <View className="mt-8 mb-4">
-            <MediumText color="black" size="xlarge" marginBottom={5}>
-              Let's Get Started 🎉
-            </MediumText>
-            <LightText color="mediumGrey" size="base">
-              Just a few more details to set up your account.
-            </LightText>
-          </View>
-
-          {renderInputField("First & Last name", "fullName", "e.g John Doe")}
-
-          {visibleSections.email && (
-            <Animatable.View animation={"fadeIn"} duration={600}>
-              {renderInputField(
-                "Email Address",
-                "email",
-                "e.g johndoe@email.com"
-              )}
-            </Animatable.View>
-          )}
-
-          {visibleSections.phone && (
-            <Animatable.View
-              animation={"fadeIn"}
-              duration={600}
-              className="mt-4"
+            <KeyboardAwareScrollView
+              contentContainerStyle={{ flexGrow: 1 }}
+              enableOnAndroid={true}
+              extraScrollHeight={Platform.OS === "ios" ? 20 : 0}
             >
-              <Label text="Phone Number" marked={false} />
-              <PhoneNumberInput
-                value={formData.phoneNumber}
-                onChangeText={(value: string) =>
-                  handleInputChange("phoneNumber", value)
-                }
-                countryCode={countryCode}
-              />
-            </Animatable.View>
-          )}
+              <View className="mt-8 mb-4">
+                <MediumText color="black" size="xlarge" marginBottom={5}>
+                  Let's Get Started 🎉
+                </MediumText>
+                <LightText color="mediumGrey" size="base">
+                  Just a few more details to set up your account.
+                </LightText>
+              </View>
 
-          {visibleSections.password && (
-            <Animatable.View
-              animation={"fadeIn"}
-              duration={600}
-              className="mt-4"
-            >
-              <Label text="Create Password" marked={false} />
-              <BasicInput
-                value={formData.password}
-                onChangeText={(value) => handlePasswordChange(value)}
-                placeholder="Password"
-                secureTextEntry
-                autoCapitalize="none"
-                autoComplete="off"
-                autoCorrect={false}
-              />
-              {showRequirements && (
-                <View style={styles.requirementsContainer}>
-                  {passwordRequirements.map((requirement, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.requirementItem,
-                        metRequirements.has(index)
-                          ? styles.requirementMet
-                          : styles.requirementNotMet,
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.requirementIcon,
-                          metRequirements.has(index)
-                            ? styles.requirementMetIcon
-                            : styles.requirementNotMetIcon,
-                        ]}
-                      >
-                        {metRequirements.has(index) ? "✓" : "✗"}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.requirementText,
-                          metRequirements.has(index)
-                            ? styles.requirementMetText
-                            : styles.requirementNotMetText,
-                        ]}
-                      >
-                        {requirement.text}
-                      </Text>
-                    </View>
-                  ))}
+              <View className="flex-row gap-2">
+                <View className="flex-1">
+                  {renderInputField(
+                    "First Name",
+                    "firstName",
+                    "e.g John",
+                    formikProps
+                  )}
                 </View>
+                <View className="flex-1">
+                  {renderInputField(
+                    "Last Name",
+                    "lastName",
+                    "e.g Doe",
+                    formikProps
+                  )}
+                </View>
+              </View>
+
+              {((formikProps.values.firstName && formikProps.values.lastName) ||
+                visibleSections.email) && (
+                <Animatable.View animation={"fadeIn"} duration={600}>
+                  {renderInputField(
+                    "Email Address",
+                    "email",
+                    "e.g johndoe@email.com",
+                    formikProps
+                  )}
+                </Animatable.View>
               )}
-            </Animatable.View>
-          )}
 
-          {visibleSections.confirmPassword && (
-            <Animatable.View
-              animation={"fadeIn"}
-              duration={600}
-              className="mt-4"
-            >
-              <Label text="Re-type Password" marked={false} />
-              <BasicInput
-                value={formData.confirmPassword}
-                onChangeText={(value) => handleConfirmPasswordChange(value)}
-                placeholder="Confirm Password"
-                secureTextEntry
-                autoCapitalize="none"
-                autoComplete="off"
-                autoCorrect={false}
+              {(formikProps.values.email || visibleSections.phone) && (
+                <Animatable.View
+                  animation={"fadeIn"}
+                  duration={600}
+                  className="mt-4"
+                >
+                  <Label text="Phone Number" marked={false} />
+                  <PhoneNumberInput
+                    value={formikProps.values.phoneNumber}
+                    onChangeText={(value: string) =>
+                      formikProps.setFieldValue("phoneNumber", value)
+                    }
+                    countryCode={countryCode}
+                  />
+                  {formikProps.touched.phoneNumber &&
+                    formikProps.errors.phoneNumber && (
+                      <Text style={styles.errorText}>
+                        {formikProps.errors.phoneNumber}
+                      </Text>
+                    )}
+                </Animatable.View>
+              )}
+
+              {(formikProps.values.phoneNumber || visibleSections.password) && (
+                <Animatable.View
+                  animation={"fadeIn"}
+                  duration={600}
+                  className="mt-4"
+                >
+                  <Label text="Create Password" marked={false} />
+                  <BasicInput
+                    value={formikProps.values.password}
+                    onChangeText={(value) =>
+                      handlePasswordChange(value, formikProps.setFieldValue)
+                    }
+                    placeholder="Password"
+                    secureTextEntry
+                    autoCapitalize="none"
+                    autoComplete="off"
+                    autoCorrect={false}
+                  />
+                  {formikProps.touched.password &&
+                    formikProps.errors.password && (
+                      <Text style={styles.errorText}>
+                        {formikProps.errors.password}
+                      </Text>
+                    )}
+                  {showRequirements && (
+                    <View style={styles.requirementsContainer}>
+                      {passwordRequirements.map((requirement, index) => (
+                        <View
+                          key={index}
+                          style={[
+                            styles.requirementItem,
+                            metRequirements.has(index)
+                              ? styles.requirementMet
+                              : styles.requirementNotMet,
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              styles.requirementIcon,
+                              metRequirements.has(index)
+                                ? styles.requirementMetIcon
+                                : styles.requirementNotMetIcon,
+                            ]}
+                          >
+                            {metRequirements.has(index) ? "✓" : "✗"}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.requirementText,
+                              metRequirements.has(index)
+                                ? styles.requirementMetText
+                                : styles.requirementNotMetText,
+                            ]}
+                          >
+                            {requirement.text}
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </Animatable.View>
+              )}
+
+              {(formikProps.values.password ||
+                visibleSections.confirmPassword) && (
+                <Animatable.View
+                  animation={"fadeIn"}
+                  duration={600}
+                  className="mt-4"
+                >
+                  {renderInputField(
+                    "Re-type Password",
+                    "confirmPassword",
+                    "Confirm Password",
+                    formikProps,
+                    true
+                  )}
+                </Animatable.View>
+              )}
+
+              {renderInputField(
+                "Referral",
+                "referral",
+                "Referral (Optional)",
+                formikProps,
+                false,
+                true
+              )}
+            </KeyboardAwareScrollView>
+
+            <View className="mt-4 flex-row items-center px-2">
+              <Checkbox 
+                value={isChecked} 
+                onValueChange={setChecked}
+                className="mr-2 h-6 w-6 rounded border-gray-300"
               />
-              {errors.confirmPassword ? (
-                <Text style={styles.errorText}>{errors.confirmPassword}</Text>
-              ) : null}
-            </Animatable.View>
-          )}
+              <MediumText color="mediumGrey" size="base">
+                By signing up, you agree to our{" "}
+                <BoldText color="primary" size="base">
+                  Terms of Service
+                </BoldText>{" "}
+                and{" "}
+                <BoldText color="primary" size="base">
+                  Privacy Policy
+                </BoldText>
+                .
+              </MediumText>
+            </View>
 
-          {renderInputField("Referral", "referral", "Referral (Optional)", "default", false, true)}
+            <Button
+              title="Proceed"
+              onPress={() => formikProps.handleSubmit()}
+              isLoading={formikProps.isSubmitting}
+              style={[
+                styles.proceedButton,
+                !formikProps.isValid && styles.proceedButtonDisabled,
+              ]}
+              textColor="#fff"
+              disabled={!formikProps.isValid || formikProps.isSubmitting}
+            />
 
-          <Button
-            title="Proceed"
-            onPress={handleButtonClick}
-            isLoading={isLoading}
-            style={[
-              styles.proceedButton,
-              !isFormComplete && styles.proceedButtonDisabled,
-            ]}
-            textColor="#fff"
-            disabled={!isFormComplete || isLoading}
-          />
-
-          <View style={styles.alreadyHaveAccountContainer}>
-            <MediumText color="mediumGrey" size="base">
-              Already have an account?{" "}
-            </MediumText>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("LoginScreen")}
-            >
-              <BoldText color="primary" size="base">
-                Login
-              </BoldText>
-            </TouchableOpacity>
+            <View style={styles.alreadyHaveAccountContainer}>
+              <MediumText color="mediumGrey" size="base">
+                Already have an account?{" "}
+              </MediumText>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("LoginScreen")}
+              >
+                <BoldText color="primary" size="base">
+                  Login
+                </BoldText>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </KeyboardAwareScrollView>
+        )}
+      </Formik>
     </SafeAreaView>
   );
 };
@@ -438,7 +405,7 @@ export default CreateAccountScreen;
 
 const styles = StyleSheet.create({
   proceedButton: {
-    marginTop: SPACING * 4,
+    marginTop: SPACING * 2,
   },
   proceedButtonDisabled: {
     backgroundColor: COLORS.violet200,
