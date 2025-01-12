@@ -150,7 +150,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       return userInfo;
     } catch (error) {
-      console.error("Onboarding error:", error);
+      console.error("Onboarding error:", error.response);
       throw error;
     } finally {
       setIsLoading(false);

@@ -351,7 +351,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
               )}
             </KeyboardAwareScrollView>
 
-            <View className="mt-4 flex-row items-center px-2">
+            {/* <View className="mt-4 flex-row items-center px-2">
               <Checkbox 
                 value={isChecked} 
                 onValueChange={setChecked}
@@ -368,7 +368,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                 </BoldText>
                 .
               </MediumText>
-            </View>
+            </View> */}
 
             <Button
               title="Proceed"
