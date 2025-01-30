@@ -12,7 +12,7 @@ import COLORS from "../../../constants/colors";
 import SPACING from "../../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/common/ui/buttons/Button";
-import useApi from "../../../utils/api";
+import useApi from "../../../services/apiClient";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import Label from "../../../components/common/ui/forms/Label";
@@ -132,7 +132,6 @@ const ResetPasswordScreen: React.FC<{
                   ]}
                   textColor="#fff"
                   isLoading={isLoading}
-                  disabled={isLoading || !values.email}
                 />
               </View>
             </>

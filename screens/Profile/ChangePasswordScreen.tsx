@@ -17,7 +17,7 @@ import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../components/common/ui/buttons/Button";
-import useApi from "../../utils/api";
+import useApi from "../../services/apiClient";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 
 const ChangePasswordScreen: React.FC<{

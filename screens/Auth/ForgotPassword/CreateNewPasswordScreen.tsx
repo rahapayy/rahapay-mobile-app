@@ -17,11 +17,13 @@ import SPACING from "../../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/common/ui/buttons/Button";
 import FONT_SIZE from "../../../constants/font-size";
-import useApi from "../../../utils/api";
+import useApi from "../../../services/apiClient";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { RootStackParamList } from "../../../types/RootStackParams";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import { LightText, MediumText } from "../../../components/common/Text";
+import { BasicPasswordInput } from "../../../components/common/ui/forms/BasicPasswordInput";
+import Label from "../../../components/common/ui/forms/Label";
 
 type CreateNewPasswordScreenProps = {
   navigation: NativeStackNavigationProp<
@@ -82,95 +84,61 @@ const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({
   };
 
   return (
-    <SafeAreaView>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="p-4">
-          <BackButton
-            navigation={navigation as NativeStackNavigationProp<any, "">}
-          />
+    <SafeAreaView className="flex-1">
+      <View className="flex-1 p-4">
+        <BackButton
+          navigation={navigation as NativeStackNavigationProp<any, "">}
+        />
 
-          <View className="mt-4">
-            <MediumText color="black" size="xlarge" marginBottom={5}>
-              Create Password
-            </MediumText>
-            <LightText color="mediumGrey" size="base">
-              Enter new password to recover account
-            </LightText>
-          </View>
-          <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
-            keyboardVerticalOffset={Platform.OS === "ios" ? -50 : 0}
-          >
+        <View className="mt-4">
+          <MediumText color="black" size="xlarge" marginBottom={5}>
+            Create Password
+          </MediumText>
+          <LightText color="mediumGrey" size="base">
+            Enter new password to recover account
+          </LightText>
+        </View>
+
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          keyboardVerticalOffset={Platform.OS === "ios" ? -50 : 0}
+        >
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View className="mt-4">
-              <Text style={styles.label} allowFontScaling={false}>
-                Password
-              </Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter new password"
-                  placeholderTextColor={"#BABFC3"}
-                  secureTextEntry={showPassword}
-                  allowFontScaling={false}
-                  value={password}
-                  onChangeText={setPassword}
-                  autoComplete="off"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-                <TouchableOpacity onPress={togglePasswordVisibility}>
-                  {showPassword ? (
-                    <EyeSlash color="#000" size={20} />
-                  ) : (
-                    <Eye color="#000" size={20} />
-                  )}
-                </TouchableOpacity>
-              </View>
+              <Label marked={false} text="Password" />
+              <BasicPasswordInput
+                placeholder="Enter new password"
+                value={password}
+                onChangeText={setPassword}
+              />
 
               <View className="mt-4">
-                <Text style={styles.label} allowFontScaling={false}>
-                  Confirm Password
-                </Text>
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Confirm new password"
-                    placeholderTextColor={"#BABFC3"}
-                    secureTextEntry={showPassword2}
-                    allowFontScaling={false}
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
-                    autoComplete="off"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                  <TouchableOpacity onPress={togglePasswordVisibility2}>
-                    {showPassword2 ? (
-                      <EyeSlash color="#000" size={20} />
-                    ) : (
-                      <Eye color="#000" size={20} />
-                    )}
-                  </TouchableOpacity>
-                </View>
+                <Label marked={false} text="Confirm Password" />
+                <BasicPasswordInput
+                  placeholder="Confirm new password"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                />
               </View>
             </View>
-            <Button
-              title={"Reset Password"}
-              onPress={handleButtonClick}
-              className="mt-6"
-              textColor="#fff"
-              isLoading={isSubmitting}
-              disabled={isSubmitting || !password || !confirmPassword}
-              style={
-                isSubmitting || !password || !confirmPassword
-                  ? styles.disabledButton
-                  : null
-              }
-            />
-          </KeyboardAvoidingView>
-        </View>
-      </ScrollView>
+          </ScrollView>
+
+          <Button
+            title={"Reset Password"}
+            onPress={handleButtonClick}
+            className="mt-6"
+            textColor="#fff"
+            isLoading={isSubmitting}
+            disabled={isSubmitting || !password || !confirmPassword}
+            style={
+              isSubmitting || !password || !confirmPassword
+                ? styles.disabledButton
+                : null
+            }
+          />
+        </KeyboardAvoidingView>
+      </View>
     </SafeAreaView>
   );
 };
@@ -186,35 +154,6 @@ const styles = StyleSheet.create({
   subText: {
     fontFamily: "Outfit-ExtraLight",
     fontSize: RFValue(13),
-  },
-  label: {
-    fontFamily: "Outfit-Regular",
-    marginBottom: 10,
-    fontSize: RFValue(12),
-  },
-  vertical: {
-    backgroundColor: COLORS.black100,
-    width: 1,
-    height: "100%",
-    marginHorizontal: SPACING,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    fontSize: RFValue(12),
-    borderRadius: 10,
-    paddingHorizontal: SPACING,
-    paddingVertical: Platform.OS === "ios" ? 14 : 10,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#DFDFDF",
-  },
-  input: {
-    flex: 1,
-    fontSize: RFValue(12),
-  },
-  numberText: {
-    fontFamily: "Outfit-Regular",
   },
   proceedButton: {
     marginTop: SPACING * 4,

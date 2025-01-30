@@ -2,42 +2,27 @@ import { useMutation } from "@tanstack/react-query";
 import { services } from "../../services";
 import type { IErrorResponse, IResponse } from "../../types/general";
 import {
-  IForgotPasswordOTPDto,
+  IOnboardingDto,
   ILoginDto,
-  ISignUpDto,
+  IForgotPasswordDto,
   IVerifyEmailDto,
+  IResetPasswordDto,
+  ICreatePinDto,
+  IReAuthenticateDto,
+  IRefreshTokenDto,
+  IRefreshTokenResponseDto,
 } from "../dtos";
 import { handleError } from "../handleError";
 
-export const useSignup = () => {
-  return useMutation<
-    IResponse<{ success: boolean }>, // Success response
-    IErrorResponse<{ message: string }>, // Error response
-    ISignUpDto
-  >({
-    mutationFn: (payload) => services.authService.signUpWithOtp(payload),
-    onSuccess: async (response) => {
-      return response.data;
-    },
-    onError: (error: any) => {
-      console.error(error ? error?.message : "Something went wrong");
-    },
-  });
-};
-
-export const useSignupWithToken = () => {
+export const useOnboarding = () => {
   return useMutation<
     IResponse<{ success: boolean }>,
     IErrorResponse<{ message: string }>,
-    ISignUpDto
+    IOnboardingDto
   >({
-    mutationFn: (payload) => services.authService.signUpWithToken(payload),
-    onSuccess: async (response) => {
-      return response.data;
-    },
-    onError: (error: any) => {
-      console.error(error ? error?.message : "Something went wrong");
-    },
+    mutationFn: (payload) => services.authService.onboarding(payload),
+    onSuccess: async (response) => response.data,
+    onError: handleError,
   });
 };
 
@@ -48,29 +33,103 @@ export const useLogin = () => {
     ILoginDto
   >({
     mutationFn: (payload) => services.authService.login(payload),
-    onSuccess: async (response) => {
-      return response.data;
-    },
-    onError: (error: any) => {
-      console.error(error ? error?.message : "Something went wrong");
-    },
+    onSuccess: async (response) => response.data,
+    onError: handleError,
   });
 };
 
-
-export const useForgotPasswordOtp = () => {
+export const useForgotPassword = () => {
   return useMutation<
-    IResponse<{ success: boolean }>, // Success response
-    IErrorResponse<{ message: string }>, // Error response
-    IForgotPasswordOTPDto // The data payload for the mutation
+    IResponse<{ success: boolean }>,
+    IErrorResponse<{ message: string }>,
+    IForgotPasswordDto
   >({
-    mutationFn: (payload: IForgotPasswordOTPDto) =>
-      services.authService.forgotPasswordOtp(payload),
-    onSuccess: async (response) => {
-      // Handle successful OTP verification and password reset
-    },
-    onError: (error: any) => {
-      console.error(error ? error?.message : "An error occurred");
-    },
+    mutationFn: (payload) => services.authService.forgotPassword(payload),
+    onSuccess: async (response) => response.data,
+    onError: handleError,
+  });
+};
+
+export const useVerifyEmail = () => {
+  return useMutation<
+    IResponse<{ success: boolean }>,
+    IErrorResponse<{ message: string }>,
+    IVerifyEmailDto
+  >({
+    mutationFn: (payload) => services.authService.verifyEmail(payload),
+    onSuccess: async (response) => response.data,
+    onError: handleError,
+  });
+};
+
+export const useResetPassword = () => {
+  return useMutation<
+    IResponse<{ success: boolean }>,
+    IErrorResponse<{ message: string }>,
+    IResetPasswordDto
+  >({
+    mutationFn: (payload) => services.authService.resetPassword(payload),
+    onSuccess: async (response) => response.data,
+    onError: handleError,
+  });
+};
+
+export const useCreatePin = () => {
+  return useMutation<
+    IResponse<{ success: boolean }>,
+    IErrorResponse<{ message: string }>,
+    ICreatePinDto
+  >({
+    mutationFn: (payload) => services.authService.createPin(payload),
+    onSuccess: async (response) => response.data,
+    onError: handleError,
+  });
+};
+
+export const useResendOTP = () => {
+  return useMutation<
+    IResponse<{ success: boolean }>,
+    IErrorResponse<{ message: string }>,
+    { email: string } // assuming payload only contains email for resending otp
+  >({
+    mutationFn: (payload) => services.authService.resendOtp(payload.email),
+    onSuccess: async (response) => response.data,
+    onError: handleError,
+  });
+};
+
+export const useVerifyResetOtp = () => {
+  return useMutation<
+    IResponse<{ success: boolean }>,
+    IErrorResponse<{ message: string }>,
+    IVerifyEmailDto // assuming IVerifyEmailDto and IForgotPasswordOTPDto have the same structure
+  >({
+    mutationFn: (payload) => services.authService.verifyResetOtp(payload),
+    onSuccess: async (response) => response.data,
+    onError: handleError,
+  });
+};
+
+export const useReAuthenticate = () => {
+  return useMutation<
+    IResponse<{ success: boolean }>,
+    IErrorResponse<{ message: string }>,
+    IReAuthenticateDto
+  >({
+    mutationFn: (payload) => services.authService.reAuthenticate(payload),
+    onSuccess: async (response) => response.data,
+    onError: handleError,
+  });
+};
+
+export const useRefreshToken = () => {
+  return useMutation<
+    IResponse<IRefreshTokenResponseDto>,
+    IErrorResponse<{ message: string }>,
+    IRefreshTokenDto
+  >({
+    // mutationFn: (payload) => services.authService.refreshToken(payload),
+    onSuccess: async (response) => response.data,
+    onError: handleError,
   });
 };

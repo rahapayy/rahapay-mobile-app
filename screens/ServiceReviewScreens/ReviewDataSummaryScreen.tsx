@@ -20,7 +20,7 @@ import Eti from "../../assets/svg/9mobilebig.svg";
 import Glo from "../../assets/svg/globig.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 import SwipeButton from "../../components/SwipeButton";
-import useApi from "../../utils/api";
+import useApi from "../../services/apiClient";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { RootStackParamList } from "../../types/RootStackParams";
 

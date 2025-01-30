@@ -4,7 +4,7 @@ import { AppState } from "react-native";
 import NetInfo, { NetInfoState } from "@react-native-community/netinfo";
 
 // import cacheProvider from "./utils/CacheProvider";
-import { axios } from "../utils/api";
+import { axios } from "../services/apiClient";
 
 const SWR = ({
   children,

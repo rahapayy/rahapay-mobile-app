@@ -1,131 +1,101 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import { getItem, removeItem, setItem } from "@/utils/storage";
+import { getItem, removeItem, setItem } from "../utils/storage";
+import { UseQueryOptions, useMutation, useQuery } from "react-query";
+import Axios, { AxiosInstance, AxiosResponse } from "axios";
 import { AuthServices } from "./modules";
 
-export const axiosInstance = axios.create({
+// Supported HTTP methods
+type MethodTypes = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+
+// Create an Axios instance
+const axiosInstance: AxiosInstance = Axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
   withCredentials: true,
   timeout: 840000,
   headers: {
     "Content-Type": "application/json",
-    Accept: "application/json",
-    "Custom-Keyword": "ProsplugMobileApp", // Custom keyword added
-    "App-Version": "1.0.0", // Update this version as needed
   },
 });
 
-export const axiosInstanceWithoutToken = axios.create({
+export const axiosInstanceWithoutToken = Axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-    "Custom-Keyword": "ProsplugMobileApp", // Custom keyword added
-    "App-Version": "1.0.0", // Update this version as needed
   },
 });
 
-// Define the structure of a retry queue item
-interface RetryQueueItem {
-  resolve: (value?: any) => void;
-  reject: (error?: any) => void;
-  config: AxiosRequestConfig;
-}
+// Function to handle unauthorized responses (401)
+let onUnauthorizedCallback = () => {};
 
-// Create a list to hold the request queue
-const refreshAndRetryQueue: RetryQueueItem[] = [];
+// Set the callback for unauthorized handling
+export const setOnUnauthorizedCallback = (cb: () => void) => {
+  onUnauthorizedCallback = cb;
+};
 
-// Flag to prevent multiple token refresh requests
-let isRefreshing = false;
+// Function to retrieve the access token
+const getAccessToken = async (): Promise<string | null> => {
+  return await getItem("access_token");
+};
 
+// Request interceptor to add Authorization header
+axiosInstance.interceptors.request.use(async (config) => {
+  const accessToken = await getAccessToken();
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return config;
+});
+
+// Response interceptor to handle 401 responses and call the unauthorized callback
 axiosInstance.interceptors.response.use(
-  (res: AxiosResponse) => {
-    return res; // Simply return the response
-  },
+  (response) => response,
   async (error) => {
-    const status = error.response ? error.response.status : null;
-    const originalRequest: AxiosRequestConfig = error.config;
-
-    if (status === 401) {
-      if (!isRefreshing) {
-        isRefreshing = true;
-        try {
-          // Fetch saved access & refresh token
-          const refreshTokenFromStorage =
-            (await getItem("REFRESH_TOKEN", true)) ?? "";
-          const accessTokenFromStorage =
-            (await getItem("ACCESS_TOKEN", true)) ?? "";
-          // Get new tokens
-          const { accessToken, refreshToken } =
-            await services.authService.refreshToken({
-              accessToken: accessTokenFromStorage,
-              refreshToken: refreshTokenFromStorage,
-            });
-
-          setItem("ACCESS_TOKEN", accessToken, true);
-          setItem("REFRESH_TOKEN", refreshToken, true);
-
-          axiosInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-
-          // Retry all requests in the queue with the new token
-          refreshAndRetryQueue.forEach(({ config, resolve, reject }) => {
-            axiosInstance
-              .request(config)
-              .then((response) => resolve(response))
-              .catch((err) => reject(err));
-          });
-
-          // Clear the queue
-          refreshAndRetryQueue.length = 0;
-
-          return await axiosInstance(originalRequest);
-        } catch (refreshError: any) {
-          console.error("Token refresh failed:", refreshError);
-          removeItem("ACCESS_TOKEN", true);
-          removeItem("REFRESH_TOKEN", true);
-
-          // Redirect to login
-          return Promise.reject(new Error(refreshError) as AxiosError);
-        } finally {
-          isRefreshing = false;
-        }
+    if (error.response?.status === 401) {
+      try {
+        await removeItem("access_token");
+        onUnauthorizedCallback(); // Trigger unauthorized callback
+      } catch (e) {
+        console.error("Error removing token:", e);
       }
-
-      // Add the original request to the queue
-      return new Promise<void>((resolve, reject) => {
-        refreshAndRetryQueue.push({ config: originalRequest, resolve, reject });
-      });
     }
-
-    if (status === 403 && error.response.data) {
-      return Promise.reject(new Error(error.response.data));
-    }
-
-    return Promise.reject(new Error(error));
+    return Promise.reject(error);
   }
 );
 
-axiosInstance.interceptors.request.use(
-  async (config) => {
-    const getToken = async () => {
-      const token = await getItem("ACCESS_TOKEN", true);
-      if (token) {
-        return token;
-      } else {
-        return "";
-      }
-    };
+// Axios request function
+const makeRequest = async (
+  method: MethodTypes,
+  url: string,
+  data?: any
+): Promise<AxiosResponse> => {
+  const response = await axiosInstance({
+    method,
+    url,
+    data,
+  });
+  return response;
+};
 
-    const token = await getToken();
-    if (token != "" || token != null) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
+// Export Axios instance for direct use
+export const axios = axiosInstance;
 
-    return config;
-  },
-  (error) => Promise.reject(new Error(error))
-);
+// Wrapper functions for React Query with Axios
+export default {
+  get: (url: string, options?: UseQueryOptions) =>
+    useQuery(
+      url,
+      () => makeRequest("GET", url),
+      options as UseQueryOptions<AxiosResponse, unknown, AxiosResponse, string>
+    ),
 
-export const services = {
-  authService: new AuthServices(axiosInstanceWithoutToken),
-  authServiceToken: new AuthServices(axiosInstance),
+  post: (url: string) =>
+    useMutation((data: any) => makeRequest("POST", url, data)),
+
+  put: (url: string) =>
+    useMutation((data: any) => makeRequest("PUT", url, data)),
+
+  delete: (url: string) => useMutation(() => makeRequest("DELETE", url)),
+
+  patch: <TData, TError>(url: string) =>
+    useMutation((data: any) => makeRequest("PATCH", url, data)),
 };

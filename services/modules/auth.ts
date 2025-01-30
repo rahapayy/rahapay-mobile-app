@@ -1,10 +1,14 @@
 import { AxiosInstance } from "axios";
 import {
-  IForgotPasswordOTPDto,
+  IOnboardingDto,
+  IVerifyEmailDto,
   ILoginDto,
+  IForgotPasswordDto,
+  IResetPasswordDto,
+  ICreatePinDto,
+  IReAuthenticateDto,
   IRefreshTokenDto,
   IRefreshTokenResponseDto,
-  ISignUpDto,
 } from "../dtos";
 
 class AuthServices {
@@ -14,34 +18,44 @@ class AuthServices {
     this.baseService = baseService;
   }
 
-  signUpWithOtp = async (payload: ISignUpDto) => {
-    const response = await this.baseService.post("/auth/signup-otp", payload);
-    return response;
+  onboarding = async (payload: IOnboardingDto) => {
+    return this.baseService.post("/auth/onboarding", payload);
   };
 
-  signUpWithToken = async (payload: ISignUpDto) => {
-    const response = await this.baseService.post("/auth/signup-token", payload);
-    return response;
+  verifyEmail = async (payload: IVerifyEmailDto) => {
+    return this.baseService.post("/auth/verify-email", payload);
   };
 
-  // Login and session management
+  resendOtp = async (email: string) => {
+    return this.baseService.post("/auth/resend-otp", { email });
+  };
+
   login = async (payload: ILoginDto) => {
-    const response = await this.baseService.post("/auth/login", payload);
-    return response;
+    return this.baseService.post("/auth/login", payload);
   };
 
-  // Password management
-  forgotPasswordOtp = async (payload: IForgotPasswordOTPDto) => {
-    const response = await this.baseService.post(
-      "/auth/forgot-password-otp",
-      payload
-    );
-    return response;
+  forgotPassword = async (payload: IForgotPasswordDto) => {
+    return this.baseService.post("/auth/forgot-password", payload);
+  };
+
+  verifyResetOtp = async (payload: IVerifyEmailDto) => {
+    return this.baseService.post("/auth/verify/reset-otp", payload);
+  };
+
+  resetPassword = async (payload: IResetPasswordDto) => {
+    return this.baseService.post("/auth/reset-password", payload);
+  };
+
+  createPin = async (payload: ICreatePinDto) => {
+    return this.baseService.post("/auth/create-pin", payload);
+  };
+
+  reAuthenticate = async (payload: IReAuthenticateDto) => {
+    return this.baseService.post("/auth/re-authenticate", payload);
   };
 
   refreshToken = async (payload: IRefreshTokenDto) => {
-    const response = await this.baseService.post("/auth/refresh", payload);
-    console.log(this.refreshToken);
+    const response = await this.baseService.post("/auth/refresh-token", payload);
     return response.data as IRefreshTokenResponseDto;
   };
 }

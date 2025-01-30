@@ -17,6 +17,7 @@ interface BasicInputProps {
   value: string;
   onChangeText: (text: string) => void;
   placeholder: string;
+  onBlur?: () => void;
   secureTextEntry?: boolean;
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
   autoComplete?: "off" | "password";
@@ -31,6 +32,7 @@ const BasicInput: React.FC<BasicInputProps> = ({
   value,
   onChangeText,
   placeholder,
+  onBlur,
   secureTextEntry = false,
   autoCapitalize = "none",
   autoComplete = "off",

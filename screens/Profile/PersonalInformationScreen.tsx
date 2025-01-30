@@ -19,7 +19,7 @@ import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../components/common/ui/buttons/Button";
 // import { AuthContext } from "../../context/AuthContext";
-import useApi from "../../utils/api";
+import useApi from "../../services/apiClient";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";

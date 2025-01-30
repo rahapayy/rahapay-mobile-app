@@ -23,6 +23,7 @@ import {
   BoldText,
   LightText,
   MediumText,
+  RegularText,
 } from "../../../components/common/Text";
 import Label from "../../../components/common/ui/forms/Label";
 import BasicInput from "../../../components/common/ui/forms/BasicInput";
@@ -134,9 +135,9 @@ const LoginScreen: React.FC<{
                     onPress={() => navigation.navigate("ResetPasswordScreen")}
                     className="mt-4 justify-center items-end"
                   >
-                    <BoldText color="primary" size="base">
+                    <MediumText color="primary" size="base">
                       Forgot Password?
-                    </BoldText>
+                    </MediumText>
                   </TouchableOpacity>
                 </View>
               </KeyboardAvoidingView>

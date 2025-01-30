@@ -18,7 +18,7 @@ import Gotv from "../../assets/svg/gotv.svg";
 import Startimes from "../../assets/svg/startimes.svg";
 import SwipeButton from "../../components/SwipeButton";
 import { RFValue } from "react-native-responsive-fontsize";
-import useApi from "../../utils/api";
+import useApi from "../../services/apiClient";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { RootStackParamList } from "../../types/RootStackParams";
 

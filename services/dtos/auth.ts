@@ -17,11 +17,15 @@ interface UserInfoType {
 }
 
 export interface IOnboardingDto {
+  email: string;
+  password: string;
+  countryCode: string;
   fullName: string;
+  phoneNumber: string;
+  referral: string;
 }
 
 export interface IRefreshTokenDto {
-  accessToken: string;
   refreshToken: string;
 }
 
@@ -30,12 +34,34 @@ export interface IRefreshTokenResponseDto {
   refreshToken: string;
 }
 
-export interface ILoginDto {}
+export interface ILoginDto {
+  email: string;
+  password: string;
+}
 
-export interface IForgotPasswordOTPDto {}
-
-export interface IVerifyEmailDto {
+export interface IForgotPasswordDto {
   email: string;
 }
 
-export interface User {}
+export interface IForgotPasswordOTPDto {
+  otp: string;
+}
+
+export interface IVerifyEmailDto {
+  otp: string;
+  email: string;
+}
+
+export interface IResetPasswordDto {
+  resetToken: string;
+  password: string;
+}
+
+export interface ICreatePinDto {
+  securityPin: string;
+  transactionPin: string;
+}
+
+export interface IReAuthenticateDto {
+  pin: string;
+}

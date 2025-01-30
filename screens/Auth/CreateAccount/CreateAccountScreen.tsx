@@ -27,7 +27,6 @@ import {
 import PhoneNumberInput from "../../../components/common/ui/forms/PhoneNumberInput";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import Checkbox from 'expo-checkbox';
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface CreateAccountScreenProps {
@@ -35,8 +34,7 @@ interface CreateAccountScreenProps {
 }
 
 const validationSchema = Yup.object().shape({
-  firstName: Yup.string().required("First name is required"),
-  lastName: Yup.string().required("Last name is required"),
+  fullName: Yup.string().required("Full name is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   phoneNumber: Yup.string().required("Phone number is required"),
   password: Yup.string()
@@ -69,7 +67,6 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
     confirmPassword: false,
   });
   const countryCode = "+234";
-  const [isChecked, setChecked] = useState(false);
   const { onboarding } = useContext(AuthContext);
 
   const passwordRequirements = useMemo(
@@ -120,7 +117,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
       optional: boolean = false
     ) => (
       <View className="mt-4">
-        <Label text={label} marked={!optional} />
+        <Label text={label} marked={false} />
         <BasicInput
           value={formikProps.values[field]}
           onChangeText={formikProps.handleChange(field)}
@@ -143,8 +140,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
     <SafeAreaView className="flex-1">
       <Formik
         initialValues={{
-          firstName: "",
-          lastName: "",
+          fullName: "",
           email: "",
           phoneNumber: "",
           password: "",
@@ -154,12 +150,11 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
         validationSchema={validationSchema}
         onSubmit={async (values, { setSubmitting }) => {
           try {
-            const fullName = `${values.firstName.trim()} ${values.lastName.trim()}`;
             const userInfo = await onboarding(
               values.email.trim(),
               values.password.trim(),
               countryCode,
-              fullName,
+              values.fullName.trim(),
               values.phoneNumber.trim(),
               values.referral.trim()
             );
@@ -212,27 +207,16 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                 </LightText>
               </View>
 
-              <View className="flex-row gap-2">
-                <View className="flex-1">
-                  {renderInputField(
-                    "First Name",
-                    "firstName",
-                    "e.g John",
-                    formikProps
-                  )}
-                </View>
-                <View className="flex-1">
-                  {renderInputField(
-                    "Last Name",
-                    "lastName",
-                    "e.g Doe",
-                    formikProps
-                  )}
-                </View>
+              <View>
+                {renderInputField(
+                  "Full Name",
+                  "fullName",
+                  "e.g John Doe",
+                  formikProps
+                )}
               </View>
 
-              {((formikProps.values.firstName && formikProps.values.lastName) ||
-                visibleSections.email) && (
+              {formikProps.values.fullName && (
                 <Animatable.View animation={"fadeIn"} duration={600}>
                   {renderInputField(
                     "Email Address",
@@ -249,7 +233,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                   duration={600}
                   className="mt-4"
                 >
-                  <Label text="Phone Number" marked={true} />
+                  <Label text="Phone Number" marked={false} />
                   <PhoneNumberInput
                     value={formikProps.values.phoneNumber}
                     onChangeText={(value: string) =>
@@ -272,7 +256,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                   duration={600}
                   className="mt-4"
                 >
-                  <Label text="Create Password" marked={true} />
+                  <Label text="Create Password" marked={false} />
                   <BasicInput
                     value={formikProps.values.password}
                     onChangeText={(value) =>
@@ -355,25 +339,6 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                 true
               )}
             </KeyboardAwareScrollView>
-
-            {/* <View className="mt-4 flex-row items-center px-2">
-              <Checkbox 
-                value={isChecked} 
-                onValueChange={setChecked}
-                className="mr-2 h-6 w-6 rounded border-gray-300"
-              />
-              <MediumText color="mediumGrey" size="base">
-                By signing up, you agree to our{" "}
-                <BoldText color="primary" size="base">
-                  Terms of Service
-                </BoldText>{" "}
-                and{" "}
-                <BoldText color="primary" size="base">
-                  Privacy Policy
-                </BoldText>
-                .
-              </MediumText>
-            </View> */}
 
             <Button
               title="Proceed"

@@ -15,7 +15,7 @@ import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import SwipeButton from "../../components/SwipeButton";
-import useApi from "../../utils/api";
+import useApi from "../../services/apiClient";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { RootStackParamList } from "../../types/RootStackParams";
 

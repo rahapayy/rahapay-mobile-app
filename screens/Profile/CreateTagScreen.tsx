@@ -15,7 +15,7 @@ import COLORS from "../../constants/colors";
 import SPACING from "../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../components/common/ui/buttons/Button";
-import useApi from "../../utils/api";
+import useApi from "../../services/apiClient";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import FONT_SIZE from "../../constants/font-size";
 import AsyncStorage from "@react-native-async-storage/async-storage";
