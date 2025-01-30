@@ -15,6 +15,10 @@ import FONT_SIZE from "../constants/font-size";
 import COLORS from "../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import { RootStackParamList } from "../types/RootStackParams";
+import Airtel from "../assets/svg/airtelbig.svg";
+import Mtn from "../assets/svg/mtnbig.svg";
+import Eti from "../assets/svg/9mobilebig.svg";
+import Glo from "../assets/svg/globig.svg";
 
 type TransactionSummaryRouteParams = {
   transaction: {
@@ -25,9 +29,8 @@ type TransactionSummaryRouteParams = {
     tranxType: string;
     referenceId: string;
     metadata?: {
-      sender?: string;
-      recipient?: string;
-      package?: string;
+      networkType?: string;
+      phoneNumber?: string;
     };
   };
 };
@@ -45,6 +48,25 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
   route,
 }) => {
   const { transaction } = route.params;
+
+  const networkType = transaction.metadata?.networkType;
+
+  const renderServiceIcon = (provider: string) => {
+    // Ensure the provider name is always in lower case for comparison
+    const providerLower = provider.toLowerCase();
+    switch (providerLower) {
+      case "airtel":
+        return <Airtel width={40} height={40} />;
+      case "mtn": // This line is changed to lowercase
+        return <Mtn width={70} height={70} />;
+      case "9mobile":
+        return <Eti width={40} height={40} />;
+      case "glo":
+        return <Glo width={40} height={40} />;
+      default:
+        return;
+    }
+  };
 
   const renderTransactionDetails = () => {
     switch (transaction.tranxType) {
@@ -69,14 +91,20 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
         return (
           <>
             <View style={styles.row}>
-              <Text style={styles.titleText}>Paid with</Text>
-              <Text style={styles.descriptionText}>{transaction.purpose}</Text>
+              <Text style={styles.titleText}>Network</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.metadata?.networkType || "N/A"}
+              </Text>
             </View>
             <View style={styles.row}>
-              <Text style={styles.titleText}>Recipient</Text>
+              <Text style={styles.titleText}>Recipient Mobile</Text>
               <Text style={styles.descriptionText}>
-                {transaction.metadata?.recipient}
+                {transaction.metadata?.phoneNumber || "N/A"}
               </Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Paid with</Text>
+              <Text style={styles.descriptionText}>{transaction.purpose}</Text>
             </View>
           </>
         );
@@ -119,6 +147,7 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
                 <WalletAdd1 color={COLORS.violet400} size={40} />
               </View>
             ) : null}
+            {networkType && renderServiceIcon(networkType)}
             <Text style={styles.itemText} allowFontScaling={false}>
               {transaction.tranxType.replace("_", " ")}
             </Text>

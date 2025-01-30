@@ -114,7 +114,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
           <View className="p-4">
             <View style={styles.tabContent}>
               <View>
-                <Text style={styles.headText} allowFontScaling={false}>
+                {/* <Text style={styles.headText} allowFontScaling={false}>
                   Saved Beneficiaries
                 </Text>
                 <View className="flex-row mb-4 gap-2">
@@ -124,7 +124,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                   <TouchableOpacity className="bg-[#EEEBF9] p-3 rounded-2xl">
                     <Text>+234 0862753934</Text>
                   </TouchableOpacity>
-                </View>
+                </View> */}
 
                 <View className="mb-4">
                   <Text style={styles.label} allowFontScaling={false}>
@@ -146,9 +146,9 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                       autoCapitalize="none"
                       autoCorrect={false}
                     />
-                    <TouchableOpacity>
+                    {/* <TouchableOpacity>
                       <ProfileCircle color={COLORS.violet400} />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                   </View>
                 </View>
 
@@ -252,13 +252,14 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                 </View>
 
                 {/* Inputs */}
-                <View>
+                <View className="mb-6">
                   <View className="mt-4">
                     <Text style={styles.label} allowFontScaling={false}>
                       Plan
                     </Text>
                     <TouchableOpacity
-                      style={[styles.inputContainer, !selectedOperator && {}]}
+                      style={[!selectedOperator && {}]}
+                      className="p-3 flex-row items-center border border-gray-300 rounded-xl"
                       onPress={() => {
                         if (selectedOperator) {
                           setModalVisible(true);

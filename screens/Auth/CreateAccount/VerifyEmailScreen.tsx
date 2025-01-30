@@ -15,7 +15,7 @@ import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
 import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import { AuthContext } from "../../../context/AuthContext";
+import { AuthContext } from "../../../services/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import { LightText, MediumText } from "../../../components/common/Text";

@@ -4,7 +4,8 @@ import COLORS from "../../constants/colors";
 import FONT_SIZE from "../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../constants/SPACING";
-import { AuthContext } from "../../context/AuthContext";
+import { AuthContext } from "../../services/AuthContext";
+// import { AuthContext } from "../../context/AuthContext";
 
 const LogOutModal: React.FC<{
   visible: boolean;

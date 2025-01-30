@@ -6,7 +6,7 @@ import slides from "../../slides";
 import OnboardingItem from "./OnboadingItem";
 import Paginator from "./Paginator";
 import NextButton from "./NextButton";
-import { setItem } from "../../utils/ayncStorage";
+import { setItem } from "../../utils/storage";
 
 interface Slide {
   id: string;

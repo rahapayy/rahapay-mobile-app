@@ -11,12 +11,34 @@ import { RFValue } from "react-native-responsive-fontsize";
 import LottieView from "lottie-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import useWallet from "../hooks/use-wallet";
+import { Skeleton } from "@rneui/themed";
+import { WalletAdd1, WalletMinus } from "iconsax-react-native";
+import COLORS from "../constants/colors";
+import Airtel from "../assets/svg/airtelbig.svg";
+import Mtn from "../assets/svg/mtnbig.svg";
+import Eti from "../assets/svg/9mobilebig.svg";
+import Glo from "../assets/svg/globig.svg";
 
 const RecentServiceTransaction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const { transactions, isLoading } = useWallet();
   const [hasTransaction, setHasTransaction] = useState(false);
+
+  const renderServiceIcon = (provider: string) => {
+    switch (provider.toLowerCase()) {
+      case "airtel":
+        return <Airtel width={40} height={40} />;
+      case "mtn":
+        return <Mtn width={40} height={40} />;
+      case "9mobile":
+        return <Eti width={40} height={40} />;
+      case "glo":
+        return <Glo width={40} height={40} />;
+      default:
+        return <WalletAdd1 size={40} color={COLORS.violet400} />;
+    }
+  };
 
   useEffect(() => {
     setHasTransaction(transactions.length > 0);
@@ -37,16 +59,50 @@ const RecentServiceTransaction: React.FC<{
         </TouchableOpacity>
       </View>
 
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <LottieView
-              source={require("../assets/animation/loading.json")}
-              autoPlay
-              loop
-              style={styles.loadingAnimation}
-            />
-            <Text style={styles.loadingText}>Loading transactions...</Text>
+          <View>
+            {[1, 2, 3].map((item) => (
+              <View key={item} style={styles.transactionItem}>
+                <Skeleton
+                  circle
+                  width={40}
+                  height={40}
+                  style={styles.skeletonImage}
+                  animation="wave"
+                />
+                <View style={styles.transactionTextContainer}>
+                  <View style={styles.transactionTextRow}>
+                    <Skeleton
+                      width={RFValue(80)}
+                      height={RFValue(16)}
+                      style={styles.skeletonText}
+                      animation="wave"
+                    />
+                    <Skeleton
+                      width={RFValue(60)}
+                      height={RFValue(16)}
+                      style={styles.skeletonText}
+                      animation="wave"
+                    />
+                  </View>
+                  <View style={[styles.transactionTextRow, { marginTop: 8 }]}>
+                    <Skeleton
+                      width={RFValue(120)}
+                      height={RFValue(12)}
+                      style={styles.skeletonText}
+                      animation="wave"
+                    />
+                    <Skeleton
+                      width={RFValue(40)}
+                      height={RFValue(12)}
+                      style={styles.skeletonText}
+                      animation="wave"
+                    />
+                  </View>
+                </View>
+              </View>
+            ))}
           </View>
         ) : hasTransaction ? (
           transactions.map(
@@ -66,10 +122,13 @@ const RecentServiceTransaction: React.FC<{
                 }
                 style={styles.transactionItem}
               >
-                <Image
-                  // source={require("../assets/images/airtel.png")}
-                  style={styles.transactionImage}
-                />
+                <View style={styles.transactionImage}>
+                  {transaction.tranxType === "WALLET_FUNDING" ? (
+                    <WalletAdd1 color={COLORS.violet400} size={28} />
+                  ) : (
+                    <WalletMinus color={COLORS.red400} size={28} />
+                  )}
+                </View>
                 <View style={styles.transactionTextContainer}>
                   <View style={styles.transactionTextRow}>
                     <Text style={styles.item} allowFontScaling={false}>
@@ -177,6 +236,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     marginRight: 10,
+    resizeMode: "contain",
   },
   transactionTextContainer: {
     flex: 1,
@@ -209,6 +269,12 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: "#06C270",
     fontSize: RFValue(10),
+  },
+  skeletonImage: {
+    marginRight: 10,
+  },
+  skeletonText: {
+    borderRadius: 4,
   },
 });
 

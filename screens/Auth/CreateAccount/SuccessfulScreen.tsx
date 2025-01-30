@@ -5,7 +5,7 @@ import Button from "../../../components/common/ui/buttons/Button";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import FONT_SIZE from "../../../constants/font-size";
 import SPACING from "../../../constants/SPACING";
-import { AuthContext } from "../../../context/AuthContext";
+import { AuthContext } from "../../../services/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SuccessfulScreen: React.FC<{

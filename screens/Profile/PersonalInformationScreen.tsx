@@ -18,7 +18,7 @@ import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../components/common/ui/buttons/Button";
-import { AuthContext } from "../../context/AuthContext";
+// import { AuthContext } from "../../context/AuthContext";
 import useApi from "../../utils/api";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -26,6 +26,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { BoldText, LightText, MediumText } from "../../components/common/Text";
 import useWallet from "../../hooks/use-wallet";
 import * as Clipboard from "expo-clipboard";
+import { AuthContext } from "../../services/AuthContext";
 
 const PersonalInformationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -163,7 +164,7 @@ const PersonalInformationScreen: React.FC<{
             PERSONAL INFORMATION
           </BoldText>
 
-          <View className="mt-4 bg-white p-4 rounded-lg shadow-md">
+          <View className="mt-4 bg-white p-4 rounded-lg">
             <View className="flex-row justify-between items-center mb-6">
               <LightText color="light" size="small">
                 First Name
@@ -180,7 +181,7 @@ const PersonalInformationScreen: React.FC<{
                   }
                 />
               ) : (
-                <MediumText color="dark" size="medium">
+                <MediumText color="dark" size="base">
                   {userDetails.fullName.split(" ")[0]}
                 </MediumText>
               )}
@@ -201,7 +202,7 @@ const PersonalInformationScreen: React.FC<{
                   }
                 />
               ) : (
-                <MediumText color="dark" size="medium">
+                <MediumText color="dark" size="base">
                   {userDetails.fullName.split(" ")[1]}
                 </MediumText>
               )}
@@ -236,7 +237,7 @@ const PersonalInformationScreen: React.FC<{
                   keyboardType="phone-pad"
                 />
               ) : (
-                <MediumText color="dark" size="medium">
+                <MediumText color="dark" size="base">
                   {userDetails.phoneNumber}
                 </MediumText>
               )}
@@ -246,7 +247,7 @@ const PersonalInformationScreen: React.FC<{
                 RahaPay Account Number
               </LightText>
               <View className="flex-row items-center">
-                <MediumText color="dark" size="medium">
+                <MediumText color="dark" size="base">
                   {account.accountNumber}
                 </MediumText>
                 <TouchableOpacity
@@ -266,7 +267,7 @@ const PersonalInformationScreen: React.FC<{
                   RAHAPAY TAG
                 </BoldText>
               </View>
-              <View className="mt-4 bg-white p-4 rounded-lg shadow-md ">
+              <View className="mt-4 bg-white p-4 rounded-lg">
                 <MediumText color="dark" size="medium">
                   Your RahaPay Tag
                 </MediumText>
@@ -296,7 +297,7 @@ const PersonalInformationScreen: React.FC<{
                   RAHAPAY TAG
                 </BoldText>
               </View>
-              <View className="mt-4 bg-white p-4 rounded-lg shadow-md ">
+              <View className="mt-4 bg-white p-4 rounded-lg">
                 <MediumText color="dark" size="medium">
                   Your RahaPay Tag
                 </MediumText>

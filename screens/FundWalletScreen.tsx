@@ -18,9 +18,10 @@ import COLORS from "../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Circle from "../assets/svg/Group 803.svg";
 import useWallet from "../hooks/use-wallet";
-import { AuthContext } from "../context/AuthContext";
+// import { AuthContext } from "../context/AuthContext";
 import { handleShowFlash } from "../components/FlashMessageComponent";
 import * as Clipboard from "expo-clipboard";
+import { AuthContext } from "../services/AuthContext";
 
 const FundWalletScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;

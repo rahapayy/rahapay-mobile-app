@@ -13,6 +13,7 @@ import ServicesScreen from "../screens/ServicesScreen";
 import WalletScreen from "../screens/WalletScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import * as Animatable from 'react-native-animatable';
+import CardsScreen from "../screens/CardsScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -88,6 +89,7 @@ const BottomTab: React.FC = () => {
           shadowOpacity: 0,
           borderTopColor: "transparent",
           height: "11%",
+          position: "absolute"
         },
         tabBarActiveTintColor: customColors.activeTintColor,
         tabBarInactiveTintColor: customColors.inactiveTintColor,
@@ -118,14 +120,14 @@ const BottomTab: React.FC = () => {
         }}
       />
       <Tab.Screen
-        name="Wallet"
-        component={WalletScreen}
+        name="Card"
+        component={CardsScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <AnimatedIcon focused={focused} IconComponent={WalletAdd1} />
+            <AnimatedIcon focused={focused} IconComponent={Cards} />
           ),
           tabBarLabel: ({ focused }) =>
-            focused ? <TabBarLabel focused={focused} title="Wallet" /> : null,
+            focused ? <TabBarLabel focused={focused} title="Card" /> : null,
           headerShown: false,
         }}
       />

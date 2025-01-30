@@ -4,7 +4,6 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import React, { useState } from "react";
@@ -15,34 +14,37 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/common/ui/buttons/Button";
 import useApi from "../../../utils/api";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import Label from "../../../components/common/ui/forms/Label";
-import {
-  LightText,
-  MediumText,
-  RegularText,
-} from "../../../components/common/Text";
+import { LightText, MediumText } from "../../../components/common/Text";
+import BasicInput from "../../../components/common/ui/forms/BasicInput";
+import { Formik } from "formik";
+import * as Yup from "yup";
 
 const ResetPasswordScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const { mutateAsync } = useApi.post("/auth/forgot-password");
 
-  const handleButtonClick = async () => {
+  const validationSchema = Yup.object().shape({
+    email: Yup.string()
+      .email("Please enter a valid email")
+      .required("Email is required"),
+  });
+
+  const handleButtonClick = async (values: { email: string }) => {
     setIsLoading(true);
     try {
-      const response = await mutateAsync({ email });
+      const response = await mutateAsync({ email: values.email });
 
       handleShowFlash({
-        message: "Password reset otp sent to your email",
+        message: "Password reset OTP sent to your email",
         type: "success",
       });
 
-      navigation.navigate("EnterCodeScreen", { email });
+      navigation.navigate("EnterCodeScreen", { email: values.email });
     } catch (error) {
       const err = error as {
         response?: {
@@ -76,56 +78,67 @@ const ResetPasswordScreen: React.FC<{
   };
 
   return (
-    <SafeAreaView className="flex-1">
-      <KeyboardAwareScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        enableOnAndroid={true}
-        extraScrollHeight={Platform.OS === "ios" ? 20 : 0}
-      >
-        <View className="p-4">
-          <BackButton navigation={navigation} />
-          <View className="mt-4">
-            <MediumText color="black" size="xlarge" marginBottom={5}>
-              Reset Password
-            </MediumText>
-            <LightText color="mediumGrey" size="base">
-              Enter your email address to receive code
-            </LightText>
-          </View>
-          <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
-            keyboardVerticalOffset={Platform.OS === "ios" ? -50 : 0}
-          >
-            <View className="mt-10">
-              <Label text="Email Address" marked={false} />
-              <TextInput
-                style={styles.textInput}
-                placeholder="Enter your email address"
-                placeholderTextColor={"#BABFC3"}
-                allowFontScaling={false}
-                value={email}
-                onChangeText={setEmail}
-                autoComplete="off"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-
-            <Button
-              title={"Reset Password"}
-              onPress={handleButtonClick}
-              style={[
-                styles.proceedButton,
-                (!email || isLoading) && styles.disabledButton,
-              ]}
-              textColor="#fff"
-              isLoading={isLoading}
-              disabled={isLoading || !email}
-            />
-          </KeyboardAvoidingView>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ padding: 16, flex: 1 }}>
+        <BackButton navigation={navigation} />
+        <View style={{ marginTop: 16 }}>
+          <MediumText color="black" size="xlarge" marginBottom={5}>
+            Reset Password
+          </MediumText>
+          <LightText color="mediumGrey" size="base">
+            Enter your email address to receive the code
+          </LightText>
         </View>
-      </KeyboardAwareScrollView>
+
+        <Formik
+          initialValues={{ email: "" }}
+          validationSchema={validationSchema}
+          onSubmit={handleButtonClick}
+        >
+          {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+            <>
+              <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : undefined}
+                style={{ flex: 1 }}
+              >
+                <View className="flex-1">
+                  <View className="mt-10">
+                    <Label text="Email Address" marked={false} />
+                    <BasicInput
+                      placeholder="Enter your email address"
+                      value={values.email}
+                      onChangeText={handleChange("email")}
+                      onBlur={handleBlur("email")}
+                      autoComplete="off"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                    />
+                    {errors.email && (
+                      <Text style={{ color: "red", marginTop: 8 }}>
+                        {errors.email}
+                      </Text>
+                    )}
+                  </View>
+                </View>
+              </KeyboardAvoidingView>
+
+              <View>
+                <Button
+                  title={"Reset Password"}
+                  onPress={handleSubmit}
+                  style={[
+                    styles.proceedButton,
+                    (!values.email || isLoading) && styles.disabledButton,
+                  ]}
+                  textColor="#fff"
+                  isLoading={isLoading}
+                  disabled={isLoading || !values.email}
+                />
+              </View>
+            </>
+          )}
+        </Formik>
+      </View>
     </SafeAreaView>
   );
 };
@@ -133,48 +146,6 @@ const ResetPasswordScreen: React.FC<{
 export default ResetPasswordScreen;
 
 const styles = StyleSheet.create({
-  headText: {
-    fontFamily: "Outfit-Medium",
-    fontSize: RFValue(20),
-    marginBottom: 10,
-  },
-  subText: {
-    fontFamily: "Outfit-ExtraLight",
-    fontSize: RFValue(13),
-  },
-  vertical: {
-    backgroundColor: COLORS.black100,
-    width: 1,
-    height: "100%",
-    marginHorizontal: SPACING,
-  },
-  textInput: {
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: "#DFDFDF",
-    paddingHorizontal: SPACING,
-    paddingVertical: Platform.OS === "ios" ? 14 : 10,
-    fontSize: RFValue(10),
-    fontFamily: "Outfit-Regular",
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    fontSize: RFValue(12),
-    borderRadius: 10,
-    paddingHorizontal: SPACING,
-    paddingVertical: Platform.OS === "ios" ? 14 : 10,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#DFDFDF",
-  },
-  input: {
-    flex: 1,
-    fontSize: RFValue(14),
-  },
-  numberText: {
-    fontFamily: "Outfit-Regular",
-  },
   proceedButton: {
     marginTop: SPACING * 2,
   },
@@ -182,9 +153,6 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: "#fff",
     fontSize: RFValue(16),
-  },
-  proceedButtonDisabled: {
-    backgroundColor: COLORS.violet200,
   },
   disabledButton: {
     backgroundColor: COLORS.violet200,

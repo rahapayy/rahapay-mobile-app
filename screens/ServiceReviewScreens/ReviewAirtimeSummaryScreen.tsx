@@ -67,10 +67,21 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
     } catch (err: unknown) {
       console.error("Error occurred:", err);
 
-      if (err instanceof Error && 'response' in err) {
+      if (err instanceof Error && "response" in err) {
         const axiosError = err as AxiosError;
+
+        // Log detailed error information
+        console.error("AxiosError Details:", {
+          status: axiosError.response?.status,
+          headers: axiosError.response?.headers,
+          data: axiosError.response?.data,
+        });
+
         if (axiosError.response?.status === 400) {
-          if (axiosError.response.data?.message === "Insufficient funds in wallet!") {
+          if (
+            axiosError.response.data?.message ===
+            "Insufficient funds in wallet!"
+          ) {
             handleShowFlash({
               message: "Insufficient funds. Please top up.",
               type: "danger",
@@ -81,6 +92,11 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
               type: "danger",
             });
           }
+        } else if (axiosError.response?.status === 503) {
+          handleShowFlash({
+            message: "Service unavailable. Please try again later.",
+            type: "danger",
+          });
         } else {
           handleShowFlash({
             message: "An error occurred. Please try again.",
@@ -88,6 +104,8 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
           });
         }
       } else {
+        // Handle non-Axios errors or unknown errors
+        console.error("Unknown error type:", err);
         handleShowFlash({
           message: "An unknown error occurred. Please try again.",
           type: "danger",

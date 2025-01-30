@@ -17,10 +17,10 @@ import COLORS from "../../../constants/colors";
 import Button from "../../../components/common/ui/buttons/Button";
 import { ArrowLeft } from "iconsax-react-native";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import { AuthContext } from "../../../context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import { LightText, MediumText } from "../../../components/common/Text";
+import { AuthContext } from "../../../services/AuthContext";
 
 const CreatePinScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;

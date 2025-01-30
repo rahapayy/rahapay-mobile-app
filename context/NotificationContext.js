@@ -10,7 +10,7 @@ import * as Notifications from "expo-notifications";
 import { Platform, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useApi from "../utils/api";
-import { AuthContext } from "./AuthContext"; 
+import { AuthContext } from "../services/AuthContext";
 
 export const NotificationContext = createContext();
 

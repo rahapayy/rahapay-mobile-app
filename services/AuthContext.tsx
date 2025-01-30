@@ -4,7 +4,7 @@ import { axios } from "../utils/api";
 import { Alert, AppState, AppStateStatus } from "react-native";
 import * as BackgroundFetch from "expo-background-fetch";
 import * as TaskManager from "expo-task-manager";
-import SWR from "./Swr";
+import SWR from "../context/Swr";
 
 // Define UserInfoType
 interface UserInfoType {

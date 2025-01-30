@@ -16,9 +16,9 @@ import COLORS from "../../constants/colors";
 import ReferImg from "../../assets/svg/refer.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 import Money from "../../assets/svg/money-earn-svgrepo-com 1.svg";
-import { AuthContext } from "../../context/AuthContext";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import * as Clipboard from "expo-clipboard";
+import { AuthContext } from "../../services/AuthContext";
 
 const ReferralScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;

@@ -14,7 +14,7 @@ import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
 import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import { AuthContext } from "../../../context/AuthContext";
+import { AuthContext } from "../../../services/AuthContext";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import { LightText, MediumText } from "../../../components/common/Text";
 
@@ -126,7 +126,7 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
             <Text style={styles.titleText} allowFontScaling={false}>
               Enter Transaction PIN
             </Text>
-            <View className="justify-center items-center">
+            <View className="px-4">
               <View style={styles.inputRow}>
                 {boxes.map((value, index) => (
                   <TextInput
@@ -151,7 +151,7 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
             <Text style={styles.titleText} allowFontScaling={false}>
               Confirm Transaction PIN
             </Text>
-            <View className="justify-center items-center">
+            <View className="px-4">
               <View style={styles.inputRow}>
                 {confirmBoxes.map((value, index) => (
                   <TextInput
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   },
   inputRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
     alignItems: "center",
     gap: SPACING,
   },

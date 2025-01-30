@@ -17,14 +17,14 @@ import {
   WalletAdd1,
 } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import COLORS from "../constants/colors";
+import COLORS from "../../constants/colors";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { AuthContext } from "../context/AuthContext";
-import useWallet from "../hooks/use-wallet";
+import useWallet from "../../hooks/use-wallet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
-import SPACING from "../constants/SPACING";
-import { BoldText, MediumText } from "./common/Text";
+import SPACING from "../../constants/SPACING";
+import { BoldText, MediumText } from "../common/Text";
+import { AuthContext } from "../../services/AuthContext";
 
 const { height: screenHeight } = Dimensions.get("window");
 
@@ -70,9 +70,11 @@ const Card: React.FC<{
 
   const { balance } = useWallet();
 
+  // console.log(balance);
+
   return (
     <ImageBackground
-      source={require("../assets/images/bg.png")}
+      source={require("../../assets/images/bg.png")}
       style={styles.backgroundImage}
     >
       <SafeAreaView style={{ flex: 1 }}>

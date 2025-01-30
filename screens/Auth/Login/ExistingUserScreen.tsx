@@ -5,7 +5,7 @@ import COLORS from "../../../constants/colors";
 import SPACING from "../../../constants/SPACING";
 import Backspace from "../../../assets/svg/solar_backspace-linear.svg";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { AuthContext } from "../../../context/AuthContext";
+import { AuthContext } from "../../../services/AuthContext";
 
 type ExistingUserScreenProps = {
   navigation: NativeStackNavigationProp<any>;

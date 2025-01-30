@@ -14,7 +14,7 @@ import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as Animatable from "react-native-animatable";
-import { AuthContext } from "../../../context/AuthContext";
+import { AuthContext } from "../../../services/AuthContext";
 import { AxiosError } from "axios";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import BasicInput from "../../../components/common/ui/forms/BasicInput";
@@ -165,6 +165,10 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
             );
 
             const userId = userInfo?.data?.id;
+            handleShowFlash({
+              message: "Sign up successful! Please verify your email.",
+              type: "success",
+            });
             navigation.navigate("VerifyEmailScreen", {
               email: values.email,
               id: userId,
@@ -197,6 +201,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
               contentContainerStyle={{ flexGrow: 1 }}
               enableOnAndroid={true}
               extraScrollHeight={Platform.OS === "ios" ? 20 : 0}
+              showsVerticalScrollIndicator={false}
             >
               <View className="mt-8 mb-4">
                 <MediumText color="black" size="xlarge" marginBottom={5}>
@@ -244,7 +249,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                   duration={600}
                   className="mt-4"
                 >
-                  <Label text="Phone Number" marked={false} />
+                  <Label text="Phone Number" marked={true} />
                   <PhoneNumberInput
                     value={formikProps.values.phoneNumber}
                     onChangeText={(value: string) =>
@@ -267,7 +272,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                   duration={600}
                   className="mt-4"
                 >
-                  <Label text="Create Password" marked={false} />
+                  <Label text="Create Password" marked={true} />
                   <BasicInput
                     value={formikProps.values.password}
                     onChangeText={(value) =>

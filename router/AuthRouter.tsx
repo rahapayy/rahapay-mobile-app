@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { getItem, setItem } from "../utils/ayncStorage";
+import { getItem, setItem } from "../utils/storage";
 import LoadingIndicator from "../components/LoadingIndicator";
 import WelcomeScreen from "../screens/WelcomeScreen";
 import Onboarding from "../components/onboarding/Onboarding";
@@ -34,9 +34,9 @@ const AuthRoute = () => {
     }
   };
 
-  // if (showOnboarding === null) {
-  //   return <LoadingIndicator />;
-  // }
+  if (showOnboarding === null) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <Stack.Navigator>

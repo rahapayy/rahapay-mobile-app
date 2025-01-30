@@ -27,9 +27,10 @@ import SPACING from "../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import BiometricModal from "../components/modals/BiometricModal";
 import CloseAccountModal from "../components/modals/CloseAccountModal";
-import { AuthContext } from "../context/AuthContext";
+// import { AuthContext } from "../context/AuthContext";
 import LogOutModal from "../components/modals/LogoutModal";
 import { LightText, MediumText } from "../components/common/Text";
+import { AuthContext } from "../services/AuthContext";
 
 const ProfileScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;

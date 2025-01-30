@@ -4,13 +4,13 @@ import { createTheme, ThemeProvider } from "@rneui/themed";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { AuthProvider } from "./context/AuthContext";
 import { QueryClient, QueryClientProvider } from "react-query";
 import FlashMessageComponent from "./components/FlashMessageComponent";
 import FlashMessage from "react-native-flash-message";
 import { NotificationProvider } from "./context/NotificationContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Router from "./router/Router";
+import { AuthProvider } from "./services/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -36,7 +36,10 @@ export default function App() {
   const [appState, setAppState] = useState(AppState.currentState);
 
   useEffect(() => {
-    const subscription = AppState.addEventListener("change", handleAppStateChange);
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
 
     // Load persisted state when the app starts
     loadPersistedState();
@@ -56,13 +59,22 @@ export default function App() {
       // Save current app state when going to the background
       await persistAppState();
     }
-    setAppState(nextAppState as "active" | "background" | "inactive" | "unknown" | "extension");
+    setAppState(
+      nextAppState as
+        | "active"
+        | "background"
+        | "inactive"
+        | "unknown"
+        | "extension"
+    );
   };
 
   // Function to save the current state
   const persistAppState = async () => {
     try {
-      const stateToPersist = { /* add important state variables here */ };
+      const stateToPersist = {
+        /* add important state variables here */
+      };
       await AsyncStorage.setItem("appState", JSON.stringify(stateToPersist));
       console.log("App state persisted!");
     } catch (error) {

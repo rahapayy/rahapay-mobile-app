@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import useSWR from "swr";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../services/AuthContext";
 
 const useWallet = () => {
   const { userInfo } = useContext(AuthContext);
@@ -17,7 +17,7 @@ const useWallet = () => {
   const { data: allTransactionsData, isValidating: isAllTransactionsLoading } =
     useSWR(`transaction/all`);
 
-  // console.log(allTransactionsData); 
+  // console.log(allTransactionsData);
 
   const isLoading = isDashboardLoading || isReservedAccountsLoading;
 
@@ -28,6 +28,8 @@ const useWallet = () => {
 
   // The reserved accounts information will now come from dashboardData
   const account = dashboardData?.wallet || {};
+
+  // console.log(account, balance);
 
   const getAllTransactions = () => {
     return {
@@ -47,6 +49,7 @@ const useWallet = () => {
       paymentStatus: any;
       transactionType: any;
       updatedAt: any;
+      metadata: any;
     }) => ({
       amount: trx.amountPaid || 0,
       created_at: new Date(trx.paidOn).toLocaleString(),
@@ -57,6 +60,7 @@ const useWallet = () => {
       status: trx.paymentStatus || "",
       tranxType: trx.transactionType || "",
       updated_at: trx.updatedAt || "",
+      metadata: trx.metadata,
     })
   );
 
