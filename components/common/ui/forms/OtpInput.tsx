@@ -9,6 +9,7 @@ interface OtpInputProps {
   value: string[];
   onChange: (value: string[]) => void;
   secureTextEntry?: boolean;
+  autoFocus?: boolean; // New prop
 }
 
 const OtpInput: React.FC<OtpInputProps> = ({
@@ -16,13 +17,16 @@ const OtpInput: React.FC<OtpInputProps> = ({
   value,
   onChange,
   secureTextEntry = false,
+  autoFocus = false, // Default to false
 }) => {
   const inputRefs = useRef<Array<TextInput | null>>(new Array(length).fill(null));
   const [inputFocused, setInputFocused] = useState(new Array(length).fill(false));
 
   useEffect(() => {
-    inputRefs.current[0]?.focus();
-  }, []);
+    if (autoFocus) {
+      inputRefs.current[0]?.focus();
+    }
+  }, [autoFocus]);
 
   const handleInput = (text: string, index: number) => {
     if (/^\d{0,1}$/.test(text)) {
@@ -95,7 +99,6 @@ const OtpInput: React.FC<OtpInputProps> = ({
 const styles = StyleSheet.create({
   inputRow: {
     flexDirection: 'row',
-    // justifyContent: 'space-between',
     alignItems: 'center',
   },
   inputBox: {

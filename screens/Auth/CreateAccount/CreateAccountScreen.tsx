@@ -293,6 +293,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                                 ? styles.requirementMetIcon
                                 : styles.requirementNotMetIcon,
                             ]}
+                            allowFontScaling={false}
                           >
                             {metRequirements.has(index) ? "✓" : "✗"}
                           </Text>
@@ -303,6 +304,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                                 ? styles.requirementMetText
                                 : styles.requirementNotMetText,
                             ]}
+                            allowFontScaling={false}
                           >
                             {requirement.text}
                           </Text>
@@ -318,7 +320,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                 <Animatable.View
                   animation={"fadeIn"}
                   duration={600}
-                  className="mt-4"
+                  // className="mt-2"
                 >
                   {renderInputField(
                     "Re-type Password",
@@ -418,7 +420,7 @@ const styles = StyleSheet.create({
     color: "#4CAF50",
   },
   requirementText: {
-    fontSize: RFValue(12),
+    fontSize: RFValue(10),
     fontFamily: "Outfit-Regular",
   },
   requirementNotMetText: {

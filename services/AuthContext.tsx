@@ -296,60 +296,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
   };
 
-  useEffect(() => {
-    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
-      if (
-        nextAppState === "active" &&
-        (appState === "inactive" || appState === "background")
-      ) {
-        const idleTime = await AsyncStorage.getItem("idleStartTime");
-        const storedUserInfo = await AsyncStorage.getItem("userInfo");
-        if (
-          idleTime &&
-          Date.now() - parseInt(idleTime) > 2 * 60 * 1000 &&
-          storedUserInfo
-        ) {
-          setIdleStartTime(null);
-          await AsyncStorage.removeItem("idleStartTime");
-          // Consider implementing a re-authentication flow here
-        }
+  const handleAppStateChange = async (nextAppState: AppStateStatus) => {
+    if (
+      nextAppState === "active" &&
+      (appState === "inactive" || appState === "background")
+    ) {
+      const idleTime = await AsyncStorage.getItem("idleStartTime");
+      const storedUserInfo = await AsyncStorage.getItem("userInfo");
 
-        if (!storedUserInfo) {
-          await logout();
+      if (
+        idleTime &&
+        Date.now() - parseInt(idleTime) > 2 * 60 * 1000 &&
+        storedUserInfo
+      ) {
+        setIdleStartTime(null);
+        await AsyncStorage.removeItem("idleStartTime");
+        await AsyncStorage.removeItem("access_token");
+        setIsAuthenticated(false); // Trigger re-authentication
+        return;
+      }
+
+      // Existing logic to handle user info and authentication
+      if (storedUserInfo) {
+        const parsedUserInfo = JSON.parse(storedUserInfo);
+        setUserInfo(parsedUserInfo);
+        setIsAuthenticated(true);
+
+        const storedAccessToken = await AsyncStorage.getItem("access_token");
+        const storedUserDetails = await AsyncStorage.getItem("userDetails");
+
+        if (storedAccessToken && storedUserDetails) {
+          setUserDetails(JSON.parse(storedUserDetails));
         } else {
-          const parsedUserInfo = JSON.parse(storedUserInfo);
-          setUserInfo(parsedUserInfo);
-          setIsAuthenticated(true);
-          const storedUserDetails = await AsyncStorage.getItem("userDetails");
-          if (storedUserDetails) {
-            setUserDetails(JSON.parse(storedUserDetails));
-          } else {
-            await fetchUserDetails(parsedUserInfo.data.accessToken);
-          }
+          await fetchUserDetails(parsedUserInfo.data.accessToken);
         }
+      } else {
+        await logout();
       }
-
-      if (
-        (appState === "active" && nextAppState === "background") ||
-        nextAppState === "inactive"
-      ) {
-        const currentTime = Date.now();
-        setIdleStartTime(currentTime);
-        await AsyncStorage.setItem("idleStartTime", currentTime.toString());
-      }
-
-      setAppState(nextAppState);
-    };
-
-    const subscription = AppState.addEventListener(
-      "change",
-      handleAppStateChange
-    );
-
-    return () => {
-      subscription.remove();
-    };
-  }, [appState]);
+    }
+  };
 
   const checkIfHasNewVersion = async () => {
     // try {

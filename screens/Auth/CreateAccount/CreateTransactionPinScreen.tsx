@@ -17,6 +17,7 @@ import { AuthContext } from "../../../services/AuthContext";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import { LightText, MediumText } from "../../../components/common/Text";
 import OtpInput from "../../../components/common/ui/forms/OtpInput";
+import Label from "../../../components/common/ui/forms/Label";
 
 interface CreateTransactionPinScreenProps {
   navigation: NativeStackNavigationProp<any, "">;
@@ -85,29 +86,27 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
 
           <View className="flex-1">
             <View style={styles.inputContainer}>
-              <Text style={styles.titleText} allowFontScaling={false}>
-                Enter Transaction PIN
-              </Text>
-              <View className=" justify-center items-center ">
+              <Label text="Enter Transaction PIN" marked={false} />
+              <View className="justify-center items-center ">
                 <OtpInput
                   length={4}
                   value={boxes}
                   onChange={setBoxes}
                   secureTextEntry
+                  autoFocus={true}
                 />
               </View>
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.titleText} allowFontScaling={false}>
-                Confirm Transaction PIN
-              </Text>
+              <Label text="Confirm Transaction PIN" marked={false} />
               <View className="justify-center items-center">
                 <OtpInput
                   length={4}
                   value={confirmBoxes}
                   onChange={setConfirmBoxes}
                   secureTextEntry
+                  autoFocus={false}
                 />
               </View>
             </View>
@@ -129,16 +128,10 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
 export default CreateTransactionPinScreen;
 
 const styles = StyleSheet.create({
-  titleText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(10),
-    marginBottom: SPACING / 2,
-    color: "#0000008F",
-    paddingHorizontal: SPACING * 2,
-  },
   inputContainer: {
     flexDirection: "column",
-    paddingVertical: SPACING * 2,
+    paddingVertical: SPACING * 1.5,
+    paddingHorizontal: SPACING * 2,
     borderRadius: 10,
     backgroundColor: COLORS.white,
     marginTop: SPACING * 2,

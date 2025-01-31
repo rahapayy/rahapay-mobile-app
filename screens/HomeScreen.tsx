@@ -10,7 +10,7 @@ const HomeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const { userInfo } = useContext(AuthContext);
-  // console.log(userInfo);
+  // console.log(userInfo); 
   
   return (
     <>
