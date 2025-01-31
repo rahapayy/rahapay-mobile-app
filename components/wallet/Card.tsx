@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import {
   ImageBackground,
   SafeAreaView,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  Platform,
 } from "react-native";
 import {
   AddCircle,
@@ -25,6 +26,7 @@ import NetInfo from "@react-native-community/netinfo";
 import SPACING from "../../constants/SPACING";
 import { BoldText, MediumText } from "../common/Text";
 import { AuthContext } from "../../services/AuthContext";
+import { ActivityIndicator, PanResponder } from "react-native";
 
 const { height: screenHeight } = Dimensions.get("window");
 
@@ -33,6 +35,14 @@ const Card: React.FC<{
 }> = ({ navigation }) => {
   const [showBalance, setShowBalance] = useState(true);
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = React.useCallback(async () => {
+    setIsRefreshing(true);
+    // Add your data refresh logic here (e.g., refetch balance)
+    await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulated delay
+    setIsRefreshing(false);
+  }, []);
 
   useEffect(() => {
     const getBalanceVisibility = async () => {
@@ -70,7 +80,30 @@ const Card: React.FC<{
 
   const { balance } = useWallet();
 
-  // console.log(balance);
+  const panResponder = React.useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+        const startY = evt.nativeEvent.locationY;
+        return startY < 30 && gestureState.dy > 0;
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dy > 50) handleRefresh();
+      },
+    })
+  ).current;
+
+  const shadowStyle = Platform.select({
+    ios: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+    },
+    android: {
+      elevation: 5,
+    },
+  });
 
   return (
     <ImageBackground
@@ -78,7 +111,15 @@ const Card: React.FC<{
       style={styles.backgroundImage}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        <View style={styles.container}>
+        <View style={styles.container} {...panResponder.panHandlers}>
+          {isRefreshing && (
+            <View
+              style={[styles.spinnerContainer, shadowStyle]}
+              className="rounded-full"
+            >
+              <ActivityIndicator size="small" color={COLORS.violet400} />
+            </View>
+          )}
           <View style={styles.header}>
             <View style={styles.headerContent}>
               <TouchableOpacity
@@ -164,17 +205,6 @@ const Card: React.FC<{
               Fund Wallet
             </Text>
           </TouchableOpacity>
-          {/* <View className="flex-row justify-between items-center gap-4">
-            <TouchableOpacity
-              onPress={() => navigation.navigate("FundWalletScreen")}
-              style={styles.fundWalletButton}
-            >
-              <AddCircle variant="Bold" color="#573CC7" />
-              <Text style={styles.fundWalletText} allowFontScaling={false}>
-                Transfer
-              </Text>
-            </TouchableOpacity>
-          </View> */}
         </View>
       </SafeAreaView>
     </ImageBackground>
@@ -263,7 +293,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     flexDirection: "row",
-    // flex: 1,
   },
   fundWalletText: {
     fontFamily: "Outfit-Regular",
@@ -283,7 +312,13 @@ const styles = StyleSheet.create({
   errorSubText: {
     fontFamily: "Outfit-Regular",
     color: "#fff",
-    fontSize: RFValue(10),
-    marginTop: 5,
+    fontSize: RFValue(12),
+  },
+  spinnerContainer: {
+    backgroundColor: "white",
+    padding: SPACING,
+    position: "absolute",
+    top: "50%",
+    left: "50%",
   },
 });

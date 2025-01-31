@@ -5,13 +5,14 @@ import QuickAction from "../components/QuickAction";
 import RecentTransaction from "../components/RecentServiceTransaction";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthContext } from "../services/AuthContext";
+import RefreshSpinner from "../components/RefreshSpinner";
 
 const HomeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const { userInfo } = useContext(AuthContext);
-  // console.log(userInfo); 
-  
+  // console.log(userInfo);
+
   return (
     <>
       <Card navigation={navigation} />
@@ -22,5 +23,3 @@ const HomeScreen: React.FC<{
 };
 
 export default HomeScreen;
-
-const styles = StyleSheet.create({});
