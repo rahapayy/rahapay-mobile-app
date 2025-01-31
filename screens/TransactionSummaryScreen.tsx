@@ -108,6 +108,27 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
             </View>
           </>
         );
+      case "DATA_PURCHASE":
+        return (
+          <>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Network</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.metadata?.networkType || "N/A"}
+              </Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Recipient Mobile</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.metadata?.phoneNumber || "N/A"}
+              </Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Paid with</Text>
+              <Text style={styles.descriptionText}>{transaction.purpose}</Text>
+            </View>
+          </>
+        );
       case "WALLET_FUNDING":
         return (
           <>

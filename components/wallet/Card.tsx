@@ -24,7 +24,12 @@ import useWallet from "../../hooks/use-wallet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import SPACING from "../../constants/SPACING";
-import { BoldText, MediumText } from "../common/Text";
+import {
+  BoldText,
+  MediumText,
+  RegularText,
+  SemiBoldText,
+} from "../common/Text";
 import { AuthContext } from "../../services/AuthContext";
 import { ActivityIndicator, PanResponder } from "react-native";
 
@@ -131,12 +136,12 @@ const Card: React.FC<{
                 </BoldText>
               </TouchableOpacity>
               <View>
-                <Text style={styles.greetingText} allowFontScaling={false}>
+                <SemiBoldText color="white" size="large">
                   Hello, {firstName} 👋
-                </Text>
-                <Text style={styles.greetingSubText} allowFontScaling={false}>
+                </SemiBoldText>
+                <RegularText color="white">
                   Let's make some bills payment!
-                </Text>
+                </RegularText>
               </View>
             </View>
             <View className="flex-row gap-4">
@@ -155,13 +160,10 @@ const Card: React.FC<{
 
           <View style={styles.balanceContainer}>
             <View style={styles.balanceContent}>
-              <WalletAdd1 color="#fff" size={24} />
-              <Text
-                style={styles.availableBalanceText}
-                allowFontScaling={false}
-              >
+              <WalletAdd1 color="#fff" size={24} className="mr-2" />
+              <RegularText color="white" size="medium">
                 Available Balance
-              </Text>
+              </RegularText>
             </View>
             <TouchableOpacity onPress={toggleBalanceVisibility}>
               {showBalance ? (
@@ -175,14 +177,16 @@ const Card: React.FC<{
           <View style={styles.balanceValueContainer}>
             {isConnected ? (
               showBalance ? (
-                <Text style={styles.balanceValue} allowFontScaling={false}>
+                <BoldText color="white" size="xxlarge">
                   ₦{" "}
                   {balance.toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                   })}
-                </Text>
+                </BoldText>
               ) : (
-                <Text style={styles.balanceValue}>🙈🙈🙈🙈🙈</Text>
+                <BoldText color="white" size="xxlarge">
+                  🙈🙈🙈🙈🙈
+                </BoldText>
               )
             ) : (
               <View style={styles.errorContainer}>
@@ -200,10 +204,10 @@ const Card: React.FC<{
             onPress={() => navigation.navigate("FundWalletScreen")}
             style={styles.fundWalletButton}
           >
-            <AddCircle variant="Bold" color="#573CC7" />
-            <Text style={styles.fundWalletText} allowFontScaling={false}>
+            <AddCircle variant="Bold" color="#573CC7" className="mr-2" />
+            <RegularText color="primary" size="medium">
               Fund Wallet
-            </Text>
+            </RegularText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

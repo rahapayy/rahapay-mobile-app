@@ -6,6 +6,7 @@ import RecentTransaction from "../components/RecentServiceTransaction";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthContext } from "../services/AuthContext";
 import RefreshSpinner from "../components/RefreshSpinner";
+import { ScrollView } from "react-native-gesture-handler";
 
 const HomeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -16,8 +17,10 @@ const HomeScreen: React.FC<{
   return (
     <>
       <Card navigation={navigation} />
-      <QuickAction navigation={navigation} />
-      <RecentTransaction navigation={navigation} />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <QuickAction navigation={navigation} />
+        <RecentTransaction navigation={navigation} />
+      </ScrollView>
     </>
   );
 };

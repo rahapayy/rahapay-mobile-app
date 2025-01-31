@@ -6,16 +6,21 @@ import {
   View,
   FlatList,
 } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../constants/colors";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import Airtime from "../assets/svg/smartphone-rotate-angle_svgrepo.com.svg";
-import Tv from "../assets/svg/tv_svgrepo.com.svg";
-import Electricity from "../assets/svg/electricity_svgrepo.com.svg";
-import Data from "../assets/svg/signal_svgrepo.com.svg";
 import { More } from "iconsax-react-native";
 import SPACING from "../constants/SPACING";
+import {
+  AirtimeIcon,
+  DataIcon,
+  ElectricityIcon,
+  TvIcon,
+} from "./common/ui/icons";
+import { BoldText, RegularText } from "./common/Text";
+import { Skeleton } from "@rneui/themed";
+import { AuthContext } from "../services/AuthContext";
 
 interface ActionItem {
   icon: React.ElementType;
@@ -27,23 +32,20 @@ const QuickAction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const { width: screenWidth } = useWindowDimensions();
+  const { isLoading } = useContext(AuthContext);
 
   // Calculate an appropriate card size based on the screen width, ensuring a minimum width
   const cardWidth = Math.max((screenWidth - 60) / 4, 80); // Minimum width set to 80
   const cardHeight = cardWidth * 1.1; // Maintain a fixed aspect ratio
 
-  // Updated style for card text to prevent wrapping
-  const cardTextStyle = {
-    ...styles.cardText,
-    width: cardWidth - 36, // take into account paddingHorizontal
-  };
+  const fill = COLORS.violet300; // Define a custom icon color
 
   const actionItems = [
-    { icon: Airtime, title: "Airtime", navigateTo: "AirtimeScreen" },
-    { icon: Data, title: "Data", navigateTo: "DataScreen" },
-    { icon: Tv, title: "TV", navigateTo: "TvSubscriptionScreen" },
+    { icon: AirtimeIcon, title: "Airtime", navigateTo: "AirtimeScreen" },
+    { icon: DataIcon, title: "Data", navigateTo: "DataScreen" },
+    { icon: TvIcon, title: "TV", navigateTo: "TvSubscriptionScreen" },
     {
-      icon: Electricity,
+      icon: ElectricityIcon,
       title: "Electricity",
       navigateTo: "ElectricityScreen",
     },
@@ -55,26 +57,20 @@ const QuickAction: React.FC<{
       onPress={() => navigation.navigate(item.navigateTo)}
       style={[styles.card, { width: cardWidth, height: cardHeight }]}
     >
-      <item.icon color={COLORS.violet300} size={26} />
-      <Text
-        style={styles.cardText}
-        numberOfLines={1}
-        ellipsizeMode="tail"
-        allowFontScaling={false}
-      >
+      <item.icon fill={fill} color={COLORS.violet300} width={24} height={24} />
+      <RegularText color="black" marginTop={5} size="base">
         {item.title}
-      </Text>
+      </RegularText>
     </TouchableOpacity>
   );
 
   return (
     <View className="p-4">
-      <Text style={styles.quickAction} allowFontScaling={false}>
+      <BoldText color="black" size="medium">
         Quick Action
-      </Text>
+      </BoldText>
       <View className="flex-row items-center justify-between mt-4">
         {/* Cards */}
-
         <FlatList
           data={actionItems}
           renderItem={renderCard}
@@ -101,11 +97,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     margin: SPACING / 2,
     borderRadius: 20,
-  },
-  cardText: {
-    fontSize: RFValue(12),
-    fontFamily: "Outfit-Regular",
-    marginTop: SPACING,
   },
   moreText: {
     fontFamily: "Outfit-Regular",

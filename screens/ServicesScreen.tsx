@@ -1,199 +1,131 @@
-import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import React from "react";
-import FONT_SIZE from "../constants/font-size";
-import Airtime from "../assets/svg/smartphone-rotate-angle_svgrepo.com.svg";
-import Tv from "../assets/svg/tv_svgrepo.com.svg";
-import Electricity from "../assets/svg/electricity_svgrepo.com.svg";
-import Data from "../assets/svg/signal_svgrepo.com.svg";
-import SPACING from "../constants/SPACING";
+import { SafeAreaView, ScrollView, TouchableOpacity, View } from "react-native";
+import React, { useContext } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Ionicons, Octicons } from "@expo/vector-icons";
-import { Ticket } from "iconsax-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../constants/colors";
+import { RegularText, SemiBoldText } from "../components/common/Text";
+import {
+  AirtimeIcon,
+  DataIcon,
+  ElectricityIcon,
+  TvIcon,
+} from "../components/common/ui/icons";
+import AirtimeRotate from "../assets/svg/airtime-rotate.svg";
+import DataRotate from "../assets/svg/data-rotate.svg";
+import TvRotate from "../assets/svg/tv-rotate.svg";
+import ElectricityRotate from "../assets/svg/electricity-rotate.svg";
+import EducationRotate from "../assets/svg/education-rotate.svg";
+import GiftRotate from "../assets/svg/gift-rotate.svg";
+import { AuthContext } from "../services/AuthContext";
 
 const ServicesScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const { isLoading } = useContext(AuthContext);
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F7F7" }}>
       <ScrollView>
         <View className="p-4">
-          <Text style={styles.headText} allowFontScaling={false}>
+          <SemiBoldText color="black" size="large">
             Services
-          </Text>
-          {/* Card */}
-          <View className="w-full bg-white p-6 mt-10 rounded-xl overflow-hidden">
-            <View className="flex flex-row flex-wrap justify-between">
-              <TouchableOpacity
-                onPress={() => navigation.navigate("AirtimeScreen")}
-                className="items-center mb-4 w-1/5"
-              >
-                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
-                  <Airtime />
-                </View>
-                <Text
-                  style={styles.titleText}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  allowFontScaling={false}
-                >
-                  Airtime
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("DataScreen")}
-                className="items-center mb-4 w-1/5"
-              >
-                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
-                  <Data />
-                </View>
-                <Text
-                  style={styles.titleText}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  allowFontScaling={false}
-                >
-                  Data
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("TvSubscriptionScreen")}
-                className="items-center mb-4 w-1/5"
-              >
-                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
-                  <Tv />
-                </View>
-                <Text
-                  style={styles.titleText}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  allowFontScaling={false}
-                >
-                  TV
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("ElectricityScreen")}
-                className="items-center mb-4 w-1/5"
-              >
-                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
-                  <Electricity />
-                </View>
-                <Text
-                  style={styles.titleText}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  allowFontScaling={false}
-                >
-                  Electricity
-                </Text>
-              </TouchableOpacity>
-            </View>
+          </SemiBoldText>
 
-            {/*  */}
-            <View className="flex flex-row flex-wrap justify-between mt-6">
-              <TouchableOpacity
-                onPress={() => navigation.navigate("ReferralScreen")}
-                className="items-center mb-4 w-1/5"
-              >
-                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
-                  <Ionicons name="gift" size={24} color={COLORS.violet400} />
-                </View>
-                <Text
-                  style={styles.titleText}
-                  // numberOfLines={1}
-                  // ellipsizeMode="tail"
-                  allowFontScaling={false}
-                >
-                  Refer & Earn
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("EducationScreen")}
-                className="items-center mb-4 w-1/5"
-              >
-                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
-                  <Ionicons
-                    name="school-sharp"
-                    size={24}
-                    color={COLORS.violet400}
-                  />
-                </View>
-                <Text
-                  style={styles.titleText}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  allowFontScaling={false}
-                >
-                  Education
-                </Text>
-              </TouchableOpacity>
-              {/* <TouchableOpacity
-                onPress={() => navigation.navigate("BettingScreen")}
-                className="items-center mb-4 w-1/5"
-              >
-                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
-                  <Ionicons
-                    name="football"
-                    size={24}
-                    color={COLORS.violet400}
-                  />
-                </View>
-                <Text
-                  style={styles.titleText}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  allowFontScaling={false}
-                >
-                  Betting
-                </Text>
-              </TouchableOpacity> */}
-              <TouchableOpacity
-                onPress={() => navigation.navigate("TicketScreen")}
-                className="items-center mb-4 w-1/5"
-              >
-                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
-                  {/* <Ionicons name="ticket" size={24} color={COLORS.violet400} /> */}
-                  <Ticket size={24} color={COLORS.violet400} variant="Bold" />
-                </View>
-                <Text
-                  style={styles.titleText}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  allowFontScaling={false}
-                >
-                  Ticket
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("TransferScreen")}
-                className="items-center mb-4 w-1/5"
-              >
-                <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
-                  <Octicons
-                    name="arrow-switch"
-                    size={24}
-                    color={COLORS.violet400}
-                  />
-                </View>
-                <Text
-                  style={styles.titleText}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  allowFontScaling={false}
-                >
-                  Transfer
-                </Text>
-              </TouchableOpacity>
-            </View>
+          {/* Grid Container */}
+          <View className="flex flex-row flex-wrap justify-between mt-4">
+            {/* Grid Items */}
+            <TouchableOpacity
+              onPress={() => navigation.navigate("AirtimeScreen")}
+              className="w-[48%] mb-4 bg-[#F5F3FD] py-4 px-3 rounded-xl border border-[#C9C1EC]"
+            >
+              <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                <AirtimeIcon width={20} height={20} fill="#5136C1" />
+              </View>
+              <RegularText color="black" marginTop={5}>
+                Airtime
+              </RegularText>
+              <View className="absolute right-0 bottom-0">
+                <AirtimeRotate />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate("DataScreen")}
+              className="w-[48%] mb-4 bg-[#E6F8F1] py-4 px-3 rounded-xl border border-[#B0E9D4]"
+            >
+              <View className="bg-[#B0E9D4] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                <DataIcon width={20} height={20} fill="#00935E" />
+              </View>
+              <RegularText color="black" marginTop={5}>
+                Data
+              </RegularText>
+              <View className="absolute right-0 bottom-0">
+                <DataRotate />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate("DataScreen")}
+              className="w-[48%] mb-4 bg-[#E6F8F1] py-4 px-3 rounded-xl border border-[#B0E9D4]"
+            >
+              <View className="bg-[#B0E9D4] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                <ElectricityIcon width={20} height={20} fill="#00935E" />
+              </View>
+              <RegularText color="black" marginTop={5}>
+                Electricity
+              </RegularText>
+              <View className="absolute right-0 bottom-0">
+                <ElectricityRotate />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate("TvSubscriptionScreen")}
+              className="w-[48%] mb-4 bg-[#FFEAEA] py-4 px-3 rounded-xl border border-[#FFBEBE]"
+            >
+              <View className="bg-[#FFBEBE] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                <TvIcon width={20} height={20} fill="#E62929" />
+              </View>
+              <RegularText color="black" marginTop={5}>
+                TV
+              </RegularText>
+              <View className="absolute right-0 bottom-0">
+                <TvRotate />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate("ReferralScreen")}
+              className="w-[48%] mb-4 bg-[#FFEAEA] py-4 px-3 rounded-xl border border-[#FFBEBE]"
+            >
+              <View className="bg-[#FFBEBE] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                <Ionicons name="gift" size={20} color={COLORS.red400} />
+              </View>
+              <RegularText color="black" marginTop={5}>
+                Refer & Earn
+              </RegularText>
+              <View className="absolute right-0 bottom-0">
+                <GiftRotate />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate("AirtimeScreen")}
+              className="w-[48%] mb-4 bg-[#F5F3FD] py-4 px-3 rounded-xl border border-[#C9C1EC]"
+            >
+              <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
+                <Ionicons
+                  name="school-sharp"
+                  size={20}
+                  color={COLORS.violet400}
+                />
+              </View>
+              <RegularText color="black" marginTop={5}>
+                Education
+              </RegularText>
+              <View className="absolute right-0 bottom-0">
+                <EducationRotate />
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -202,16 +134,3 @@ const ServicesScreen: React.FC<{
 };
 
 export default ServicesScreen;
-
-const styles = StyleSheet.create({
-  headText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.large,
-  },
-  titleText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.extraSmall,
-    marginTop: SPACING,
-    textAlign: "center",
-  },
-});

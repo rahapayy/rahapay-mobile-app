@@ -25,7 +25,7 @@ export default function App() {
     "Outfit-Bold": require("./assets/fonts/Outfit-Bold.ttf"),
     "Outfit-ExtraBold": require("./assets/fonts/Outfit-ExtraBold.ttf"),
     "Outfit-ExtraLight": require("./assets/fonts/Outfit-ExtraLight.ttf"),
-    "Outfit-Light": require("./assets/fonts/Outfit-Regular.ttf"),
+    "Outfit-Light": require("./assets/fonts/Outfit-Light.ttf"),
     "Outfit-Medium": require("./assets/fonts/Outfit-Medium.ttf"),
     "Outfit-Regular": require("./assets/fonts/Outfit-Regular.ttf"),
     "Outfit-SemiBold": require("./assets/fonts/Outfit-SemiBold.ttf"),

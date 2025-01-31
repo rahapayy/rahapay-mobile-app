@@ -18,15 +18,15 @@ import COLORS from "../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Circle from "../assets/svg/Group 803.svg";
 import useWallet from "../hooks/use-wallet";
-// import { AuthContext } from "../context/AuthContext";
 import { handleShowFlash } from "../components/FlashMessageComponent";
 import * as Clipboard from "expo-clipboard";
 import { AuthContext } from "../services/AuthContext";
+import { Skeleton } from "@rneui/themed";
 
 const FundWalletScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { account } = useWallet();
+  const { account, isLoading } = useWallet();
 
   const { userDetails } = useContext(AuthContext);
 
@@ -57,6 +57,21 @@ const FundWalletScreen: React.FC<{
           {/* Cards */}
           <View style={styles.cardsContainer}>
             <View style={styles.cardWrapper}>
+              {/* {isLoading ? (
+                // Display Skeleton components while loading
+                <View style={styles.walletContain}>
+                  <View style={styles.skeletonHeader}>
+                    <Skeleton style={styles.skeletonCircle} />
+                    <Skeleton style={styles.skeletonTitle} />
+                  </View>
+                  <Skeleton style={styles.skeletonBankName} />
+                  <View style={styles.skeletonCopyContainer}>
+                    <Skeleton style={styles.skeletonCopyText} />
+                    <Skeleton style={styles.skeletonAccountNumber} />
+                  </View>
+                  <Skeleton style={styles.skeletonName} />
+                </View>
+              ) : ( */}
               <ImageBackground
                 source={require("../assets/images/layer.png")}
                 resizeMode="cover"
@@ -94,6 +109,7 @@ const FundWalletScreen: React.FC<{
                   {userDetails?.fullName}
                 </Text>
               </ImageBackground>
+              {/* )} */}
             </View>
           </View>
         </View>
@@ -235,5 +251,44 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Medium",
     fontSize: FONT_SIZE.small,
     color: "#fff",
+  },
+  skeletonHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: SPACING,
+  },
+  skeletonCircle: {
+    width: RFValue(40),
+    height: RFValue(40),
+    borderRadius: RFValue(20),
+  },
+  skeletonTitle: {
+    width: "60%", // Approximate width of the title text
+    height: RFValue(20),
+  },
+  skeletonBankName: {
+    width: "100%", // Full width of the card
+    height: RFValue(18),
+    marginBottom: SPACING,
+  },
+  skeletonCopyContainer: {
+    backgroundColor: COLORS.violet700, // Matches the button background color
+    borderRadius: 5,
+    paddingVertical: 2,
+    paddingHorizontal: SPACING,
+    width: "100%",
+    marginBottom: SPACING,
+  },
+  skeletonCopyText: {
+    width: "100%",
+    height: RFValue(14),
+  },
+  skeletonAccountNumber: {
+    width: "70%", // Approximate width of the account number
+    height: RFValue(30),
+  },
+  skeletonName: {
+    width: "50%", // Approximate width of the account name
+    height: RFValue(20),
   },
 });

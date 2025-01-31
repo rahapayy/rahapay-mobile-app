@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import useSWR from "swr";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../services/AuthContext";
 
 interface UserType {
   // Ensure these types match the response from your backend
@@ -21,7 +21,9 @@ const useUser = () => {
   const { userInfo } = useContext(AuthContext);
 
   const shouldFetch = userInfo?.data?.user?.id; // Only fetch if `id` is non-null/non-undefined
-  const { data, error, mutate, isValidating } = useSWR<UserType>(shouldFetch ? `/users/${userInfo.data.user.id}` : null);
+  const { data, error, mutate, isValidating } = useSWR<UserType>(
+    shouldFetch ? `/users/${userInfo.data.user.id}` : null
+  );
 
   const user = React.useMemo(
     () => (data ? data : undefined), // Or deeper extraction depending on your API response structure
@@ -29,7 +31,7 @@ const useUser = () => {
   );
 
   // Wrap any additional logic here as needed, potentially to handle loading and error states
-  
+
   return { user, error, mutate, isValidating };
 };
 
