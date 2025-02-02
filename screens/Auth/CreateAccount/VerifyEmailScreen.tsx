@@ -186,7 +186,7 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
       <ScrollView>
         <View className="p-4">
           <ProgressIndicator
-            navigation={undefined}
+            navigation={navigation}
             currentStep={1}
             totalSteps={4}
           />

@@ -75,7 +75,7 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
       <SafeAreaView style={{ flex: 1 }}>
         <View style={{ padding: 16, flex: 1 }}>
           <ProgressIndicator
-            navigation={undefined}
+            navigation={navigation}
             currentStep={2}
             totalSteps={4}
           />

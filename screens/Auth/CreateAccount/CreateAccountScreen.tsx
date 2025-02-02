@@ -192,24 +192,8 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
       >
         {(formikProps) => (
           <View className="flex-1 px-4">
-            {/* <View className="flex-row justify-between items-center">
-              <BackButton navigation={navigation} />
-
-              <View className="flex-row gap-2">
-                <View className="w-1 h-1 bg-gray-300 p-2 rounded-full" />
-
-                <View className="w-1 h-1 bg-gray-300 p-2 rounded-full" />
-
-                <View className="w-1 h-1 bg-gray-300 p-2 rounded-full" />
-
-                <View className="w-1 h-1 bg-gray-300 p-2 rounded-full" />
-              </View>
-
-              <LightText color="light">1/4</LightText>
-            </View> */}
-
             <ProgressIndicator
-              navigation={undefined}
+              navigation={navigation}
               currentStep={0}
               totalSteps={4}
             />
