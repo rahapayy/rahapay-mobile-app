@@ -189,7 +189,7 @@ const RecentServiceTransaction: React.FC<{
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    // padding: 16,
   },
   header: {
     flexDirection: "row",

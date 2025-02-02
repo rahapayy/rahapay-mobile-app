@@ -112,8 +112,8 @@ const ProfileScreen: React.FC<{
               </TouchableOpacity>
             </View>
             <View>
-              <MediumText color="black">{fullName}</MediumText>
-              <LightText color="light">{userDetails.email}</LightText>
+              {/* <MediumText color="black">{fullName}</MediumText> */}
+              {/* <LightText color="light">{userDetails.email}</LightText> */}
             </View>
           </View>
 

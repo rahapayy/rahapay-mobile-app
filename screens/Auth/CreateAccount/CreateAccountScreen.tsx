@@ -28,6 +28,8 @@ import PhoneNumberInput from "../../../components/common/ui/forms/PhoneNumberInp
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { SafeAreaView } from "react-native-safe-area-context";
+import SectionDivider from "../../../components/SectionDivider";
+import ProgressIndicator from "../../../components/ProgressIndicator";
 
 interface CreateAccountScreenProps {
   navigation: NativeStackNavigationProp<any, "">;
@@ -190,7 +192,27 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
       >
         {(formikProps) => (
           <View className="flex-1 px-4">
-            <BackButton navigation={navigation} />
+            {/* <View className="flex-row justify-between items-center">
+              <BackButton navigation={navigation} />
+
+              <View className="flex-row gap-2">
+                <View className="w-1 h-1 bg-gray-300 p-2 rounded-full" />
+
+                <View className="w-1 h-1 bg-gray-300 p-2 rounded-full" />
+
+                <View className="w-1 h-1 bg-gray-300 p-2 rounded-full" />
+
+                <View className="w-1 h-1 bg-gray-300 p-2 rounded-full" />
+              </View>
+
+              <LightText color="light">1/4</LightText>
+            </View> */}
+
+            <ProgressIndicator
+              navigation={undefined}
+              currentStep={0}
+              totalSteps={4}
+            />
 
             <KeyboardAwareScrollView
               contentContainerStyle={{ flexGrow: 1 }}

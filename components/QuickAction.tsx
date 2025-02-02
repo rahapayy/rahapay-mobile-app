@@ -35,7 +35,7 @@ const QuickAction: React.FC<{
   const { isLoading } = useContext(AuthContext);
 
   // Calculate an appropriate card size based on the screen width, ensuring a minimum width
-  const cardWidth = Math.max((screenWidth - 60) / 4, 80); // Minimum width set to 80
+  const cardWidth = Math.max((screenWidth - 60) / 5, 80); // Minimum width set to 80
   const cardHeight = cardWidth * 1.1; // Maintain a fixed aspect ratio
 
   const fill = COLORS.violet300; // Define a custom icon color
@@ -49,7 +49,6 @@ const QuickAction: React.FC<{
       title: "Electricity",
       navigateTo: "ElectricityScreen",
     },
-    { icon: More, title: "More", navigateTo: "Services" },
   ];
 
   const renderCard = ({ item }: { item: ActionItem }) => (
@@ -65,7 +64,7 @@ const QuickAction: React.FC<{
   );
 
   return (
-    <View className="p-4">
+    <View className="">
       <BoldText color="black" size="medium">
         Quick Action
       </BoldText>
@@ -87,19 +86,11 @@ const QuickAction: React.FC<{
 export default QuickAction;
 
 const styles = StyleSheet.create({
-  quickAction: {
-    fontFamily: "Outfit-SemiBold",
-    fontSize: RFValue(16),
-  },
   card: {
     backgroundColor: COLORS.white,
     justifyContent: "center",
     alignItems: "center",
     margin: SPACING / 2,
     borderRadius: 20,
-  },
-  moreText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
   },
 });

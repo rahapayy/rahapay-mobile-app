@@ -18,6 +18,7 @@ import BackButton from "../../../components/common/ui/buttons/BackButton";
 import { LightText, MediumText } from "../../../components/common/Text";
 import OtpInput from "../../../components/common/ui/forms/OtpInput";
 import Label from "../../../components/common/ui/forms/Label";
+import ProgressIndicator from "../../../components/ProgressIndicator";
 
 interface CreateTransactionPinScreenProps {
   navigation: NativeStackNavigationProp<any, "">;
@@ -73,7 +74,11 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={{ flex: 1 }}>
         <View style={{ padding: 16, flex: 1 }}>
-          <BackButton navigation={navigation} />
+          <ProgressIndicator
+            navigation={undefined}
+            currentStep={2}
+            totalSteps={4}
+          />
 
           <View style={{ marginTop: 16 }}>
             <MediumText color="black" size="xlarge" marginBottom={5}>

@@ -20,6 +20,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import { LightText, MediumText } from "../../../components/common/Text";
 import OtpInput from "../../../components/OtpInput";
+import ProgressIndicator from "../../../components/ProgressIndicator";
 
 type VerifyEmailScreenRouteParams = {
   email: string;
@@ -184,7 +185,11 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
     <SafeAreaView className="flex-1">
       <ScrollView>
         <View className="p-4">
-          <BackButton navigation={navigation} />
+          <ProgressIndicator
+            navigation={undefined}
+            currentStep={1}
+            totalSteps={4}
+          />
 
           <View className="mt-4">
             <MediumText color="black" size="xlarge" marginBottom={5}>
