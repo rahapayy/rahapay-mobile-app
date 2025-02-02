@@ -51,33 +51,29 @@ const QuickAction: React.FC<{
     },
   ];
 
-  const renderCard = ({ item }: { item: ActionItem }) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate(item.navigateTo)}
-      style={[styles.card, { width: cardWidth, height: cardHeight }]}
-    >
-      <item.icon fill={fill} color={COLORS.violet300} width={24} height={24} />
-      <RegularText color="black" marginTop={5} size="base">
-        {item.title}
-      </RegularText>
-    </TouchableOpacity>
-  );
-
   return (
     <View className="">
       <BoldText color="black" size="medium">
         Quick Action
       </BoldText>
       <View className="flex-row items-center justify-between mt-4">
-        {/* Cards */}
-        <FlatList
-          data={actionItems}
-          renderItem={renderCard}
-          keyExtractor={(item, index) => index.toString()}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 4 }}
-        />
+        {actionItems.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => navigation.navigate(item.navigateTo)}
+            style={[styles.card, { width: cardWidth, height: cardHeight }]}
+          >
+            <item.icon
+              fill={fill}
+              color={COLORS.violet300}
+              width={24}
+              height={24}
+            />
+            <RegularText color="black" marginTop={8} size="base">
+              {item.title}
+            </RegularText>
+          </TouchableOpacity>
+        ))}
       </View>
     </View>
   );

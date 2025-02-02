@@ -19,6 +19,7 @@ import Mtn from "../assets/svg/mtnbig.svg";
 import Eti from "../assets/svg/9mobilebig.svg";
 import Glo from "../assets/svg/globig.svg";
 import { BoldText, LightText } from "./common/Text";
+import { SPACING } from "../constants/ui";
 
 const RecentServiceTransaction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -190,6 +191,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // padding: 16,
+    paddingBottom: SPACING * 14,
   },
   header: {
     flexDirection: "row",
