@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
     overflow: "hidden",
-    backgroundColor: COLORS.violet400,
+    // backgroundColor: COLORS.violet400,
     height: screenHeight * 0.35,
     paddingBottom: 20,
   },

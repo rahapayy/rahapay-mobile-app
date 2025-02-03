@@ -19,6 +19,7 @@ import useApi from "../../services/apiClient";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import FONT_SIZE from "../../constants/font-size";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import BackButton from "../../components/common/ui/buttons/BackButton";
 
 const CreateTagScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -89,9 +90,7 @@ const CreateTagScreen: React.FC<{
     <SafeAreaView className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="p-4">
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <ArrowLeft color="#000" />
-          </TouchableOpacity>
+          <BackButton navigation={navigation} />
           <View className="mt-4">
             <Text style={styles.headText} allowFontScaling={false}>
               Create a RahaPay Tag

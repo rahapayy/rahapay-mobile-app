@@ -1,9 +1,10 @@
 import { View, ImageBackground, FlatList } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { SemiBoldText } from "../common/Text";
 import Button from "../common/ui/buttons/Button";
 import { SPACING } from "../../constants/ui";
 import AtIcon from "../../assets/svg/@ at the rate 1.svg";
+import { AuthContext } from "../../services/AuthContext";
 
 const banners = [
   {
@@ -25,10 +26,14 @@ const banners = [
 ];
 
 const Banner = () => {
+  const { userDetails } = useContext(AuthContext);
+  const filteredBanners = userDetails?.userName
+    ? banners.filter((b) => b.id !== "1")
+    : banners;
   return (
     <View className="py-6">
       <FlatList
-        data={banners}
+        data={filteredBanners}
         horizontal
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}

@@ -7,7 +7,6 @@ import {
   FlatList,
 } from "react-native";
 import React, { useContext } from "react";
-import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../constants/colors";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { More } from "iconsax-react-native";
@@ -86,7 +85,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     justifyContent: "center",
     alignItems: "center",
-    margin: SPACING / 2,
     borderRadius: 20,
   },
 });
