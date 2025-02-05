@@ -25,6 +25,7 @@ Notifications.setNotificationHandler({
 export const NotificationProvider = ({ children }) => {
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(null);
+  const [notifications, setNotifications] = useState([]);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [hasAskedForPermission, setHasAskedForPermission] = useState(false);
   const notificationListener = useRef();
@@ -67,6 +68,7 @@ export const NotificationProvider = ({ children }) => {
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
         setNotification(notification);
+        setNotifications((prev) => [...prev, notification]);
         console.log("Notification received in foreground:", notification);
       });
 
@@ -165,10 +167,11 @@ export const NotificationProvider = ({ children }) => {
       value={{
         expoPushToken,
         notification,
+        notifications,
         notificationsEnabled,
         setNotificationsEnabled,
         hasAskedForPermission,
-        requestNotificationPermissions, // Expose this new function
+        requestNotificationPermissions,
       }}
     >
       {children}

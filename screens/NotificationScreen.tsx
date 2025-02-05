@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, DocumentDownload } from "iconsax-react-native";
 import SPACING from "../constants/SPACING";
@@ -16,11 +16,13 @@ import FONT_SIZE from "../constants/font-size";
 import COLORS from "../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import LottieView from "lottie-react-native";
+import { NotificationContext } from "../context/NotificationContext";
 
 const NotificationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [hasTransaction, setHasTransaction] = useState(true);
+  // const [hasTransaction, setHasTransaction] = useState(true);
+  const { notifications } = useContext(NotificationContext);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -38,45 +40,70 @@ const NotificationScreen: React.FC<{
             </Text>
           </View>
 
-          {hasTransaction ? (
-            // Render transactions
+          {notifications.length > 0 ? (
             <View className="p-4">
-              <TouchableOpacity
-                onPress={() => navigation.navigate("TransactionSummaryScreen")}
-                style={styles.transactionItem}
-              >
-                <Image
-                  source={require("../assets/images/small-logo.png")}
-                  style={styles.transactionImage}
-                />
-                <View style={styles.transactionTextContainer}>
-                  <View style={styles.transactionTextRow}>
-                    <Text style={styles.item} allowFontScaling={false}>
-                      Transaction Completed
-                    </Text>
-                    <Text style={styles.valueText} allowFontScaling={false}>
-                      Apr 01, 2024, 02:12 PM
-                    </Text>
-                  </View>
-                  <View style={styles.transactionTextRow}>
-                    <Text style={styles.date} allowFontScaling={false}>
-                      Transaction with ID #1234567890 was completed successful
-                    </Text>
-                    {/* Transaction status */}
-                    <View>
-                      <Text
-                        style={styles.completedText}
-                        allowFontScaling={false}
-                      >
-                        View
-                      </Text>
+              {notifications.map(
+                (
+                  notification: {
+                    request: {
+                      content: {
+                        title: any;
+                        data: { timestamp: any };
+                        body: any;
+                      };
+                    };
+                    date: any;
+                  },
+                  index: React.Key | null | undefined
+                ) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() =>
+                      navigation.navigate("TransactionSummaryScreen")
+                    }
+                    style={styles.transactionItem}
+                  >
+                    <Image
+                      source={require("../assets/images/small-logo.png")}
+                      style={styles.transactionImage}
+                    />
+                    <View style={styles.transactionTextContainer}>
+                      <View style={styles.transactionTextRow}>
+                        <Text style={styles.item} allowFontScaling={false}>
+                          {notification.request.content.title ||
+                            "New Notification"}
+                        </Text>
+                        <Text style={styles.valueText} allowFontScaling={false}>
+                          {new Date(
+                            notification.request.content.data?.timestamp ||
+                              notification.date
+                          ).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </Text>
+                      </View>
+                      <View style={styles.transactionTextRow}>
+                        <Text style={styles.date} allowFontScaling={false}>
+                          {notification.request.content.body ||
+                            "Notification content"}
+                        </Text>
+                        <Text
+                          style={styles.completedText}
+                          allowFontScaling={false}
+                        >
+                          View
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                </View>
-              </TouchableOpacity>
+                  </TouchableOpacity>
+                )
+              )}
             </View>
           ) : (
-            // Render no transaction message
             <View style={styles.noTransactionContainer}>
               <LottieView
                 source={require("../assets/animation/noTransaction.json")}
@@ -85,7 +112,7 @@ const NotificationScreen: React.FC<{
                 style={styles.loadingAnimation}
               />
               <Text style={styles.notransactionText}>
-                You don’t have any transactions
+                You don't have any notifications
               </Text>
             </View>
           )}

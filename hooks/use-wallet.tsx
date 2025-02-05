@@ -6,16 +6,32 @@ const useWallet = () => {
   const { userInfo } = useContext(AuthContext);
 
   // Fetch data from both endpoints
-  const { data: dashboardData, isValidating: isDashboardLoading } =
-    useSWR(`user/dashboard/me/`);
+  const {
+    data: dashboardData,
+    isValidating: isDashboardLoading,
+    mutate: mutateDashboard,
+  } = useSWR(`user/dashboard/me/`, {
+    // refreshInterval: 5000, // Refresh every 5 seconds
+    revalidateOnFocus: true,
+  });
 
   const {
     data: reservedAccountsData,
     isValidating: isReservedAccountsLoading,
+    mutate: mutateReservedAccounts,
   } = useSWR(`user/reserved-accounts`);
 
-  const { data: allTransactionsData, isValidating: isAllTransactionsLoading } =
-    useSWR(`transaction/all`);
+  const {
+    data: allTransactionsData,
+    isValidating: isAllTransactionsLoading,
+    mutate: mutateAllTransactions,
+  } = useSWR(`transaction/all`);
+
+  const refreshAll = () => {
+    mutateDashboard();
+    mutateReservedAccounts();
+    mutateAllTransactions();
+  };
 
   // console.log(allTransactionsData);
 
@@ -68,6 +84,7 @@ const useWallet = () => {
   return {
     balance,
     account,
+    refreshAll,
     transactions: formattedTransactions,
     isLoading,
     getAllTransactions,

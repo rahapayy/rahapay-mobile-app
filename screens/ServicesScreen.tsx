@@ -64,7 +64,7 @@ const ServicesScreen: React.FC<{
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => navigation.navigate("DataScreen")}
+              onPress={() => navigation.navigate("ElectricityScreen")}
               className="w-[48%] mb-4 bg-[#E6F8F1] py-4 px-3 rounded-xl border border-[#B0E9D4]"
             >
               <View className="bg-[#B0E9D4] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
@@ -109,7 +109,7 @@ const ServicesScreen: React.FC<{
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => navigation.navigate("AirtimeScreen")}
+              onPress={() => navigation.navigate("EducationScreen")}
               className="w-[48%] mb-4 bg-[#F5F3FD] py-4 px-3 rounded-xl border border-[#C9C1EC]"
             >
               <View className="bg-[#EEEBF9] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">

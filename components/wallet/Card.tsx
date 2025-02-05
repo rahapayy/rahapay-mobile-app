@@ -24,14 +24,10 @@ import useWallet from "../../hooks/use-wallet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import SPACING from "../../constants/SPACING";
-import {
-  BoldText,
-  MediumText,
-  RegularText,
-  SemiBoldText,
-} from "../common/Text";
+import { BoldText, RegularText, SemiBoldText } from "../common/Text";
 import { AuthContext } from "../../services/AuthContext";
 import { ActivityIndicator, PanResponder } from "react-native";
+import { Skeleton } from "@rneui/themed";
 
 const { height: screenHeight } = Dimensions.get("window");
 
@@ -44,7 +40,7 @@ const Card: React.FC<{
 
   const handleRefresh = React.useCallback(async () => {
     setIsRefreshing(true);
-    // Add your data refresh logic here (e.g., refetch balance)
+    await refreshAll();
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulated delay
     setIsRefreshing(false);
   }, []);
@@ -83,7 +79,7 @@ const Card: React.FC<{
     .join("")
     .toUpperCase();
 
-  const { balance } = useWallet();
+  const { refreshAll, balance } = useWallet();
 
   const panResponder = React.useRef(
     PanResponder.create({
@@ -175,7 +171,15 @@ const Card: React.FC<{
           </View>
 
           <View style={styles.balanceValueContainer}>
-            {isConnected ? (
+            {isRefreshing ? (
+              <Skeleton
+                animation="wave"
+                width={100}
+                height={RFValue(26)}
+                style={styles.balanceSkeleton}
+                skeletonStyle={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
+              />
+            ) : isConnected ? (
               showBalance ? (
                 <BoldText color="white" size="xxlarge">
                   ₦{" "}
@@ -283,6 +287,10 @@ const styles = StyleSheet.create({
   },
   eyeIcon: {
     marginLeft: 10,
+  },
+  balanceSkeleton: {
+    borderRadius: 4,
+    marginVertical: 4,
   },
   balanceValueContainer: {},
   balanceValue: {

@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axios } from "./apiClient";
-import { Alert, AppState, AppStateStatus } from "react-native";
+import { AppState, AppStateStatus } from "react-native";
 import * as BackgroundFetch from "expo-background-fetch";
 import * as TaskManager from "expo-task-manager";
 import SWR from "../context/Swr";
@@ -265,26 +265,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
+    console.log("Attempting to log out..."); // Log when a logout attempt starts
     setIsLoading(true);
+  
     try {
-      // Call the logout endpoint
-      // await axios.post("/auth/logout");
-
+      // const response = await axios.post("/auth/logout");
+      // console.log("Logged out:", response); // To log the response of the logout request
+  
       setUserInfo(null);
       setIsAuthenticated(false);
       setUserDetails(null);
+  
       await AsyncStorage.multiRemove([
         "userInfo",
         "access_token",
         "userDetails",
       ]);
+  
+      console.log("Local storage cleared"); // To confirm that local storage keys are removed
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error("Logout error:", error); // This will log if there's any error in the logout process
     } finally {
       setIsLoading(false);
+      console.log("Logout process completed."); // To confirm that the logout function is complete
     }
-  };
+  }, []);
+
 
   const isLoggedIn = () => {
     return (

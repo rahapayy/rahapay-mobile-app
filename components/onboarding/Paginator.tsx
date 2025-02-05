@@ -10,7 +10,7 @@ interface PaginationProps {
 
 const Paginator: FC<PaginationProps> = ({ data, scrollx }) => {
   const { width, height } = useWindowDimensions();
-  const bottomPosition = height * 0.1;
+  const bottomPosition = height * 0.0;
 
   return (
     <View style={{ flexDirection: "row", bottom: bottomPosition }}>
