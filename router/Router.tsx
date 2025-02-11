@@ -4,16 +4,16 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AppStack from "./AppStack";
 import AuthRoute from "./AuthRouter";
 import LoadingIndicator from "../components/LoadingIndicator";
-import { AuthContext } from "../services/AuthContext";
+import { useAuth } from "../services/AuthContext";
 
 const Stack = createNativeStackNavigator();
 
 const Router = () => {
-  const { isAuthenticated, isAppReady } = useContext(AuthContext);
+  const { isAuthenticated, isAppReady } = useAuth();
 
-  if (!isAppReady) {
-    return <LoadingIndicator />;
-  }
+  // if (!isAppReady) {
+  //   return <LoadingIndicator />;
+  // }
 
   return (
     <NavigationContainer>

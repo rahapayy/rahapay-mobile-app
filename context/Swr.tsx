@@ -2,9 +2,7 @@ import React from "react";
 import { SWRConfig } from "swr";
 import { AppState } from "react-native";
 import NetInfo, { NetInfoState } from "@react-native-community/netinfo";
-
-// import cacheProvider from "./utils/CacheProvider";
-import { axios } from "../services/apiClient";
+import { axiosInstance } from "../services";
 
 const SWR = ({
   children,
@@ -121,7 +119,7 @@ export default SWR;
 
 export const fetcher = async (url: string) => {
   try {
-    const res = await axios.get(url);
+    const res = await axiosInstance.get(url);
     if (res.status === 200 || res.status === 201) {
       return res.data;
     } else {

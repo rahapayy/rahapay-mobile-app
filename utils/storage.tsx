@@ -2,10 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 
 // Define secure keys
-const SECURE_KEYS = new Set<string>([
-  "accessToken",
-  "refreshToken",
-]);
+const SECURE_KEYS = new Set<string>(["accessToken", "refreshToken"]);
 
 // Helper function to check secure keys
 const isSecureKey = (key: string): boolean => SECURE_KEYS.has(key);
@@ -15,8 +12,10 @@ export const setItem = async (key: string, value: string): Promise<void> => {
   try {
     if (isSecureKey(key)) {
       await SecureStore.setItemAsync(key, value);
+      console.log(`Secure token stored for key "${key}": ${value}`);
     } else {
       await AsyncStorage.setItem(key, value);
+      console.log(`Token stored for key "${key}": ${value}`);
     }
   } catch (error) {
     console.error(`Error storing value for key "${key}": `, error);
@@ -33,7 +32,11 @@ export const getItem = async (
     const value = isSecureKey(key)
       ? await SecureStore.getItemAsync(key)
       : await AsyncStorage.getItem(key);
-      
+
+    if (value) {
+      console.log(`Token retrieved for key "${key}": ${value}`);
+    }
+
     return value !== null ? value : defaultValue;
   } catch (error) {
     console.error(`Error retrieving value for key "${key}": `, error);
@@ -46,8 +49,10 @@ export const removeItem = async (key: string): Promise<void> => {
   try {
     if (isSecureKey(key)) {
       await SecureStore.deleteItemAsync(key);
+      console.log(`Secure token removed for key "${key}"`);
     } else {
       await AsyncStorage.removeItem(key);
+      console.log(`Token removed for key "${key}"`);
     }
   } catch (error) {
     console.error(`Error deleting value for key "${key}": `, error);
@@ -91,18 +96,17 @@ export const multiSet = async (keyValuePairs: [string, any][]) => {
       const jsonValue = JSON.stringify(value);
       if (isSecureKey(key)) {
         securePairs.push(SecureStore.setItemAsync(key, jsonValue));
+        console.log(`Secure token stored for key "${key}": ${jsonValue}`);
       } else {
         nonSecurePairs.push([key, jsonValue]);
+        console.log(`Token stored for key "${key}": ${jsonValue}`);
       }
     });
 
     // Process storage operations in parallel
-    await Promise.all([
-      AsyncStorage.multiSet(nonSecurePairs),
-      ...securePairs,
-    ]);
+    await Promise.all([AsyncStorage.multiSet(nonSecurePairs), ...securePairs]);
   } catch (error) {
-    console.error('Error saving multiple items', error);
+    console.error("Error saving multiple items", error);
   }
 };
 
@@ -113,17 +117,21 @@ export const multiRemove = async (keys: string[]) => {
     const nonSecureKeys: string[] = [];
 
     // Separate secure and non-secure keys
-    keys.forEach(key => {
+    keys.forEach((key) => {
       isSecureKey(key) ? secureKeys.push(key) : nonSecureKeys.push(key);
     });
 
     // Process removals in parallel
     await Promise.all([
       AsyncStorage.multiRemove(nonSecureKeys),
-      ...secureKeys.map(key => SecureStore.deleteItemAsync(key)),
+      ...secureKeys.map((key) => SecureStore.deleteItemAsync(key)),
     ]);
+
+    // Log removals
+    secureKeys.forEach(key => console.log(`Secure token removed for key "${key}"`));
+    nonSecureKeys.forEach(key => console.log(`Token removed for key "${key}"`));
   } catch (error) {
-    console.error('Error removing multiple items', error);
+    console.error("Error removing multiple items", error);
   }
 };
 
@@ -132,10 +140,12 @@ export const clearStorage = async (): Promise<void> => {
   try {
     // Clear AsyncStorage
     await AsyncStorage.clear();
+    console.log("All non-secure tokens cleared");
     // Remove all secure items
     await Promise.all(
-      Array.from(SECURE_KEYS).map(key => SecureStore.deleteItemAsync(key))
+      Array.from(SECURE_KEYS).map((key) => SecureStore.deleteItemAsync(key))
     );
+    console.log("All secure tokens cleared");
   } catch (error) {
     console.error("Error clearing storage: ", error);
     throw error;
@@ -155,6 +165,20 @@ export const getAllKeys = async (): Promise<string[]> => {
 
 // Storage keys enumeration
 export const StorageKeys = {
-  ACCESS_TOKEN: "accessToken",
-  REFRESH_TOKEN: "refreshToken",
+  ACCESS_TOKEN: { key: "accessToken", isSecure: true },
+  REFRESH_TOKEN: { key: "refreshToken", isSecure: true },
+};
+
+// Function to store authToken if defined
+export const storeAuthToken = async (authToken: string | undefined) => {
+  try {
+    if (authToken) {
+      await setItem("authToken", authToken);
+      console.log("authToken stored successfully.");
+    } else {
+      console.error("Error: authToken is undefined.");
+    }
+  } catch (error) {
+    console.error("Error storing authToken: ", error);
+  }
 };

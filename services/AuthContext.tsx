@@ -1,417 +1,181 @@
-import React, { createContext, useCallback, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  ReactNode,
+  useMemo,
+} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { axios } from "./apiClient";
-import { AppState, AppStateStatus } from "react-native";
-import * as BackgroundFetch from "expo-background-fetch";
-import * as TaskManager from "expo-task-manager";
-import SWR from "../context/Swr";
+import { SWRConfig } from "swr";
+import { axiosInstance } from "./apiClient";
+import { UserInfoType } from "./dtos";
+import { AuthServices } from "./modules";
+import { getItem } from "@/utils/storage";
 
-// Define UserInfoType
-interface UserInfoType {
-  id: string;
-  email: string;
-  fullName: string;
-  phoneNumber: string;
-  data: {
-    id: string;
-    user?: any;
-    accessToken?: string;
-    refreshToken?: string;
-  };
-  access_token: string;
-  refresh_token: string;
-  expires_at: number;
-}
-
-const BACKGROUND_FETCH_TASK = "background-logout";
-
-TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
-  await AsyncStorage.multiRemove(["userInfo", "access_token", "userDetails"]);
-  return BackgroundFetch.BackgroundFetchResult.NewData;
-});
-
-async function registerBackgroundFetchAsync() {
-  return BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
-    minimumInterval: 60 * 15, // 15 minutes
-    stopOnTerminate: false,
-    startOnBoot: true,
-  });
-}
-
-export const AuthContext = createContext<{
+interface AuthContextType {
   isLoading: boolean;
+  isAuthenticated: boolean;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   userInfo: UserInfoType | null;
   setUserInfo: (userInfo: UserInfoType | null) => void;
-  onboarding: (
-    email: string,
-    password: string,
-    countryCode: string,
-    fullName: string,
-    phoneNumber: string,
-    referral: string
-  ) => Promise<UserInfoType>;
-  verifyEmail: (verificationCode: string) => Promise<any>;
-  resendOtp: (id: string) => Promise<any>;
-  login: (id: string, password: string) => Promise<UserInfoType>;
-  logout: () => Promise<void>;
-  isLoggedIn: () => boolean;
-  createPin: (pin: string) => Promise<any>;
   isAppReady: boolean;
-  isAuthenticated: boolean;
   userDetails: any;
   fetchUserDetails: (token: string) => Promise<void>;
-  refreshAccessToken: (
-    refreshToken: string
-  ) => Promise<{ accessToken: string }>;
-  reauthenticate: (pin: string) => Promise<any>;
-  setIsUserAuthenticated: (value: boolean) => Promise<void>;
-}>({
+}
+
+interface SWRProps {
+  children: React.ReactNode;
+  logOut: () => Promise<void>;
+}
+
+type AuthProviderProps = {
+  children: ReactNode; // ReactNode allows for any renderable content
+};
+
+export const AuthContext = createContext<AuthContextType>({
   isLoading: false,
+  isAuthenticated: false,
+  setIsAuthenticated: () => {},
   userInfo: null,
   setUserInfo: () => {},
-  onboarding: async () => ({} as UserInfoType),
-  verifyEmail: async () => {},
-  resendOtp: async () => {},
-  login: async () => ({} as UserInfoType),
-  logout: async () => {},
-  isLoggedIn: () => false,
-  createPin: async () => {},
-  isAuthenticated: false,
   isAppReady: false,
   userDetails: null,
   fetchUserDetails: async () => {},
-  refreshAccessToken: async () => ({} as { accessToken: string }),
-  reauthenticate: async (pin: string) => {},
-  setIsUserAuthenticated: async (value: boolean) => {},
 });
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+const SWR: React.FC<SWRProps> = ({ children, logOut }) => {
+  return (
+    <SWRConfig
+      value={{
+        fetcher: async (url: string) => {
+          try {
+            const response = await axiosInstance.get(url);
+            return response.data;
+          } catch (error: any) {
+            if (error.response?.status === 401) {
+              await logOut();
+            }
+            throw error;
+          }
+        },
+        provider: () => new Map(),
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+      }}
+    >
+      {children}
+    </SWRConfig>
+  );
+};
+
+export default SWR;
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
   const [userDetails, setUserDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [idleStartTime, setIdleStartTime] = useState<number | null>(null);
-  const [isAppReady, setIsAppReady] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [appState, setAppState] = useState<AppStateStatus>(
-    AppState.currentState
-  );
+  const [isAppReady, setIsAppReady] = useState(false);
+
+  const authService = new AuthServices(axiosInstance);
+
+  const checkAuth = async () => {
+    try {
+      const accessToken = await getItem("accessToken");
+      console.log(accessToken);
+    } catch (error) {
+      setIsAuthenticated(false);
+    }
+    setIsLoading(false);
+  };
+
+  // Check the authentication state on component mount.
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const fetchUserDetails = async (token: string) => {
+    try {
+      const response = await axiosInstance.get("/user/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log(response);
+      
+      setUserDetails(response.data.data);
+      await AsyncStorage.setItem(
+        "userDetails",
+        JSON.stringify(response.data.data)
+      );
+    } catch (error) {
+      console.error("Failed to fetch user details:", error);
+      throw error;
+    }
+  };
+
+  const logout = useCallback(async () => {
+    try {
+      await AsyncStorage.multiRemove([
+        "userInfo",
+        "accessToken",
+        "userDetails",
+      ]);
+      setUserInfo(null);
+      setIsAuthenticated(false);
+      setUserDetails(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  }, []);
 
   useEffect(() => {
-    const checkLoginStatus = async () => {
+    const initializeAuth = async () => {
       try {
-        const storedUserInfo = await AsyncStorage.getItem("userInfo");
-        const storedAccessToken = await AsyncStorage.getItem("access_token");
-        const storedUserDetails = await AsyncStorage.getItem("userDetails");
+        const storedUserInfo = await getItem("userInfo");
+        const storedUserDetails = await getItem("userDetails");
+
         if (storedUserInfo) {
           const parsedUserInfo = JSON.parse(storedUserInfo);
           setUserInfo(parsedUserInfo);
           setIsAuthenticated(true);
 
-          if (storedAccessToken && storedUserDetails) {
+          if (storedUserDetails) {
             setUserDetails(JSON.parse(storedUserDetails));
-          } else {
+          } else if (parsedUserInfo.data.accessToken) {
             await fetchUserDetails(parsedUserInfo.data.accessToken);
           }
         }
       } catch (error) {
-        console.error("Error reading user info from AsyncStorage:", error);
+        console.error("Error initializing auth:", error);
       } finally {
         setIsLoading(false);
         setIsAppReady(true);
       }
     };
 
-    checkLoginStatus();
+    initializeAuth();
   }, []);
 
-  const onboarding = async (
-    email: string,
-    password: string,
-    countryCode: string,
-    fullName: string,
-    phoneNumber: string,
-    referral: string
-  ): Promise<UserInfoType> => {
-    setIsLoading(true);
-    try {
-      const res = await axios.post(`/auth/onboarding`, {
-        email,
-        password,
-        countryCode,
-        fullName,
-        phoneNumber,
-        referral,
-      });
-
-      const userInfo: UserInfoType = res.data;
-      setUserInfo(userInfo);
-
-      await AsyncStorage.setItem("userId", userInfo.data.id);
-
-      return userInfo;
-    } catch (error) {
-      console.error("Onboarding error:", error.response);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  async function setIsUserAuthenticated(value: boolean) {
-    await fetchUserDetails(userInfo?.data.accessToken ?? "");
-    setIsAuthenticated(value);
-  }
-
-  const verifyEmail = async (otp: string) => {
-    setIsLoading(true);
-    try {
-      const response = await axios.post(`/auth/verify-email`, { otp });
-      return response.data;
-    } catch (error) {
-      console.error("Email verification error:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const resendOtp = async (id: string) => {
-    setIsLoading(true);
-    try {
-      const response = await axios.post(`/auth/resend-otp`, { id });
-      return response.data;
-    } catch (error) {
-      console.error("Resend OTP error:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const login = async (id: string, password: string): Promise<UserInfoType> => {
-    setIsLoading(true);
-    try {
-      const res = await axios.post(`/auth/login`, { id, password });
-      const userInfo: UserInfoType = res.data;
-      setUserInfo(userInfo);
-      setIsAuthenticated(true);
-
-      await AsyncStorage.multiSet([
-        ["userInfo", JSON.stringify(userInfo)],
-        ["access_token", userInfo.data.accessToken || ""],
-      ]);
-
-      await fetchUserDetails(userInfo.data.accessToken || "");
-
-      return userInfo;
-    } catch (error) {
-      console.error("Login error:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const createPin = async (pin: string) => {
-    setIsLoading(true);
-    try {
-      const response = await axios.post(`/auth/create-pin`, {
-        securityPin: pin,
-        transactionPin: pin,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Failed to create pin:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const refreshAccessToken = async (
-    refreshToken: string
-  ): Promise<{ accessToken: string }> => {
-    try {
-      const response = await axios.post(`/auth/refresh-token`, {
-        refreshToken,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Failed to refresh access token:", error);
-      throw error;
-    }
-  };
-
-  const reauthenticate = async (pin: string) => {
-    setIsLoading(true);
-    try {
-      const response = await axios.post("/auth/reauthenticate", { pin });
-      return response.data;
-    } catch (error) {
-      console.error("Failed to reauthenticate:", error);
-      throw error;
-    }
-  };
-
-  const fetchUserDetails = async (token: any) => {
-    try {
-      const res = await axios.get(`/user/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUserDetails(res.data.data);
-      AsyncStorage.setItem("userDetails", JSON.stringify(res.data.data));
-    } catch (error) {
-      console.error("Failed to fetch user details:", error);
-    }
-  };
-
-  const logout = useCallback(async () => {
-    console.log("Attempting to log out..."); // Log when a logout attempt starts
-    setIsLoading(true);
-  
-    try {
-      // const response = await axios.post("/auth/logout");
-      // console.log("Logged out:", response); // To log the response of the logout request
-  
-      setUserInfo(null);
-      setIsAuthenticated(false);
-      setUserDetails(null);
-  
-      await AsyncStorage.multiRemove([
-        "userInfo",
-        "access_token",
-        "userDetails",
-      ]);
-  
-      console.log("Local storage cleared"); // To confirm that local storage keys are removed
-    } catch (error) {
-      console.error("Logout error:", error); // This will log if there's any error in the logout process
-    } finally {
-      setIsLoading(false);
-      console.log("Logout process completed."); // To confirm that the logout function is complete
-    }
-  }, []);
-
-
-  const isLoggedIn = () => {
-    return (
-      isAuthenticated &&
-      userInfo !== null &&
-      userInfo.access_token !== undefined &&
-      userInfo.refresh_token !== undefined &&
-      userInfo.expires_at > Date.now() / 1000
-    );
-  };
-
-  const handleAppStateChange = async (nextAppState: AppStateStatus) => {
-    if (
-      nextAppState === "active" &&
-      (appState === "inactive" || appState === "background")
-    ) {
-      const idleTime = await AsyncStorage.getItem("idleStartTime");
-      const storedUserInfo = await AsyncStorage.getItem("userInfo");
-
-      if (
-        idleTime &&
-        Date.now() - parseInt(idleTime) > 2 * 60 * 1000 &&
-        storedUserInfo
-      ) {
-        setIdleStartTime(null);
-        await AsyncStorage.removeItem("idleStartTime");
-        await AsyncStorage.removeItem("access_token");
-        setIsAuthenticated(false); // Trigger re-authentication
-        return;
-      }
-
-      // Existing logic to handle user info and authentication
-      if (storedUserInfo) {
-        const parsedUserInfo = JSON.parse(storedUserInfo);
-        setUserInfo(parsedUserInfo);
-        setIsAuthenticated(true);
-
-        const storedAccessToken = await AsyncStorage.getItem("access_token");
-        const storedUserDetails = await AsyncStorage.getItem("userDetails");
-
-        if (storedAccessToken && storedUserDetails) {
-          setUserDetails(JSON.parse(storedUserDetails));
-        } else {
-          await fetchUserDetails(parsedUserInfo.data.accessToken);
-        }
-      } else {
-        await logout();
-      }
-    }
-  };
-
-  const checkIfHasNewVersion = async () => {
-    // try {
-    //   const { data } = await axios.get("/settings/app-version");
-    //   const updateData: { id: string; isRequired: boolean; version: string } = data.data;
-    //   const appVersion = Constants.default.expoConfig?.version;
-    //   if (appVersion && updateData?.version) {
-    //     const appVersionNumber = parseFloat(appVersion.replace(/\./g, ""));
-    //     const updateVersionNumber = parseFloat(updateData.version.replace(/\./g, ""));
-    //     if (updateVersionNumber > appVersionNumber) {
-    //       Alert.alert(
-    //         "New Version Available",
-    //         `There is a new version of the app available. Please update to the latest version to continue using the app.`,
-    //         [
-    //           {
-    //             text: "Update",
-    //             onPress: () => {
-    //               Linking.openURL(""); // Add your app store URL here
-    //             },
-    //           },
-    //           {
-    //             text: "Cancel",
-    //             onPress: () => {
-    //               if (updateData.isRequired) {
-    //                 checkIfHasNewVersion();
-    //               }
-    //             },
-    //           },
-    //         ]
-    //       );
-    //     }
-    //   }
-    // } catch (error) {
-    //   console.error("Failed to check for new version:", error);
-    // }
-  };
-
-  useEffect(() => {
-    checkIfHasNewVersion();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      await registerBackgroundFetchAsync();
-    })();
-  }, []);
+  const value = useMemo(
+    () => ({
+      isLoading,
+      isAuthenticated,
+      userInfo,
+      isAppReady,
+      userDetails,
+      setIsAuthenticated,
+      setUserInfo,
+      fetchUserDetails,
+    }),
+    []
+  );
 
   return (
-    <AuthContext.Provider
-      value={{
-        isLoading,
-        userInfo,
-        setUserInfo,
-        onboarding,
-        verifyEmail,
-        resendOtp,
-        createPin,
-        userDetails,
-        fetchUserDetails,
-        login,
-        logout,
-        isLoggedIn,
-        isAppReady,
-        isAuthenticated,
-        refreshAccessToken,
-        reauthenticate,
-        setIsUserAuthenticated,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       <SWR logOut={logout}>{children}</SWR>
     </AuthContext.Provider>
   );
 };
+
+export const useAuth = () => useContext(AuthContext);

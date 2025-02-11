@@ -30,6 +30,8 @@ import * as Yup from "yup";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SectionDivider from "../../../components/SectionDivider";
 import ProgressIndicator from "../../../components/ProgressIndicator";
+import { IOnboardingDto } from "@/services/dtos";
+import { services } from "@/services";
 
 interface CreateAccountScreenProps {
   navigation: NativeStackNavigationProp<any, "">;
@@ -69,7 +71,6 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
     confirmPassword: false,
   });
   const countryCode = "+234";
-  const { onboarding } = useContext(AuthContext);
 
   const passwordRequirements = useMemo(
     () => [
@@ -152,16 +153,21 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
         validationSchema={validationSchema}
         onSubmit={async (values, { setSubmitting }) => {
           try {
-            const userInfo = await onboarding(
-              values.email.trim(),
-              values.password.trim(),
+            const payload: IOnboardingDto = {
+              email: values.email.trim(),
+              password: values.password.trim(),
               countryCode,
-              values.fullName.trim(),
-              values.phoneNumber.trim(),
-              values.referral.trim()
-            );
+              fullName: values.fullName.trim(),
+              phoneNumber: values.phoneNumber.trim(),
+              referral: values.referral.trim(),
+            };
 
-            const userId = userInfo?.data?.id;
+            // const userId = userInfo?.data?.id;
+
+            const response = await services.authService.onboarding(payload);
+            const userId = response?.data.data.id;
+            console.log(userId);
+
             handleShowFlash({
               message: "Sign up successful! Please verify your email.",
               type: "success",

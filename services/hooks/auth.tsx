@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { services } from "../../services";
+import { services } from "@/services";
 import type { IErrorResponse, IResponse } from "../../types/general";
 import {
   IOnboardingDto,
@@ -116,7 +116,7 @@ export const useReAuthenticate = () => {
     IErrorResponse<{ message: string }>,
     IReAuthenticateDto
   >({
-    mutationFn: (payload) => services.authService.reAuthenticate(payload),
+    mutationFn: (payload) => services.authService.reauthenticate(payload),
     onSuccess: async (response) => response.data,
     onError: handleError,
   });

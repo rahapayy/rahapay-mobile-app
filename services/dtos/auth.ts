@@ -1,6 +1,6 @@
-import { IResponse } from "../../types/general";
+// import { IResponse } from "../../../types/general";
 
-interface UserInfoType {
+export interface UserInfoType {
   id: string;
   email: string;
   fullName: string;
@@ -35,7 +35,7 @@ export interface IRefreshTokenResponseDto {
 }
 
 export interface ILoginDto {
-  email: string;
+  id: string;
   password: string;
 }
 
@@ -43,7 +43,7 @@ export interface IForgotPasswordDto {
   email: string;
 }
 
-export interface IForgotPasswordOTPDto {
+export interface IVerifyResetDto {
   otp: string;
 }
 

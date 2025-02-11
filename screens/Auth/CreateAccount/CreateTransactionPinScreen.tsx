@@ -6,19 +6,19 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
 import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import { AuthContext } from "../../../services/AuthContext";
-import BackButton from "../../../components/common/ui/buttons/BackButton";
 import { LightText, MediumText } from "../../../components/common/Text";
 import OtpInput from "../../../components/common/ui/forms/OtpInput";
 import Label from "../../../components/common/ui/forms/Label";
 import ProgressIndicator from "../../../components/ProgressIndicator";
+import { ICreatePinDto } from "@/services/dtos";
+import { services } from "@/services";
+import { getItem } from "@/utils/storage";
 
 interface CreateTransactionPinScreenProps {
   navigation: NativeStackNavigationProp<any, "">;
@@ -30,8 +30,6 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
   const [boxes, setBoxes] = useState(["", "", "", ""]);
   const [confirmBoxes, setConfirmBoxes] = useState(["", "", "", ""]);
   const [loading, setLoading] = useState(false);
-
-  const { createPin } = useContext(AuthContext);
 
   const handleConfirmPin = async () => {
     setLoading(true);
@@ -48,15 +46,30 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
     }
 
     try {
-      await createPin(pin);
+      const payload: ICreatePinDto = {
+        securityPin: pin,
+        transactionPin: pin,
+      };
+
+      const response = await services.authService.createPin(payload);
+      console.log(response);
+
+      if (response?.data?.accessToken) {
+        await getItem("ACCESS_TOKEN", response.data.accessToken || "");
+        await getItem("REFRESH_TOKEN", response.data.refreshToken || "");
+      }
       handleShowFlash({
         message: "Transaction PIN created successfully!",
         type: "success",
       });
 
       navigation.navigate("CreatePinScreen");
-    } catch (error) {
-      console.error("Error creating transaction PIN:", error);
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message instanceof Array
+          ? error.response.data.message[0]
+          : error.response?.data?.message || "An unexpected error occurred";
+      console.error("Login error:", errorMessage);
       handleShowFlash({
         message: "Failed to create transaction PIN. Please try again.",
         type: "danger",

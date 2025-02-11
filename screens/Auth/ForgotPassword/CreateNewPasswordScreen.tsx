@@ -17,13 +17,14 @@ import SPACING from "../../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/common/ui/buttons/Button";
 import FONT_SIZE from "../../../constants/font-size";
-import useApi from "../../../services/apiClient";
+import useApi, { services } from "../../../services/apiClient";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { RootStackParamList } from "../../../types/RootStackParams";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import { LightText, MediumText } from "../../../components/common/Text";
 import { BasicPasswordInput } from "../../../components/common/ui/forms/BasicPasswordInput";
 import Label from "../../../components/common/ui/forms/Label";
+import { IResetPasswordDto } from "@/services/dtos";
 
 type CreateNewPasswordScreenProps = {
   navigation: NativeStackNavigationProp<
@@ -38,6 +39,7 @@ const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({
   route,
 }) => {
   const { resetToken } = route.params;
+  // console.log(resetToken);
 
   const [showPassword, setShowPassword] = useState(true);
   const [showPassword2, setShowPassword2] = useState(true);
@@ -48,6 +50,8 @@ const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { mutateAsync } = useApi.patch("/auth/reset-password");
+
+  // IResetPasswordDto
 
   const handleButtonClick = async () => {
     if (password !== confirmPassword) {
@@ -61,19 +65,25 @@ const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({
     setIsSubmitting(true);
     try {
       console.log("Making request with resetToken:", resetToken);
-      await mutateAsync({ password, resetToken });
+      const payload: IResetPasswordDto = {
+        resetToken: String(resetToken),
+        password: password,
+      };
+
+      const response = await services.authService.resetPassword(payload);
+      console.log(response);
+
       handleShowFlash({
         message: "Password reset successfully!",
         type: "success",
       });
       navigation.navigate("LoginScreen");
-    } catch (error) {
-      const err = error as {
-        response?: { data?: { message?: string } };
-        message: string;
-      };
+    } catch (error: any) {
       const errorMessage =
-        err.response?.data?.message || err.message || "An error occurred";
+        error.response?.data?.message instanceof Array
+          ? error.response.data.message[0]
+          : error.response?.data?.message || "An unexpected error occurred";
+      console.error("error:", errorMessage);
       handleShowFlash({
         message: errorMessage,
         type: "danger",

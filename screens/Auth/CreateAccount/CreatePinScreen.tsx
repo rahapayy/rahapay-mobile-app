@@ -19,6 +19,9 @@ import { LightText, MediumText } from "../../../components/common/Text";
 import OtpInput from "../../../components/common/ui/forms/OtpInput";
 import Label from "../../../components/common/ui/forms/Label";
 import ProgressIndicator from "../../../components/ProgressIndicator";
+import { ICreatePinDto } from "@/services/dtos";
+import { services } from "@/services";
+import { getItem } from "@/utils/storage";
 
 interface CreatePinScreenProps {
   navigation: NativeStackNavigationProp<any, "">;
@@ -29,7 +32,7 @@ const CreatePinScreen: React.FC<CreatePinScreenProps> = ({ navigation }) => {
   const [confirmBoxes, setConfirmBoxes] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
 
-  const { createPin } = useContext(AuthContext);
+  // const { createPin } = useContext(AuthContext);
 
   const handleConfirmPin = async () => {
     setLoading(true);
@@ -46,14 +49,25 @@ const CreatePinScreen: React.FC<CreatePinScreenProps> = ({ navigation }) => {
     }
 
     try {
-      await createPin(pin);
+      const payload: ICreatePinDto = {
+        securityPin: pin,
+        transactionPin: pin,
+      };
+
+      const response = await services.authService.createPin(payload);
+      console.log(response);
+
+      if (response?.data?.accessToken) {
+        await getItem("ACCESS_TOKEN", response.data.accessToken || "");
+        await getItem("REFRESH_TOKEN", response.data.refreshToken || "");
+      }
       handleShowFlash({
         message: "Security PIN created successfully!",
         type: "success",
       });
 
       navigation.navigate("SuccessfulScreen");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating security PIN:", error);
       handleShowFlash({
         message: "Failed to create security PIN. Please try again.",

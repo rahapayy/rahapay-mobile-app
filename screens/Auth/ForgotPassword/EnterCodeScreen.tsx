@@ -11,7 +11,7 @@ import {
 import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
 import Button from "../../../components/common/ui/buttons/Button";
-import useApi from "../../../services/apiClient";
+import useApi, { services } from "../../../services/apiClient";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import {
@@ -20,6 +20,7 @@ import {
   RegularText,
 } from "../../../components/common/Text";
 import OtpInput from "../../../components/OtpInput";
+import { IVerifyResetDto } from "@/services/dtos";
 
 type EnterCodeScreenRouteParams = {
   email: string;
@@ -31,14 +32,12 @@ const EnterCodeScreen: React.FC<{
   const route =
     useRoute<RouteProp<{ params: EnterCodeScreenRouteParams }, "params">>();
   const email = route.params.email;
+  
   const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isOtpRequested, setIsOtpRequested] = useState(false);
   const boxRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
   const [boxIsFocused, setBoxIsFocused] = useState(new Array(6).fill(false));
   const [resendCountdown, setResendCountdown] = useState(60);
-  const { mutateAsync: requestOtp } = useApi.post("/auth/forgot-password");
-  const { mutateAsync: verifyOtp } = useApi.post("/auth/verify/reset-otp");
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -85,45 +84,51 @@ const EnterCodeScreen: React.FC<{
     }
   };
 
-  const requestOtpHandler = async () => {
-    setIsSubmitting(true);
-    setResendCountdown(60); // Reset countdown when Resend OTP is clicked
-    try {
-      const response = await requestOtp({ email });
-      console.log("OTP Request Response:", response.data);
-      handleShowFlash({
-        message: "OTP sent to your email successfully!",
-        type: "success",
-      });
-      setIsOtpRequested(true);
-    } catch (error) {
-      const err = error as {
-        response?: { data?: { message?: string } };
-        message: string;
-      };
-      const errorMessage =
-        err.response?.data?.message || err.message || "An error occurred";
-      handleShowFlash({
-        message: errorMessage,
-        type: "danger",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  // const requestOtpHandler = async () => {
+  //   setIsSubmitting(true);
+  //   setResendCountdown(60); // Reset countdown when Resend OTP is clicked
+  //   try {
+  //     await services.authService.resendOtp(id);
+  //     handleShowFlash({
+  //       message: "OTP sent to your email successfully!",
+  //       type: "success",
+  //     });
+  //     setIsOtpRequested(true);
+  //   } catch (error) {
+  //     const err = error as {
+  //       response?: { data?: { message?: string } };
+  //       message: string;
+  //     };
+  //     const errorMessage =
+  //       err.response?.data?.message || err.message || "An error occurred";
+  //     handleShowFlash({
+  //       message: errorMessage,
+  //       type: "danger",
+  //     });
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
 
   const handleButtonClick = async () => {
     const otp = boxes.join("");
     if (otp.length === 6) {
       setIsSubmitting(true);
       try {
-        const response = await verifyOtp({ otp, email });
+        const payload: IVerifyResetDto = {
+          otp,
+        };
+
+        const response = await services.authService.verifyResetOtp(payload);
+
         console.log("API Response:", response.data);
         handleShowFlash({
           message: "OTP verified successfully!",
           type: "success",
         });
-        const resetToken = response.data.data.resetToken;
+
+        const resetToken = response;
+
         console.log("Received resetToken:", resetToken);
         if (!resetToken) {
           throw new Error("Reset token is missing from the response");
@@ -131,13 +136,12 @@ const EnterCodeScreen: React.FC<{
         navigation.navigate("CreateNewPasswordScreen", {
           resetToken: resetToken,
         });
-      } catch (error) {
-        const err = error as {
-          response?: { data?: { message?: string } };
-          message: string;
-        };
+      } catch (error: any) {
         const errorMessage =
-          err.response?.data?.message || err.message || "An error occurred";
+          error.response?.data?.message instanceof Array
+            ? error.response.data.message[0]
+            : error.response?.data?.message || "An unexpected error occurred";
+        console.error("Login error:", errorMessage);
         handleShowFlash({
           message: errorMessage,
           type: "danger",
@@ -179,7 +183,7 @@ const EnterCodeScreen: React.FC<{
           <View className="justify-center items-center mt-6">
             <LightText color="light">Didn't receive an OTP?</LightText>
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={requestOtpHandler}
               disabled={resendCountdown > 0}
             >
@@ -190,7 +194,7 @@ const EnterCodeScreen: React.FC<{
                     : "Resend OTP"}
                 </RegularText>
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
 

@@ -1,7 +1,7 @@
 export interface IResponse<T = unknown> {
   data: T;
-  message?: string;
-  success?: boolean;
+  message: string;
+  success: boolean;
 }
 export interface IErrorResponse<T = unknown> {
   data: T;
