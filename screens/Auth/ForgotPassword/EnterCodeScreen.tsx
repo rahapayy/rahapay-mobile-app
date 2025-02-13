@@ -11,7 +11,7 @@ import {
 import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
 import Button from "../../../components/common/ui/buttons/Button";
-import useApi, { services } from "../../../services/apiClient";
+import  { services } from "../../../services/apiClient";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import {
@@ -127,7 +127,7 @@ const EnterCodeScreen: React.FC<{
           type: "success",
         });
 
-        const resetToken = response;
+        const resetToken = response.data.resetToken;
 
         console.log("Received resetToken:", resetToken);
         if (!resetToken) {

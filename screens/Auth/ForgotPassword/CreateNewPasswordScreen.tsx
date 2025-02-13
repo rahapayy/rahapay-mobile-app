@@ -17,7 +17,7 @@ import SPACING from "../../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/common/ui/buttons/Button";
 import FONT_SIZE from "../../../constants/font-size";
-import useApi, { services } from "../../../services/apiClient";
+import { services } from "../../../services/apiClient";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { RootStackParamList } from "../../../types/RootStackParams";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
@@ -38,7 +38,6 @@ const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { resetToken } = route.params;
   // console.log(resetToken);
 
   const [showPassword, setShowPassword] = useState(true);
@@ -49,7 +48,6 @@ const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { mutateAsync } = useApi.patch("/auth/reset-password");
 
   // IResetPasswordDto
 
@@ -64,9 +62,9 @@ const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({
 
     setIsSubmitting(true);
     try {
-      console.log("Making request with resetToken:", resetToken);
+      console.log("Making request with resetToken:", route.params.resetToken);
       const payload: IResetPasswordDto = {
-        resetToken: String(resetToken),
+        resetToken: route.params.resetToken,
         password: password,
       };
 
@@ -102,7 +100,7 @@ const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({
 
         <View className="mt-4">
           <MediumText color="black" size="xlarge" marginBottom={5}>
-            Create Password
+            Create New Password
           </MediumText>
           <LightText color="mediumGrey" size="base">
             Enter new password to recover account
