@@ -5,15 +5,9 @@ export interface UserInfoType {
   email: string;
   fullName: string;
   phoneNumber: string;
-  data: {
-    id: string;
-    user?: any;
-    accessToken?: string;
-    refreshToken?: string;
-  };
-  access_token: string;
-  refresh_token: string;
-  expires_at: number;
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: number;
 }
 
 export interface IOnboardingDto {
@@ -27,6 +21,7 @@ export interface IOnboardingDto {
 
 export interface IRefreshTokenDto {
   refreshToken: string;
+  accessToken: string;
 }
 
 export interface IRefreshTokenResponseDto {

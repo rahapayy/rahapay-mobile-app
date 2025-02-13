@@ -2,17 +2,14 @@ import React, {
   createContext,
   useState,
   useEffect,
-  useCallback,
   useContext,
   ReactNode,
   useMemo,
 } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SWRConfig } from "swr";
 import { axiosInstance } from "./apiClient";
 import { UserInfoType } from "./dtos";
-import { AuthServices } from "./modules";
-import { getItem } from "@/utils/storage";
+import { getItem, removeItem } from "@/utils/storage";
 
 interface AuthContextType {
   isLoading: boolean;
@@ -21,8 +18,7 @@ interface AuthContextType {
   userInfo: UserInfoType | null;
   setUserInfo: (userInfo: UserInfoType | null) => void;
   isAppReady: boolean;
-  userDetails: any;
-  fetchUserDetails: (token: string) => Promise<void>;
+  logOut: () => void;
 }
 
 interface SWRProps {
@@ -39,10 +35,9 @@ export const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   setIsAuthenticated: () => {},
   userInfo: null,
+  logOut: () => {},
   setUserInfo: () => {},
   isAppReady: false,
-  userDetails: null,
-  fetchUserDetails: async () => {},
 });
 
 const SWR: React.FC<SWRProps> = ({ children, logOut }) => {
@@ -79,12 +74,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAppReady, setIsAppReady] = useState(false);
 
-  const authService = new AuthServices(axiosInstance);
-
   const checkAuth = async () => {
     try {
-      const accessToken = await getItem("accessToken");
-      console.log(accessToken);
+      const accessToken = await getItem("ACCESS_TOKEN", true);
+      console.log("Access token: " + accessToken);
+
+      setIsAuthenticated(!!accessToken);
     } catch (error) {
       setIsAuthenticated(false);
     }
@@ -96,66 +91,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
-  const fetchUserDetails = async (token: string) => {
-    try {
-      const response = await axiosInstance.get("/user/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log(response);
-      
-      setUserDetails(response.data.data);
-      await AsyncStorage.setItem(
-        "userDetails",
-        JSON.stringify(response.data.data)
-      );
-    } catch (error) {
-      console.error("Failed to fetch user details:", error);
-      throw error;
-    }
+  const logOut = async () => {
+    // Perform logout logic
+    removeItem("ACCESS_TOKEN", true);
+    removeItem("REFRESH_TOKEN", true);
+    setIsAuthenticated(false);
   };
-
-  const logout = useCallback(async () => {
-    try {
-      await AsyncStorage.multiRemove([
-        "userInfo",
-        "accessToken",
-        "userDetails",
-      ]);
-      setUserInfo(null);
-      setIsAuthenticated(false);
-      setUserDetails(null);
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const storedUserInfo = await getItem("userInfo");
-        const storedUserDetails = await getItem("userDetails");
-
-        if (storedUserInfo) {
-          const parsedUserInfo = JSON.parse(storedUserInfo);
-          setUserInfo(parsedUserInfo);
-          setIsAuthenticated(true);
-
-          if (storedUserDetails) {
-            setUserDetails(JSON.parse(storedUserDetails));
-          } else if (parsedUserInfo.data.accessToken) {
-            await fetchUserDetails(parsedUserInfo.data.accessToken);
-          }
-        }
-      } catch (error) {
-        console.error("Error initializing auth:", error);
-      } finally {
-        setIsLoading(false);
-        setIsAppReady(true);
-      }
-    };
-
-    initializeAuth();
-  }, []);
 
   const value = useMemo(
     () => ({
@@ -163,17 +104,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       isAuthenticated,
       userInfo,
       isAppReady,
+      logOut,
       userDetails,
       setIsAuthenticated,
       setUserInfo,
-      fetchUserDetails,
     }),
     []
   );
 
   return (
     <AuthContext.Provider value={value}>
-      <SWR logOut={logout}>{children}</SWR>
+      <SWR logOut={logOut}>{children}</SWR>
     </AuthContext.Provider>
   );
 };

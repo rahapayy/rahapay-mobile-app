@@ -11,6 +11,7 @@ import {
   IReAuthenticateDto,
   IRefreshTokenDto,
   IRefreshTokenResponseDto,
+  UserInfoType,
 } from "../dtos";
 import { handleError } from "../handleError";
 
@@ -28,12 +29,12 @@ export const useOnboarding = () => {
 
 export const useLogin = () => {
   return useMutation<
-    IResponse<{ success: boolean }>,
+    IResponse<UserInfoType>,
     IErrorResponse<{ message: string }>,
     ILoginDto
   >({
-    mutationFn: (payload) => services.authService.login(payload),
-    onSuccess: async (response) => response.data,
+    mutationFn: (payload: ILoginDto) => services.authService.login(payload),
+    onSuccess: async (response: IResponse<UserInfoType>) => response.data,
     onError: handleError,
   });
 };

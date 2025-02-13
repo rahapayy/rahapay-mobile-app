@@ -26,10 +26,10 @@ class AuthServices {
 
   async login(
     payload: ILoginDto
-  ): Promise<IResponse<{ success: boolean; data: UserInfoType }>> {
+  ): Promise<IResponse<UserInfoType>> {
     const response = await this.baseService.post("/auth/login", payload);
     return response.data;
-  }
+  }  
 
   async verifyEmail(payload: IVerifyEmailDto) {
     const response = await this.baseService.post("/auth/verify-email", payload);

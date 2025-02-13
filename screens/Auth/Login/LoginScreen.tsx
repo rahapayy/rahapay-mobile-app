@@ -50,6 +50,7 @@ const LoginScreen: React.FC<{
     values: { id: string; password: string },
     { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
   ) => {
+    setSubmitting(true);
     try {
       const payload: ILoginDto = {
         id: values.id,
@@ -57,12 +58,17 @@ const LoginScreen: React.FC<{
       };
 
       const response = await services.authService.login(payload);
-      // console.log(response.data.data.access_token);
-
-      handleShowFlash({
-        message: "Logged in successfully!",
-        type: "success",
-      });
+      console.log(response);
+      if (response) {
+        handleShowFlash({
+          message: "Logged In Successfully",
+          type: "success",
+        });
+        setItem("ACCESS_TOKEN", response.data.accessToken, true);
+        setItem("REFRESH_TOKEN", response.data.refreshToken, true);
+        setIsAuthenticated(true);
+        
+      }
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message instanceof Array
