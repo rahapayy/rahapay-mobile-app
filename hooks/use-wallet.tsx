@@ -1,9 +1,8 @@
-import { useContext } from "react";
+import { useAuth } from "@/services/AuthContext";
 import useSWR from "swr";
-import { AuthContext } from "../services/AuthContext";
 
 const useWallet = () => {
-  const { userInfo } = useContext(AuthContext);
+  const { userInfo } = useAuth();
 
   // Fetch data from both endpoints
   const {
@@ -40,6 +39,11 @@ const useWallet = () => {
   // Correct the extraction of the transactions array
   const transactions = dashboardData?.transacton || []; // Fix the transactions source and correct the typo
 
+  // Filter the COMMISSION to not show amount in the transaction history
+  const filteredTransactions = transactions.filter(
+    (trx: { transactionType: string }) => trx.transactionType !== "COMMISSION"
+  );
+
   const balance = dashboardData?.wallet?.balance || 0;
 
   // The reserved accounts information will now come from dashboardData
@@ -55,7 +59,7 @@ const useWallet = () => {
   };
 
   // Mapping transactions to required fields without categorization
-  const formattedTransactions = transactions.map(
+  const formattedTransactions = filteredTransactions.map(
     (trx: {
       amountPaid: any;
       paidOn: string | number | Date;

@@ -21,9 +21,9 @@ import Eti from "../../assets/svg/9mobilebig.svg";
 import Glo from "../../assets/svg/globig.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 import SwipeButton from "../../components/SwipeButton";
-import useApi from "../../services/apiClient";
-import { handleShowFlash } from "../../components/FlashMessageComponent";
+import { IAirtimePurchasePayload } from "@/services/modules/airtime";
 import { RootStackParamList } from "../../types/RootStackParams";
+import { services } from "@/services";
 
 type ReviewAirtimeSummaryScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -45,72 +45,26 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
 }) => {
   const { selectedOperator, phoneNumber, amount } = route.params;
 
-  const { mutateAsync } = useApi.post("/top-up/airtime");
-
   const handleSwipeConfirm = async (reset: () => void) => {
     try {
-      const response = await mutateAsync({
-        amount,
-        networkType: selectedOperator.toLowerCase(),
-        phoneNumber,
+      const payload: IAirtimePurchasePayload = {
+        amount: route.params.amount,
+        networkType: route.params.selectedOperator.toLowerCase(),
+        phoneNumber: route.params.phoneNumber,
+      };
+
+      const response = await services.airtimeService.purchaseAirtime(payload);
+      
+      navigation.navigate("TransactionStatusScreen", {
+        status: response.status,
+        message: response.msg,
+        amount: response.amount
       });
-
-      console.log("Full API response:", response.data);
-
-      if (response.data.status === "success") {
-        navigation.navigate("TransactionStatusScreen", {
-          status: "successful",
-        });
-      } else {
-        navigation.navigate("TransactionStatusScreen", { status: "failed" });
-      }
-    } catch (err: unknown) {
-      console.error("Error occurred:", err);
-
-      if (err instanceof Error && "response" in err) {
-        const axiosError = err as AxiosError;
-
-        // Log detailed error information
-        console.error("AxiosError Details:", {
-          status: axiosError.response?.status,
-          headers: axiosError.response?.headers,
-          data: axiosError.response?.data,
-        });
-
-        if (axiosError.response?.status === 400) {
-          if (
-            axiosError.response.data?.message ===
-            "Insufficient funds in wallet!"
-          ) {
-            handleShowFlash({
-              message: "Insufficient funds. Please top up.",
-              type: "danger",
-            });
-          } else {
-            handleShowFlash({
-              message: "Bad request. Please check your input and try again.",
-              type: "danger",
-            });
-          }
-        } else if (axiosError.response?.status === 503) {
-          handleShowFlash({
-            message: "Service unavailable. Please try again later.",
-            type: "danger",
-          });
-        } else {
-          handleShowFlash({
-            message: "An error occurred. Please try again.",
-            type: "danger",
-          });
-        }
-      } else {
-        // Handle non-Axios errors or unknown errors
-        console.error("Unknown error type:", err);
-        handleShowFlash({
-          message: "An unknown error occurred. Please try again.",
-          type: "danger",
-        });
-      }
+    } catch (error: any) {
+      navigation.navigate("TransactionStatusScreen", {
+        status: "failed",
+        message: error.response?.msg || "Transaction failed",
+      });
     } finally {
       reset();
     }

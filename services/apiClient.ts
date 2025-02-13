@@ -3,6 +3,7 @@ import { getItem, removeItem, setItem } from "@/utils/storage";
 import { AuthServices } from "./modules";
 import UserServices from "./modules/user";
 import DeviceToken from "./modules/notificaiton";
+import AirtimeService from "./modules/airtime";
 
 export const axiosInstance = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
@@ -124,4 +125,5 @@ export const services = {
   authServiceToken: new AuthServices(axiosInstance),
   userService: new UserServices(axiosInstance),
   notificationService: new DeviceToken(axiosInstance),
+  airtimeService: new AirtimeService(axiosInstance),
 };

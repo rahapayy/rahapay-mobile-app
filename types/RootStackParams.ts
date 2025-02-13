@@ -52,7 +52,7 @@ export type RootStackParamList = {
     amount: number;
   };
   TransactionStatusScreen: {
-    status: "pending" | "failed" | "successful";
+    status: "pending" | "failed" | "success";
   };
   CustomerCareScreen: undefined;
   CableServiceDetailsScreen: undefined;
