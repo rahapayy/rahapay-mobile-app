@@ -15,9 +15,9 @@ const Router = () => {
     console.log("isAuthenticated:", isAuthenticated);
   }, [isAuthenticated]); // Debugging log to check state changes
 
-  // if (!isAppReady) {
-  //   return <LoadingIndicator />;
-  // }
+  if (!isAppReady) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <NavigationContainer>

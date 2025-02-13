@@ -82,8 +82,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsAuthenticated(!!accessToken);
     } catch (error) {
       setIsAuthenticated(false);
+    } finally {
+      setIsAppReady(true);
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   // Check the authentication state on component mount.
@@ -109,7 +111,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsAuthenticated,
       setUserInfo,
     }),
-    []
+    [isLoading, isAuthenticated, userInfo, isAppReady, userDetails]
   );
 
   return (

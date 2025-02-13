@@ -67,7 +67,6 @@ const LoginScreen: React.FC<{
         setItem("ACCESS_TOKEN", response.data.accessToken, true);
         setItem("REFRESH_TOKEN", response.data.refreshToken, true);
         setIsAuthenticated(true);
-        
       }
     } catch (error: any) {
       const errorMessage =
