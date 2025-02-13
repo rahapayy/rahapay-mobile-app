@@ -182,9 +182,9 @@ const AirtimeScreen: React.FC<{
                         autoCapitalize="none"
                         autoCorrect={false}
                       />
-                      <TouchableOpacity>
+                      {/* <TouchableOpacity>
                         <ProfileCircle color={COLORS.violet400} />
-                      </TouchableOpacity>
+                      </TouchableOpacity> */}
                     </View>
                   </View>
 
