@@ -1,37 +1,25 @@
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, View } from "react-native";
 import React from "react";
-import FONT_SIZE from "../constants/font-size";
 import ComingSoon from "../assets/svg/Coming Soon.svg";
+import { MediumText, RegularText } from "../components/common/Text";
 
 const CardsScreen = () => {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView>
-        <View className="p-4">
-          <Text style={styles.headText}>Create Virtual Card</Text>
-        </View>
+    <SafeAreaView className="flex-1">
+      <View className="p-4">
+        <MediumText color="black" size="large">
+          Create Virtual Card
+        </MediumText>
+      </View>
 
-        <View className="justify-center items-center">
-          <ComingSoon />
-          <Text style={styles.comingsoonText}>
-            We are creating something amazing. Stay tuned!
-          </Text>
-        </View>
-      </ScrollView>
+      <View className="flex-1 justify-center items-center p-4 mb-14">
+        <ComingSoon />
+        <RegularText color="black" size="base">
+          We are creating something amazing. Stay tuned!
+        </RegularText>
+      </View>
     </SafeAreaView>
   );
 };
 
 export default CardsScreen;
-
-const styles = StyleSheet.create({
-  headText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.large,
-  },
-  comingsoonText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.medium,
-    textAlign: "center",
-  },
-});

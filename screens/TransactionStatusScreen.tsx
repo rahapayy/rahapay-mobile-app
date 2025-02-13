@@ -49,7 +49,7 @@ const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
           animation: "shake",
           icon: <Warning2 variant="Bold" color={COLORS.red400} size={150} />,
         };
-      case "successful":
+      case "success":
         return {
           headText: "Transaction Completed",
           subText: "Order has been processed successfully.",

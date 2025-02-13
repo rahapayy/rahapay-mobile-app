@@ -9,8 +9,8 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { Platform, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import useApi from "../utils/api";
-import { AuthContext } from "../services/AuthContext";
+import useApi from "../services/apiClient";
+import { useAuth } from "../services/AuthContext";
 
 export const NotificationContext = createContext();
 
@@ -25,14 +25,17 @@ Notifications.setNotificationHandler({
 export const NotificationProvider = ({ children }) => {
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(null);
+  const [notifications, setNotifications] = useState([]);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [hasAskedForPermission, setHasAskedForPermission] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
-  const { mutateAsync: sendDeviceToken } = useApi.post(
-    "/notification/device-token"
-  );
-  const { isAuthenticated } = useContext(AuthContext); // Use AuthContext to check authentication status
+  const { mutateAsync: sendDeviceToken } = useApi({
+    mutationFn: (token) => services.notificationService.sendDeviceToken(token),
+    onError: (error) => handleError(error),
+  });
+
+  const { isAuthenticated } = useAuth(); // Use AuthContext to check authentication status
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -67,6 +70,7 @@ export const NotificationProvider = ({ children }) => {
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
         setNotification(notification);
+        setNotifications((prev) => [...prev, notification]);
         console.log("Notification received in foreground:", notification);
       });
 
@@ -165,10 +169,11 @@ export const NotificationProvider = ({ children }) => {
       value={{
         expoPushToken,
         notification,
+        notifications,
         notificationsEnabled,
         setNotificationsEnabled,
         hasAskedForPermission,
-        requestNotificationPermissions, // Expose this new function
+        requestNotificationPermissions,
       }}
     >
       {children}

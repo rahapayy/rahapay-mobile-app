@@ -1,54 +1,56 @@
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
-import React, { useContext } from "react";
+import React from "react";
 import LottieView from "lottie-react-native";
 import Button from "../../../components/common/ui/buttons/Button";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import FONT_SIZE from "../../../constants/font-size";
 import SPACING from "../../../constants/SPACING";
-import { AuthContext } from "../../../services/AuthContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MediumText, LightText } from "../../../components/common/Text";
+import { useAuth } from "@/services/AuthContext";
+import { setItem } from "@/utils/storage";
+import { services } from "@/services";
 
 const SuccessfulScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { setIsUserAuthenticated, userInfo } = useContext(AuthContext);
-  const handleButtonClick = async () => {
-    // Set user as authenticated
-    await setIsUserAuthenticated(true);
+  const { setIsAuthenticated, setUserInfo } = useAuth();
 
-    // Store user info and access token in AsyncStorage
-    await AsyncStorage.multiSet([
-      ["userInfo", JSON.stringify(userInfo)],
-      ["access_token", userInfo?.data?.accessToken || ""],
-    ]);
-
-    // Navigate directly to the AppStack
-    setTimeout(() => {
-      navigation.navigate("AppStack");
-    }, 0);
+  const handleCompletion = async () => {
+    try {
+      // Final check and navigation
+      const userResponse = await services.authServiceToken.getUserDetails();
+      setUserInfo(userResponse.data);
+      setIsAuthenticated(true);
+    } catch (error) {
+      // Handle error
+    }
   };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
-        <View className="mt-20">
+        <View className="mt-20 flex-1">
           <LottieView
             source={require("../../../assets/animation/success.json")}
             autoPlay
             loop
             style={styles.animation}
           />
-          <Text style={styles.headText}>Congratulations!</Text>
-          <Text style={styles.subText}>
-            Great news! Your RahaPay account has been created successfully.
-          </Text>
         </View>
+      </View>
+      <View className="justify-center items-center mb-12">
+        <MediumText color="black" size="xlarge" marginBottom={15}>
+          Congratulations!
+        </MediumText>
+        <LightText color="mediumGrey" center>
+          Great news! Your RahaPay account has been created successfully.
+        </LightText>
       </View>
 
       <View style={styles.buttonContainer}>
         <Button
           title={"Continue"}
-          onPress={handleButtonClick}
+          onPress={handleCompletion}
           style={styles.button}
           textColor="#fff"
         />
@@ -65,8 +67,8 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   animation: {
-    width: 300,
-    height: 300,
+    width: 350,
+    height: 350,
   },
   headText: {
     fontFamily: "Outfit-Medium",

@@ -9,6 +9,7 @@ import {
 import React, { FC } from "react";
 import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
+import { RegularText } from "../common/Text";
 
 const { height: windowHeight, width: windowWidth } = Dimensions.get("window");
 
@@ -60,9 +61,7 @@ const NextButton: FC<NextButtonProps> = ({
           },
         ]}
       >
-        <Text style={[styles.buttonText, { color: COLORS.black400 }]}>
-          Login
-        </Text>
+        <RegularText color="black">Login</RegularText>
       </TouchableOpacity>
     </View>
   );

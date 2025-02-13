@@ -1,13 +1,9 @@
-import React, { useRef, useState } from "react";
-import { ArrowLeft } from "iconsax-react-native";
+import React, { useEffect, useRef, useState } from "react";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RFValue } from "react-native-responsive-fontsize";
 import {
   SafeAreaView,
-  ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -15,10 +11,16 @@ import {
 import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
 import Button from "../../../components/common/ui/buttons/Button";
-import useApi from "../../../utils/api";
+import  { services } from "../../../services/apiClient";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
-import { LightText, MediumText } from "../../../components/common/Text";
+import {
+  LightText,
+  MediumText,
+  RegularText,
+} from "../../../components/common/Text";
+import OtpInput from "../../../components/OtpInput";
+import { IVerifyResetDto } from "@/services/dtos";
 
 type EnterCodeScreenRouteParams = {
   email: string;
@@ -30,11 +32,30 @@ const EnterCodeScreen: React.FC<{
   const route =
     useRoute<RouteProp<{ params: EnterCodeScreenRouteParams }, "params">>();
   const email = route.params.email;
+  
   const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const boxRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
   const [boxIsFocused, setBoxIsFocused] = useState(new Array(6).fill(false));
-  const { mutateAsync: verifyOtp } = useApi.post("/auth/verify/reset-otp");
+  const [resendCountdown, setResendCountdown] = useState(60);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (resendCountdown > 0) {
+      timer = setTimeout(() => setResendCountdown((prev) => prev - 1), 1000);
+    }
+
+    return () => clearTimeout(timer);
+  }, [resendCountdown]);
+
+  const handlePaste = (text: string) => {
+    if (/^\d{6}$/.test(text)) {
+      const newBoxes = text.split("");
+      setBoxes(newBoxes);
+      boxRefs.current[5]?.focus();
+    }
+  };
 
   const handleInput = (text: string, index: number) => {
     if (/^\d{0,1}$/.test(text)) {
@@ -63,32 +84,64 @@ const EnterCodeScreen: React.FC<{
     }
   };
 
+  // const requestOtpHandler = async () => {
+  //   setIsSubmitting(true);
+  //   setResendCountdown(60); // Reset countdown when Resend OTP is clicked
+  //   try {
+  //     await services.authService.resendOtp(id);
+  //     handleShowFlash({
+  //       message: "OTP sent to your email successfully!",
+  //       type: "success",
+  //     });
+  //     setIsOtpRequested(true);
+  //   } catch (error) {
+  //     const err = error as {
+  //       response?: { data?: { message?: string } };
+  //       message: string;
+  //     };
+  //     const errorMessage =
+  //       err.response?.data?.message || err.message || "An error occurred";
+  //     handleShowFlash({
+  //       message: errorMessage,
+  //       type: "danger",
+  //     });
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
   const handleButtonClick = async () => {
     const otp = boxes.join("");
     if (otp.length === 6) {
       setIsSubmitting(true);
       try {
-        const response = await verifyOtp({ otp, email });
-        console.log("API Response:", response.data); // Ensure the resetToken is part of this response
+        const payload: IVerifyResetDto = {
+          otp,
+        };
+
+        const response = await services.authService.verifyResetOtp(payload);
+
+        console.log("API Response:", response.data);
         handleShowFlash({
           message: "OTP verified successfully!",
           type: "success",
         });
-        const resetToken = response.data.data.resetToken; // Correct path to resetToken
-        console.log("Received resetToken:", resetToken); // Debugging line
+
+        const resetToken = response.data.resetToken;
+
+        console.log("Received resetToken:", resetToken);
         if (!resetToken) {
           throw new Error("Reset token is missing from the response");
         }
         navigation.navigate("CreateNewPasswordScreen", {
           resetToken: resetToken,
         });
-      } catch (error) {
-        const err = error as {
-          response?: { data?: { message?: string } };
-          message: string;
-        };
+      } catch (error: any) {
         const errorMessage =
-          err.response?.data?.message || err.message || "An error occurred";
+          error.response?.data?.message instanceof Array
+            ? error.response.data.message[0]
+            : error.response?.data?.message || "An unexpected error occurred";
+        console.error("Login error:", errorMessage);
         handleShowFlash({
           message: errorMessage,
           type: "danger",
@@ -105,12 +158,11 @@ const EnterCodeScreen: React.FC<{
   };
 
   return (
-    <SafeAreaView className="flex-1">
-      <ScrollView>
-        <View className="p-4">
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1, justifyContent: "space-between", padding: 16 }}>
+        <View>
           <BackButton navigation={navigation} />
-
-          <View className="mt-4">
+          <View style={{ marginTop: 16 }}>
             <MediumText color="black" size="xlarge" marginBottom={5}>
               Enter Code
             </MediumText>
@@ -119,51 +171,42 @@ const EnterCodeScreen: React.FC<{
             </LightText>
           </View>
 
-          <View style={styles.inputContainer}>
-            <View style={styles.inputRow}>
-              {boxes.map((value, index) => (
-                <TextInput
-                  key={index}
-                  ref={(ref) => (boxRefs.current[index] = ref)}
-                  style={[
-                    styles.inputBox,
-                    boxIsFocused[index] && styles.inputBoxFocused,
-                  ]}
-                  keyboardType="numeric"
-                  value={value}
-                  secureTextEntry
-                  allowFontScaling={false}
-                  onChangeText={(text) => handleInput(text, index)}
-                  onFocus={() =>
-                    setBoxIsFocused((prevState) => [
-                      ...prevState.slice(0, index),
-                      true,
-                      ...prevState.slice(index + 1),
-                    ])
-                  }
-                  onBlur={() =>
-                    setBoxIsFocused((prevState) => [
-                      ...prevState.slice(0, index),
-                      false,
-                      ...prevState.slice(index + 1),
-                    ])
-                  }
-                  onKeyPress={(event) => handleKeyPress(index, event)}
-                />
-              ))}
-            </View>
-          </View>
-
-          <Button
-            title={"Proceed"}
-            onPress={handleButtonClick}
-            className="mt-4"
-            textColor="#fff"
-            isLoading={isSubmitting}
-            disabled={isSubmitting || boxes.some((box) => !box)}
+          <OtpInput
+            boxes={boxes}
+            boxRefs={boxRefs}
+            handleInput={handleInput}
+            handlePaste={handlePaste}
+            handleKeyPress={handleKeyPress}
+            boxIsFocused={boxIsFocused}
+            setBoxIsFocused={setBoxIsFocused}
           />
+          <View className="justify-center items-center mt-6">
+            <LightText color="light">Didn't receive an OTP?</LightText>
+
+            {/* <TouchableOpacity
+              onPress={requestOtpHandler}
+              disabled={resendCountdown > 0}
+            >
+              <View style={styles.countdownContainer}>
+                <RegularText color="black" size="medium">
+                  {resendCountdown > 0
+                    ? `Resend OTP (${resendCountdown}s)`
+                    : "Resend OTP"}
+                </RegularText>
+              </View>
+            </TouchableOpacity> */}
+          </View>
         </View>
-      </ScrollView>
+
+        <Button
+          title={"Proceed"}
+          onPress={handleButtonClick}
+          style={{ marginTop: "auto" }}
+          textColor="#fff"
+          isLoading={isSubmitting}
+          // disabled={isSubmitting || boxes.some((box) => !box)}
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -171,47 +214,11 @@ const EnterCodeScreen: React.FC<{
 export default EnterCodeScreen;
 
 const styles = StyleSheet.create({
-  headText: {
-    fontFamily: "Outfit-Medium",
-    fontSize: RFValue(20),
-    marginBottom: 10,
-  },
-  subText: {
-    fontFamily: "Outfit-ExtraLight",
-    fontSize: RFValue(13),
-  },
-  inputContainer: {
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: SPACING * 2,
-    borderRadius: 15,
-  },
-  input: {
-    flex: 1,
-    height: "100%",
-    fontSize: RFValue(19),
-    fontWeight: "bold",
-  },
-  inputRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  inputBox: {
-    flex: 1,
-    textAlign: "center",
+  countdownContainer: {
+    marginTop: SPACING * 2,
+    backgroundColor: COLORS.violet200,
     paddingVertical: SPACING * 1.5,
-    paddingHorizontal: SPACING,
-    borderRadius: 10,
-    margin: SPACING / 2,
-    borderWidth: 1,
-    borderColor: "#DFDFDF",
-    fontSize: RFValue(19),
-    fontWeight: "bold",
-  },
-  inputBoxFocused: {
-    borderColor: COLORS.violet400,
-    borderWidth: 1,
+    paddingHorizontal: SPACING * 2,
+    borderRadius: 4,
   },
 });

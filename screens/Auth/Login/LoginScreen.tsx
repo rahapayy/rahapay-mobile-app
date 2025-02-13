@@ -16,8 +16,7 @@ import SPACING from "../../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import { AuthContext } from "../../../services/AuthContext";
-import { AxiosError } from "axios";
+import { services } from "@/services";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import {
   BoldText,
@@ -26,6 +25,9 @@ import {
 } from "../../../components/common/Text";
 import Label from "../../../components/common/ui/forms/Label";
 import BasicInput from "../../../components/common/ui/forms/BasicInput";
+import { ILoginDto } from "../../../services/dtos";
+import { useAuth } from "@/services/AuthContext";
+import { setItem } from "@/utils/storage";
 
 const validationSchema = Yup.object().shape({
   id: Yup.string()
@@ -42,24 +44,44 @@ const validationSchema = Yup.object().shape({
 const LoginScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { login } = useContext(AuthContext);
+  const { setIsAuthenticated, setUserInfo } = useAuth(); 
 
   const handleLogin = async (
     values: { id: string; password: string },
-    { setSubmitting }
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
   ) => {
+    setSubmitting(true);
     try {
-      await login(values.id, values.password);
-      handleShowFlash({ message: "Logged in successfully!", type: "success" });
-    } catch (error) {
-      let errorMessage = "An error occurred. Please try again.";
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 404) errorMessage = "User not found.";
-        else if (error.response.status === 401)
-          errorMessage = "Incorrect password.";
-        else errorMessage = "Server error. Try again later.";
+      const payload: ILoginDto = {
+        id: values.id,
+        password: values.password,
+      };
+
+      const response = await services.authService.login(payload);
+      console.log(response);
+      if (response) {
+        // Await token storage
+        await setItem("ACCESS_TOKEN", response.data.accessToken, true);
+        await setItem("REFRESH_TOKEN", response.data.refreshToken, true);
+        
+        // Fetch user details after successful login
+        const userResponse = await services.authServiceToken.getUserDetails();
+        
+        // Update both auth state and user info
+        setIsAuthenticated(true);
+        setUserInfo(userResponse.data);
       }
-      handleShowFlash({ message: errorMessage, type: "danger" });
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message instanceof Array
+          ? error.response.data.message[0]
+          : error.response?.data?.message || "An unexpected error occurred";
+      console.error("Login error:", errorMessage);
+
+      handleShowFlash({
+        message: "Invalid username or password",
+        type: "danger",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -103,7 +125,7 @@ const LoginScreen: React.FC<{
                     <BasicInput
                       value={values.id}
                       onChangeText={handleChange("id")}
-                      onBlur={handleBlur("id")}
+                      // onBlur={handleBlur("id")}
                       placeholder="Email or Phone Number"
                       autoCapitalize="none"
                       autoComplete="off"
@@ -119,7 +141,7 @@ const LoginScreen: React.FC<{
                     <BasicInput
                       value={values.password}
                       onChangeText={handleChange("password")}
-                      onBlur={handleBlur("password")}
+                      // onBlur={handleBlur("password")}
                       placeholder="Password"
                       secureTextEntry
                       autoCapitalize="none"
@@ -134,9 +156,9 @@ const LoginScreen: React.FC<{
                     onPress={() => navigation.navigate("ResetPasswordScreen")}
                     className="mt-4 justify-center items-end"
                   >
-                    <BoldText color="primary" size="base">
+                    <MediumText color="primary" size="base">
                       Forgot Password?
-                    </BoldText>
+                    </MediumText>
                   </TouchableOpacity>
                 </View>
               </KeyboardAvoidingView>

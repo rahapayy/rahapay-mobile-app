@@ -7,7 +7,7 @@ import {
   View,
   Share,
 } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, Copy, People, Send2 } from "iconsax-react-native";
 import SPACING from "../../constants/SPACING";
@@ -18,12 +18,14 @@ import { RFValue } from "react-native-responsive-fontsize";
 import Money from "../../assets/svg/money-earn-svgrepo-com 1.svg";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import * as Clipboard from "expo-clipboard";
-import { AuthContext } from "../../services/AuthContext";
+import { useAuth } from "../../services/AuthContext";
+import Button from "../../components/common/ui/buttons/Button";
+import { MediumText, RegularText } from "../../components/common/Text";
 
 const ReferralScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { userDetails } = useContext(AuthContext);
+  const { userInfo } = useAuth();
 
   const copyToClipboard = async (textToCopy: string) => {
     await Clipboard.setStringAsync(textToCopy);
@@ -35,7 +37,7 @@ const ReferralScreen: React.FC<{
 
   const shareWithFriends = async () => {
     try {
-      const referralCode = userDetails?.userName;
+      const referralCode = userInfo?.userName;
       const message = `Join RahaPay and earn rewards! Use my referral code: ${referralCode}`;
       const result = await Share.share({
         message,
@@ -68,61 +70,89 @@ const ReferralScreen: React.FC<{
         </View>
         <View style={styles.content}>
           <ReferImg style={styles.image} />
-          <Text style={styles.headerText} allowFontScaling={false}>
+          <MediumText size="xxlarge" color="white">
             Refer & Earn Cash
-          </Text>
-          <Text style={styles.desText}>
+          </MediumText>
+          <RegularText color="white" size="base" marginBottom={10}>
             Earn 6% of your friends' first deposit
-          </Text>
+          </RegularText>
         </View>
       </SafeAreaView>
       <View style={styles.copyContainer}>
-        <Text style={styles.topText} allowFontScaling={false}>
-          Your unique referral code
-        </Text>
-        <View className="flex-row gap-2 mb-2">
-          <View style={styles.tagContain}>
-            <Text style={styles.tagText} allowFontScaling={false}>
-              {userDetails?.userName}
-            </Text>
-          </View>
-          <TouchableOpacity
-            onPress={() => copyToClipboard(userDetails?.userName)}
-            style={styles.copyContain}
-          >
-            <Text style={styles.copyText} allowFontScaling={false}>
-              Copy
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View className="w-80 mb-4">
-          <TouchableOpacity
-            onPress={shareWithFriends}
-            style={styles.shareButton}
-          >
-            <Send2 variant="Bold" color="#fff" />
-            <Text style={styles.shareText} allowFontScaling={false}>
-              Share to invite your friends
-            </Text>
-          </TouchableOpacity>
-        </View>
+        {userInfo?.userName ? (
+          <>
+            <RegularText
+              color="black"
+              size="base"
+              marginBottom={6}
+              marginTop={6}
+            >
+              Your unique referral code
+            </RegularText>
+            <View className="flex-row gap-2 mb-2">
+              <View style={styles.tagContain}>
+                <Text style={styles.tagText}>{userInfo.userName}</Text>
+              </View>
+              <Button
+                onPress={() => copyToClipboard(userInfo.userName)}
+                title="Copy"
+                textColor="white"
+                style={styles.copyContain}
+              />
+            </View>
+            <Button
+              onPress={shareWithFriends}
+              title="Share to invite your friends"
+              frontIcon={<Send2 variant="Bold" color="#fff" />}
+              textColor="white"
+              style={styles.shareButton}
+              className="mb-4"
+            />
+          </>
+        ) : (
+          <>
+            <View className="py-4 justify-center items-center">
+              <RegularText center color="black">
+                Your referral code is your username. Click on the button below
+                to create yours now to start inviting friends and earning
+                rewards.
+              </RegularText>
+              <Button
+                onPress={async () => {
+                  await navigation.navigate("CreateTagScreen");
+                }}
+                textColor="white"
+                title="Create Tag"
+                className="mt-6"
+                style={styles.shareButton}
+              />
+            </View>
+          </>
+        )}
       </View>
 
       <View style={styles.cashoutContain}>
         <View className="flex-row justify-between items-center px-4">
           <View className="flex-row items-center">
             <People color="#000" variant="Bold" />
-            <Text style={styles.referralText}>My Referrals</Text>
+            <RegularText color="black" marginLeft={8}>
+              My Referrals
+            </RegularText>
           </View>
-          <Text style={styles.valueText}>0</Text>
+          <MediumText color="black" size="large">
+            0
+          </MediumText>
         </View>
         <View className="flex-row justify-between items-center px-4 mt-2">
           <View className="flex-row items-center">
             <Money />
-            <Text style={styles.referralText}>Total Referral Earnings</Text>
+            <RegularText color="black" marginLeft={8}>
+              Total Referral Earnings
+            </RegularText>
           </View>
-          <Text style={styles.valueText}>₦0.00</Text>
+          <MediumText color="black" size="large">
+            ₦0.00
+          </MediumText>
         </View>
       </View>
     </View>
@@ -153,20 +183,6 @@ const styles = StyleSheet.create({
   image: {
     marginBottom: SPACING * 2,
   },
-  headerText: {
-    color: "#fff",
-    fontSize: RFValue(28),
-    fontFamily: "Outfit-Medium",
-    textAlign: "center",
-  },
-  desText: {
-    color: "#fff",
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.small,
-    textAlign: "center",
-    marginTop: SPACING,
-    marginBottom: SPACING,
-  },
   copyContainer: {
     paddingHorizontal: SPACING,
     marginTop: SPACING,
@@ -177,12 +193,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   shareButton: {
-    backgroundColor: COLORS.violet400,
-    justifyContent: "center",
-    alignItems: "center",
     paddingVertical: SPACING * 1.7,
-    borderRadius: 10,
-    flexDirection: "row",
+    width: 250,
   },
   shareText: {
     fontFamily: "Outfit-Regular",
@@ -196,9 +208,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   copyContain: {
-    backgroundColor: COLORS.violet800,
-    padding: SPACING * 1.7,
-    borderRadius: 5,
+    width: 80,
   },
   topText: {
     fontFamily: "Outfit-Regular",

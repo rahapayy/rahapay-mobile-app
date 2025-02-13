@@ -20,9 +20,10 @@ import Eti from "../../assets/svg/9mobilebig.svg";
 import Glo from "../../assets/svg/globig.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 import SwipeButton from "../../components/SwipeButton";
-import useApi from "../../utils/api";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { RootStackParamList } from "../../types/RootStackParams";
+import { DataPurchasePayload } from "@/services/modules/data";
+import { services } from "@/services";
 
 type ReviewDataSummaryScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -44,54 +45,27 @@ const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
 }) => {
   const { selectedOperator, selectedPlan, phoneNumber } = route.params;
 
-  const { mutateAsync } = useApi.post("/top-up/data");
-
   const handleSwipeConfirm = async (reset: () => void) => {
     try {
-      const response = await mutateAsync({
-        planId: selectedPlan.plan_id,
-        networkType: selectedOperator.toLowerCase(),
-        phoneNumber: phoneNumber,
-      });
+      const payload: DataPurchasePayload = {
+        planId: route.params.selectedPlan.plan_id,
+        networkType: route.params.selectedOperator.toLowerCase(),
+        phoneNumber: route.params.phoneNumber,
+      };
 
-      if (response.data.success) {
-        navigation.navigate("TransactionStatusScreen", {
-          status: "successful",
-        });
-      } else {
-        navigation.navigate("TransactionStatusScreen", { status: "failed" });
-      }
-    } catch (err: unknown) {
-      console.error("Error topping up data:", err);
-      if (err instanceof Error && "response" in err) {
-        const axiosError = err as AxiosError;
-        if (axiosError.response?.status === 400) {
-          if (
-            axiosError.response.data?.message ===
-            "Insufficient funds in wallet!"
-          ) {
-            handleShowFlash({
-              message: "Insufficient funds. Please top up.",
-              type: "danger",
-            });
-          } else {
-            handleShowFlash({
-              message: "Bad request. Please check your input and try again.",
-              type: "danger",
-            });
-          }
-        } else {
-          handleShowFlash({
-            message: "An error occurred. Please try again.",
-            type: "danger",
-          });
-        }
-      } else {
-        handleShowFlash({
-          message: "An unknown error occurred. Please try again.",
-          type: "danger",
-        });
-      }
+      const response = await services.dataService.purchaseData(payload);
+      // const response = await services.airtimeService.purchaseAirtime(payload);
+
+      navigation.navigate("TransactionStatusScreen", {
+        status: response.status,
+        message: response.msg,
+        amount: response.amount,
+      });
+    } catch (error: any) {
+      navigation.navigate("TransactionStatusScreen", {
+        status: "failed",
+        message: error.response?.data?.msg || "Data purchase failed",
+      });
     } finally {
       reset();
     }

@@ -14,7 +14,6 @@ import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as Animatable from "react-native-animatable";
-import { AuthContext } from "../../../services/AuthContext";
 import { AxiosError } from "axios";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import BasicInput from "../../../components/common/ui/forms/BasicInput";
@@ -27,16 +26,18 @@ import {
 import PhoneNumberInput from "../../../components/common/ui/forms/PhoneNumberInput";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import Checkbox from 'expo-checkbox';
 import { SafeAreaView } from "react-native-safe-area-context";
+import SectionDivider from "../../../components/SectionDivider";
+import ProgressIndicator from "../../../components/ProgressIndicator";
+import { IOnboardingDto } from "@/services/dtos";
+import { services } from "@/services";
 
 interface CreateAccountScreenProps {
   navigation: NativeStackNavigationProp<any, "">;
 }
 
 const validationSchema = Yup.object().shape({
-  firstName: Yup.string().required("First name is required"),
-  lastName: Yup.string().required("Last name is required"),
+  fullName: Yup.string().required("Full name is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   phoneNumber: Yup.string().required("Phone number is required"),
   password: Yup.string()
@@ -69,8 +70,6 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
     confirmPassword: false,
   });
   const countryCode = "+234";
-  const [isChecked, setChecked] = useState(false);
-  const { onboarding } = useContext(AuthContext);
 
   const passwordRequirements = useMemo(
     () => [
@@ -120,7 +119,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
       optional: boolean = false
     ) => (
       <View className="mt-4">
-        <Label text={label} marked={!optional} />
+        <Label text={label} marked={false} />
         <BasicInput
           value={formikProps.values[field]}
           onChangeText={formikProps.handleChange(field)}
@@ -143,8 +142,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
     <SafeAreaView className="flex-1">
       <Formik
         initialValues={{
-          firstName: "",
-          lastName: "",
+          fullName: "",
           email: "",
           phoneNumber: "",
           password: "",
@@ -154,17 +152,21 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
         validationSchema={validationSchema}
         onSubmit={async (values, { setSubmitting }) => {
           try {
-            const fullName = `${values.firstName.trim()} ${values.lastName.trim()}`;
-            const userInfo = await onboarding(
-              values.email.trim(),
-              values.password.trim(),
+            const payload: IOnboardingDto = {
+              email: values.email.trim(),
+              password: values.password.trim(),
               countryCode,
-              fullName,
-              values.phoneNumber.trim(),
-              values.referral.trim()
-            );
+              fullName: values.fullName.trim(),
+              phoneNumber: values.phoneNumber.trim(),
+              referral: values.referral.trim(),
+            };
 
-            const userId = userInfo?.data?.id;
+            // const userId = userInfo?.data?.id;
+
+            const response = await services.authService.onboarding(payload);
+            const userId = response.data.id;
+            console.log(userId);
+
             handleShowFlash({
               message: "Sign up successful! Please verify your email.",
               type: "success",
@@ -195,7 +197,11 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
       >
         {(formikProps) => (
           <View className="flex-1 px-4">
-            <BackButton navigation={navigation} />
+            <ProgressIndicator
+              navigation={navigation}
+              currentStep={0}
+              totalSteps={4}
+            />
 
             <KeyboardAwareScrollView
               contentContainerStyle={{ flexGrow: 1 }}
@@ -212,27 +218,16 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                 </LightText>
               </View>
 
-              <View className="flex-row gap-2">
-                <View className="flex-1">
-                  {renderInputField(
-                    "First Name",
-                    "firstName",
-                    "e.g John",
-                    formikProps
-                  )}
-                </View>
-                <View className="flex-1">
-                  {renderInputField(
-                    "Last Name",
-                    "lastName",
-                    "e.g Doe",
-                    formikProps
-                  )}
-                </View>
+              <View>
+                {renderInputField(
+                  "Full Name",
+                  "fullName",
+                  "e.g John Doe",
+                  formikProps
+                )}
               </View>
 
-              {((formikProps.values.firstName && formikProps.values.lastName) ||
-                visibleSections.email) && (
+              {formikProps.values.fullName && (
                 <Animatable.View animation={"fadeIn"} duration={600}>
                   {renderInputField(
                     "Email Address",
@@ -249,7 +244,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                   duration={600}
                   className="mt-4"
                 >
-                  <Label text="Phone Number" marked={true} />
+                  <Label text="Phone Number" marked={false} />
                   <PhoneNumberInput
                     value={formikProps.values.phoneNumber}
                     onChangeText={(value: string) =>
@@ -272,7 +267,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                   duration={600}
                   className="mt-4"
                 >
-                  <Label text="Create Password" marked={true} />
+                  <Label text="Create Password" marked={false} />
                   <BasicInput
                     value={formikProps.values.password}
                     onChangeText={(value) =>
@@ -309,6 +304,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                                 ? styles.requirementMetIcon
                                 : styles.requirementNotMetIcon,
                             ]}
+                            allowFontScaling={false}
                           >
                             {metRequirements.has(index) ? "✓" : "✗"}
                           </Text>
@@ -319,6 +315,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                                 ? styles.requirementMetText
                                 : styles.requirementNotMetText,
                             ]}
+                            allowFontScaling={false}
                           >
                             {requirement.text}
                           </Text>
@@ -334,7 +331,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                 <Animatable.View
                   animation={"fadeIn"}
                   duration={600}
-                  className="mt-4"
+                  // className="mt-2"
                 >
                   {renderInputField(
                     "Re-type Password",
@@ -355,25 +352,6 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                 true
               )}
             </KeyboardAwareScrollView>
-
-            {/* <View className="mt-4 flex-row items-center px-2">
-              <Checkbox 
-                value={isChecked} 
-                onValueChange={setChecked}
-                className="mr-2 h-6 w-6 rounded border-gray-300"
-              />
-              <MediumText color="mediumGrey" size="base">
-                By signing up, you agree to our{" "}
-                <BoldText color="primary" size="base">
-                  Terms of Service
-                </BoldText>{" "}
-                and{" "}
-                <BoldText color="primary" size="base">
-                  Privacy Policy
-                </BoldText>
-                .
-              </MediumText>
-            </View> */}
 
             <Button
               title="Proceed"
@@ -453,7 +431,7 @@ const styles = StyleSheet.create({
     color: "#4CAF50",
   },
   requirementText: {
-    fontSize: RFValue(12),
+    fontSize: RFValue(10),
     fontFamily: "Outfit-Regular",
   },
   requirementNotMetText: {

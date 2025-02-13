@@ -1,6 +1,10 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { getItem, removeItem, setItem } from "@/utils/storage";
 import { AuthServices } from "./modules";
+import UserServices from "./modules/user";
+import DeviceToken from "./modules/notificaiton";
+import AirtimeService from "./modules/airtime";
+import DataService from "./modules/data";
 
 export const axiosInstance = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
@@ -9,8 +13,6 @@ export const axiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-    "Custom-Keyword": "ProsplugMobileApp", // Custom keyword added
-    "App-Version": "1.0.0", // Update this version as needed
   },
 });
 
@@ -19,8 +21,6 @@ export const axiosInstanceWithoutToken = axios.create({
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-    "Custom-Keyword": "ProsplugMobileApp", // Custom keyword added
-    "App-Version": "1.0.0", // Update this version as needed
   },
 });
 
@@ -108,16 +108,12 @@ axiosInstance.interceptors.request.use(
   async (config) => {
     const getToken = async () => {
       const token = await getItem("ACCESS_TOKEN", true);
-      if (token) {
-        return token;
-      } else {
-        return "";
-      }
+      return token;
     };
 
     const token = await getToken();
-    if (token != "" || token != null) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+    if (token && token !== "") {
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
@@ -128,4 +124,8 @@ axiosInstance.interceptors.request.use(
 export const services = {
   authService: new AuthServices(axiosInstanceWithoutToken),
   authServiceToken: new AuthServices(axiosInstance),
+  userService: new UserServices(axiosInstance),
+  notificationService: new DeviceToken(axiosInstance),
+  airtimeService: new AirtimeService(axiosInstance),
+  dataService: new DataService(axiosInstance),
 };

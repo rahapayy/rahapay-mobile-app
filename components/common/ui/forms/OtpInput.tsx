@@ -1,28 +1,32 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../../constants/SPACING";
 import COLORS from "../../../../constants/colors";
 
-interface VerificationInputProps {
+interface OtpInputProps {
   length: number;
   value: string[];
   onChange: (value: string[]) => void;
   secureTextEntry?: boolean;
+  autoFocus?: boolean; // New prop
 }
 
-const VerificationInput: React.FC<VerificationInputProps> = ({
+const OtpInput: React.FC<OtpInputProps> = ({
   length,
   value,
   onChange,
   secureTextEntry = false,
+  autoFocus = false, // Default to false
 }) => {
   const inputRefs = useRef<Array<TextInput | null>>(new Array(length).fill(null));
   const [inputFocused, setInputFocused] = useState(new Array(length).fill(false));
 
   useEffect(() => {
-    inputRefs.current[0]?.focus();
-  }, []);
+    if (autoFocus) {
+      inputRefs.current[0]?.focus();
+    }
+  }, [autoFocus]);
 
   const handleInput = (text: string, index: number) => {
     if (/^\d{0,1}$/.test(text)) {
@@ -53,47 +57,48 @@ const VerificationInput: React.FC<VerificationInputProps> = ({
   };
 
   return (
-    <View style={styles.inputRow}>
-      {value.map((digit, index) => (
-        <TextInput
-          key={index}
-          ref={(ref) => (inputRefs.current[index] = ref)}
-          style={[
-            styles.inputBox,
-            inputFocused[index] && styles.inputBoxFocused,
-          ]}
-          keyboardType="numeric"
-          value={digit}
-          secureTextEntry={secureTextEntry}
-          allowFontScaling={false}
-          onChangeText={(text) => {
-            if (text.length > 1) {
-              handlePaste(text);
-            } else {
-              handleInput(text, index);
-            }
-          }}
-          onKeyPress={(event) => handleKeyPress(event, index)}
-          onFocus={() => setInputFocused((prev) => {
-            const newFocused = [...prev];
-            newFocused[index] = true;
-            return newFocused;
-          })}
-          onBlur={() => setInputFocused((prev) => {
-            const newFocused = [...prev];
-            newFocused[index] = false;
-            return newFocused;
-          })}
-        />
-      ))}
-    </View>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={styles.inputRow}>
+        {value.map((digit, index) => (
+          <TextInput
+            key={index}
+            ref={(ref) => (inputRefs.current[index] = ref)}
+            style={[
+              styles.inputBox,
+              inputFocused[index] && styles.inputBoxFocused,
+            ]}
+            keyboardType="numeric"
+            value={digit}
+            secureTextEntry={secureTextEntry}
+            allowFontScaling={false}
+            onChangeText={(text) => {
+              if (text.length > 1) {
+                handlePaste(text);
+              } else {
+                handleInput(text, index);
+              }
+            }}
+            onKeyPress={(event) => handleKeyPress(event, index)}
+            onFocus={() => setInputFocused((prev) => {
+              const newFocused = [...prev];
+              newFocused[index] = true;
+              return newFocused;
+            })}
+            onBlur={() => setInputFocused((prev) => {
+              const newFocused = [...prev];
+              newFocused[index] = false;
+              return newFocused;
+            })}
+          />
+        ))}
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
   inputRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
   },
   inputBox: {
@@ -113,4 +118,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default VerificationInput;
+export default OtpInput;

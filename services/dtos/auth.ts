@@ -1,28 +1,35 @@
-import { IResponse } from "../../types/general";
+// import { IResponse } from "../../../types/general";
 
-interface UserInfoType {
+export interface UserInfoType {
   id: string;
   email: string;
+  userName: string;
   fullName: string;
   phoneNumber: string;
-  data: {
-    id: string;
-    user?: any;
-    accessToken?: string;
-    refreshToken?: string;
-  };
-  access_token: string;
-  refresh_token: string;
-  expires_at: number;
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: number;
+  deviceToken?: string;
+}
+
+export interface IUpdateProfilePayload {
+  fullName: string;
+  phoneNumber: string;
+  email: string;
 }
 
 export interface IOnboardingDto {
+  email: string;
+  password: string;
+  countryCode: string;
   fullName: string;
+  phoneNumber: string;
+  referral: string;
 }
 
 export interface IRefreshTokenDto {
-  accessToken: string;
   refreshToken: string;
+  accessToken: string;
 }
 
 export interface IRefreshTokenResponseDto {
@@ -30,12 +37,34 @@ export interface IRefreshTokenResponseDto {
   refreshToken: string;
 }
 
-export interface ILoginDto {}
+export interface ILoginDto {
+  id: string;
+  password: string;
+}
 
-export interface IForgotPasswordOTPDto {}
-
-export interface IVerifyEmailDto {
+export interface IForgotPasswordDto {
   email: string;
 }
 
-export interface User {}
+export interface IVerifyResetDto {
+  otp: string;
+}
+
+export interface IVerifyEmailDto {
+  otp: string;
+  email: string;
+}
+
+export interface IResetPasswordDto {
+  resetToken: string;
+  password: string;
+}
+
+export interface ICreatePinDto {
+  securityPin: string;
+  transactionPin: string;
+}
+
+export interface IReAuthenticateDto {
+  pin: string;
+}

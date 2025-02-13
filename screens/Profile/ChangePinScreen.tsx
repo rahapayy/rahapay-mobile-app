@@ -18,7 +18,7 @@ import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
-import useApi from "../../utils/api";
+import useApi from "../../services/apiClient";
 import { RouteProp, useRoute } from "@react-navigation/native";
 
 const ChangePinScreen: React.FC<{

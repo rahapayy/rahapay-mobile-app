@@ -22,7 +22,6 @@ import Eti from "../../assets/svg/eti.svg";
 import Glo from "../../assets/svg/glo.svg";
 import Button from "../../components/common/ui/buttons/Button";
 import ComingSoon from "../../assets/svg/Coming Soon.svg";
-import useApi from "../../utils/api";
 
 const AirtimeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -31,9 +30,8 @@ const AirtimeScreen: React.FC<{
   const [amount, setAmount] = useState("");
   const [selectedOperator, setSelectedOperator] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const { mutateAsync } = useApi.post("/beneficiary/me?service=airtime");
 
-  const amounts = [50, 100, 200, 500, 1000, 2000, 3000, 5000];
+  const amounts = [100, 200, 500, 1000, 2000, 3000, 5000];
 
   // Check if all required fields are filled
   const isButtonDisabled = !selectedOperator || !phoneNumber || !amount;
@@ -183,9 +181,9 @@ const AirtimeScreen: React.FC<{
                         autoCapitalize="none"
                         autoCorrect={false}
                       />
-                      <TouchableOpacity>
+                      {/* <TouchableOpacity>
                         <ProfileCircle color={COLORS.violet400} />
-                      </TouchableOpacity>
+                      </TouchableOpacity> */}
                     </View>
                   </View>
 
@@ -302,7 +300,7 @@ const AirtimeScreen: React.FC<{
                         </Text>
                         <TextInput
                           style={styles.input}
-                          placeholder="Amount"
+                          placeholder="100 - 500,000"
                           placeholderTextColor="#BABFC3"
                           allowFontScaling={false}
                           value={amount}

@@ -1,21 +1,36 @@
-import { useContext } from "react";
+import { useAuth } from "@/services/AuthContext";
 import useSWR from "swr";
-import { AuthContext } from "../services/AuthContext";
 
 const useWallet = () => {
-  const { userInfo } = useContext(AuthContext);
+  const { userInfo } = useAuth();
 
   // Fetch data from both endpoints
-  const { data: dashboardData, isValidating: isDashboardLoading } =
-    useSWR(`user/dashboard/me/`);
+  const {
+    data: dashboardData,
+    isValidating: isDashboardLoading,
+    mutate: mutateDashboard,
+  } = useSWR(`user/dashboard/me`, {
+    // refreshInterval: 5000, // Refresh every 5 seconds
+    revalidateOnFocus: true,
+  });
 
   const {
     data: reservedAccountsData,
     isValidating: isReservedAccountsLoading,
+    mutate: mutateReservedAccounts,
   } = useSWR(`user/reserved-accounts`);
 
-  const { data: allTransactionsData, isValidating: isAllTransactionsLoading } =
-    useSWR(`transaction/all`);
+  const {
+    data: allTransactionsData,
+    isValidating: isAllTransactionsLoading,
+    mutate: mutateAllTransactions,
+  } = useSWR(`transaction/all`);
+
+  const refreshAll = () => {
+    mutateDashboard();
+    mutateReservedAccounts();
+    mutateAllTransactions();
+  };
 
   // console.log(allTransactionsData);
 
@@ -23,6 +38,11 @@ const useWallet = () => {
 
   // Correct the extraction of the transactions array
   const transactions = dashboardData?.transacton || []; // Fix the transactions source and correct the typo
+
+  // Filter the COMMISSION to not show amount in the transaction history
+  const filteredTransactions = transactions.filter(
+    (trx: { transactionType: string }) => trx.transactionType !== "COMMISSION"
+  );
 
   const balance = dashboardData?.wallet?.balance || 0;
 
@@ -39,7 +59,7 @@ const useWallet = () => {
   };
 
   // Mapping transactions to required fields without categorization
-  const formattedTransactions = transactions.map(
+  const formattedTransactions = filteredTransactions.map(
     (trx: {
       amountPaid: any;
       paidOn: string | number | Date;
@@ -68,6 +88,7 @@ const useWallet = () => {
   return {
     balance,
     account,
+    refreshAll,
     transactions: formattedTransactions,
     isLoading,
     getAllTransactions,

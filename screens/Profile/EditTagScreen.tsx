@@ -15,10 +15,10 @@ import COLORS from "../../constants/colors";
 import SPACING from "../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../components/common/ui/buttons/Button";
-import useApi from "../../utils/api";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import FONT_SIZE from "../../constants/font-size";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { services } from "@/services";
+import { Skeleton } from "@rneui/themed";
 
 const EditTagScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -27,64 +27,52 @@ const EditTagScreen: React.FC<{
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
+  const [error, setError] = useState(null);
 
   const isFormComplete = tag;
 
-  // const { mutateAsync: updateTagMutateAsync } = useApi.patch("/auth/username");
-  const { data: suggestedTagsResponse, refetch: fetchUsernames } = useApi.get(
-    "/user/suggest-username?numberOfSuggestions=7",
-    {
-      enabled: false,
-    }
-  );
-
-  const updateTagMutation = useApi.patch<{ userName: string }, Error>(
-    "/user/username"
-  );
-
-  const handleSetTag = async () => {
+  const fetchSuggestedTags = async () => {
     setLoading(true);
     try {
-      await updateTagMutation.mutateAsync({ userName: tag });
-      navigation.goBack();
-      handleShowFlash({
-        message: "Tag updated successfully!",
-        type: "success",
-      });
-      setTag("");
+      const response = await services.userService.suggestUsername(7);
+
+      // Remove the .data reference since suggestedUserNames is at the top level
+      const suggestedUsernames = response?.suggestedUserNames;
+      if (Array.isArray(suggestedUsernames) && suggestedUsernames.length > 0) {
+        setSuggestedTags(suggestedUsernames);
+      } else {
+        console.log("No suggested usernames received.");
+      }
     } catch (error) {
-      handleShowFlash({
-        message: "Failed to update tag. Please try another.",
-        type: "danger",
-      });
-      // Optionally log the error too
-      console.error("Failed to update tag:", error);
-      console.error({ error });
+      console.error("Error fetching suggested tags:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    AsyncStorage.getItem("access_token").then((value) => {
-      console.log("access token found");
-      if (value) {
-        console.log({ value });
-        fetchUsernames();
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    if (
-      suggestedTagsResponse?.data &&
-      suggestedTagsResponse.data &&
-      suggestedTagsResponse.data?.suggestedUserNames
-    ) {
-      setSuggestedTags(suggestedTagsResponse.data?.suggestedUserNames);
+  const handleSetTag = async () => {
+    try {
+      setIsLoading(true);
+      await services.userService.updateUsername({ userName: tag });
+      handleShowFlash({
+        message: "Tag updated successfully!",
+        type: "success",
+      });
+      navigation.navigate("HomeScreen");
+    } catch (error) {
+      handleShowFlash({
+        message: "Failed to update tag. Please try another.",
+        type: "danger",
+      });
+    } finally {
+      setIsLoading(false);
     }
-  }, [suggestedTagsResponse]);
+  };
 
+  useEffect(() => {
+    fetchSuggestedTags();
+  }, []);
+  
   return (
     <SafeAreaView className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -124,10 +112,20 @@ const EditTagScreen: React.FC<{
               />
             </View>
           </View>
-          {/* Suggested availble usertags */}
+          {/* Suggested available user tags */}
           <View className="flex-row gap-2 w-full flex-wrap mt-3">
-            {suggestedTags?.length > 0 &&
-              suggestedTags?.map((suggestedTag, index) => (
+            {loading ? (
+              Array.from({ length: 5 }, (_, i) => (
+                <Skeleton
+                  key={i}
+                  width={100}
+                  height={25}
+                  style={{ backgroundColor: COLORS.grey100, borderRadius: 8 }}
+                  skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                />
+              ))
+            ) : suggestedTags && suggestedTags.length > 0 ? (
+              suggestedTags.map((suggestedTag, index) => (
                 <TouchableOpacity
                   key={index}
                   style={{
@@ -150,23 +148,28 @@ const EditTagScreen: React.FC<{
                     {suggestedTag}
                   </Text>
                 </TouchableOpacity>
-              ))}
+              ))
+            ) : (
+              <Text>No suggestions available.</Text>
+            )}
           </View>
-
-          <Button
-            title="Update My Tag"
-            onPress={handleSetTag}
-            isLoading={loading}
-            style={[
-              styles.proceedButton,
-              // If the form is not complete, add styles.proceedButtonDisabled
-              !isFormComplete && styles.proceedButtonDisabled,
-            ]}
-            textColor={COLORS.white}
-            disabled={!isFormComplete || isLoading}
-          />
         </View>
       </ScrollView>
+
+      <View className="justify-center items-center">
+        <Button
+          title="Update My Tag"
+          onPress={handleSetTag}
+          isLoading={loading}
+          style={[
+            styles.proceedButton,
+            // If the form is not complete, add styles.proceedButtonDisabled
+            !isFormComplete && styles.proceedButtonDisabled,
+          ]}
+          textColor={COLORS.white}
+          disabled={!isFormComplete || isLoading}
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -222,7 +225,7 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
   },
   proceedButton: {
-    marginTop: SPACING * 2,
+    marginBottom: SPACING * 2,
   },
   proceedButtonText: {
     fontFamily: "Outfit-Regular",

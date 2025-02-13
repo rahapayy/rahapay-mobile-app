@@ -25,7 +25,7 @@ export default function App() {
     "Outfit-Bold": require("./assets/fonts/Outfit-Bold.ttf"),
     "Outfit-ExtraBold": require("./assets/fonts/Outfit-ExtraBold.ttf"),
     "Outfit-ExtraLight": require("./assets/fonts/Outfit-ExtraLight.ttf"),
-    "Outfit-Light": require("./assets/fonts/Outfit-Regular.ttf"),
+    "Outfit-Light": require("./assets/fonts/Outfit-Light.ttf"),
     "Outfit-Medium": require("./assets/fonts/Outfit-Medium.ttf"),
     "Outfit-Regular": require("./assets/fonts/Outfit-Regular.ttf"),
     "Outfit-SemiBold": require("./assets/fonts/Outfit-SemiBold.ttf"),
@@ -111,7 +111,7 @@ export default function App() {
       <ThemeProvider theme={theme}>
         <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
           <QueryClientProvider client={queryClient}>
-            <NotificationProvider>
+            {/* <NotificationProvider> */}
               <StatusBar barStyle={"default"} />
               <Router />
               <FlashMessage
@@ -119,7 +119,7 @@ export default function App() {
                 position="top"
                 MessageComponent={FlashMessageComponent}
               />
-            </NotificationProvider>
+            {/* </NotificationProvider> */}
           </QueryClientProvider>
         </GestureHandlerRootView>
       </ThemeProvider>

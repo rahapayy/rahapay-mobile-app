@@ -6,83 +6,86 @@ import {
   View,
   FlatList,
 } from "react-native";
-import React from "react";
-import { RFValue } from "react-native-responsive-fontsize";
+import React, { useContext } from "react";
 import COLORS from "../constants/colors";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import Airtime from "../assets/svg/smartphone-rotate-angle_svgrepo.com.svg";
-import Tv from "../assets/svg/tv_svgrepo.com.svg";
-import Electricity from "../assets/svg/electricity_svgrepo.com.svg";
-import Data from "../assets/svg/signal_svgrepo.com.svg";
 import { More } from "iconsax-react-native";
 import SPACING from "../constants/SPACING";
+import {
+  AirtimeIcon,
+  DataIcon,
+  ElectricityIcon,
+  TvIcon,
+} from "./common/ui/icons";
+import { BoldText, LightText, RegularText } from "./common/Text";
+import { Skeleton } from "@rneui/themed";
+import { AuthContext } from "../services/AuthContext";
 
 interface ActionItem {
   icon: React.ElementType;
   title: string;
-  navigateTo: string;
+  navigateTo?: string;
+  isComingSoon?: boolean;
 }
 
 const QuickAction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const { width: screenWidth } = useWindowDimensions();
+  const { isLoading } = useContext(AuthContext);
 
   // Calculate an appropriate card size based on the screen width, ensuring a minimum width
-  const cardWidth = Math.max((screenWidth - 60) / 4, 80); // Minimum width set to 80
+  const cardWidth = Math.max((screenWidth - 60) / 5, 80); // Minimum width set to 80
   const cardHeight = cardWidth * 1.1; // Maintain a fixed aspect ratio
 
-  // Updated style for card text to prevent wrapping
-  const cardTextStyle = {
-    ...styles.cardText,
-    width: cardWidth - 36, // take into account paddingHorizontal
-  };
+  const fill = COLORS.violet300; // Define a custom icon color
 
   const actionItems = [
-    { icon: Airtime, title: "Airtime", navigateTo: "AirtimeScreen" },
-    { icon: Data, title: "Data", navigateTo: "DataScreen" },
-    { icon: Tv, title: "TV", navigateTo: "TvSubscriptionScreen" },
+    { icon: AirtimeIcon, title: "Airtime", navigateTo: "AirtimeScreen" },
+    { icon: DataIcon, title: "Data", navigateTo: "DataScreen" },
+    { icon: TvIcon, title: "TV", isComingSoon: true },
     {
-      icon: Electricity,
+      icon: ElectricityIcon,
       title: "Electricity",
-      navigateTo: "ElectricityScreen",
+      isComingSoon: true,
     },
-    { icon: More, title: "More", navigateTo: "Services" },
   ];
 
-  const renderCard = ({ item }: { item: ActionItem }) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate(item.navigateTo)}
-      style={[styles.card, { width: cardWidth, height: cardHeight }]}
-    >
-      <item.icon color={COLORS.violet300} size={26} />
-      <Text
-        style={styles.cardText}
-        numberOfLines={1}
-        ellipsizeMode="tail"
-        allowFontScaling={false}
-      >
-        {item.title}
-      </Text>
-    </TouchableOpacity>
-  );
-
   return (
-    <View className="p-4">
-      <Text style={styles.quickAction} allowFontScaling={false}>
+    <View className="">
+      <BoldText color="black" size="medium">
         Quick Action
-      </Text>
-      <View className="flex-row items-center justify-between mt-4">
-        {/* Cards */}
-
-        <FlatList
-          data={actionItems}
-          renderItem={renderCard}
-          keyExtractor={(item, index) => index.toString()}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 4 }}
-        />
+      </BoldText>
+      <View className="flex-row items-center justify-between mt-4 mb-2">
+        {actionItems.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() =>
+              item.navigateTo && navigation.navigate(item.navigateTo)
+            }
+            style={[
+              styles.card,
+              item.isComingSoon && styles.disabledCard,
+              { width: cardWidth, height: cardHeight },
+            ]}
+          >
+            <item.icon fill={fill} width={24} height={24} />
+            {item.isComingSoon && (
+              <View style={styles.badgeContainer}>
+                <RegularText color="black" size="xsmall" center>
+                  Coming Soon!
+                </RegularText>
+              </View>
+            )}
+            <RegularText
+              color={item.isComingSoon ? "mediumGrey" : "black"}
+              marginTop={8}
+              size="base"
+            >
+              {item.title}
+            </RegularText>
+          </TouchableOpacity>
+        ))}
       </View>
     </View>
   );
@@ -91,24 +94,22 @@ const QuickAction: React.FC<{
 export default QuickAction;
 
 const styles = StyleSheet.create({
-  quickAction: {
-    fontFamily: "Outfit-SemiBold",
-    fontSize: RFValue(16),
-  },
   card: {
     backgroundColor: COLORS.white,
     justifyContent: "center",
     alignItems: "center",
-    margin: SPACING / 2,
     borderRadius: 20,
+    position: "relative",
   },
-  cardText: {
-    fontSize: RFValue(12),
-    fontFamily: "Outfit-Regular",
-    marginTop: SPACING,
+  disabledCard: {
+    opacity: 0.5,
   },
-  moreText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
+  badgeContainer: {
+    position: "absolute",
+    top: -10,
+    right: -10,
+    backgroundColor: COLORS.violet200,
+    padding: 3,
+    borderRadius: 10
   },
 });

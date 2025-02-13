@@ -12,7 +12,7 @@ import COLORS from "../../../constants/colors";
 import SPACING from "../../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/common/ui/buttons/Button";
-import useApi from "../../../utils/api";
+import useApi, { services } from "../../../services/apiClient";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import Label from "../../../components/common/ui/forms/Label";
@@ -20,13 +20,12 @@ import { LightText, MediumText } from "../../../components/common/Text";
 import BasicInput from "../../../components/common/ui/forms/BasicInput";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { IForgotPasswordDto } from "@/services/dtos";
 
 const ResetPasswordScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
-
-  const { mutateAsync } = useApi.post("/auth/forgot-password");
 
   const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -37,7 +36,13 @@ const ResetPasswordScreen: React.FC<{
   const handleButtonClick = async (values: { email: string }) => {
     setIsLoading(true);
     try {
-      const response = await mutateAsync({ email: values.email });
+      const payload: IForgotPasswordDto = {
+        email: values.email,
+      };
+
+      const response = await services.authService.forgotPassword(payload);
+      console.log(response);
+      
 
       handleShowFlash({
         message: "Password reset OTP sent to your email",
@@ -132,7 +137,6 @@ const ResetPasswordScreen: React.FC<{
                   ]}
                   textColor="#fff"
                   isLoading={isLoading}
-                  disabled={isLoading || !values.email}
                 />
               </View>
             </>

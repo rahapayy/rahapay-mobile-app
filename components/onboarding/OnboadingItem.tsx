@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
+import { BoldText, MediumText, RegularText } from "../common/Text";
 
 interface Slide {
   id: string;
@@ -24,7 +25,7 @@ interface OnboardingItemProps {
 const OnboardingItem: React.FC<OnboardingItemProps> = ({ item }) => {
   const { width, height } = useWindowDimensions();
   const animation = useRef(null);
-  const bottomPosition = height * 0 - 10;
+  const bottomPosition = height * 0 - 60;
 
   return (
     <SafeAreaView style={styles.contain}>
@@ -33,10 +34,14 @@ const OnboardingItem: React.FC<OnboardingItemProps> = ({ item }) => {
           source={item.image}
           style={[styles.image, { width, resizeMode: "contain" }]}
         />
-        <View style={{ flex: 0.2 }}>
-          <Text style={[styles.title]}>{item.title}</Text>
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <Text style={[styles.description]}>{item.description}</Text>
+        <View className="mt-6">
+          <MediumText color="black" center size="xxlarge">
+            {item.title}
+          </MediumText>
+          <View className="px-4">
+            <RegularText color="light" size="base" center marginTop={10}>
+              {item.description}
+            </RegularText>
           </View>
         </View>
       </View>
@@ -54,22 +59,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   image: {
-    flex: 0.5,
+    flex: 0.7,
     justifyContent: "center",
-  },
-  title: {
-    fontFamily: "Outfit-Medium",
-    fontSize: RFValue(28),
-    marginBottom: 10,
-    color: "#000",
-    textAlign: "center",
-    marginTop: 16,
-  },
-  description: {
-    fontFamily: "Outfit-Regular",
-    color: "#6A737D",
-    textAlign: "center",
-    fontSize: RFValue(14),
-    width: 300,
   },
 });

@@ -15,11 +15,14 @@ import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
 import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import { AuthContext } from "../../../services/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import BackButton from "../../../components/common/ui/buttons/BackButton";
 import { LightText, MediumText } from "../../../components/common/Text";
 import OtpInput from "../../../components/OtpInput";
+import ProgressIndicator from "../../../components/ProgressIndicator";
+import { IVerifyEmailDto } from "@/services/dtos";
+import { services } from "@/services";
+import { setItem } from "@/utils/storage";
+import { useAuth } from "@/services/AuthContext";
 
 type VerifyEmailScreenRouteParams = {
   email: string;
@@ -45,8 +48,7 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
   const [isInputFilled, setIsInputFilled] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(60);
   const [isLoading, setIsLoading] = useState(false);
-  const { verifyEmail, resendOtp, refreshAccessToken } =
-    useContext(AuthContext);
+  const { setUserInfo } = useAuth();
 
   useEffect(() => {
     setIsInputFilled(boxes.every((box) => box !== ""));
@@ -107,23 +109,28 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
     if (otp.length === 6) {
       setIsSubmitting(true);
       try {
-        await verifyEmail(otp)
-          .then((response) => {
-            refreshAccessToken(response.data.refreshToken)
-              .then(async (response) => {
-                await AsyncStorage.setItem(
-                  "access_token",
-                  response.accessToken
-                );
-                handleShowFlash({
-                  message: "Email verified successfully!",
-                  type: "success",
-                });
-                navigation.navigate("CreateTransactionPinScreen");
-              })
-              .catch((err) => console.log({ refreshError: err }));
-          })
-          .catch((err) => console.log({ verifyErr: err }));
+        const payload: IVerifyEmailDto = {
+          otp: otp,
+          email,
+        };
+
+        const response = await services.authService.verifyEmail(payload);
+        console.log(response);
+
+        if (response?.data?.accessToken) {
+          await setItem("ACCESS_TOKEN", response.data.accessToken, true);
+          await setItem("REFRESH_TOKEN", response.data.refreshToken, true);
+
+          // Fetch user details immediately after verification
+          const userResponse = await services.authServiceToken.getUserDetails();
+          setUserInfo(userResponse.data);
+
+          navigation.navigate("CreateTransactionPinScreen");
+          handleShowFlash({
+            message: "Your account has been successfully verified!",
+            type: "success",
+          });
+        }
       } catch (error) {
         const err = error as {
           response?: { data?: { message?: string; code?: string } };
@@ -157,7 +164,7 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
 
   const handleResendOTP = async () => {
     try {
-      await resendOtp(id);
+      await services.authService.resendOtp(id);
       handleShowFlash({
         message: "OTP resent successfully!",
         type: "success",
@@ -184,7 +191,11 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
     <SafeAreaView className="flex-1">
       <ScrollView>
         <View className="p-4">
-          <BackButton navigation={navigation} />
+          <ProgressIndicator
+            navigation={navigation}
+            currentStep={1}
+            totalSteps={4}
+          />
 
           <View className="mt-4">
             <MediumText color="black" size="xlarge" marginBottom={5}>

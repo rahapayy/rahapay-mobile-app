@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import {
   ImageBackground,
   SafeAreaView,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  Platform,
 } from "react-native";
 import {
   AddCircle,
@@ -23,8 +24,10 @@ import useWallet from "../../hooks/use-wallet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import SPACING from "../../constants/SPACING";
-import { BoldText, MediumText } from "../common/Text";
-import { AuthContext } from "../../services/AuthContext";
+import { BoldText, RegularText, SemiBoldText } from "../common/Text";
+import { useAuth } from "../../services/AuthContext";
+import { ActivityIndicator, PanResponder } from "react-native";
+import { Skeleton } from "@rneui/themed";
 
 const { height: screenHeight } = Dimensions.get("window");
 
@@ -33,6 +36,14 @@ const Card: React.FC<{
 }> = ({ navigation }) => {
   const [showBalance, setShowBalance] = useState(true);
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = React.useCallback(async () => {
+    setIsRefreshing(true);
+    await refreshAll();
+    await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulated delay
+    setIsRefreshing(false);
+  }, []);
 
   useEffect(() => {
     const getBalanceVisibility = async () => {
@@ -58,19 +69,42 @@ const Card: React.FC<{
     });
   };
 
-  const { userDetails } = useContext(AuthContext);
+  const { userInfo } = useAuth();
 
-  const fullName = userDetails?.fullName || "";
+  const fullName = userInfo?.fullName || "";
   const firstName = fullName.split(" ")[0];
   const initials = fullName
     .split(" ")
-    .map((n: any[]) => n[0])
+    .map((n) => n[0])
     .join("")
     .toUpperCase();
 
-  const { balance } = useWallet();
+  const { refreshAll, balance } = useWallet();
 
-  // console.log(balance);
+  const panResponder = React.useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+        const startY = evt.nativeEvent.locationY;
+        return startY < 30 && gestureState.dy > 0;
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dy > 50) handleRefresh();
+      },
+    })
+  ).current;
+
+  const shadowStyle = Platform.select({
+    ios: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+    },
+    android: {
+      elevation: 5,
+    },
+  });
 
   return (
     <ImageBackground
@@ -78,7 +112,15 @@ const Card: React.FC<{
       style={styles.backgroundImage}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        <View style={styles.container}>
+        <View style={styles.container} {...panResponder.panHandlers}>
+          {isRefreshing && (
+            <View
+              style={[styles.spinnerContainer, shadowStyle]}
+              className="rounded-full"
+            >
+              <ActivityIndicator size="small" color={COLORS.violet400} />
+            </View>
+          )}
           <View style={styles.header}>
             <View style={styles.headerContent}>
               <TouchableOpacity
@@ -90,12 +132,12 @@ const Card: React.FC<{
                 </BoldText>
               </TouchableOpacity>
               <View>
-                <Text style={styles.greetingText} allowFontScaling={false}>
+                <SemiBoldText color="white" size="large">
                   Hello, {firstName} 👋
-                </Text>
-                <Text style={styles.greetingSubText} allowFontScaling={false}>
+                </SemiBoldText>
+                <RegularText color="white">
                   Let's make some bills payment!
-                </Text>
+                </RegularText>
               </View>
             </View>
             <View className="flex-row gap-4">
@@ -114,13 +156,10 @@ const Card: React.FC<{
 
           <View style={styles.balanceContainer}>
             <View style={styles.balanceContent}>
-              <WalletAdd1 color="#fff" size={24} />
-              <Text
-                style={styles.availableBalanceText}
-                allowFontScaling={false}
-              >
+              <WalletAdd1 color="#fff" size={24} className="mr-2" />
+              <RegularText color="white" size="medium">
                 Available Balance
-              </Text>
+              </RegularText>
             </View>
             <TouchableOpacity onPress={toggleBalanceVisibility}>
               {showBalance ? (
@@ -132,16 +171,26 @@ const Card: React.FC<{
           </View>
 
           <View style={styles.balanceValueContainer}>
-            {isConnected ? (
+            {isRefreshing ? (
+              <Skeleton
+                animation="wave"
+                width={100}
+                height={RFValue(26)}
+                style={{ backgroundColor: COLORS.grey100, borderRadius: 8 }}
+                skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+              />
+            ) : isConnected ? (
               showBalance ? (
-                <Text style={styles.balanceValue} allowFontScaling={false}>
+                <BoldText color="white" size="xxlarge">
                   ₦{" "}
                   {balance.toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                   })}
-                </Text>
+                </BoldText>
               ) : (
-                <Text style={styles.balanceValue}>🙈🙈🙈🙈🙈</Text>
+                <BoldText color="white" size="xxlarge">
+                  ******
+                </BoldText>
               )
             ) : (
               <View style={styles.errorContainer}>
@@ -159,22 +208,11 @@ const Card: React.FC<{
             onPress={() => navigation.navigate("FundWalletScreen")}
             style={styles.fundWalletButton}
           >
-            <AddCircle variant="Bold" color="#573CC7" />
-            <Text style={styles.fundWalletText} allowFontScaling={false}>
+            <AddCircle variant="Bold" color="#573CC7" className="mr-2" />
+            <RegularText color="primary" size="medium">
               Fund Wallet
-            </Text>
+            </RegularText>
           </TouchableOpacity>
-          {/* <View className="flex-row justify-between items-center gap-4">
-            <TouchableOpacity
-              onPress={() => navigation.navigate("FundWalletScreen")}
-              style={styles.fundWalletButton}
-            >
-              <AddCircle variant="Bold" color="#573CC7" />
-              <Text style={styles.fundWalletText} allowFontScaling={false}>
-                Transfer
-              </Text>
-            </TouchableOpacity>
-          </View> */}
         </View>
       </SafeAreaView>
     </ImageBackground>
@@ -188,7 +226,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
     overflow: "hidden",
-    backgroundColor: COLORS.violet400,
+    // backgroundColor: COLORS.violet400,
     height: screenHeight * 0.35,
     paddingBottom: 20,
   },
@@ -250,6 +288,10 @@ const styles = StyleSheet.create({
   eyeIcon: {
     marginLeft: 10,
   },
+  balanceSkeleton: {
+    borderRadius: 4,
+    marginVertical: 4,
+  },
   balanceValueContainer: {},
   balanceValue: {
     fontFamily: "Outfit-SemiBold",
@@ -263,7 +305,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     flexDirection: "row",
-    // flex: 1,
   },
   fundWalletText: {
     fontFamily: "Outfit-Regular",
@@ -283,7 +324,13 @@ const styles = StyleSheet.create({
   errorSubText: {
     fontFamily: "Outfit-Regular",
     color: "#fff",
-    fontSize: RFValue(10),
-    marginTop: 5,
+    fontSize: RFValue(12),
+  },
+  spinnerContainer: {
+    backgroundColor: "white",
+    padding: SPACING,
+    position: "absolute",
+    top: "50%",
+    left: "50%",
   },
 });

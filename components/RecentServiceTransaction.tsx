@@ -18,6 +18,8 @@ import Airtel from "../assets/svg/airtelbig.svg";
 import Mtn from "../assets/svg/mtnbig.svg";
 import Eti from "../assets/svg/9mobilebig.svg";
 import Glo from "../assets/svg/globig.svg";
+import { BoldText, LightText } from "./common/Text";
+import { SPACING } from "../constants/ui";
 
 const RecentServiceTransaction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -25,8 +27,17 @@ const RecentServiceTransaction: React.FC<{
   const { transactions, isLoading } = useWallet();
   const [hasTransaction, setHasTransaction] = useState(false);
 
-  const renderServiceIcon = (provider: string) => {
-    switch (provider.toLowerCase()) {
+  const renderServiceIcon = (
+    provider: string | undefined,
+    tranxType: string
+  ) => {
+    // If it's a wallet funding transaction, return the WalletAdd1 icon
+    if (tranxType === "WALLET_FUNDING") {
+      return <WalletAdd1 size={24} color={COLORS.violet400} />;
+    }
+
+    // Otherwise, render icons based on the provider (network type)
+    switch (provider?.toLowerCase()) {
       case "airtel":
         return <Airtel width={40} height={40} />;
       case "mtn":
@@ -36,7 +47,7 @@ const RecentServiceTransaction: React.FC<{
       case "glo":
         return <Glo width={40} height={40} />;
       default:
-        return <WalletAdd1 size={40} color={COLORS.violet400} />;
+        return;
     }
   };
 
@@ -47,19 +58,17 @@ const RecentServiceTransaction: React.FC<{
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.rtText} allowFontScaling={false}>
+        <BoldText color="black" size="medium">
           Recent Transactions
-        </Text>
+        </BoldText>
         <TouchableOpacity
           onPress={() => navigation.navigate("TransactionHistoryScreen")}
         >
-          <Text style={styles.viewmoreText} allowFontScaling={false}>
-            View More
-          </Text>
+          <LightText color="light">View More</LightText>
         </TouchableOpacity>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <View>
         {isLoading ? (
           <View>
             {[1, 2, 3].map((item) => (
@@ -68,7 +77,11 @@ const RecentServiceTransaction: React.FC<{
                   circle
                   width={40}
                   height={40}
-                  style={styles.skeletonImage}
+                  style={{
+                    backgroundColor: COLORS.grey100,
+                    marginRight: 10,
+                  }}
+                  skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                   animation="wave"
                 />
                 <View style={styles.transactionTextContainer}>
@@ -76,13 +89,21 @@ const RecentServiceTransaction: React.FC<{
                     <Skeleton
                       width={RFValue(80)}
                       height={RFValue(16)}
-                      style={styles.skeletonText}
+                      style={{
+                        backgroundColor: COLORS.grey100,
+                        marginRight: 10,
+                      }}
+                      skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                       animation="wave"
                     />
                     <Skeleton
                       width={RFValue(60)}
                       height={RFValue(16)}
-                      style={styles.skeletonText}
+                      style={{
+                        backgroundColor: COLORS.grey100,
+                        marginRight: 10,
+                      }}
+                      skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                       animation="wave"
                     />
                   </View>
@@ -90,13 +111,21 @@ const RecentServiceTransaction: React.FC<{
                     <Skeleton
                       width={RFValue(120)}
                       height={RFValue(12)}
-                      style={styles.skeletonText}
+                      style={{
+                        backgroundColor: COLORS.grey100,
+                        marginRight: 10,
+                      }}
+                      skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                       animation="wave"
                     />
                     <Skeleton
                       width={RFValue(40)}
                       height={RFValue(12)}
-                      style={styles.skeletonText}
+                      style={{
+                        backgroundColor: COLORS.grey100,
+                        marginRight: 10,
+                      }}
+                      skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                       animation="wave"
                     />
                   </View>
@@ -105,59 +134,61 @@ const RecentServiceTransaction: React.FC<{
             ))}
           </View>
         ) : hasTransaction ? (
-          transactions.map(
-            (transaction: {
-              id: React.Key | null | undefined;
-              tranxType: string;
-              amount: any;
-              created_at: any;
-              status: string;
-            }) => (
-              <TouchableOpacity
-                key={transaction.id}
-                onPress={() =>
-                  navigation.navigate("TransactionSummaryScreen", {
-                    transaction,
-                  })
-                }
-                style={styles.transactionItem}
-              >
-                <View style={styles.transactionImage}>
-                  {transaction.tranxType === "WALLET_FUNDING" ? (
-                    <WalletAdd1 color={COLORS.violet400} size={28} />
-                  ) : (
-                    <WalletMinus color={COLORS.red400} size={28} />
-                  )}
-                </View>
-                <View style={styles.transactionTextContainer}>
-                  <View style={styles.transactionTextRow}>
-                    <Text style={styles.item} allowFontScaling={false}>
-                      {transaction.tranxType}
-                    </Text>
-                    <Text style={styles.valueText} allowFontScaling={false}>
-                      ₦{" "}
-                      {transaction.amount.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                      })}
-                    </Text>
+          transactions
+            .slice(0, 3)
+            .map(
+              (transaction: {
+                id: React.Key | null | undefined;
+                tranxType: string;
+                amount: any;
+                created_at: any;
+                status: string;
+              }) => (
+                <TouchableOpacity
+                  key={transaction.id}
+                  onPress={() =>
+                    navigation.navigate("TransactionSummaryScreen", {
+                      transaction,
+                    })
+                  }
+                  style={styles.transactionItem}
+                >
+                  <View style={styles.transactionImage}>
+                    {renderServiceIcon(
+                      transaction.metadata.networkType,
+                      transaction.tranxType
+                    )}
                   </View>
-                  <View style={styles.transactionTextRow}>
-                    <Text style={styles.date} allowFontScaling={false}>
-                      {transaction.created_at}
-                    </Text>
-                    <View style={styles.statusContainer}>
-                      <Text
-                        style={styles.completedText}
-                        allowFontScaling={false}
-                      >
-                        {transaction.status}
+
+                  <View style={styles.transactionTextContainer}>
+                    <View style={styles.transactionTextRow}>
+                      <Text style={styles.item} allowFontScaling={false}>
+                        {transaction.tranxType}
+                      </Text>
+                      <Text style={styles.valueText} allowFontScaling={false}>
+                        ₦{" "}
+                        {transaction.amount.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                        })}
                       </Text>
                     </View>
+                    <View style={styles.transactionTextRow}>
+                      <Text style={styles.date} allowFontScaling={false}>
+                        {transaction.created_at}
+                      </Text>
+                      <View style={styles.statusContainer}>
+                        <Text
+                          style={styles.completedText}
+                          allowFontScaling={false}
+                        >
+                          {transaction.status}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              )
             )
-          )
         ) : (
           <View style={styles.noTransactionContainer}>
             <LottieView
@@ -171,7 +202,7 @@ const RecentServiceTransaction: React.FC<{
             </Text>
           </View>
         )}
-      </ScrollView>
+      </View>
     </View>
   );
 };
@@ -179,7 +210,8 @@ const RecentServiceTransaction: React.FC<{
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    // padding: 16,
+    paddingBottom: SPACING * 14,
   },
   header: {
     flexDirection: "row",
@@ -237,6 +269,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 10,
     resizeMode: "contain",
+    justifyContent: "center",
+    alignItems: "center",
   },
   transactionTextContainer: {
     flex: 1,
@@ -270,9 +304,7 @@ const styles = StyleSheet.create({
     color: "#06C270",
     fontSize: RFValue(10),
   },
-  skeletonImage: {
-    marginRight: 10,
-  },
+  skeletonImage: {},
   skeletonText: {
     borderRadius: 4,
   },

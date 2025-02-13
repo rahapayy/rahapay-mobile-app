@@ -1,4 +1,4 @@
-import { handleShowFlash } from "@/components/FlashMessageComponent";
+import { handleShowFlash } from "../components/FlashMessageComponent";
 
 export const handleError = (error: any) => {
   const errorMessage =

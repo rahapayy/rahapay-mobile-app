@@ -20,6 +20,8 @@ interface ButtonProps extends TouchableOpacityProps {
   isLoading?: boolean;
   borderOnly?: boolean;
   subBrand?: boolean;
+  frontIcon?: React.ReactNode;
+  backIcon?: React.ReactNode;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -30,15 +32,12 @@ const Button: React.FC<ButtonProps> = ({
   isLoading = false,
   disabled,
   borderOnly = false,
-  subBrand = false, // Default value for new prop
+  subBrand = false,
+  frontIcon,
+  backIcon,
   ...rest
 }) => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
-
-  // Adjust these styles according to screen width and height
-  const buttonWidth = screenWidth * 0.85;
-  const buttonHeight = screenHeight * 0.06;
-  const buttonBottomMargin = screenHeight * 0.1;
 
   return (
     <TouchableOpacity
@@ -53,15 +52,18 @@ const Button: React.FC<ButtonProps> = ({
       {...rest}
     >
       <View style={styles.contentContainer}>
-        {isLoading && (
+        {frontIcon && <View style={styles.icon}>{frontIcon}</View>}
+        {isLoading ? (
           <ActivityIndicator size="small" color="#fff" style={styles.spinner} />
+        ) : (
+          <Text
+            style={[styles.buttonText, { color: textColor }]}
+            allowFontScaling={false}
+          >
+            {title}
+          </Text>
         )}
-        <Text
-          style={[styles.buttonText, { color: textColor }]}
-          allowFontScaling={false}
-        >
-          {title}
-        </Text>
+        {backIcon && <View style={styles.icon}>{backIcon}</View>}
       </View>
     </TouchableOpacity>
   );
@@ -93,6 +95,9 @@ const styles = StyleSheet.create({
   contentContainer: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  icon: {
+    marginHorizontal: 5,
   },
   spinner: {
     marginRight: 8,

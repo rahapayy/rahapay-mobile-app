@@ -18,72 +18,52 @@ import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../components/common/ui/buttons/Button";
-// import { AuthContext } from "../../context/AuthContext";
-import useApi from "../../utils/api";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { BoldText, LightText, MediumText } from "../../components/common/Text";
 import useWallet from "../../hooks/use-wallet";
 import * as Clipboard from "expo-clipboard";
-import { AuthContext } from "../../services/AuthContext";
+import { AuthContext, useAuth } from "../../services/AuthContext";
+import { IUpdateProfilePayload, UserInfoType } from "@/services/dtos";
+import { services } from "@/services";
+import { handleError } from "@/services/handleError";
 
 const PersonalInformationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { userDetails, fetchUserDetails } = useContext(AuthContext);
+  const { userInfo, setUserInfo } = useAuth();
   const { account } = useWallet();
-  const fullName = userDetails?.fullName || "";
+
+  const fullName = userInfo?.fullName || "";
   const initials = fullName
     .split(" ")
-    .map((n: any[]) => n[0])
+    .map((n: string) => n[0])
     .join("")
     .toUpperCase();
-  const { mutateAsync: updateUser, isLoading } = useApi.patch(
-    "/user/update/profile"
-  );
-  const [isEditing, setIsEditing] = useState(false);
+
   const [formValues, setFormValues] = useState({
-    fullName: userDetails?.fullName,
-    phone: userDetails?.phoneNumber,
-    email: userDetails?.email,
+    fullName: userInfo?.fullName || "",
+    phone: userInfo?.phoneNumber || "",
+    email: userInfo?.email || "",
   });
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      AsyncStorage.getItem("access_token").then((token) => {
-        if (token) {
-          fetchUserDetails(token);
-        }
-      });
-    });
-
-    return unsubscribe;
-  }, [navigation, fetchUserDetails]);
-
-  useEffect(() => {
-    setFormValues({
-      fullName: userDetails?.fullName,
-      phone: userDetails?.phoneNumber,
-      email: userDetails?.email,
-    });
-  }, [userDetails]);
+  const [isEditing, setIsEditing] = useState(false);
 
   function handleInputChange(value: string, fieldKey: keyof typeof formValues) {
     setFormValues({ ...formValues, [fieldKey]: value });
   }
 
-  function handleEditToggle() {
-    if (isEditing) {
-      handleSaveChanges();
-    } else {
-      setIsEditing(true);
-    }
-  }
-
   async function handleSaveChanges() {
+    if (!formValues.fullName || !formValues.phone || !formValues.email) {
+      handleShowFlash({
+        message: "Please fill all required fields",
+        type: "warning",
+      });
+      return;
+    }
+
     try {
-      await updateUser({
+      const data = await services.userService.updateProfile({
         fullName: formValues.fullName,
         phoneNumber: formValues.phone,
         email: formValues.email,
@@ -92,19 +72,10 @@ const PersonalInformationScreen: React.FC<{
         message: "Profile updated successfully!",
         type: "success",
       });
+      // setUserInfo(data.data as unknown as UserInfoType); // Update global user info
       setIsEditing(false);
-      const token = await AsyncStorage.getItem("access_token");
-      if (token) {
-        await fetchUserDetails(token);
-      }
     } catch (error) {
-      const err = error as {
-        response?: { data?: { message?: string } };
-        message: string;
-      };
-      const errorMessage =
-        err.response?.data?.message || err.message || "An error occurred";
-
+      const errorMessage = handleError(error);
       handleShowFlash({
         message: errorMessage,
         type: "danger",
@@ -112,6 +83,21 @@ const PersonalInformationScreen: React.FC<{
     }
   }
 
+  // Sync form with latest user info
+  useEffect(() => {
+    setFormValues({
+      fullName: userInfo?.fullName || "",
+      phone: userInfo?.phoneNumber || "",
+      email: userInfo?.email || "",
+    });
+  }, [userInfo]);
+  function handleEditToggle() {
+    if (isEditing) {
+      handleSaveChanges();
+    } else {
+      setIsEditing(true);
+    }
+  }
   const copyToClipboard = async (textToCopy: string) => {
     await Clipboard.setStringAsync(textToCopy);
     handleShowFlash({
@@ -150,11 +136,13 @@ const PersonalInformationScreen: React.FC<{
             <BoldText color="white">{initials}</BoldText>
           </View>
           <View>
-            <BoldText color="dark" size="large" right>
-              {userDetails.fullName}
-            </BoldText>
+            <View style={{ alignSelf: 'flex-end' }}>
+              <BoldText color="dark" size="large">
+                {userInfo?.fullName}
+              </BoldText>
+            </View>
             <LightText color="light" size="base">
-              {userDetails.email}
+              {userInfo?.email}
             </LightText>
           </View>
         </View>
@@ -167,57 +155,31 @@ const PersonalInformationScreen: React.FC<{
           <View className="mt-4 bg-white p-4 rounded-lg">
             <View className="flex-row justify-between items-center mb-6">
               <LightText color="light" size="small">
-                First Name
+                Full Name
               </LightText>
               {isEditing ? (
                 <TextInput
                   style={styles.input}
-                  value={formValues.fullName.split(" ")[0]}
-                  onChangeText={(value) =>
-                    handleInputChange(
-                      `${value} ${formValues.fullName.split(" ")[1]}`,
-                      "fullName"
-                    )
-                  }
+                  value={formValues.fullName}
+                  onChangeText={(value) => handleInputChange(value, "fullName")}
                 />
               ) : (
                 <MediumText color="dark" size="base">
-                  {userDetails.fullName.split(" ")[0]}
+                  {userInfo?.fullName}
                 </MediumText>
               )}
             </View>
-            <View className="flex-row justify-between items-center mb-6">
-              <LightText color="light" size="small">
-                Last Name
-              </LightText>
-              {isEditing ? (
-                <TextInput
-                  style={styles.input}
-                  value={formValues.fullName.split(" ")[1]}
-                  onChangeText={(value) =>
-                    handleInputChange(
-                      `${formValues.fullName.split(" ")[0]} ${value}`,
-                      "fullName"
-                    )
-                  }
-                />
-              ) : (
-                <MediumText color="dark" size="base">
-                  {userDetails.fullName.split(" ")[1]}
-                </MediumText>
-              )}
-            </View>
-            {userDetails.userName && (
+            {userInfo?.userName && (
               <View className="flex-row justify-between items-center mb-6">
                 <LightText color="light" size="small">
                   RahaPay Tag
                 </LightText>
                 <View className="flex-row items-center">
                   <MediumText color="dark" size="medium">
-                    {userDetails.userName}
+                    {userInfo?.userName}
                   </MediumText>
                   <TouchableOpacity
-                    onPress={() => copyToClipboard(userDetails.userName)}
+                    onPress={() => copyToClipboard(userInfo?.userName)}
                     style={{ marginLeft: 8 }}
                   >
                     <Copy color={COLORS.violet400} size={20} />
@@ -238,7 +200,7 @@ const PersonalInformationScreen: React.FC<{
                 />
               ) : (
                 <MediumText color="dark" size="base">
-                  {userDetails.phoneNumber}
+                  {userInfo?.phoneNumber}
                 </MediumText>
               )}
             </View>
@@ -260,7 +222,7 @@ const PersonalInformationScreen: React.FC<{
             </View>
           </View>
 
-          {userDetails.userName ? (
+          {userInfo?.userName ? (
             <>
               <View className="mt-4">
                 <BoldText color="dark" size="small">
@@ -387,96 +349,3 @@ const styles = StyleSheet.create({
     // color: COLORS.dark,
   },
 });
-
-{
-  /* <View className="justify-center items-center gap-4 mt-4">
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initials}</Text>
-          </View>
-          <Text style={styles.nameText} allowFontScaling={false}>
-            {userDetails.fullName}
-          </Text>
-          <Text style={styles.nameText} allowFontScaling={false}>
-            {userDetails.email}
-          </Text>
-        </View> */
-}
-
-{
-  /* <View className="p-4">
-          <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
-            keyboardVerticalOffset={Platform.OS === "ios" ? -50 : 0}
-          >
-            <View className="mt-10">
-              <Text style={styles.label} allowFontScaling={false}>
-                Full Name
-              </Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="First & Last name"
-                allowFontScaling={false}
-                placeholderTextColor={"#DFDFDF"}
-                onChangeText={(value) => handleInputChange(value, "fullName")}
-                defaultValue={userDetails?.fullName}
-              />
-            </View>
-
-            <View className="mt-4">
-              <Text style={styles.label} allowFontScaling={false}>
-                Phone Number
-              </Text>
-              <View style={styles.inputContainer}>
-                <Image
-                  source={require("../../assets/images/flag-for-nigeria.png")}
-                  alt=""
-                  className="w-6 h-6"
-                />
-                <View>
-                  <Text style={styles.numberText} allowFontScaling={false}>
-                    {" "}
-                    +234{" "}
-                  </Text>
-                </View>
-                <View style={styles.vertical} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="8038929383"
-                  placeholderTextColor="#BABFC3"
-                  keyboardType="numeric"
-                  allowFontScaling={false}
-                  onChangeText={(value) => handleInputChange(value, "phone")}
-                  defaultValue={userDetails?.phoneNumber}
-                />
-              </View>
-            </View>
-
-            <View className="mt-4">
-              <Text style={styles.label} allowFontScaling={false}>
-                Email Address
-              </Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Example@email.com"
-                placeholderTextColor={"#DFDFDF"}
-                allowFontScaling={false}
-                onChangeText={(value) => handleInputChange(value, "email")}
-                defaultValue={userDetails?.email}
-              />
-            </View>
-            <Button
-              title={"Save Changes"}
-              onPress={handleButtonClick}
-              isLoading={isLoading}
-              disabled={
-                userDetails?.fullName === formValues.fullName &&
-                userDetails?.phone === formValues.phone &&
-                userDetails?.email === formValues.email
-              }
-              style={styles.proceedButton}
-              textColor="#fff"
-            />
-          </KeyboardAvoidingView>
-        </View> */
-}

@@ -88,7 +88,7 @@ const Onboarding: React.FC<{
 
   return (
     <View style={styles.container}>
-      <View style={{ flex: 3 }}>
+      <View style={styles.sliderContainer}>
         <FlatList
           data={slides}
           renderItem={({ item }) => <OnboardingItem item={item} />}
@@ -110,12 +110,17 @@ const Onboarding: React.FC<{
         />
       </View>
 
-      <Paginator data={slides} scrollx={scrollx} />
-      <NextButton
-        scrollTo={next}
-        onCreateAccountPress={onCreateAccountPress}
-        onLoginPress={onLoginPress}
-      />
+      <View style={styles.paginatorContainer}>
+        <Paginator data={slides} scrollx={scrollx} />
+      </View>
+
+      <View style={styles.buttonContainer}>
+        <NextButton
+          scrollTo={next}
+          onCreateAccountPress={onCreateAccountPress}
+          onLoginPress={onLoginPress}
+        />
+      </View>
     </View>
   );
 };
@@ -128,5 +133,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#F7F7F7",
     alignItems: "center",
     justifyContent: "center",
+  },
+  sliderContainer: {
+    flex: 3,
+    justifyContent: "center",
+  },
+  paginatorContainer: {
+    flex: 0.5,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

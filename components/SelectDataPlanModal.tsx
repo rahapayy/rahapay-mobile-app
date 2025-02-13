@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,71 +8,48 @@ import {
   Dimensions,
   FlatList,
 } from "react-native";
-import COLORS from "../constants/colors";
-import useSWR from "swr";
-import Airtel from "../assets/svg/airtelbig.svg";
-import Mtn from "../assets/svg/mtnbig.svg";
-import Eti from "../assets/svg/9mobilebig.svg";
-import Glo from "../assets/svg/globig.svg";
-import SPACING from "../constants/SPACING";
-import { FontAwesome6 } from "@expo/vector-icons";
+import LoadingIndicator from "./LoadingIndicator";
+import { DataPlan } from "@/services/modules/data";
+import COLORS from "@/constants/colors";
+
+const SPACING = 16;
 
 const { height } = Dimensions.get("window");
-
-interface DataPlan {
-  plan_id: string;
-  plan_name: string;
-  plan_day: string;
-  amount: number;
-}
 
 interface SelectDataPlanModalProps {
   visible: boolean;
   onClose: () => void;
-  route: {
-    params: {
-      selectedOperator?: string;
-      onSelectPackage: (
-        plan: string,
-        days: string,
-        plan_id: string,
-        amount: number
-      ) => void;
-    };
-  };
+  dataPlans: DataPlan[];
+  onSelectPackage: (plan: DataPlan) => void;
+  isLoading: boolean;
+  error: string | null;
 }
 
 const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
   visible,
   onClose,
-  route,
+  dataPlans,
+  onSelectPackage,
+  isLoading,
+  error,
 }) => {
-  const selectedOperator = route.params?.selectedOperator || "";
-  const onSelectPackage = route.params?.onSelectPackage;
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const { data } = useSWR(`/top-up/get-plan?networkType=${selectedOperator}`);
+  // Extract unique plan types for categories
+  const categories = Array.from(
+    new Set(dataPlans.map((plan) => plan.plan_type))
+  );
 
-  const dataPlans = React.useMemo(() => data || [], [data]);
+  // Filter data plans based on the selected category
+  const filteredDataPlans = selectedCategory
+    ? dataPlans.filter((plan) => plan.plan_type === selectedCategory)
+    : dataPlans;
 
   const renderDataPlan = ({ item }: { item: DataPlan }) => (
     <TouchableOpacity
-      style={[
-        styles.dataPlanContainer,
-        selectedOperator === item.plan_name && styles.selectedDataPlan,
-      ]}
-      onPress={() => {
-        onSelectPackage(
-          item.plan_name,
-          item.plan_day,
-          item.plan_id,
-          item.amount
-        );
-      }}
+      style={styles.dataPlanContainer}
+      onPress={() => onSelectPackage(item)}
     >
-      {selectedOperator === "Airtel" && <Airtel width={32} height={32} />}
-      {selectedOperator === "Mtn" && <Mtn width={32} height={32} />}
-      {selectedOperator === "9Mobile" && <Eti width={32} height={32} />}
-      {selectedOperator === "Glo" && <Glo width={32} height={32} />}
       <Text style={styles.planText} allowFontScaling={false}>
         {item.plan_name}
       </Text>
@@ -80,13 +57,13 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
         -
       </Text>
       <Text style={styles.planText} allowFontScaling={false}>
-        {item.plan_day}{" "}
+        {item.validity}
       </Text>
       <Text style={styles.for} allowFontScaling={false}>
         -
       </Text>
       <Text style={styles.planText} allowFontScaling={false}>
-        ₦ {item.amount}
+        ₦{item.amount}
       </Text>
     </TouchableOpacity>
   );
@@ -101,22 +78,74 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
       <View style={styles.centeredView}>
         <TouchableOpacity style={styles.overlay} onPress={onClose} />
         <View style={styles.modalView}>
-          <View className="flex-row justify-between">
+          <View style={styles.header}>
             <Text style={styles.modalText} allowFontScaling={false}>
               Select Data Plan
             </Text>
-
             <TouchableOpacity onPress={onClose}>
-              <FontAwesome6 name="xmark" size={24} color="black" />
+              <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
-          <FlatList
-            data={dataPlans}
-            renderItem={renderDataPlan}
-            keyExtractor={(item, index) =>
-              `${item.plan_name}_${item.plan_id || index}`
-            }
-          />
+
+          {/* Category Buttons */}
+          <View style={styles.categoryContainer}>
+            <TouchableOpacity
+              style={[
+                styles.categoryButton,
+                !selectedCategory && styles.selectedCategoryButton,
+              ]}
+              onPress={() => setSelectedCategory(null)}
+            >
+              <Text
+                style={[
+                  styles.categoryButtonText,
+                  !selectedCategory && styles.selectedCategoryButtonText,
+                ]}
+              >
+                All
+              </Text>
+            </TouchableOpacity>
+            {categories.map((category) => (
+              <TouchableOpacity
+                key={category}
+                style={[
+                  styles.categoryButton,
+                  selectedCategory === category &&
+                    styles.selectedCategoryButton,
+                ]}
+                onPress={() => setSelectedCategory(category)}
+              >
+                <Text
+                  style={[
+                    styles.categoryButtonText,
+                    selectedCategory === category &&
+                      styles.selectedCategoryButtonText,
+                  ]}
+                >
+                  {category}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {isLoading && <LoadingIndicator />}
+
+          {error && <Text style={styles.errorText}>{error}</Text>}
+
+          {!isLoading && !error && filteredDataPlans.length > 0 && (
+            <FlatList
+              data={filteredDataPlans}
+              renderItem={renderDataPlan}
+              keyExtractor={(item) => item.plan_id}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
+
+          {!isLoading && !error && filteredDataPlans.length === 0 && (
+            <Text style={styles.noPlansText}>
+              No plans available for this category
+            </Text>
+          )}
         </View>
       </View>
     </Modal>
@@ -140,7 +169,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: "100%",
-    height: height * 0.4,
+    height: height * 0.5, // Increased height to accommodate categories
     backgroundColor: "white",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -154,43 +183,69 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  modalText: {
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 15,
-    fontFamily: "Outfit-SemiBold",
+  },
+  modalText: {
     fontSize: 18,
     fontWeight: "bold",
+    fontFamily: "Outfit-SemiBold",
   },
-  closeButton: {
-    backgroundColor: COLORS.violet200,
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-    marginTop: 20,
-  },
-  textStyle: {
-    color: "white",
+  closeButtonText: {
+    color: COLORS.violet200,
+    fontSize: 16,
     fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
     textAlign: "center",
+    marginBottom: 15,
+  },
+  noPlansText: {
+    textAlign: "center",
+    color: "gray",
   },
   dataPlanContainer: {
-    // padding: 10,
-    gap: 6,
-    marginBottom: SPACING,
     flexDirection: "row",
     alignItems: "center",
+    gap: 6,
+    marginBottom: SPACING,
+    paddingVertical: 10,
   },
-  selectedDataPlan: {
-    borderTopWidth: 4,
-    borderTopColor: "#3498db",
+  planText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    fontFamily: "Outfit-Regular",
   },
   for: {
     fontSize: 10,
     fontWeight: "bold",
     fontFamily: "Outfit-Regular",
   },
-  planText: {
+  categoryContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginBottom: 15,
+  },
+  categoryButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: COLORS.violet100,
+  },
+  selectedCategoryButton: {
+    backgroundColor: COLORS.violet300,
+  },
+  categoryButtonText: {
     fontSize: 14,
-    fontWeight: "bold",
+    color: COLORS.grey500,
     fontFamily: "Outfit-Regular",
+  },
+  selectedCategoryButtonText: {
+    color: "white",
   },
 });

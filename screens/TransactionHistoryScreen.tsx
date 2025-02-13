@@ -1,3 +1,4 @@
+// AllTransactionsScreen.tsx
 import {
   Image,
   Platform,
@@ -16,12 +17,13 @@ import FONT_SIZE from "../constants/font-size";
 import LottieView from "lottie-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import useWallet from "../hooks/use-wallet";
+import { MediumText } from "../components/common/Text";
+import { Skeleton } from "@rneui/themed";
 
 const AllTransactionsScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { getAllTransactions } = useWallet();
-  const { transactions, isLoading } = getAllTransactions();
+  const { transactions, isLoading } = useWallet();
   const [hasTransaction, setHasTransaction] = useState(false);
 
   useEffect(() => {
@@ -30,43 +32,79 @@ const AllTransactionsScreen: React.FC<{
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView>
-        <View style={styles.header}>
+      <View style={styles.header}>
+        <View className="flex-row items-center">
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.leftIcon}
           >
             <ArrowLeft color={"#000"} size={24} />
           </TouchableOpacity>
-          <Text style={[styles.headerText]} allowFontScaling={false}>
-            All Transactions
-          </Text>
-          <TouchableOpacity>
-            <DocumentText color={"#000"} />
-          </TouchableOpacity>
+          <MediumText color="black" size="large">
+            Transactions
+          </MediumText>
         </View>
-        <View style={styles.container}>
+        <TouchableOpacity>
+          <DocumentText color={"#000"} />
+        </TouchableOpacity>
+      </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View className="px-4">
           {isLoading ? (
-            <View style={styles.loadingContainer}>
-              <LottieView
-                source={require("../assets/animation/loading.json")}
-                autoPlay
-                loop
-                style={styles.loadingAnimation}
-              />
-              <Text style={styles.loadingText}>Loading transactions...</Text>
+            <View>
+              {[1, 2, 3, 4, 5, 6].map((item) => (
+                <View key={item} style={styles.transactionItem}>
+                  <Skeleton
+                    circle
+                    width={40}
+                    height={40}
+                    style={styles.skeletonImage}
+                    animation="wave"
+                  />
+                  <View style={styles.transactionTextContainer}>
+                    <View style={styles.transactionTextRow}>
+                      <Skeleton
+                        width={RFValue(80)}
+                        height={RFValue(16)}
+                        style={styles.skeletonText}
+                        animation="wave"
+                      />
+                      <Skeleton
+                        width={RFValue(60)}
+                        height={RFValue(16)}
+                        style={styles.skeletonText}
+                        animation="wave"
+                      />
+                    </View>
+                    <View style={[styles.transactionTextRow, { marginTop: 8 }]}>
+                      <Skeleton
+                        width={RFValue(120)}
+                        height={RFValue(12)}
+                        style={styles.skeletonText}
+                        animation="wave"
+                      />
+                      <Skeleton
+                        width={RFValue(40)}
+                        height={RFValue(12)}
+                        style={styles.skeletonText}
+                        animation="wave"
+                      />
+                    </View>
+                  </View>
+                </View>
+              ))}
             </View>
           ) : hasTransaction ? (
             transactions.map(
               (transaction: {
-                _id: React.Key | null | undefined;
-                transactionType: string;
-                amountPaid: number;
-                createdAt: string;
-                paymentStatus: string;
+                id: React.Key | null | undefined;
+                tranxType: string;
+                amount: any;
+                created_at: any;
+                status: string;
               }) => (
                 <TouchableOpacity
-                  key={transaction._id}
+                  key={transaction.id}
                   onPress={() =>
                     navigation.navigate("TransactionSummaryScreen", {
                       transaction,
@@ -81,26 +119,25 @@ const AllTransactionsScreen: React.FC<{
                   <View style={styles.transactionTextContainer}>
                     <View style={styles.transactionTextRow}>
                       <Text style={styles.item} allowFontScaling={false}>
-                        {transaction.transactionType}
+                        {transaction.tranxType}
                       </Text>
                       <Text style={styles.valueText} allowFontScaling={false}>
                         ₦{" "}
-                        {transaction.amountPaid.toLocaleString("en-US", {
+                        {transaction.amount.toLocaleString("en-US", {
                           minimumFractionDigits: 2,
                         })}
                       </Text>
                     </View>
                     <View style={styles.transactionTextRow}>
                       <Text style={styles.date} allowFontScaling={false}>
-                        {new Date(transaction.createdAt).toLocaleDateString()}{" "}
-                        {/* Format date */}
+                        {transaction.created_at}
                       </Text>
                       <View style={styles.statusContainer}>
                         <Text
                           style={styles.completedText}
                           allowFontScaling={false}
                         >
-                          {transaction.paymentStatus}
+                          {transaction.status}
                         </Text>
                       </View>
                     </View>
@@ -130,6 +167,7 @@ const AllTransactionsScreen: React.FC<{
 const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: SPACING * 2,
     paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
@@ -219,6 +257,12 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: "#06C270",
     fontSize: RFValue(10),
+  },
+  skeletonImage: {
+    marginRight: 10,
+  },
+  skeletonText: {
+    borderRadius: 4,
   },
 });
 
