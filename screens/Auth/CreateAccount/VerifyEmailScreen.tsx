@@ -116,11 +116,9 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
         console.log(response);
 
         if (response?.data?.accessToken) {
-          await setItem("ACCESS_TOKEN", response.data.accessToken || "");
-          await setItem("REFRESH_TOKEN", response.data.refreshToken || "");
-          navigation.navigate("CreateTransactionPinScreen", {
-            accessToken: response.data.accessToken,
-          });
+          await setItem("ACCESS_TOKEN", response.data.accessToken, true);
+          await setItem("REFRESH_TOKEN", response.data.refreshToken, true);
+          navigation.navigate("CreateTransactionPinScreen");
         }
         handleShowFlash({
           message: "Your account has been successfully verified!",
