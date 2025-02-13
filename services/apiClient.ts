@@ -109,7 +109,7 @@ axiosInstance.interceptors.request.use(
 
     const token = await getToken();
     if (token && token !== "") {
-      config.headers["Authorization"] = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;

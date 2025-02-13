@@ -14,7 +14,6 @@ import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as Animatable from "react-native-animatable";
-import { AuthContext } from "../../../services/AuthContext";
 import { AxiosError } from "axios";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import BasicInput from "../../../components/common/ui/forms/BasicInput";
@@ -165,7 +164,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
             // const userId = userInfo?.data?.id;
 
             const response = await services.authService.onboarding(payload);
-            const userId = response?.data.data.id;
+            const userId = response.data.id;
             console.log(userId);
 
             handleShowFlash({

@@ -54,7 +54,7 @@ const CreatePinScreen: React.FC<CreatePinScreenProps> = ({ navigation }) => {
         transactionPin: pin,
       };
 
-      const response = await services.authService.createPin(payload);
+      const response = await services.authServiceToken.createPin(payload);
       console.log(response);
 
       if (response?.data?.accessToken) {
