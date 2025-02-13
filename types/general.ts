@@ -1,4 +1,5 @@
 export interface IResponse<T = unknown> {
+  [x: string]: any;
   data: T;
   message: string;
   success: boolean;

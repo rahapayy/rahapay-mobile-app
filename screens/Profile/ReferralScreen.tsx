@@ -18,20 +18,14 @@ import { RFValue } from "react-native-responsive-fontsize";
 import Money from "../../assets/svg/money-earn-svgrepo-com 1.svg";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import * as Clipboard from "expo-clipboard";
-import { AuthContext } from "../../services/AuthContext";
+import { useAuth } from "../../services/AuthContext";
 import Button from "../../components/common/ui/buttons/Button";
 import { MediumText, RegularText } from "../../components/common/Text";
 
 const ReferralScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { userDetails, fetchUserDetails } = useContext(AuthContext);
-
-  useEffect(() => {
-    if (userDetails?.token) {
-      fetchUserDetails(userDetails.token);
-    }
-  }, []);
+  const { userInfo } = useAuth();
 
   const copyToClipboard = async (textToCopy: string) => {
     await Clipboard.setStringAsync(textToCopy);
@@ -43,7 +37,7 @@ const ReferralScreen: React.FC<{
 
   const shareWithFriends = async () => {
     try {
-      const referralCode = userDetails?.userName;
+      const referralCode = userInfo?.userName;
       const message = `Join RahaPay and earn rewards! Use my referral code: ${referralCode}`;
       const result = await Share.share({
         message,
@@ -85,7 +79,7 @@ const ReferralScreen: React.FC<{
         </View>
       </SafeAreaView>
       <View style={styles.copyContainer}>
-        {userDetails?.userName ? (
+        {userInfo?.userName ? (
           <>
             <RegularText
               color="black"
@@ -97,10 +91,10 @@ const ReferralScreen: React.FC<{
             </RegularText>
             <View className="flex-row gap-2 mb-2">
               <View style={styles.tagContain}>
-                <Text style={styles.tagText}>{userDetails.userName}</Text>
+                <Text style={styles.tagText}>{userInfo.userName}</Text>
               </View>
               <Button
-                onPress={() => copyToClipboard(userDetails.userName)}
+                onPress={() => copyToClipboard(userInfo.userName)}
                 title="Copy"
                 textColor="white"
                 style={styles.copyContain}
@@ -126,9 +120,6 @@ const ReferralScreen: React.FC<{
               <Button
                 onPress={async () => {
                   await navigation.navigate("CreateTagScreen");
-                  if (userDetails?.token) {
-                    await fetchUserDetails(userDetails.token);
-                  }
                 }}
                 textColor="white"
                 title="Create Tag"

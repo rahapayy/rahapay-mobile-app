@@ -1,6 +1,8 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { getItem, removeItem, setItem } from "@/utils/storage";
 import { AuthServices } from "./modules";
+import UserServices from "./modules/user";
+import DeviceToken from "./modules/notificaiton";
 
 export const axiosInstance = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
@@ -117,8 +119,9 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(new Error(error))
 );
 
-
 export const services = {
   authService: new AuthServices(axiosInstanceWithoutToken),
   authServiceToken: new AuthServices(axiosInstance),
+  userService: new UserServices(axiosInstance),
+  notificationService: new DeviceToken(axiosInstance),
 };

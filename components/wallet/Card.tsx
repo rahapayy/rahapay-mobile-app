@@ -25,7 +25,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import SPACING from "../../constants/SPACING";
 import { BoldText, RegularText, SemiBoldText } from "../common/Text";
-import { AuthContext } from "../../services/AuthContext";
+import { useAuth } from "../../services/AuthContext";
 import { ActivityIndicator, PanResponder } from "react-native";
 import { Skeleton } from "@rneui/themed";
 
@@ -69,13 +69,13 @@ const Card: React.FC<{
     });
   };
 
-  const { userDetails } = useContext(AuthContext);
+  const { userInfo } = useAuth();
 
-  const fullName = userDetails?.fullName || "";
+  const fullName = userInfo?.fullName || "";
   const firstName = fullName.split(" ")[0];
   const initials = fullName
     .split(" ")
-    .map((n: any[]) => n[0])
+    .map((n) => n[0])
     .join("")
     .toUpperCase();
 
@@ -176,8 +176,8 @@ const Card: React.FC<{
                 animation="wave"
                 width={100}
                 height={RFValue(26)}
-                style={styles.balanceSkeleton}
-                skeletonStyle={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
+                style={{ backgroundColor: COLORS.grey100, borderRadius: 8 }}
+                skeletonStyle={{ backgroundColor: COLORS.grey50 }}
               />
             ) : isConnected ? (
               showBalance ? (
@@ -189,7 +189,7 @@ const Card: React.FC<{
                 </BoldText>
               ) : (
                 <BoldText color="white" size="xxlarge">
-                  🙈🙈🙈🙈🙈
+                  ******
                 </BoldText>
               )
             ) : (

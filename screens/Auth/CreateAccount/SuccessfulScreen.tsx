@@ -5,28 +5,25 @@ import Button from "../../../components/common/ui/buttons/Button";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import FONT_SIZE from "../../../constants/font-size";
 import SPACING from "../../../constants/SPACING";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  MediumText,
-  LightText,
-} from "../../../components/common/Text";
+import { MediumText, LightText } from "../../../components/common/Text";
 import { useAuth } from "@/services/AuthContext";
+import { setItem } from "@/utils/storage";
+import { services } from "@/services";
 
 const SuccessfulScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { setIsAuthenticated, userInfo } = useAuth();
-  const handleButtonClick = async () => {
-    // Set user as authenticated
-    await setIsAuthenticated(true);
+  const { setIsAuthenticated, setUserInfo } = useAuth();
 
-    // Store user info and access token in AsyncStorage
-    await AsyncStorage.multiSet([
-      ["userInfo", JSON.stringify(userInfo)],
-      ["access_token", userInfo?.accessToken || ""],
-    ]);
-
-   
+  const handleCompletion = async () => {
+    try {
+      // Final check and navigation
+      const userResponse = await services.authServiceToken.getUserDetails();
+      setUserInfo(userResponse.data);
+      setIsAuthenticated(true);
+    } catch (error) {
+      // Handle error
+    }
   };
 
   return (
@@ -53,7 +50,7 @@ const SuccessfulScreen: React.FC<{
       <View style={styles.buttonContainer}>
         <Button
           title={"Continue"}
-          onPress={handleButtonClick}
+          onPress={handleCompletion}
           style={styles.button}
           textColor="#fff"
         />

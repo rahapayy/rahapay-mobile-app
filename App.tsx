@@ -112,13 +112,13 @@ export default function App() {
         <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
           <QueryClientProvider client={queryClient}>
             {/* <NotificationProvider> */}
-            <StatusBar barStyle={"default"} />
-            <Router />
-            <FlashMessage
-              statusBarHeight={StatusBar.currentHeight || 0}
-              position="top"
-              MessageComponent={FlashMessageComponent}
-            />
+              <StatusBar barStyle={"default"} />
+              <Router />
+              <FlashMessage
+                statusBarHeight={StatusBar.currentHeight || 0}
+                position="top"
+                MessageComponent={FlashMessageComponent}
+              />
             {/* </NotificationProvider> */}
           </QueryClientProvider>
         </GestureHandlerRootView>

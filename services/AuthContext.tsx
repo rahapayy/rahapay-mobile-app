@@ -7,7 +7,7 @@ import React, {
   useMemo,
 } from "react";
 import { SWRConfig } from "swr";
-import { axiosInstance } from "./apiClient";
+import { axiosInstance, services } from "./apiClient";
 import { UserInfoType } from "./dtos";
 import { getItem, removeItem } from "@/utils/storage";
 
@@ -78,6 +78,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const accessToken = await getItem("ACCESS_TOKEN", true);
       console.log("Access token: " + accessToken);
+
+      if (accessToken) {
+        // Fetch user details when checking auth
+        const userResponse = await services.authServiceToken.getUserDetails();
+        setUserInfo(userResponse.data);
+      }
 
       setIsAuthenticated(!!accessToken);
     } catch (error) {

@@ -44,7 +44,7 @@ const validationSchema = Yup.object().shape({
 const LoginScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated, setUserInfo } = useAuth(); 
 
   const handleLogin = async (
     values: { id: string; password: string },
@@ -60,13 +60,16 @@ const LoginScreen: React.FC<{
       const response = await services.authService.login(payload);
       console.log(response);
       if (response) {
-        handleShowFlash({
-          message: "Logged In Successfully",
-          type: "success",
-        });
-        setItem("ACCESS_TOKEN", response.data.accessToken, true);
-        setItem("REFRESH_TOKEN", response.data.refreshToken, true);
+        // Await token storage
+        await setItem("ACCESS_TOKEN", response.data.accessToken, true);
+        await setItem("REFRESH_TOKEN", response.data.refreshToken, true);
+        
+        // Fetch user details after successful login
+        const userResponse = await services.authServiceToken.getUserDetails();
+        
+        // Update both auth state and user info
         setIsAuthenticated(true);
+        setUserInfo(userResponse.data);
       }
     } catch (error: any) {
       const errorMessage =

@@ -17,14 +17,15 @@ import {
   ElectricityIcon,
   TvIcon,
 } from "./common/ui/icons";
-import { BoldText, RegularText } from "./common/Text";
+import { BoldText, LightText, RegularText } from "./common/Text";
 import { Skeleton } from "@rneui/themed";
 import { AuthContext } from "../services/AuthContext";
 
 interface ActionItem {
   icon: React.ElementType;
   title: string;
-  navigateTo: string;
+  navigateTo?: string;
+  isComingSoon?: boolean;
 }
 
 const QuickAction: React.FC<{
@@ -42,11 +43,11 @@ const QuickAction: React.FC<{
   const actionItems = [
     { icon: AirtimeIcon, title: "Airtime", navigateTo: "AirtimeScreen" },
     { icon: DataIcon, title: "Data", navigateTo: "DataScreen" },
-    { icon: TvIcon, title: "TV", navigateTo: "TvSubscriptionScreen" },
+    { icon: TvIcon, title: "TV", isComingSoon: true },
     {
       icon: ElectricityIcon,
       title: "Electricity",
-      navigateTo: "ElectricityScreen",
+      isComingSoon: true,
     },
   ];
 
@@ -55,20 +56,32 @@ const QuickAction: React.FC<{
       <BoldText color="black" size="medium">
         Quick Action
       </BoldText>
-      <View className="flex-row items-center justify-between mt-4">
+      <View className="flex-row items-center justify-between mt-4 mb-2">
         {actionItems.map((item, index) => (
           <TouchableOpacity
             key={index}
-            onPress={() => navigation.navigate(item.navigateTo)}
-            style={[styles.card, { width: cardWidth, height: cardHeight }]}
+            onPress={() =>
+              item.navigateTo && navigation.navigate(item.navigateTo)
+            }
+            style={[
+              styles.card,
+              item.isComingSoon && styles.disabledCard,
+              { width: cardWidth, height: cardHeight },
+            ]}
           >
-            <item.icon
-              fill={fill}
-              color={COLORS.violet300}
-              width={24}
-              height={24}
-            />
-            <RegularText color="black" marginTop={8} size="base">
+            <item.icon fill={fill} width={24} height={24} />
+            {item.isComingSoon && (
+              <View style={styles.badgeContainer}>
+                <RegularText color="black" size="xsmall" center>
+                  Coming Soon!
+                </RegularText>
+              </View>
+            )}
+            <RegularText
+              color={item.isComingSoon ? "mediumGrey" : "black"}
+              marginTop={8}
+              size="base"
+            >
               {item.title}
             </RegularText>
           </TouchableOpacity>
@@ -86,5 +99,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 20,
+    position: "relative",
+  },
+  disabledCard: {
+    opacity: 0.5,
+  },
+  badgeContainer: {
+    position: "absolute",
+    top: -10,
+    right: -10,
+    backgroundColor: COLORS.violet200,
+    padding: 3,
+    borderRadius: 10
   },
 });

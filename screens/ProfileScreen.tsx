@@ -32,18 +32,18 @@ import {
   MediumText,
   SemiBoldText,
 } from "../components/common/Text";
-import { AuthContext } from "../services/AuthContext";
+import { AuthContext, useAuth } from "../services/AuthContext";
 
 const ProfileScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { userDetails, logout } = useContext(AuthContext);
+  const { userInfo, logOut } = useAuth();
 
-  const fullName = userDetails?.fullName || "";
+  const fullName = userInfo?.fullName || "";
   const firstName = fullName.split(" ")[0];
   const initials = fullName
     .split(" ")
-    .map((n: any[]) => n[0])
+    .map((n: string) => n[0])
     .join("")
     .toUpperCase();
 
@@ -89,7 +89,7 @@ const ProfileScreen: React.FC<{
   };
 
   const handleLogout = () => {
-    logout();
+    logOut();
   };
 
   return (
@@ -113,7 +113,7 @@ const ProfileScreen: React.FC<{
             </View>
             <View>
               <MediumText color="black">{fullName}</MediumText>
-              <LightText color="light">{userDetails.email}</LightText>
+              <LightText color="light">{userInfo?.email}</LightText>
             </View>
           </View>
 

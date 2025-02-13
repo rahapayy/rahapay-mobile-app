@@ -10,7 +10,7 @@ import * as Notifications from "expo-notifications";
 import { Platform, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useApi from "../services/apiClient";
-import { AuthContext } from "../services/AuthContext";
+import { useAuth } from "../services/AuthContext";
 
 export const NotificationContext = createContext();
 
@@ -30,10 +30,12 @@ export const NotificationProvider = ({ children }) => {
   const [hasAskedForPermission, setHasAskedForPermission] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
-  const { mutateAsync: sendDeviceToken } = useApi.post(
-    "/notification/device-token"
-  );
-  const { isAuthenticated } = useContext(AuthContext); // Use AuthContext to check authentication status
+  const { mutateAsync: sendDeviceToken } = useApi({
+    mutationFn: (token) => services.notificationService.sendDeviceToken(token),
+    onError: (error) => handleError(error),
+  });
+
+  const { isAuthenticated } = useAuth(); // Use AuthContext to check authentication status
 
   useEffect(() => {
     if (isAuthenticated) {

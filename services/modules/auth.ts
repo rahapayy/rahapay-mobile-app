@@ -24,12 +24,10 @@ class AuthServices {
     return response.data;
   }
 
-  async login(
-    payload: ILoginDto
-  ): Promise<IResponse<UserInfoType>> {
+  async login(payload: ILoginDto): Promise<IResponse<UserInfoType>> {
     const response = await this.baseService.post("/auth/login", payload);
     return response.data;
-  }  
+  }
 
   async verifyEmail(payload: IVerifyEmailDto) {
     const response = await this.baseService.post("/auth/verify-email", payload);
@@ -85,6 +83,11 @@ class AuthServices {
       "/auth/refresh-token",
       payload
     );
+    return response.data;
+  }
+
+  async getUserDetails(): Promise<IResponse<UserInfoType>> {
+    const response = await this.baseService.get("/user/me");
     return response.data;
   }
 

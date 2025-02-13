@@ -77,7 +77,11 @@ const RecentServiceTransaction: React.FC<{
                   circle
                   width={40}
                   height={40}
-                  style={styles.skeletonImage}
+                  style={{
+                    backgroundColor: COLORS.grey100,
+                    marginRight: 10,
+                  }}
+                  skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                   animation="wave"
                 />
                 <View style={styles.transactionTextContainer}>
@@ -85,13 +89,21 @@ const RecentServiceTransaction: React.FC<{
                     <Skeleton
                       width={RFValue(80)}
                       height={RFValue(16)}
-                      style={styles.skeletonText}
+                      style={{
+                        backgroundColor: COLORS.grey100,
+                        marginRight: 10,
+                      }}
+                      skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                       animation="wave"
                     />
                     <Skeleton
                       width={RFValue(60)}
                       height={RFValue(16)}
-                      style={styles.skeletonText}
+                      style={{
+                        backgroundColor: COLORS.grey100,
+                        marginRight: 10,
+                      }}
+                      skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                       animation="wave"
                     />
                   </View>
@@ -99,13 +111,21 @@ const RecentServiceTransaction: React.FC<{
                     <Skeleton
                       width={RFValue(120)}
                       height={RFValue(12)}
-                      style={styles.skeletonText}
+                      style={{
+                        backgroundColor: COLORS.grey100,
+                        marginRight: 10,
+                      }}
+                      skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                       animation="wave"
                     />
                     <Skeleton
                       width={RFValue(40)}
                       height={RFValue(12)}
-                      style={styles.skeletonText}
+                      style={{
+                        backgroundColor: COLORS.grey100,
+                        marginRight: 10,
+                      }}
+                      skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                       animation="wave"
                     />
                   </View>
@@ -135,7 +155,7 @@ const RecentServiceTransaction: React.FC<{
                 >
                   <View style={styles.transactionImage}>
                     {renderServiceIcon(
-                      transaction.metadata?.networkType,
+                      transaction.metadata.networkType,
                       transaction.tranxType
                     )}
                   </View>
@@ -284,9 +304,7 @@ const styles = StyleSheet.create({
     color: "#06C270",
     fontSize: RFValue(10),
   },
-  skeletonImage: {
-    marginRight: 10,
-  },
+  skeletonImage: {},
   skeletonText: {
     borderRadius: 4,
   },

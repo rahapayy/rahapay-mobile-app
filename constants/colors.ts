@@ -45,8 +45,7 @@ const COLORS = {
   violet900: "#1C1344",
   //  White
   white: "#FFFFFF",
-
-  // Orange
+  //  Orange
   orange50: "#FFF4E5",
   orange100: "#FFECB3",
   orange200: "#FFD580",
@@ -57,11 +56,21 @@ const COLORS = {
   orange700: "#EF6C00",
   orange800: "#E65100",
   orange900: "#DD2C00",
-
-  success: "#28a745", // Green for success messages
-  info: "#17a2b8", // Blue for info messages
-  default: "#6c757d", // Gray for default messages
-  error: "#dc3545", // Red for error messages
+  //  Grey
+  grey50: "#F2F2F2",
+  grey100: "#E6E6E6",
+  grey200: "#CCCCCC",
+  grey300: "#B3B3B3",
+  grey400: "#999999",
+  grey500: "#808080",
+  grey600: "#666666",
+  grey700: "#4D4D4D",
+  grey800: "#333333",
+  grey900: "#1A1A1A",
+  success: "#28a745",
+  info: "#17a2b8",
+  default: "#6c757d",
+  error: "#dc3545",
   brand: "#5136C1",
 };
 

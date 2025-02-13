@@ -15,11 +15,10 @@ import COLORS from "../../constants/colors";
 import SPACING from "../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../components/common/ui/buttons/Button";
-import useApi from "../../services/apiClient";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import FONT_SIZE from "../../constants/font-size";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import BackButton from "../../components/common/ui/buttons/BackButton";
+import { services } from "@/services";
 
 const CreateTagScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -28,63 +27,51 @@ const CreateTagScreen: React.FC<{
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
+  const [error, setError] = useState(null);
 
   const isFormComplete = tag;
 
-  // const { mutateAsync: updateTagMutateAsync } = useApi.patch("/auth/username");
-  const { data: suggestedTagsResponse, refetch: fetchUsernames } = useApi.get(
-    "/user/suggest-username?numberOfSuggestions=7",
-    {
-      enabled: false,
-    }
-  );
-
-  const updateTagMutation = useApi.patch<{ userName: string }, Error>(
-    "/user/username"
-  );
-
-  const handleSetTag = async () => {
+  const fetchSuggestedTags = async () => {
     setLoading(true);
     try {
-      await updateTagMutation.mutateAsync({ userName: tag });
-      navigation.navigate("HomeScreen");
-      handleShowFlash({
-        message: "Tag updated successfully!",
-        type: "success",
-      });
-      setTag("");
+      const response = await services.userService.suggestUsername(7);
+
+      // Remove the .data reference since suggestedUserNames is at the top level
+      const suggestedUsernames = response?.suggestedUserNames;
+      if (Array.isArray(suggestedUsernames) && suggestedUsernames.length > 0) {
+        setSuggestedTags(suggestedUsernames);
+      } else {
+        console.log("No suggested usernames received.");
+      }
     } catch (error) {
-      handleShowFlash({
-        message: "Failed to update tag. Please try another.",
-        type: "danger",
-      });
-      // Optionally log the error too
-      console.error("Failed to update tag:", error);
-      console.error({ error });
+      console.error("Error fetching suggested tags:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    AsyncStorage.getItem("access_token").then((value) => {
-      console.log("access token found");
-      if (value) {
-        console.log({ value });
-        fetchUsernames();
-      }
-    });
-  }, []);
+  const updateTag = async () => {
+    try {
+      setIsLoading(true);
+      await services.userService.updateUsername({ userName: tag });
+      handleShowFlash({
+        message: "Tag updated successfully!",
+        type: "success",
+      });
+      navigation.navigate("HomeScreen");
+    } catch (error) {
+      handleShowFlash({
+        message: "Failed to update tag. Please try another.",
+        type: "danger",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (
-      suggestedTagsResponse?.data &&
-      suggestedTagsResponse.data &&
-      suggestedTagsResponse.data?.suggestedUserNames
-    ) {
-      setSuggestedTags(suggestedTagsResponse.data?.suggestedUserNames);
-    }
-  }, [suggestedTagsResponse]);
+    fetchSuggestedTags();
+  }, []);
 
   return (
     <SafeAreaView className="flex-1">
@@ -150,15 +137,15 @@ const CreateTagScreen: React.FC<{
                   </Text>
                 </TouchableOpacity>
               ))}
+            {error && <Text style={{ color: "red" }}>{error}</Text>}
           </View>
 
           <Button
             title="Set My Tag"
-            onPress={handleSetTag}
-            isLoading={loading}
+            onPress={updateTag}
+            isLoading={isLoading}
             style={[
               styles.proceedButton,
-              // If the form is not complete, add styles.proceedButtonDisabled
               !isFormComplete && styles.proceedButtonDisabled,
             ]}
             textColor={COLORS.white}

@@ -22,6 +22,7 @@ import ProgressIndicator from "../../../components/ProgressIndicator";
 import { IVerifyEmailDto } from "@/services/dtos";
 import { services } from "@/services";
 import { setItem } from "@/utils/storage";
+import { useAuth } from "@/services/AuthContext";
 
 type VerifyEmailScreenRouteParams = {
   email: string;
@@ -47,6 +48,7 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
   const [isInputFilled, setIsInputFilled] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(60);
   const [isLoading, setIsLoading] = useState(false);
+  const { setUserInfo } = useAuth();
 
   useEffect(() => {
     setIsInputFilled(boxes.every((box) => box !== ""));
@@ -118,12 +120,17 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
         if (response?.data?.accessToken) {
           await setItem("ACCESS_TOKEN", response.data.accessToken, true);
           await setItem("REFRESH_TOKEN", response.data.refreshToken, true);
+
+          // Fetch user details immediately after verification
+          const userResponse = await services.authServiceToken.getUserDetails();
+          setUserInfo(userResponse.data);
+
           navigation.navigate("CreateTransactionPinScreen");
+          handleShowFlash({
+            message: "Your account has been successfully verified!",
+            type: "success",
+          });
         }
-        handleShowFlash({
-          message: "Your account has been successfully verified!",
-          type: "success",
-        });
       } catch (error) {
         const err = error as {
           response?: { data?: { message?: string; code?: string } };

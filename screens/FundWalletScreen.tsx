@@ -20,7 +20,7 @@ import Circle from "../assets/svg/Group 803.svg";
 import useWallet from "../hooks/use-wallet";
 import { handleShowFlash } from "../components/FlashMessageComponent";
 import * as Clipboard from "expo-clipboard";
-import { AuthContext } from "../services/AuthContext";
+import { AuthContext, useAuth } from "../services/AuthContext";
 import { Skeleton } from "@rneui/themed";
 
 const FundWalletScreen: React.FC<{
@@ -28,7 +28,7 @@ const FundWalletScreen: React.FC<{
 }> = ({ navigation }) => {
   const { account, isLoading } = useWallet();
 
-  const { userDetails } = useContext(AuthContext);
+  const { userInfo } = useAuth();
 
   const copyToClipboard = async (textToCopy: string) => {
     await Clipboard.setStringAsync(textToCopy);
@@ -106,7 +106,7 @@ const FundWalletScreen: React.FC<{
                   </View>
                 </View>
                 <Text style={styles.accountName} allowFontScaling={false}>
-                  {userDetails?.fullName}
+                  {userInfo?.fullName}
                 </Text>
               </ImageBackground>
               {/* )} */}
