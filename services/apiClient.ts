@@ -4,6 +4,7 @@ import { AuthServices } from "./modules";
 import UserServices from "./modules/user";
 import DeviceToken from "./modules/notificaiton";
 import AirtimeService from "./modules/airtime";
+import DataService from "./modules/data";
 
 export const axiosInstance = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
@@ -126,4 +127,5 @@ export const services = {
   userService: new UserServices(axiosInstance),
   notificationService: new DeviceToken(axiosInstance),
   airtimeService: new AirtimeService(axiosInstance),
+  dataService: new DataService(axiosInstance),
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -28,6 +28,9 @@ import Glo from "../../assets/svg/glo.svg";
 import Button from "../../components/common/ui/buttons/Button";
 import SelectDataPlanModal from "../../components/SelectDataPlanModal";
 import { Skeleton } from "@rneui/base";
+import { useDataPlans } from "@/services/hooks/data";
+import { DataPlan } from "@/services/modules/data";
+import { services } from "@/services";
 
 interface DataScreenProps {
   navigation: NativeStackNavigationProp<any>;
@@ -35,6 +38,8 @@ interface DataScreenProps {
 
 const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
   const [selectedOperator, setSelectedOperator] = useState("");
+  const [dataPlans, setDataPlans] = useState<DataPlan[]>([]);
+  const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<{
     plan: string;
@@ -43,19 +48,40 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
     amount: number;
   } | null>(null);
   const [phoneNumber, setPhoneNumber] = useState("");
-  const onSelectPackage = (
-    plan: string,
-    days: string,
-    plan_id: string,
-    amount: number
-  ) => {
-    // Handle the selected package
-    console.log({ plan, days, plan_id, amount });
-    setSelectedPlan({ plan, days, plan_id, amount });
+  const [error, setError] = useState<string | null>(null);
 
+  const onSelectPackage = (plan: DataPlan) => {
+    setSelectedPlan({
+      plan: plan.plan_name,
+      days: plan.validity,
+      plan_id: plan.plan_id,
+      amount: parseFloat(plan.amount),
+    });
     setModalVisible(false);
   };
 
+  // Fetch data plans when operator changes
+  useEffect(() => {
+    const fetchDataPlans = async () => {
+      if (!selectedOperator) return;
+
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await services.dataService.getDataPlans(
+          selectedOperator
+        );
+        setDataPlans(response);
+      } catch (err) {
+        setError("Failed to load data plans. Please try again.");
+        console.error("Error fetching data plans:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDataPlans();
+  }, [selectedOperator]);
   // Check if all required fields are filled
   const isButtonDisabled = !selectedOperator || !phoneNumber || !selectedPlan;
 
@@ -286,7 +312,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                 </View>
 
                 {/* Save as Beneficiary Toogle */}
-                <View className="mb-4">
+                {/* <View className="mb-4">
                   <View className="flex-row items-center gap-2 mt-2">
                     <Text
                       style={styles.beneficiaryText}
@@ -296,11 +322,12 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                     </Text>
                     <Switch />
                   </View>
-                </View>
+                </View> */}
               </View>
             </View>
             <Button
               title={"Proceed"}
+              className="mt-10"
               style={{
                 backgroundColor: isButtonDisabled
                   ? COLORS.violet200
@@ -322,12 +349,10 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
             <SelectDataPlanModal
               visible={modalVisible}
               onClose={() => setModalVisible(false)}
-              route={{
-                params: {
-                  selectedOperator,
-                  onSelectPackage,
-                },
-              }}
+              dataPlans={dataPlans}
+              onSelectPackage={onSelectPackage}
+              isLoading={loading}
+              error={error}
             />
           </View>
         </View>

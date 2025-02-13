@@ -9,7 +9,7 @@ const useWallet = () => {
     data: dashboardData,
     isValidating: isDashboardLoading,
     mutate: mutateDashboard,
-  } = useSWR(`user/dashboard/me/`, {
+  } = useSWR(`user/dashboard/me`, {
     // refreshInterval: 5000, // Refresh every 5 seconds
     revalidateOnFocus: true,
   });
