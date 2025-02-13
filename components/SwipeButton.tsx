@@ -12,7 +12,7 @@ import LottieView from "lottie-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const windowWidth = Dimensions.get("window").width;
-const sliderWidth = 360;
+const sliderWidth = 350;
 const knobWidth = 50;
 const maxTranslateX = sliderWidth - knobWidth - 20;
 
@@ -64,67 +64,62 @@ const SwipeButton: React.FC<SwipeButtonProps> = ({ onConfirm, buttonText }) => {
   };
 
   return (
-    <SafeAreaView style={styles.contain}>
-      <View style={styles.centeredView}>
-        <View style={styles.sliderBackground}>
-          {isConfirmed ? (
-            <LottieView
-              source={require("../assets/animation/loading.json")}
-              autoPlay
-              loop
-              style={styles.loadingAnimation}
-            />
-          ) : (
-            <>
-              <PanGestureHandler
-                onGestureEvent={onGestureEvent}
-                onHandlerStateChange={onHandlerStateChange}
-              >
-                <Animated.View
-                  style={[
-                    styles.sliderKnob,
-                    {
-                      transform: [{ translateX }],
-                    },
-                  ]}
-                >
-                  <LottieView
-                    source={require("../assets/animation/rightarrow.json")}
-                    autoPlay
-                    loop
-                    style={{
-                      width: 40,
-                      height: 40,
-                    }}
-                  />
-                </Animated.View>
-              </PanGestureHandler>
+    <View style={styles.centeredView}>
+      <View style={styles.sliderBackground}>
+        {isConfirmed ? (
+          <LottieView
+            source={require("../assets/animation/loading.json")}
+            autoPlay
+            loop
+            style={styles.loadingAnimation}
+          />
+        ) : (
+          <>
+            <PanGestureHandler
+              onGestureEvent={onGestureEvent}
+              onHandlerStateChange={onHandlerStateChange}
+            >
               <Animated.View
                 style={[
-                  styles.sliderTextContainer,
+                  styles.sliderKnob,
                   {
-                    transform: [{ translateX: textTranslateX }],
+                    transform: [{ translateX }],
                   },
                 ]}
               >
-                <Text style={styles.slideText} allowFontScaling={false}>
-                  {buttonText || "Slide to Confirm"}
-                </Text>
+                <LottieView
+                  source={require("../assets/animation/rightarrow.json")}
+                  autoPlay
+                  loop
+                  style={{
+                    width: 40,
+                    height: 40,
+                  }}
+                />
               </Animated.View>
-            </>
-          )}
-        </View>
+            </PanGestureHandler>
+            <Animated.View
+              style={[
+                styles.sliderTextContainer,
+                {
+                  transform: [{ translateX: textTranslateX }],
+                },
+              ]}
+            >
+              <Text style={styles.slideText} allowFontScaling={false}>
+                {buttonText || "Slide to Confirm"}
+              </Text>
+            </Animated.View>
+          </>
+        )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
 export default SwipeButton;
 
 const styles = StyleSheet.create({
-  contain: {
-    flex: 1,
-  },
   centeredView: {
     flex: 1,
     justifyContent: "center",

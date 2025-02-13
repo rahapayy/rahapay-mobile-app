@@ -218,6 +218,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   swipeButtonContainer: {
-    marginTop: 24,
+    marginTop: SPACING * 5,
   },
 });
