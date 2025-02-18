@@ -1,10 +1,4 @@
-import {
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import COLORS from "../constants/colors";
 import SPACING from "../constants/SPACING";
@@ -15,6 +9,7 @@ import { RouteProp } from "@react-navigation/native";
 import Button from "../components/common/ui/buttons/Button";
 import { ReceiptText, Timer, Warning2 } from "iconsax-react-native";
 import { RootStackParamList } from "../types/RootStackParams";
+import useWallet from "@/hooks/use-wallet";
 
 type TransactionStatusScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -32,6 +27,15 @@ type Props = {
 
 const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
   const { status } = route.params;
+
+  const { refreshAll } = useWallet(); // Access the refresh function
+
+  const handleDone = () => {
+    if (status === "success") {
+      refreshAll(); // Refresh user balance after successful transaction
+    }
+    navigation.navigate("HomeScreen");
+  };
 
   const getStatusProps = () => {
     switch (status) {
@@ -73,7 +77,7 @@ const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <View className=" justify-center items-center">
+        <View className="justify-center items-center mt-6">
           <View style={styles.circleContain}>
             <Animatable.View
               animation={animation}
@@ -91,24 +95,19 @@ const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
               {subText}
             </Text>
           </View>
-          <TouchableOpacity className="mt-2">
-            <Text style={styles.viewReciptText} allowFontScaling={false}>
-              View Receipt
-            </Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.buttonContainer}>
           <Button
-            title={"Done"}
+            title={"Share Receipt"}
             textColor="#fff"
-            onPress={() => navigation.navigate("HomeScreen")}
+            // onPress={() => navigation.navigate("TransactionSummaryScreen")}
           />
           <Button
-            title={"Pay Another Bill"}
-            textColor="#A07CFF"
-            style={styles.inactiveButton}
-            onPress={() => navigation.navigate("AirtimeScreen")}
+            title={"Done"}
+            textColor="black"
+            borderOnly
+            onPress={handleDone}
           />
         </View>
       </View>
@@ -152,7 +151,8 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: "100%",
-    justifyContent: "flex-end", // Align buttons to the bottom
+    justifyContent: "flex-end",
+    gap: 10,
   },
   inactiveButton: {
     backgroundColor: COLORS.violet200,
