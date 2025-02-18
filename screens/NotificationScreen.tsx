@@ -8,26 +8,27 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, DocumentDownload } from "iconsax-react-native";
+import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../constants/SPACING";
 import FONT_SIZE from "../constants/font-size";
 import COLORS from "../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import LottieView from "lottie-react-native";
 import { NotificationContext } from "../context/NotificationContext";
+import { Skeleton } from "@rneui/themed";
 
 const NotificationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  // const [hasTransaction, setHasTransaction] = useState(true);
   const { notifications } = useContext(NotificationContext);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
         <View>
+          {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
@@ -35,75 +36,76 @@ const NotificationScreen: React.FC<{
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={[styles.headerText]} allowFontScaling={false}>
+            <Text style={styles.headerText} allowFontScaling={false}>
               Notifications
             </Text>
           </View>
 
+          {/* Notification List */}
           {notifications.length > 0 ? (
-            <View className="p-4">
+            <View style={{ padding: SPACING }}>
               {notifications.map(
                 (
                   notification: {
-                    request: {
-                      content: {
-                        title: any;
-                        data: { timestamp: any };
-                        body: any;
-                      };
-                    };
+                    request: { content: { title: any; body: any; data: any } };
                     date: any;
                   },
                   index: React.Key | null | undefined
-                ) => (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() =>
-                      navigation.navigate("TransactionSummaryScreen")
+                ) => {
+                  // Extract details from the notification payload.
+                  const { title, body, data } = notification.request.content;
+                  const timestamp = data?.timestamp || notification.date;
+                  const displayDate = new Date(timestamp).toLocaleDateString(
+                    "en-US",
+                    {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
                     }
-                    style={styles.transactionItem}
-                  >
-                    <Image
-                      source={require("../assets/images/small-logo.png")}
-                      style={styles.transactionImage}
-                    />
-                    <View style={styles.transactionTextContainer}>
-                      <View style={styles.transactionTextRow}>
-                        <Text style={styles.item} allowFontScaling={false}>
-                          {notification.request.content.title ||
-                            "New Notification"}
-                        </Text>
-                        <Text style={styles.valueText} allowFontScaling={false}>
-                          {new Date(
-                            notification.request.content.data?.timestamp ||
-                              notification.date
-                          ).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </Text>
-                      </View>
-                      <View style={styles.transactionTextRow}>
-                        <Text style={styles.date} allowFontScaling={false}>
-                          {notification.request.content.body ||
-                            "Notification content"}
-                        </Text>
-                        <Text
-                          style={styles.completedText}
-                          allowFontScaling={false}
-                        >
+                  );
+
+                  return (
+                    <View
+                      key={index}
+                      // onPress={() =>
+                      //   navigation.navigate("TransactionSummaryScreen")
+                      // }
+                      style={styles.transactionItem}
+                    >
+                      <Image
+                        source={require("../assets/images/small-logo.png")}
+                        style={styles.transactionImage}
+                      />
+                      <View style={styles.transactionTextContainer}>
+                        <View style={styles.transactionTextRow}>
+                          <Text style={styles.item} allowFontScaling={false}>
+                            {title || "New Notification"}
+                          </Text>
+                          <Text
+                            style={styles.valueText}
+                            allowFontScaling={false}
+                          >
+                            {displayDate}
+                          </Text>
+                        </View>
+                        <View style={styles.transactionTextRow}>
+                          <Text style={styles.date} allowFontScaling={false}>
+                            {body || "Notification content"}
+                          </Text>
+                          {/* <Text style={styles.completedText} allowFontScaling={false}>
                           View
-                        </Text>
+                        </Text> */}
+                        </View>
                       </View>
                     </View>
-                  </TouchableOpacity>
-                )
+                  );
+                }
               )}
             </View>
           ) : (
+            // Fallback if no notifications
             <View style={styles.noTransactionContainer}>
               <LottieView
                 source={require("../assets/animation/noTransaction.json")}
@@ -140,63 +142,6 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.medium,
     fontFamily: "Outfit-Regular",
     flex: 1,
-  },
-  headerTextDark: {
-    color: COLORS.white,
-  },
-  headTextContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  itemText: {
-    fontSize: FONT_SIZE.medium,
-    fontFamily: "Outfit-Medium",
-    paddingVertical: SPACING * 2,
-  },
-  container: {
-    backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING,
-    paddingVertical: SPACING,
-    borderRadius: SPACING,
-    marginTop: SPACING * 4,
-  },
-  headText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(18),
-    marginBottom: SPACING,
-  },
-  titleText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(16),
-    paddingVertical: SPACING,
-  },
-  descriptionText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
-    color: "#9BA1A8",
-  },
-  completedText: {
-    fontFamily: "Outfit-Regular",
-    color: COLORS.violet500,
-  },
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderStyle: "dotted",
-    borderColor: "#000",
-    paddingVertical: SPACING,
-    paddingHorizontal: SPACING * 3,
-    borderRadius: 8,
-    marginTop: SPACING * 2,
-  },
-  buttonText: {
-    marginLeft: SPACING,
-    color: "#000",
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.medium,
   },
   loadingAnimation: {
     width: 200,
@@ -236,10 +181,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 5,
   },
-  failedText: {
-    color: "#FF2E2E",
-    fontFamily: "Outfit-Regular",
-  },
   valueText: {
     fontFamily: "Outfit-Medium",
     fontSize: RFValue(8),
@@ -254,5 +195,9 @@ const styles = StyleSheet.create({
     fontSize: RFValue(10),
     width: 200,
     marginTop: 5,
+  },
+  completedText: {
+    fontFamily: "Outfit-Regular",
+    color: COLORS.violet500,
   },
 });

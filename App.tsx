@@ -111,7 +111,7 @@ export default function App() {
       <ThemeProvider theme={theme}>
         <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
           <QueryClientProvider client={queryClient}>
-            {/* <NotificationProvider> */}
+            <NotificationProvider>
               <StatusBar barStyle={"default"} />
               <Router />
               <FlashMessage
@@ -119,7 +119,7 @@ export default function App() {
                 position="top"
                 MessageComponent={FlashMessageComponent}
               />
-            {/* </NotificationProvider> */}
+            </NotificationProvider>
           </QueryClientProvider>
         </GestureHandlerRootView>
       </ThemeProvider>

@@ -5,7 +5,7 @@ class DeviceToken {
   constructor(private readonly baseService: AxiosInstance) {}
 
   async sendDeviceToken(token: string): Promise<IResponse<void>> {
-    const response = await this.baseService.patch(
+    const response = await this.baseService.post(
       "/notification/device-token",
       {
         deviceToken: token,

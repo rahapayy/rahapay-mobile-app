@@ -20,7 +20,7 @@ import Circle from "../assets/svg/Group 803.svg";
 import useWallet from "../hooks/use-wallet";
 import { handleShowFlash } from "../components/FlashMessageComponent";
 import * as Clipboard from "expo-clipboard";
-import { AuthContext, useAuth } from "../services/AuthContext";
+import { useAuth } from "../services/AuthContext";
 import { Skeleton } from "@rneui/themed";
 
 const FundWalletScreen: React.FC<{
