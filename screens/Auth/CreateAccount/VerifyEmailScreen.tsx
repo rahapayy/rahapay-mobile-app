@@ -16,7 +16,11 @@ import COLORS from "../../../constants/colors";
 import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LightText, MediumText } from "../../../components/common/Text";
+import {
+  LightText,
+  MediumText,
+  SemiBoldText,
+} from "../../../components/common/Text";
 import OtpInput from "../../../components/OtpInput";
 import ProgressIndicator from "../../../components/ProgressIndicator";
 import { IVerifyEmailDto } from "@/services/dtos";
@@ -189,63 +193,61 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
 
   return (
     <SafeAreaView className="flex-1">
-        <View className="p-4">
-          <ProgressIndicator
-            navigation={navigation}
-            currentStep={1}
-            totalSteps={4}
-          />
+      <View className="p-4">
+        <ProgressIndicator
+          navigation={navigation}
+          currentStep={1}
+          totalSteps={4}
+        />
 
-          <View className="mt-4">
-            <MediumText color="black" size="xlarge" marginBottom={5}>
-              Verify Email Address
-            </MediumText>
-            <LightText color="mediumGrey" size="base">
-              Enter the OTP sent to {email}
-            </LightText>
-          </View>
-
-          <OtpInput
-            boxes={boxes}
-            boxRefs={boxRefs}
-            handleInput={handleInput}
-            handlePaste={handlePaste}
-            handleKeyPress={handleKeyPress}
-            boxIsFocused={boxIsFocused}
-            setBoxIsFocused={setBoxIsFocused}
-          />
-
-          <Button
-            title={"Verify Account"}
-            onPress={handleButtonClick}
-            className="mt-4"
-            textColor="#fff"
-            isLoading={isLoading}
-            disabled={isSubmitting || !isInputFilled || isLoading}
-            style={
-              isSubmitting || !isInputFilled ? styles.disabledButton : null
-            }
-          />
-
-          <View className="justify-center items-center mt-6">
-            <Text style={styles.otpText} allowFontScaling={false}>
-              Didn't receive an OTP?
-            </Text>
-
-            <TouchableOpacity
-              onPress={handleResendOTP}
-              disabled={resendCountdown > 0}
-            >
-              <View style={styles.countdownContainer}>
-                <Text style={styles.countdownText} allowFontScaling={false}>
-                  {resendCountdown > 0
-                    ? `Resend OTP (${resendCountdown}s)`
-                    : "Resend OTP"}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
+        <View className="mt-4">
+          <SemiBoldText color="black" size="xlarge" marginBottom={5}>
+            Verify Email Address
+          </SemiBoldText>
+          <LightText color="mediumGrey" size="base">
+            Enter the OTP sent to {email}
+          </LightText>
         </View>
+
+        <OtpInput
+          boxes={boxes}
+          boxRefs={boxRefs}
+          handleInput={handleInput}
+          handlePaste={handlePaste}
+          handleKeyPress={handleKeyPress}
+          boxIsFocused={boxIsFocused}
+          setBoxIsFocused={setBoxIsFocused}
+        />
+
+        <Button
+          title={"Verify Account"}
+          onPress={handleButtonClick}
+          className="mt-4"
+          textColor="#fff"
+          isLoading={isLoading}
+          disabled={isSubmitting || !isInputFilled || isLoading}
+          style={isSubmitting || !isInputFilled ? styles.disabledButton : null}
+        />
+
+        <View className="justify-center items-center mt-6">
+          <Text style={styles.otpText} allowFontScaling={false}>
+            Didn't receive an OTP?
+          </Text>
+
+          <TouchableOpacity
+            onPress={handleResendOTP}
+            disabled={resendCountdown > 0}
+          >
+            <View style={styles.countdownContainer}>
+              <Text style={styles.countdownText} allowFontScaling={false}>
+                {resendCountdown > 0
+                  ? `Resend OTP (${resendCountdown}s)`
+                  : "Resend OTP"}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
     </SafeAreaView>
   );
 };

@@ -4,38 +4,33 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
 import SPACING from "../../constants/SPACING";
 import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../components/common/ui/buttons/Button";
-import useApi from "../../services/apiClient";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
+import { services } from "@/services";
+import { BasicPasswordInput } from "@/components/common/ui/forms/BasicPasswordInput";
+import BackButton from "@/components/common/ui/buttons/BackButton";
+import { BoldText, RegularText } from "@/components/common/Text";
+import Label from "@/components/common/ui/forms/Label";
 
 const ChangePasswordScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // State to manage loading state
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
   const [formValues, setFormValues] = useState({
     currPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
-
-  const {
-    mutateAsync: updatePassword,
-    isLoading,
-    error,
-  } = useApi.patch("/user/update/credentials");
 
   function handleInputChange(value: string, fieldKey: keyof typeof formValues) {
     setFormValues({ ...formValues, [fieldKey]: value });
@@ -48,134 +43,97 @@ const ChangePasswordScreen: React.FC<{
         type: "danger",
       });
     } else {
-      updatePassword({
-        type: "password",
-        current: formValues.currPassword,
-        new: formValues.newPassword,
-      })
-        .then(() => {
-          handleShowFlash({
-            message: "Password updated successfully!",
-            type: "success",
+      setIsLoading(true); // Start loading
+      try {
+        const data = await services.userService
+          .updateCredentials({
+            type: "password",
+            current: formValues.currPassword,
+            new: formValues.newPassword,
+          })
+          .then(() => {
+            handleShowFlash({
+              message: "Password updated successfully!",
+              type: "success",
+            });
+            navigation.goBack();
+          })
+          .catch((error) => {
+            // Handle error without showing the error message to the user
+            console.error("Failed to update password:", error.message);
+            handleShowFlash({
+              message: "Failed to update password. Please try again.",
+              type: "danger",
+            });
           });
-          navigation.goBack();
-        })
-        .catch((error) => {
-          const err = error as {
-            response?: { data?: { message?: string } };
-            message: string;
-          };
-          const errorMessage =
-            err.response?.data?.message || err.message || "An error occurred";
-
-          handleShowFlash({
-            message: errorMessage,
-            type: "danger",
-          });
+      } catch (error: any) {
+        // Handle error without showing the error message to the user
+        console.error("Failed to update password:", error.message);
+        handleShowFlash({
+          message: "Failed to update password. Please try again.",
+          type: "danger",
         });
+      } finally {
+        setIsLoading(false); // Stop loading
+      }
     }
   }
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
-        <View className="p-4">
+        <View className="px-4">
           <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.leftIcon}
-            >
-              <ArrowLeft color={"#000"} size={24} />
-            </TouchableOpacity>
-            <Text style={[styles.headerText]} allowFontScaling={false}>
+            <BackButton navigation={navigation} />
+            <RegularText color="black" size="large">
               Change Password
-            </Text>
+            </RegularText>
           </View>
 
           <View>
             <View>
-              <Text style={styles.label} allowFontScaling={false}>
-                Current Password
-              </Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Password"
-                  placeholderTextColor="#BABFC3"
-                  allowFontScaling={false}
-                  value={formValues.currPassword}
-                  secureTextEntry={!showPassword}
-                  onChangeText={(value) =>
-                    handleInputChange(value, "currPassword")
-                  }
-                />
-                <TouchableOpacity onPress={togglePasswordVisibility}>
-                  {showPassword ? (
-                    <Eye color="#000" size={20} />
-                  ) : (
-                    <EyeSlash color="#000" size={20} />
-                  )}
-                </TouchableOpacity>
-              </View>
+              <Label text="Current Password" marked={false} />
+              <BasicPasswordInput
+                style={styles.input}
+                placeholder="Password"
+                value={formValues.currPassword}
+                onChangeText={(value) =>
+                  handleInputChange(value, "currPassword")
+                }
+              />
             </View>
             <View className="mt-4">
-              <Text style={styles.label} allowFontScaling={false}>
-                New Password
-              </Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Password"
-                  placeholderTextColor="#BABFC3"
-                  allowFontScaling={false}
-                  secureTextEntry={!showPassword}
-                  value={formValues.newPassword}
-                  onChangeText={(value) =>
-                    handleInputChange(value, "newPassword")
-                  }
-                />
-                <TouchableOpacity onPress={togglePasswordVisibility}>
-                  {showPassword ? (
-                    <Eye color="#000" size={20} />
-                  ) : (
-                    <EyeSlash color="#000" size={20} />
-                  )}
-                </TouchableOpacity>
-              </View>
+              <Label text="New Password" marked={false} />
+              <BasicPasswordInput
+                style={styles.input}
+                placeholder="Password"
+                value={formValues.newPassword}
+                onChangeText={(value) =>
+                  handleInputChange(value, "newPassword")
+                }
+              />
             </View>
             <View className="mt-4">
-              <Text style={styles.label} allowFontScaling={false}>
-                Confirm Password
-              </Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Password"
-                  placeholderTextColor="#BABFC3"
-                  allowFontScaling={false}
-                  secureTextEntry={!showPassword}
-                  value={formValues.confirmPassword}
-                  onChangeText={(value) =>
-                    handleInputChange(value, "confirmPassword")
-                  }
-                />
-                <TouchableOpacity onPress={togglePasswordVisibility}>
-                  {showPassword ? (
-                    <Eye color="#000" size={20} />
-                  ) : (
-                    <EyeSlash color="#000" size={20} />
-                  )}
-                </TouchableOpacity>
-              </View>
+              <Label text="Confirm Password" marked={false} />
+
+              <BasicPasswordInput
+                style={styles.input}
+                placeholder="Password"
+                value={formValues.confirmPassword}
+                onChangeText={(value) =>
+                  handleInputChange(value, "confirmPassword")
+                }
+              />
             </View>
             <Button
               title={"Save Changes"}
               onPress={handleButtonClick}
               style={styles.proceedButton}
-              isLoading={isLoading}
+              isLoading={isLoading} // Use isLoading state to manage button loading
               disabled={
                 !formValues.confirmPassword ||
                 !formValues.newPassword ||
-                !formValues.currPassword
+                !formValues.currPassword ||
+                isLoading // Disable button while loading
               }
               textColor="#fff"
             />
@@ -194,6 +152,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
     paddingBottom: SPACING * 3,
+    gap: 4,
   },
   leftIcon: {
     marginRight: SPACING,
@@ -254,12 +213,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING * 3,
     borderRadius: 8,
     marginTop: SPACING * 2,
-  },
-  buttonText: {
-    marginLeft: SPACING,
-    color: "#000",
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.medium,
   },
   inputContainer: {
     flexDirection: "row",

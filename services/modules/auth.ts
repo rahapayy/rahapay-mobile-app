@@ -9,9 +9,9 @@ import {
   IReAuthenticateDto,
   IRefreshTokenDto,
   IRefreshTokenResponseDto,
-  UserInfoType,
   IVerifyResetDto,
 } from "@/services/dtos";
+import { UserInfoType } from "@/services/dtos/user";
 import { IResponse } from "@/types/general";
 
 class AuthServices {

@@ -1,16 +1,14 @@
 import { View, Text } from "react-native";
 import React from "react";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import { Dimensions } from 'react-native';
 
 type DividerProps = {
   length: number;
 };
 
 const Divider = ({ length }: DividerProps) => {
-  return <View style={{ marginVertical: hp(length) }} />;
+  const { height } = Dimensions.get('window');
+  return <View style={{ marginVertical: (height * length) / 100 }} />;
 };
 
 export default Divider;

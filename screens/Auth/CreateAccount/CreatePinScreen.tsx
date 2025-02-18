@@ -15,7 +15,11 @@ import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { AuthContext } from "../../../services/AuthContext";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
-import { LightText, MediumText } from "../../../components/common/Text";
+import {
+  LightText,
+  MediumText,
+  SemiBoldText,
+} from "../../../components/common/Text";
 import OtpInput from "../../../components/common/ui/forms/OtpInput";
 import Label from "../../../components/common/ui/forms/Label";
 import ProgressIndicator from "../../../components/ProgressIndicator";
@@ -94,9 +98,9 @@ const CreatePinScreen: React.FC<CreatePinScreenProps> = ({ navigation }) => {
 
           <View className="flex-1">
             <View style={{ marginTop: 16 }}>
-              <MediumText color="black" size="xlarge" marginBottom={5}>
+              <SemiBoldText color="black" size="xlarge" marginBottom={5}>
                 Create Your Security PIN
-              </MediumText>
+              </SemiBoldText>
               <LightText color="mediumGrey" size="base">
                 This PIN will be used to secure your account and authorize
                 important actions

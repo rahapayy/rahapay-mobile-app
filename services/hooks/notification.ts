@@ -4,7 +4,8 @@ import { handleError } from "../handleError";
 
 export const useDeviceToken = () => {
   return useMutation({
-    mutationFn: (token: string) => services.notificationService.sendDeviceToken(token),
+    mutationFn: (token: string) =>
+      services.notificationService.sendDeviceToken(token),
     onError: (error) => handleError(error),
   });
 };

@@ -5,7 +5,6 @@ import {
   SafeAreaView,
   StyleSheet,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import SPACING from "../../../constants/SPACING";
@@ -17,7 +16,7 @@ import BackButton from "../../../components/common/ui/buttons/BackButton";
 import {
   LightText,
   MediumText,
-  RegularText,
+  SemiBoldText,
 } from "../../../components/common/Text";
 import OtpInput from "../../../components/OtpInput";
 import { IVerifyResetDto } from "@/services/dtos";
@@ -163,9 +162,9 @@ const EnterCodeScreen: React.FC<{
         <View>
           <BackButton navigation={navigation} />
           <View style={{ marginTop: 16 }}>
-            <MediumText color="black" size="xlarge" marginBottom={5}>
+            <SemiBoldText color="black" size="xlarge" marginBottom={5}>
               Enter Code
-            </MediumText>
+            </SemiBoldText>
             <LightText color="mediumGrey" size="base">
               Enter the code sent to {email}
             </LightText>

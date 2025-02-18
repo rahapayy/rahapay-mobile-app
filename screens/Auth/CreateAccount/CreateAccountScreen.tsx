@@ -13,21 +13,19 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import * as Animatable from "react-native-animatable";
 import { AxiosError } from "axios";
-import BackButton from "../../../components/common/ui/buttons/BackButton";
 import BasicInput from "../../../components/common/ui/forms/BasicInput";
 import Label from "../../../components/common/ui/forms/Label";
 import {
   BoldText,
   LightText,
   MediumText,
+  SemiBoldText,
 } from "../../../components/common/Text";
 import PhoneNumberInput from "../../../components/common/ui/forms/PhoneNumberInput";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { SafeAreaView } from "react-native-safe-area-context";
-import SectionDivider from "../../../components/SectionDivider";
 import ProgressIndicator from "../../../components/ProgressIndicator";
 import { IOnboardingDto } from "@/services/dtos";
 import { services } from "@/services";
@@ -210,9 +208,9 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
               showsVerticalScrollIndicator={false}
             >
               <View className="mt-8 mb-4">
-                <MediumText color="black" size="xlarge" marginBottom={5}>
+                <SemiBoldText color="black" size="xlarge" marginBottom={5}>
                   Let's Get Started 🎉
-                </MediumText>
+                </SemiBoldText>
                 <LightText color="mediumGrey" size="base">
                   Just a few more details to set up your account.
                 </LightText>
@@ -227,121 +225,102 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                 )}
               </View>
 
-              {formikProps.values.fullName && (
-                <Animatable.View animation={"fadeIn"} duration={600}>
-                  {renderInputField(
-                    "Email Address",
-                    "email",
-                    "e.g johndoe@email.com",
-                    formikProps
+              <View>
+                {renderInputField(
+                  "Email Address",
+                  "email",
+                  "e.g johndoe@email.com",
+                  formikProps
+                )}
+              </View>
+
+              <View className="mt-4">
+                <Label text="Phone Number" marked={false} />
+                <PhoneNumberInput
+                  value={formikProps.values.phoneNumber}
+                  onChangeText={(value: string) =>
+                    formikProps.setFieldValue("phoneNumber", value)
+                  }
+                  countryCode={countryCode}
+                />
+                {formikProps.touched.phoneNumber &&
+                  formikProps.errors.phoneNumber && (
+                    <Text style={styles.errorText}>
+                      {formikProps.errors.phoneNumber}
+                    </Text>
                   )}
-                </Animatable.View>
-              )}
+              </View>
 
-              {(formikProps.values.email || visibleSections.phone) && (
-                <Animatable.View
-                  animation={"fadeIn"}
-                  duration={600}
-                  className="mt-4"
-                >
-                  <Label text="Phone Number" marked={false} />
-                  <PhoneNumberInput
-                    value={formikProps.values.phoneNumber}
-                    onChangeText={(value: string) =>
-                      formikProps.setFieldValue("phoneNumber", value)
-                    }
-                    countryCode={countryCode}
-                  />
-                  {formikProps.touched.phoneNumber &&
-                    formikProps.errors.phoneNumber && (
-                      <Text style={styles.errorText}>
-                        {formikProps.errors.phoneNumber}
-                      </Text>
-                    )}
-                </Animatable.View>
-              )}
-
-              {(formikProps.values.phoneNumber || visibleSections.password) && (
-                <Animatable.View
-                  animation={"fadeIn"}
-                  duration={600}
-                  className="mt-4"
-                >
-                  <Label text="Create Password" marked={false} />
-                  <BasicInput
-                    value={formikProps.values.password}
-                    onChangeText={(value) =>
-                      handlePasswordChange(value, formikProps.setFieldValue)
-                    }
-                    placeholder="Password"
-                    secureTextEntry
-                    autoCapitalize="none"
-                    autoComplete="off"
-                    autoCorrect={false}
-                  />
-                  {formikProps.touched.password &&
-                    formikProps.errors.password && (
-                      <Text style={styles.errorText}>
-                        {formikProps.errors.password}
-                      </Text>
-                    )}
-                  {showRequirements && (
-                    <View style={styles.requirementsContainer}>
-                      {passwordRequirements.map((requirement, index) => (
-                        <View
-                          key={index}
+              <View className="mt-4">
+                <Label text="Create Password" marked={false} />
+                <BasicInput
+                  value={formikProps.values.password}
+                  onChangeText={(value) =>
+                    handlePasswordChange(value, formikProps.setFieldValue)
+                  }
+                  placeholder="Password"
+                  secureTextEntry
+                  autoCapitalize="none"
+                  autoComplete="off"
+                  autoCorrect={false}
+                />
+                {formikProps.touched.password &&
+                  formikProps.errors.password && (
+                    <Text style={styles.errorText}>
+                      {formikProps.errors.password}
+                    </Text>
+                  )}
+                {showRequirements && (
+                  <View style={styles.requirementsContainer}>
+                    {passwordRequirements.map((requirement, index) => (
+                      <View
+                        key={index}
+                        style={[
+                          styles.requirementItem,
+                          metRequirements.has(index)
+                            ? styles.requirementMet
+                            : styles.requirementNotMet,
+                        ]}
+                      >
+                        <Text
                           style={[
-                            styles.requirementItem,
+                            styles.requirementIcon,
                             metRequirements.has(index)
-                              ? styles.requirementMet
-                              : styles.requirementNotMet,
+                              ? styles.requirementMetIcon
+                              : styles.requirementNotMetIcon,
                           ]}
+                          allowFontScaling={false}
                         >
-                          <Text
-                            style={[
-                              styles.requirementIcon,
-                              metRequirements.has(index)
-                                ? styles.requirementMetIcon
-                                : styles.requirementNotMetIcon,
-                            ]}
-                            allowFontScaling={false}
-                          >
-                            {metRequirements.has(index) ? "✓" : "✗"}
-                          </Text>
-                          <Text
-                            style={[
-                              styles.requirementText,
-                              metRequirements.has(index)
-                                ? styles.requirementMetText
-                                : styles.requirementNotMetText,
-                            ]}
-                            allowFontScaling={false}
-                          >
-                            {requirement.text}
-                          </Text>
-                        </View>
-                      ))}
-                    </View>
-                  )}
-                </Animatable.View>
-              )}
+                          {metRequirements.has(index) ? "✓" : "✗"}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.requirementText,
+                            metRequirements.has(index)
+                              ? styles.requirementMetText
+                              : styles.requirementNotMetText,
+                          ]}
+                          allowFontScaling={false}
+                        >
+                          {requirement.text}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
 
-              {(formikProps.values.password ||
-                visibleSections.confirmPassword) && (
-                <Animatable.View
-                  animation={"fadeIn"}
-                  duration={600}
-                  // className="mt-2"
-                >
-                  {renderInputField(
-                    "Re-type Password",
-                    "confirmPassword",
-                    "Confirm Password",
-                    formikProps,
-                    true
-                  )}
-                </Animatable.View>
-              )}
+              <View
+                // className="mt-2"
+              >
+                {renderInputField(
+                  "Re-type Password",
+                  "confirmPassword",
+                  "Confirm Password",
+                  formikProps,
+                  true
+                )}
+              </View>
 
               {renderInputField(
                 "Referral",
@@ -351,32 +330,31 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                 false,
                 true
               )}
+              <Button
+                title="Proceed"
+                onPress={() => formikProps.handleSubmit()}
+                isLoading={formikProps.isSubmitting}
+                style={[
+                  styles.proceedButton,
+                  !formikProps.isValid && styles.proceedButtonDisabled,
+                ]}
+                textColor="#fff"
+                disabled={!formikProps.isValid || formikProps.isSubmitting}
+              />
+
+              <View style={styles.alreadyHaveAccountContainer}>
+                <MediumText color="mediumGrey" size="base">
+                  Already have an account?{" "}
+                </MediumText>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("LoginScreen")}
+                >
+                  <BoldText color="primary" size="base">
+                    Login
+                  </BoldText>
+                </TouchableOpacity>
+              </View>
             </KeyboardAwareScrollView>
-
-            <Button
-              title="Proceed"
-              onPress={() => formikProps.handleSubmit()}
-              isLoading={formikProps.isSubmitting}
-              style={[
-                styles.proceedButton,
-                !formikProps.isValid && styles.proceedButtonDisabled,
-              ]}
-              textColor="#fff"
-              disabled={!formikProps.isValid || formikProps.isSubmitting}
-            />
-
-            <View style={styles.alreadyHaveAccountContainer}>
-              <MediumText color="mediumGrey" size="base">
-                Already have an account?{" "}
-              </MediumText>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("LoginScreen")}
-              >
-                <BoldText color="primary" size="base">
-                  Login
-                </BoldText>
-              </TouchableOpacity>
-            </View>
           </View>
         )}
       </Formik>
@@ -388,7 +366,7 @@ export default CreateAccountScreen;
 
 const styles = StyleSheet.create({
   proceedButton: {
-    marginTop: SPACING * 2,
+    marginTop: SPACING * 5,
   },
   proceedButtonDisabled: {
     backgroundColor: COLORS.violet200,

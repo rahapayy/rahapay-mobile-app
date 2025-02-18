@@ -12,7 +12,7 @@ import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
 import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import { LightText, MediumText } from "../../../components/common/Text";
+import { LightText, MediumText, SemiBoldText } from "../../../components/common/Text";
 import OtpInput from "../../../components/common/ui/forms/OtpInput";
 import Label from "../../../components/common/ui/forms/Label";
 import ProgressIndicator from "../../../components/ProgressIndicator";
@@ -90,9 +90,9 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
           />
 
           <View style={{ marginTop: 16 }}>
-            <MediumText color="black" size="xlarge" marginBottom={5}>
+            <SemiBoldText color="black" size="xlarge" marginBottom={5}>
               Create Your Transaction PIN
-            </MediumText>
+            </SemiBoldText>
             <LightText color="mediumGrey" size="base">
               Use this pin for secure transactions
             </LightText>

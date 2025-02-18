@@ -15,6 +15,7 @@ import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
 import { ArrowLeft, ArrowRight2 } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RegularText } from "@/components/common/Text";
 
 const options = [
   {
@@ -41,9 +42,9 @@ const SelectPinChangeScreen: React.FC<{
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={[styles.headerText]} allowFontScaling={false}>
+            <RegularText color="black" size="large">
               Select pin type
-            </Text>
+            </RegularText>
           </View>
           <View>
             {options.map((item, index) => (

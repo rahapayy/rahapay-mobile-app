@@ -11,8 +11,8 @@ import {
   IReAuthenticateDto,
   IRefreshTokenDto,
   IRefreshTokenResponseDto,
-  UserInfoType,
 } from "../dtos";
+import { UserInfoType } from "@/services/dtos/user";
 import { handleError } from "../handleError";
 
 export const useOnboarding = () => {

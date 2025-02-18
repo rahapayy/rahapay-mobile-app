@@ -29,6 +29,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#5136C1"
       },
+       "googleServicesFile": "./google-services.json",
       "package": "com.app.rahapay"
     },
     "web": {

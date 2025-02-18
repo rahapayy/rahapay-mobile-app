@@ -19,6 +19,7 @@ import Airtel from "../assets/svg/airtelbig.svg";
 import Mtn from "../assets/svg/mtnbig.svg";
 import Eti from "../assets/svg/9mobilebig.svg";
 import Glo from "../assets/svg/globig.svg";
+import { DownloadReceiptButton } from "@/components/DownloadReceipt";
 
 type TransactionSummaryRouteParams = {
   transaction: {
@@ -56,13 +57,13 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
     const providerLower = provider.toLowerCase();
     switch (providerLower) {
       case "airtel":
-        return <Airtel width={40} height={40} />;
+        return <Airtel width={70} height={70} />;
       case "mtn": // This line is changed to lowercase
         return <Mtn width={70} height={70} />;
       case "9mobile":
-        return <Eti width={40} height={40} />;
+        return <Eti width={70} height={70} />;
       case "glo":
-        return <Glo width={40} height={40} />;
+        return <Glo width={70} height={70} />;
       default:
         return;
     }
@@ -208,12 +209,7 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
               </View>
             </View>
 
-            <TouchableOpacity style={styles.button}>
-              <DocumentDownload color="#000" />
-              <Text style={styles.buttonText} allowFontScaling={false}>
-                Download Receipt
-              </Text>
-            </TouchableOpacity>
+            <DownloadReceiptButton transaction={transaction} />
           </View>
         </View>
       </ScrollView>

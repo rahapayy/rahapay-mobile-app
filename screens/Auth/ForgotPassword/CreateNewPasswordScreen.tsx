@@ -7,9 +7,6 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import COLORS from "../../../constants/colors";
@@ -21,7 +18,7 @@ import { services } from "../../../services/apiClient";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import { RootStackParamList } from "../../../types/RootStackParams";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
-import { LightText, MediumText } from "../../../components/common/Text";
+import { LightText, MediumText, SemiBoldText } from "../../../components/common/Text";
 import { BasicPasswordInput } from "../../../components/common/ui/forms/BasicPasswordInput";
 import Label from "../../../components/common/ui/forms/Label";
 import { IResetPasswordDto } from "@/services/dtos";
@@ -39,11 +36,6 @@ const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({
   route,
 }) => {
   // console.log(resetToken);
-
-  const [showPassword, setShowPassword] = useState(true);
-  const [showPassword2, setShowPassword2] = useState(true);
-  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
-  const togglePasswordVisibility2 = () => setShowPassword2((prev) => !prev);
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -99,9 +91,9 @@ const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({
         />
 
         <View className="mt-4">
-          <MediumText color="black" size="xlarge" marginBottom={5}>
+          <SemiBoldText color="black" size="xlarge" marginBottom={5}>
             Create New Password
-          </MediumText>
+          </SemiBoldText>
           <LightText color="mediumGrey" size="base">
             Enter new password to recover account
           </LightText>

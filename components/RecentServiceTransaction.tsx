@@ -1,31 +1,49 @@
+import React, { useEffect, useState, useMemo } from "react";
 import {
-  Image,
-  ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  StyleSheet,
+  Platform,
 } from "react-native";
-import React, { useState, useEffect } from "react";
 import { RFValue } from "react-native-responsive-fontsize";
 import LottieView from "lottie-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import useWallet from "../hooks/use-wallet";
 import { Skeleton } from "@rneui/themed";
-import { WalletAdd1, WalletMinus } from "iconsax-react-native";
+import { DocumentText, WalletAdd1 } from "iconsax-react-native";
+import useWallet from "../hooks/use-wallet";
+import { BoldText, LightText } from "./common/Text";
 import COLORS from "../constants/colors";
+import SPACING from "../constants/SPACING";
 import Airtel from "../assets/svg/airtelbig.svg";
 import Mtn from "../assets/svg/mtnbig.svg";
 import Eti from "../assets/svg/9mobilebig.svg";
 import Glo from "../assets/svg/globig.svg";
-import { BoldText, LightText } from "./common/Text";
-import { SPACING } from "../constants/ui";
 
 const RecentServiceTransaction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { transactions, isLoading } = useWallet();
+  const { getAllTransactions } = useWallet();
+  const { transactions, isLoading } = getAllTransactions();
   const [hasTransaction, setHasTransaction] = useState(false);
+
+  // Get the 3 most recent transactions using useMemo
+  const recentTransactions = useMemo(() => {
+    if (transactions.length === 0) return [];
+    
+    // Sort transactions by date (most recent first)
+    const sortedTransactions = [...transactions].sort((a, b) => {
+      return new Date(b.paidOn || 0).getTime() - new Date(a.paidOn || 0).getTime();
+    });
+    
+    // Return only the first 3 transactions
+    return sortedTransactions.slice(0, 3);
+  }, [transactions]);
+
+  // Update hasTransaction flag when transactions change
+  useEffect(() => {
+    setHasTransaction(transactions.length > 0);
+  }, [transactions]);
 
   const renderServiceIcon = (
     provider: string | undefined,
@@ -36,24 +54,134 @@ const RecentServiceTransaction: React.FC<{
       return <WalletAdd1 size={24} color={COLORS.violet400} />;
     }
 
-    // Otherwise, render icons based on the provider (network type)
-    switch (provider?.toLowerCase()) {
-      case "airtel":
-        return <Airtel width={40} height={40} />;
-      case "mtn":
-        return <Mtn width={40} height={40} />;
-      case "9mobile":
-        return <Eti width={40} height={40} />;
-      case "glo":
-        return <Glo width={40} height={40} />;
-      default:
-        return;
+    // Get provider from metadata if available
+    if (provider?.toLowerCase() === "airtel") {
+      return <Airtel width={40} height={40} />;
+    } else if (provider?.toLowerCase() === "mtn") {
+      return <Mtn width={40} height={40} />;
+    } else if (provider?.toLowerCase() === "9mobile") {
+      return <Eti width={40} height={40} />;
+    } else if (provider?.toLowerCase() === "glo") {
+      return <Glo width={40} height={40} />;
     }
+
+    // Default icon if no match
   };
 
-  useEffect(() => {
-    setHasTransaction(transactions.length > 0);
-  }, [transactions]);
+  const renderLoadingSkeleton = () => (
+    <View>
+      {[1, 2, 3].map((item) => (
+        <View key={item} style={styles.transactionItem}>
+          <Skeleton
+            circle
+            width={40}
+            height={40}
+            style={{
+              backgroundColor: COLORS.grey100,
+              marginRight: 10,
+            }}
+            skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+            animation="wave"
+          />
+          <View style={styles.transactionTextContainer}>
+            <View style={styles.transactionTextRow}>
+              <Skeleton
+                width={RFValue(80)}
+                height={RFValue(16)}
+                style={{
+                  backgroundColor: COLORS.grey100,
+                  marginRight: 10,
+                }}
+                skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                animation="wave"
+              />
+              <Skeleton
+                width={RFValue(60)}
+                height={RFValue(16)}
+                style={{
+                  backgroundColor: COLORS.grey100,
+                  marginRight: 10,
+                }}
+                skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                animation="wave"
+              />
+            </View>
+            <View style={[styles.transactionTextRow, { marginTop: 8 }]}>
+              <Skeleton
+                width={RFValue(120)}
+                height={RFValue(12)}
+                style={{
+                  backgroundColor: COLORS.grey100,
+                  marginRight: 10,
+                }}
+                skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                animation="wave"
+              />
+              <Skeleton
+                width={RFValue(40)}
+                height={RFValue(12)}
+                style={{
+                  backgroundColor: COLORS.grey100,
+                  marginRight: 10,
+                }}
+                skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                animation="wave"
+              />
+            </View>
+          </View>
+        </View>
+      ))}
+    </View>
+  );
+
+  const renderEmptyState = () => (
+    <View style={styles.noTransactionContainer}>
+      <LottieView
+        source={require("../assets/animation/noTransaction.json")}
+        autoPlay
+        loop
+        style={styles.noTransactionAnimation}
+      />
+      <Text style={styles.notransactionText}>
+        You don't have any transactions
+      </Text>
+    </View>
+  );
+
+  const mapTransactionToSummaryFormat = (transaction: {
+    paidOn: string | number | Date;
+    purpose: any;
+    transactionType: any;
+    amountPaid: any;
+    paymentStatus: any;
+    referenceId: any;
+    _id: any;
+    metadata: { networkType: any; phoneNumber: any };
+  }) => {
+    // Format the date string from transaction.paidOn
+    const formattedDate = new Date(transaction.paidOn).toLocaleString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    // Map to the expected format for TransactionSummaryScreen
+    return {
+      purpose: transaction.purpose || transaction.transactionType,
+      amount: transaction.amountPaid,
+      created_at: formattedDate,
+      status: transaction.paymentStatus,
+      tranxType: transaction.transactionType,
+      referenceId: transaction.referenceId || transaction._id,
+      metadata: {
+        ...transaction.metadata,
+        networkType: transaction.metadata?.networkType,
+        phoneNumber: transaction.metadata?.phoneNumber,
+      }
+    };
+  };
 
   return (
     <View style={styles.container}>
@@ -70,137 +198,79 @@ const RecentServiceTransaction: React.FC<{
 
       <View>
         {isLoading ? (
-          <View>
-            {[1, 2, 3].map((item) => (
-              <View key={item} style={styles.transactionItem}>
-                <Skeleton
-                  circle
-                  width={40}
-                  height={40}
-                  style={{
-                    backgroundColor: COLORS.grey100,
-                    marginRight: 10,
-                  }}
-                  skeletonStyle={{ backgroundColor: COLORS.grey50 }}
-                  animation="wave"
-                />
+          renderLoadingSkeleton()
+        ) : hasTransaction ? (
+          recentTransactions.map((transaction) => {
+            const formattedTime = new Date(transaction.paidOn).toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit',
+            });
+            
+            // Extract network type from metadata if available
+            const networkType = transaction.metadata?.networkType;
+            
+            return (
+              <TouchableOpacity
+                key={transaction._id}
+                onPress={() =>
+                  navigation.navigate("TransactionSummaryScreen", { 
+                    transaction: mapTransactionToSummaryFormat(transaction)
+                  })
+                }
+                style={styles.transactionItem}
+              >
+                <View style={styles.iconContainer}>
+                  {renderServiceIcon(networkType, transaction.transactionType)}
+                </View>
                 <View style={styles.transactionTextContainer}>
                   <View style={styles.transactionTextRow}>
-                    <Skeleton
-                      width={RFValue(80)}
-                      height={RFValue(16)}
-                      style={{
-                        backgroundColor: COLORS.grey100,
-                        marginRight: 10,
-                      }}
-                      skeletonStyle={{ backgroundColor: COLORS.grey50 }}
-                      animation="wave"
-                    />
-                    <Skeleton
-                      width={RFValue(60)}
-                      height={RFValue(16)}
-                      style={{
-                        backgroundColor: COLORS.grey100,
-                        marginRight: 10,
-                      }}
-                      skeletonStyle={{ backgroundColor: COLORS.grey50 }}
-                      animation="wave"
-                    />
+                    <Text style={styles.item} allowFontScaling={false}>
+                      {transaction.transactionType}
+                    </Text>
+                    <Text 
+                      style={[
+                        styles.valueText, 
+                        { color: transaction.transactionType.includes('PURCHASE') ? 'black' : 'black' }
+                      ]} 
+                      allowFontScaling={false}>
+                      {transaction.transactionType.includes('PURCHASE') ? '-' : '+'} ₦{transaction.amountPaid}
+                    </Text>
                   </View>
-                  <View style={[styles.transactionTextRow, { marginTop: 8 }]}>
-                    <Skeleton
-                      width={RFValue(120)}
-                      height={RFValue(12)}
-                      style={{
-                        backgroundColor: COLORS.grey100,
-                        marginRight: 10,
-                      }}
-                      skeletonStyle={{ backgroundColor: COLORS.grey50 }}
-                      animation="wave"
-                    />
-                    <Skeleton
-                      width={RFValue(40)}
-                      height={RFValue(12)}
-                      style={{
-                        backgroundColor: COLORS.grey100,
-                        marginRight: 10,
-                      }}
-                      skeletonStyle={{ backgroundColor: COLORS.grey50 }}
-                      animation="wave"
-                    />
+                  <View style={styles.transactionTextRow}>
+                    <Text style={styles.date} allowFontScaling={false}>
+                      {formattedTime}
+                    </Text>
+                    <View 
+                      style={[
+                        styles.statusContainer, 
+                        {
+                          backgroundColor: 
+                            transaction.paymentStatus === 'SUCCESS' || transaction.paymentStatus === 'SUCCESSFUL' 
+                              ? '#E6F9F1' 
+                              : '#FFEDE9'
+                        }
+                      ]}>
+                      <Text 
+                        style={[
+                          styles.completedText,
+                          {
+                            color: 
+                              transaction.paymentStatus === 'SUCCESS' || transaction.paymentStatus === 'SUCCESSFUL' 
+                                ? '#06C270' 
+                                : '#FF3B30'
+                          }
+                        ]} 
+                        allowFontScaling={false}>
+                        {transaction.paymentStatus}
+                      </Text>
+                    </View>
                   </View>
                 </View>
-              </View>
-            ))}
-          </View>
-        ) : hasTransaction ? (
-          transactions
-            .slice(0, 3)
-            .map(
-              (transaction: {
-                id: React.Key | null | undefined;
-                tranxType: string;
-                amount: any;
-                created_at: any;
-                status: string;
-              }) => (
-                <TouchableOpacity
-                  key={transaction.id}
-                  onPress={() =>
-                    navigation.navigate("TransactionSummaryScreen", {
-                      transaction,
-                    })
-                  }
-                  style={styles.transactionItem}
-                >
-                  <View style={styles.transactionImage}>
-                    {renderServiceIcon(
-                      transaction.metadata.networkType,
-                      transaction.tranxType
-                    )}
-                  </View>
-
-                  <View style={styles.transactionTextContainer}>
-                    <View style={styles.transactionTextRow}>
-                      <Text style={styles.item} allowFontScaling={false}>
-                        {transaction.tranxType}
-                      </Text>
-                      <Text style={styles.valueText} allowFontScaling={false}>
-                        ₦{" "}
-                        {transaction.amount.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                        })}
-                      </Text>
-                    </View>
-                    <View style={styles.transactionTextRow}>
-                      <Text style={styles.date} allowFontScaling={false}>
-                        {transaction.created_at}
-                      </Text>
-                      <View style={styles.statusContainer}>
-                        <Text
-                          style={styles.completedText}
-                          allowFontScaling={false}
-                        >
-                          {transaction.status}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              )
-            )
+              </TouchableOpacity>
+            );
+          })
         ) : (
-          <View style={styles.noTransactionContainer}>
-            <LottieView
-              source={require("../assets/animation/noTransaction.json")}
-              autoPlay
-              loop
-              style={styles.noTransactionAnimation}
-            />
-            <Text style={styles.notransactionText}>
-              You don’t have any transactions
-            </Text>
-          </View>
+          renderEmptyState()
         )}
       </View>
     </View>
@@ -210,8 +280,7 @@ const RecentServiceTransaction: React.FC<{
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 16,
-    paddingBottom: SPACING * 40,
+    paddingBottom: Platform.OS === "android" ? SPACING * 25 : SPACING * 38,
   },
   header: {
     flexDirection: "row",
@@ -219,42 +288,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
-  rtText: {
-    fontFamily: "Outfit-SemiBold",
-    fontSize: RFValue(14),
-  },
-  viewmoreText: {
-    fontFamily: "Outfit-Regular",
-    color: "#9BA1A8",
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  loadingAnimation: {
-    width: 100,
-    height: 100,
-  },
-  loadingText: {
-    marginTop: 16,
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
-  },
-  noTransactionContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    // marginTop: 10,
-  },
-  noTransactionAnimation: {
-    width: 200,
-    height: 200,
-  },
-  notransactionText: {
-    // marginTop: 10,
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+    backgroundColor: '#F7F9FC',
   },
   transactionItem: {
     flexDirection: "row",
@@ -262,15 +303,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: "#E5E5E5",
-  },
-  transactionImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-    resizeMode: "contain",
-    justifyContent: "center",
-    alignItems: "center",
   },
   transactionTextContainer: {
     flex: 1,
@@ -304,9 +336,19 @@ const styles = StyleSheet.create({
     color: "#06C270",
     fontSize: RFValue(10),
   },
-  skeletonImage: {},
-  skeletonText: {
-    borderRadius: 4,
+  noTransactionContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: SPACING * 8,
+  },
+  noTransactionAnimation: {
+    width: 200,
+    height: 200,
+  },
+  notransactionText: {
+    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(14),
   },
 });
 

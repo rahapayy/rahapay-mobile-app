@@ -9,7 +9,7 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { Platform, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import useApi from "../services/apiClient";
+import { services } from "../services/apiClient";
 import { useAuth } from "../services/AuthContext";
 
 export const NotificationContext = createContext();
@@ -30,10 +30,6 @@ export const NotificationProvider = ({ children }) => {
   const [hasAskedForPermission, setHasAskedForPermission] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
-  const { mutateAsync: sendDeviceToken } = useApi({
-    mutationFn: (token) => services.notificationService.sendDeviceToken(token),
-    onError: (error) => handleError(error),
-  });
 
   const { isAuthenticated } = useAuth(); // Use AuthContext to check authentication status
 
@@ -41,6 +37,8 @@ export const NotificationProvider = ({ children }) => {
     if (isAuthenticated) {
       checkIfPermissionRequested();
     }
+    // Optionally, load persisted notifications from AsyncStorage
+    loadPersistedNotifications();
   }, [isAuthenticated]);
 
   useEffect(() => {
@@ -64,20 +62,59 @@ export const NotificationProvider = ({ children }) => {
     const token = await registerForPushNotificationsAsync();
     if (token) {
       setExpoPushToken(token);
+      console.log("Device token:", token);
       sendDeviceTokenToBackend(token);
     }
-
+  
+    // Listener for foreground notifications
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
         setNotification(notification);
-        setNotifications((prev) => [...prev, notification]);
+        setNotifications((prev) => {
+          const updated = [...prev, notification];
+          persistNotifications(updated);
+          console.log("Updated notifications (foreground):", updated);
+          return updated;
+        });
         console.log("Notification received in foreground:", notification);
       });
-
+  
+    // Listener for notifications that the user interacts with (background)
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
         console.log("Notification response received:", response);
+        if (response?.notification) {
+          setNotifications((prev) => {
+            const updated = [...prev, response.notification];
+            persistNotifications(updated);
+            console.log("Updated notifications (response):", updated);
+            return updated;
+          });
+        }
       });
+  };
+  
+
+  const persistNotifications = async (notificationsToPersist) => {
+    try {
+      await AsyncStorage.setItem(
+        "persistedNotifications",
+        JSON.stringify(notificationsToPersist)
+      );
+    } catch (error) {
+      console.error("Error persisting notifications:", error);
+    }
+  };
+
+  const loadPersistedNotifications = async () => {
+    try {
+      const saved = await AsyncStorage.getItem("persistedNotifications");
+      if (saved) {
+        setNotifications(JSON.parse(saved));
+      }
+    } catch (error) {
+      console.error("Error loading notifications:", error);
+    }
   };
 
   const checkIfPermissionRequested = async () => {
@@ -117,9 +154,10 @@ export const NotificationProvider = ({ children }) => {
 
   const sendDeviceTokenToBackend = async (token) => {
     try {
-      await sendDeviceToken({
-        deviceToken: token,
-      });
+      const response = await services.notificationService.sendDeviceToken(
+        token
+      );
+      console.log(response);
       console.log("Device token sent to backend successfully.");
     } catch (error) {
       console.error("Error sending device token to backend:", error);

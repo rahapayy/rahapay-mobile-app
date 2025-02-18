@@ -146,7 +146,7 @@ const AppStack = () => {
       <Stack.Screen
         name="TransactionStatusScreen"
         component={TransactionStatusScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, presentation: "containedModal" }}
       />
       <Stack.Screen
         name="BettingScreen"
