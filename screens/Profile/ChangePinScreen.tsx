@@ -18,7 +18,7 @@ import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
-import useApi from "../../services/apiClient";
+import { services } from "@/services";
 import { RouteProp, useRoute } from "@react-navigation/native";
 
 const ChangePinScreen: React.FC<{
@@ -40,10 +40,7 @@ const ChangePinScreen: React.FC<{
     newPin: "",
     confirmPin: "",
   });
-
-  const { mutateAsync: updatePin, isLoading } = useApi.patch(
-    "/user/update/credentials"
-  );
+  const [isLoading, setIsLoading] = useState(false); // State to manage loading state
 
   function handleInputChange(value: string, fieldKey: keyof typeof formValues) {
     setFormValues({ ...formValues, [fieldKey]: value });
@@ -56,31 +53,43 @@ const ChangePinScreen: React.FC<{
         type: "danger",
       });
     } else {
-      updatePin({
-        type: pinType,
-        current: formValues.currPin,
-        new: formValues.newPin,
-      })
-        .then(() => {
-          handleShowFlash({
-            message: "Transaction pin changed successfully!",
-            type: "success",
-          });
-          navigation.goBack();
-        })
-        .catch((error) => {
-          const err = error as {
-            response?: { data?: { message?: string } };
-            message: string;
-          };
-          const errorMessage =
-            err.response?.data?.message || err.message || "An error occurred";
+      setIsLoading(true); // Start loading
+      try {
+        const response = await services.userService
+          .updateCredentials({
+            type: pinType,
+            current: formValues.currPin,
+            new: formValues.newPin,
+          })
+          .then(() => {
+            handleShowFlash({
+              message: "Transaction pin changed successfully!",
+              type: "success",
+            });
+            navigation.goBack();
+          })
+          .catch((error) => {
+            const err = error as {
+              response?: { data?: { message?: string } };
+              message: string;
+            };
+            const errorMessage =
+              err.response?.data?.message || err.message || "An error occurred";
 
-          handleShowFlash({
-            message: errorMessage,
-            type: "danger",
+            handleShowFlash({
+              message: errorMessage,
+              type: "danger",
+            });
           });
+      } catch (error: any) {
+        console.error("Failed to update pin:", error.message);
+        handleShowFlash({
+          message: "Failed to update pin. Please try again.",
+          type: "danger",
         });
+      } finally {
+        setIsLoading(false); // Stop loading
+      }
     }
   }
   return (
@@ -174,11 +183,12 @@ const ChangePinScreen: React.FC<{
             </View>
             <Button
               title={"Save Changes"}
-              isLoading={isLoading}
+              isLoading={isLoading} // Pass isLoading state to Button component
               disabled={
                 !formValues.confirmPin ||
                 !formValues.newPin ||
-                !formValues.currPin
+                !formValues.currPin ||
+                isLoading // Disable button while loading
               }
               onPress={handleButtonClick}
               style={styles.proceedButton}

@@ -7,6 +7,8 @@ import {
   Text,
   TouchableOpacity,
   View,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -21,13 +23,16 @@ import BackButton from "../../../components/common/ui/buttons/BackButton";
 import {
   BoldText,
   LightText,
-  MediumText,
+  RegularText,
+  SemiBoldText,
 } from "../../../components/common/Text";
 import Label from "../../../components/common/ui/forms/Label";
 import BasicInput from "../../../components/common/ui/forms/BasicInput";
 import { ILoginDto } from "../../../services/dtos";
 import { useAuth } from "@/services/AuthContext";
 import { setItem } from "@/utils/storage";
+import Divider from "@/components/Divider";
+import { BasicPasswordInput } from "@/components/common/ui/forms/BasicPasswordInput";
 
 const validationSchema = Yup.object().shape({
   id: Yup.string()
@@ -44,7 +49,7 @@ const validationSchema = Yup.object().shape({
 const LoginScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { setIsAuthenticated, setUserInfo } = useAuth(); 
+  const { setIsAuthenticated, setUserInfo } = useAuth();
 
   const handleLogin = async (
     values: { id: string; password: string },
@@ -63,10 +68,10 @@ const LoginScreen: React.FC<{
         // Await token storage
         await setItem("ACCESS_TOKEN", response.data.accessToken, true);
         await setItem("REFRESH_TOKEN", response.data.refreshToken, true);
-        
+
         // Fetch user details after successful login
         const userResponse = await services.authServiceToken.getUserDetails();
-        
+
         // Update both auth state and user info
         setIsAuthenticated(true);
         setUserInfo(userResponse.data);
@@ -89,105 +94,100 @@ const LoginScreen: React.FC<{
 
   return (
     <SafeAreaView className="flex-1">
-      <View className="flex-1 p-4">
-        <BackButton navigation={navigation} />
-        <View className="mt-8">
-          <MediumText color="black" size="xlarge" marginBottom={5}>
-            Login
-          </MediumText>
-          <LightText color="mediumGrey" size="base">
-            Welcome back, let's sign in to your account!
-          </LightText>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View className="flex-1 p-4">
+          {/* <BackButton navigation={navigation} /> */}
+          <View className="mt-4">
+            <SemiBoldText color="black" size="large" marginBottom={5}>
+              Welcome Back
+            </SemiBoldText>
+            <LightText color="mediumGrey" size="base">
+              Let's sign in to your account!
+            </LightText>
+          </View>
+
+          <Formik
+            initialValues={{ id: "", password: "" }}
+            validationSchema={validationSchema}
+            onSubmit={handleLogin}
+          >
+            {({
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              values,
+              errors,
+              touched,
+              isSubmitting,
+            }) => (
+              <>
+                <KeyboardAvoidingView
+                  behavior={Platform.OS === "ios" ? "padding" : undefined}
+                  style={{ flex: 1 }}
+                >
+                  <View className="flex-1">
+                    <View className="mt-10">
+                      <Label text="Email or Phone Number" marked={false} />
+                      <BasicInput
+                        value={values.id}
+                        onChangeText={handleChange("id")}
+                        placeholder="Email or Phone Number"
+                        autoCapitalize="none"
+                        autoComplete="off"
+                        autoCorrect={false}
+                      />
+                      {touched.id && errors.id && (
+                        <Text style={styles.errorText}>{errors.id}</Text>
+                      )}
+                    </View>
+
+                    <View className="mt-4">
+                      <Label text="Password" marked={false} />
+                      <BasicPasswordInput
+                        value={values.password}
+                        onChangeText={handleChange("password")}
+                        placeholder="Password"
+                      />
+                      {touched.password && errors.password && (
+                        <Text style={styles.errorText}>{errors.password}</Text>
+                      )}
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate("ResetPasswordScreen")}
+                      className="mt-4 justify-center items-end"
+                    >
+                      <RegularText color="black" size="base">
+                        Forgot Password?
+                      </RegularText>
+                    </TouchableOpacity>
+                    <Divider length={3} />
+                    <Button
+                      title="Login"
+                      onPress={handleSubmit}
+                      isLoading={isSubmitting}
+                      style={styles.proceedButton}
+                      textColor="#fff"
+                      disabled={isSubmitting}
+                    />
+                    <View className="flex-row justify-center items-center mt-6">
+                      <LightText color="mediumGrey" size="base">
+                        Don't have an account?{" "}
+                      </LightText>
+                      <TouchableOpacity
+                        onPress={() => navigation.navigate("CreateAccountScreen")}
+                      >
+                        <BoldText color="primary" size="base">
+                          Create Account
+                        </BoldText>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </KeyboardAvoidingView>
+              </>
+            )}
+          </Formik>
         </View>
-
-        <Formik
-          initialValues={{ id: "", password: "" }}
-          validationSchema={validationSchema}
-          onSubmit={handleLogin}
-        >
-          {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            values,
-            errors,
-            touched,
-            isSubmitting,
-          }) => (
-            <>
-              <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : undefined}
-                style={{ flex: 1 }}
-              >
-                <View className="flex-1">
-                  <View className="mt-10">
-                    <Label text="Email or Phone Number" marked={false} />
-                    <BasicInput
-                      value={values.id}
-                      onChangeText={handleChange("id")}
-                      // onBlur={handleBlur("id")}
-                      placeholder="Email or Phone Number"
-                      autoCapitalize="none"
-                      autoComplete="off"
-                      autoCorrect={false}
-                    />
-                    {touched.id && errors.id && (
-                      <Text style={styles.errorText}>{errors.id}</Text>
-                    )}
-                  </View>
-
-                  <View className="mt-4">
-                    <Label text="Password" marked={false} />
-                    <BasicInput
-                      value={values.password}
-                      onChangeText={handleChange("password")}
-                      // onBlur={handleBlur("password")}
-                      placeholder="Password"
-                      secureTextEntry
-                      autoCapitalize="none"
-                      autoComplete="off"
-                      autoCorrect={false}
-                    />
-                    {touched.password && errors.password && (
-                      <Text style={styles.errorText}>{errors.password}</Text>
-                    )}
-                  </View>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("ResetPasswordScreen")}
-                    className="mt-4 justify-center items-end"
-                  >
-                    <MediumText color="primary" size="base">
-                      Forgot Password?
-                    </MediumText>
-                  </TouchableOpacity>
-                </View>
-              </KeyboardAvoidingView>
-              <View className="">
-                <Button
-                  title="Login"
-                  onPress={handleSubmit}
-                  isLoading={isSubmitting}
-                  style={styles.proceedButton}
-                  textColor="#fff"
-                  disabled={isSubmitting}
-                />
-                <View className="flex-row justify-center items-center mt-6">
-                  <LightText color="mediumGrey" size="base">
-                    Don't have an account?{" "}
-                  </LightText>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("CreateAccountScreen")}
-                  >
-                    <BoldText color="primary" size="base">
-                      Create Account
-                    </BoldText>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </>
-          )}
-        </Formik>
-      </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 };

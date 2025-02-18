@@ -5,6 +5,8 @@ import {
   StyleSheet,
   Text,
   View,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import React, { useState } from "react";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -12,11 +14,11 @@ import COLORS from "../../../constants/colors";
 import SPACING from "../../../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Button from "../../../components/common/ui/buttons/Button";
-import useApi, { services } from "../../../services/apiClient";
+import { services } from "../../../services/apiClient";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import Label from "../../../components/common/ui/forms/Label";
-import { LightText, MediumText } from "../../../components/common/Text";
+import { LightText, MediumText, SemiBoldText } from "../../../components/common/Text";
 import BasicInput from "../../../components/common/ui/forms/BasicInput";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -42,7 +44,6 @@ const ResetPasswordScreen: React.FC<{
 
       const response = await services.authService.forgotPassword(payload);
       console.log(response);
-      
 
       handleShowFlash({
         message: "Password reset OTP sent to your email",
@@ -84,65 +85,66 @@ const ResetPasswordScreen: React.FC<{
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ padding: 16, flex: 1 }}>
-        <BackButton navigation={navigation} />
-        <View style={{ marginTop: 16 }}>
-          <MediumText color="black" size="xlarge" marginBottom={5}>
-            Reset Password
-          </MediumText>
-          <LightText color="mediumGrey" size="base">
-            Enter your email address to receive the code
-          </LightText>
-        </View>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={{ padding: 16, flex: 1 }}>
+          <BackButton navigation={navigation} />
+          <View style={{ marginTop: 16 }}>
+            <SemiBoldText color="black" size="xlarge" marginBottom={5}>
+              Reset Password
+            </SemiBoldText>
+            <LightText color="mediumGrey" size="base">
+              Enter your email address to receive the code
+            </LightText>
+          </View>
 
-        <Formik
-          initialValues={{ email: "" }}
-          validationSchema={validationSchema}
-          onSubmit={handleButtonClick}
-        >
-          {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
-            <>
-              <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : undefined}
-                style={{ flex: 1 }}
-              >
-                <View className="flex-1">
-                  <View className="mt-10">
-                    <Label text="Email Address" marked={false} />
-                    <BasicInput
-                      placeholder="Enter your email address"
-                      value={values.email}
-                      onChangeText={handleChange("email")}
-                      onBlur={handleBlur("email")}
-                      autoComplete="off"
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                    />
-                    {errors.email && (
-                      <Text style={{ color: "red", marginTop: 8 }}>
-                        {errors.email}
-                      </Text>
-                    )}
+          <Formik
+            initialValues={{ email: "" }}
+            validationSchema={validationSchema}
+            onSubmit={handleButtonClick}
+          >
+            {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+              <>
+                <KeyboardAvoidingView
+                  behavior={Platform.OS === "ios" ? "padding" : undefined}
+                  style={{ flex: 1 }}
+                >
+                  <View className="flex-1">
+                    <View className="mt-10">
+                      <Label text="Email Address" marked={false} />
+                      <BasicInput
+                        placeholder="Enter your email address"
+                        value={values.email}
+                        onChangeText={handleChange("email")}
+                        autoComplete="off"
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                      />
+                      {errors.email && (
+                        <Text style={{ color: "red", marginTop: 8 }}>
+                          {errors.email}
+                        </Text>
+                      )}
+                    </View>
                   </View>
-                </View>
-              </KeyboardAvoidingView>
+                </KeyboardAvoidingView>
 
-              <View>
-                <Button
-                  title={"Reset Password"}
-                  onPress={handleSubmit}
-                  style={[
-                    styles.proceedButton,
-                    (!values.email || isLoading) && styles.disabledButton,
-                  ]}
-                  textColor="#fff"
-                  isLoading={isLoading}
-                />
-              </View>
-            </>
-          )}
-        </Formik>
-      </View>
+                <View>
+                  <Button
+                    title={"Reset Password"}
+                    onPress={handleSubmit}
+                    style={[
+                      styles.proceedButton,
+                      (!values.email || isLoading) && styles.disabledButton,
+                    ]}
+                    textColor="#fff"
+                    isLoading={isLoading}
+                  />
+                </View>
+              </>
+            )}
+          </Formik>
+        </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 };

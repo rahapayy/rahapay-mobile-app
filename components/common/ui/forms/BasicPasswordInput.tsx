@@ -60,9 +60,9 @@ export const BasicPasswordInput: React.FC<BasicPasswordInputProps> = ({
       />
       <TouchableOpacity onPress={togglePasswordVisibility}>
         {showPassword ? (
-          <EyeSlash color="#000" size={20} />
+          <Eye color={COLORS.violet400} size={20} variant="Bold" />
         ) : (
-          <Eye color="#000" size={20} />
+          <EyeSlash color={COLORS.violet400} size={20} variant="Bold" />
         )}
       </TouchableOpacity>
     </View>
