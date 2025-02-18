@@ -13,7 +13,7 @@ import LottieView from "lottie-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import useWallet from "../hooks/use-wallet";
 import { Skeleton } from "@rneui/themed";
-import { WalletAdd1, WalletMinus } from "iconsax-react-native";
+import { WalletAdd1 } from "iconsax-react-native";
 import COLORS from "../constants/colors";
 import Airtel from "../assets/svg/airtelbig.svg";
 import Mtn from "../assets/svg/mtnbig.svg";
@@ -211,7 +211,7 @@ const RecentServiceTransaction: React.FC<{
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingBottom: Platform.OS === "android" ? SPACING * 25 : SPACING * 30,
+    paddingBottom: Platform.OS === "android" ? SPACING * 25 : SPACING * 38,
   },
   header: {
     flexDirection: "row",

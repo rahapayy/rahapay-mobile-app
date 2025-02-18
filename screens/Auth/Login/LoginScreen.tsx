@@ -98,7 +98,7 @@ const LoginScreen: React.FC<{
         <View className="flex-1 p-4">
           {/* <BackButton navigation={navigation} /> */}
           <View className="mt-4">
-            <SemiBoldText color="black" size="large" marginBottom={5}>
+            <SemiBoldText color="black" size="xlarge" marginBottom={5}>
               Welcome Back
             </SemiBoldText>
             <LightText color="mediumGrey" size="base">

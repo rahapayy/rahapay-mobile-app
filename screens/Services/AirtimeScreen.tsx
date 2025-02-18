@@ -7,11 +7,10 @@ import {
   TouchableOpacity,
   View,
   Platform,
-  TextInput,
   Switch,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, ProfileCircle, TickCircle } from "iconsax-react-native";
+import { ArrowLeft, TickCircle } from "iconsax-react-native";
 import SPACING from "../../constants/SPACING";
 import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
@@ -22,6 +21,10 @@ import Eti from "../../assets/svg/eti.svg";
 import Glo from "../../assets/svg/glo.svg";
 import Button from "../../components/common/ui/buttons/Button";
 import ComingSoon from "../../assets/svg/Coming Soon.svg";
+import { RegularText } from "@/components/common/Text";
+import CurrencyInput from "@/components/common/ui/forms/CurrencyInput";
+import BasicInput from "@/components/common/ui/forms/BasicInput";
+import Label from "@/components/common/ui/forms/Label";
 
 const AirtimeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -30,6 +33,7 @@ const AirtimeScreen: React.FC<{
   const [amount, setAmount] = useState("");
   const [selectedOperator, setSelectedOperator] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [amountError, setAmountError] = useState(false);
 
   const amounts = [100, 200, 500, 1000, 2000, 3000, 5000];
 
@@ -43,6 +47,13 @@ const AirtimeScreen: React.FC<{
     if (isNaN(sanitizedAmount) || sanitizedAmount <= 0) {
       alert("Please enter a valid positive amount.");
       return;
+    }
+
+    if (sanitizedAmount < 100) {
+      setAmountError(true);
+      return;
+    } else {
+      setAmountError(false); // Reset the error if the amount is >= 100
     }
 
     navigation.navigate("ReviewAirtimeSummaryScreen", {
@@ -162,35 +173,23 @@ const AirtimeScreen: React.FC<{
                   </View> */}
 
                   <View className="mt-2 mb-4">
-                    <Text style={styles.label} allowFontScaling={false}>
-                      Phone Number
-                    </Text>
-                    <View style={styles.inputContainer}>
-                      <TextInput
-                        style={styles.input}
-                        placeholder="Enter phone number"
-                        placeholderTextColor="#BABFC3"
-                        allowFontScaling={false}
-                        value={phoneNumber}
-                        keyboardType="numeric"
-                        onChangeText={(text) => {
-                          setPhoneNumber(text);
-                          detectOperator(text);
-                        }}
-                        autoComplete="off"
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                      />
-                      {/* <TouchableOpacity>
-                        <ProfileCircle color={COLORS.violet400} />
-                      </TouchableOpacity> */}
-                    </View>
+                    <Label text="Phone Number" marked={false} />
+                    <BasicInput
+                      placeholder="Enter phone number"
+                      value={phoneNumber}
+                      keyboardType="numeric"
+                      onChangeText={(text) => {
+                        setPhoneNumber(text);
+                        detectOperator(text);
+                      }}
+                      autoComplete="off"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                    />
                   </View>
 
                   {/* Select Network Provider */}
-                  <Text style={styles.headText} allowFontScaling={false}>
-                    Select Network Provider
-                  </Text>
+                  <Label text="Select Network Provider" marked={false} />
                   <View className="flex-row p-2 bg-white rounded-xl  items-center justify-between">
                     <TouchableOpacity
                       onPress={() => setSelectedOperator("Airtel")}
@@ -291,30 +290,20 @@ const AirtimeScreen: React.FC<{
                   {/* Inputs */}
                   <View>
                     <View className="mt-4">
-                      <Text style={styles.label} allowFontScaling={false}>
-                        Amount
-                      </Text>
-                      <View style={styles.inputContainer}>
-                        <Text style={styles.naira} allowFontScaling={false}>
-                          ₦{" "}
-                        </Text>
-                        <TextInput
-                          style={styles.input}
-                          placeholder="100 - 500,000"
-                          placeholderTextColor="#BABFC3"
-                          allowFontScaling={false}
-                          value={amount}
-                          keyboardType="numeric"
-                          onChangeText={(text) => setAmount(text)}
-                          autoComplete="off"
-                          autoCapitalize="none"
-                          autoCorrect={false}
-                        />
-                      </View>
+                      <CurrencyInput
+                        value={amount}
+                        error={amountError}
+                        errorMessage="Amount must be at least 100"
+                        onChange={(text) => {
+                          setAmount(text);
+                          // detectOperator(text);
+                          setAmountError(false);
+                        }}
+                      />
                     </View>
                   </View>
                   {/* Top up suggestion box */}
-                  <View className="bg-[#EEEBF9] rounded-xl mt-4">
+                  <View className="bg-[#EEEBF9] rounded-xl ">
                     <View className="p-4">
                       <Text style={styles.topupText} allowFontScaling={false}>
                         Topup
@@ -491,6 +480,13 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     height: Platform.OS === "ios" ? 30 : 33,
     fontFamily: "Outfit-Regular",
+  },
+  errorInput: {
+    borderColor: "red",
+  },
+  errorText: {
+    color: "red",
+    marginTop: 8,
   },
   topupText: {
     fontFamily: "Outfit-Regular",
