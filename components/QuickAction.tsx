@@ -4,7 +4,6 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   View,
-  FlatList,
 } from "react-native";
 import React, { useContext } from "react";
 import COLORS from "../constants/colors";
@@ -15,8 +14,7 @@ import {
   ElectricityIcon,
   TvIcon,
 } from "./common/ui/icons";
-import { BoldText, LightText, RegularText } from "./common/Text";
-import { Skeleton } from "@rneui/themed";
+import { BoldText, RegularText } from "./common/Text";
 import { AuthContext } from "../services/AuthContext";
 
 interface ActionItem {
@@ -32,21 +30,15 @@ const QuickAction: React.FC<{
   const { width: screenWidth } = useWindowDimensions();
   const { isLoading } = useContext(AuthContext);
 
-  // Calculate an appropriate card size based on the screen width, ensuring a minimum width
-  const cardWidth = Math.max((screenWidth - 60) / 5, 80); // Minimum width set to 80
-  const cardHeight = cardWidth * 1.1; // Maintain a fixed aspect ratio
-
-  const fill = COLORS.violet300; // Define a custom icon color
+  // Set a fixed card size to maintain consistency across screens
+  const cardSize = Math.min((screenWidth - 64) / 4, 100);
+  const fill = COLORS.violet300;
 
   const actionItems = [
     { icon: AirtimeIcon, title: "Airtime", navigateTo: "AirtimeScreen" },
     { icon: DataIcon, title: "Data", navigateTo: "DataScreen" },
     { icon: TvIcon, title: "TV", isComingSoon: true },
-    {
-      icon: ElectricityIcon,
-      title: "Electricity",
-      isComingSoon: true,
-    },
+    { icon: ElectricityIcon, title: "Electricity", isComingSoon: true },
   ];
 
   return (
@@ -61,15 +53,14 @@ const QuickAction: React.FC<{
             onPress={() =>
               item.navigateTo && navigation.navigate(item.navigateTo)
             }
-            style={[
-              styles.card,
-              item.isComingSoon && styles.disabledCard,
-              { width: cardWidth, height: cardHeight },
-            ]}
+            className={`bg-white justify-center items-center rounded-2xl relative ${
+              item.isComingSoon ? "opacity-50" : ""
+            }`}
+            style={{ width: cardSize, height: cardSize * 1.1 }}
           >
             <item.icon fill={fill} width={24} height={24} />
             {item.isComingSoon && (
-              <View style={styles.badgeContainer}>
+              <View className="absolute -top-2 -right-0 bg-violet-200 p-1 rounded-md">
                 <RegularText color="black" size="xsmall" center>
                   Coming Soon!
                 </RegularText>
@@ -90,24 +81,3 @@ const QuickAction: React.FC<{
 };
 
 export default QuickAction;
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: COLORS.white,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 20,
-    position: "relative",
-  },
-  disabledCard: {
-    opacity: 0.5,
-  },
-  badgeContainer: {
-    position: "absolute",
-    top: -10,
-    right: -10,
-    backgroundColor: COLORS.violet200,
-    padding: 3,
-    borderRadius: 10
-  },
-});
