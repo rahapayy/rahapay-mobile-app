@@ -56,13 +56,13 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
     const providerLower = provider.toLowerCase();
     switch (providerLower) {
       case "airtel":
-        return <Airtel width={40} height={40} />;
+        return <Airtel width={70} height={70} />;
       case "mtn": // This line is changed to lowercase
         return <Mtn width={70} height={70} />;
       case "9mobile":
-        return <Eti width={40} height={40} />;
+        return <Eti width={70} height={70} />;
       case "glo":
-        return <Glo width={40} height={40} />;
+        return <Glo width={70} height={70} />;
       default:
         return;
     }
