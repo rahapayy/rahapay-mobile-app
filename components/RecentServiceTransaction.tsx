@@ -1,5 +1,6 @@
 import {
   Image,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -210,8 +211,7 @@ const RecentServiceTransaction: React.FC<{
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 16,
-    paddingBottom: SPACING * 40,
+    paddingBottom: Platform.OS === "android" ? SPACING * 25 : SPACING * 30,
   },
   header: {
     flexDirection: "row",
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    // marginTop: 10,
+    marginBottom: SPACING * 8,
   },
   noTransactionAnimation: {
     width: 200,
