@@ -1,6 +1,6 @@
 import { AxiosInstance } from "axios";
 import { IResponse } from "@/types/general";
-import { IUpdateProfilePayload } from "../dtos";
+import { IUpdateUserCredentials, IUpdateProfilePayload } from "../dtos/user";
 
 class UserServices {
   constructor(private readonly baseService: AxiosInstance) {}
@@ -26,6 +26,16 @@ class UserServices {
   ): Promise<IResponse<void>> {
     const response = await this.baseService.patch(
       "/user/update/profile",
+      payload
+    );
+    return response.data;
+  }
+
+  async updateCredentials(
+    payload: IUpdateUserCredentials
+  ): Promise<IResponse<void>> {
+    const response = await this.baseService.patch(
+      "/user/update/credentials",
       payload
     );
     return response.data;

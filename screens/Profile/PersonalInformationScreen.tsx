@@ -19,13 +19,12 @@ import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { BoldText, LightText, MediumText } from "../../components/common/Text";
 import useWallet from "../../hooks/use-wallet";
 import * as Clipboard from "expo-clipboard";
 import { AuthContext, useAuth } from "../../services/AuthContext";
-import { IUpdateProfilePayload, UserInfoType } from "@/services/dtos";
+import { IUpdateProfilePayload, UserInfoType } from "@/services/dtos/user";
 import { services } from "@/services";
 import { handleError } from "@/services/handleError";
 
