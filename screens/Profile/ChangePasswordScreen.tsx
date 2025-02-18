@@ -17,7 +17,7 @@ import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { services } from "@/services";
 import { BasicPasswordInput } from "@/components/common/ui/forms/BasicPasswordInput";
 import BackButton from "@/components/common/ui/buttons/BackButton";
-import { RegularText } from "@/components/common/Text";
+import { BoldText, RegularText } from "@/components/common/Text";
 import Label from "@/components/common/ui/forms/Label";
 
 const ChangePasswordScreen: React.FC<{
@@ -84,7 +84,7 @@ const ChangePasswordScreen: React.FC<{
         <View className="px-4">
           <View style={styles.header}>
             <BackButton navigation={navigation} />
-            <RegularText color="black" size="large" marginLeft={10}>
+            <RegularText color="black" size="large">
               Change Password
             </RegularText>
           </View>

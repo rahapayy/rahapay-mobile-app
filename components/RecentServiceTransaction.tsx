@@ -230,7 +230,7 @@ const RecentServiceTransaction: React.FC<{
                     <Text 
                       style={[
                         styles.valueText, 
-                        { color: transaction.transactionType.includes('PURCHASE') ? 'red' : 'black' }
+                        { color: transaction.transactionType.includes('PURCHASE') ? 'black' : 'black' }
                       ]} 
                       allowFontScaling={false}>
                       {transaction.transactionType.includes('PURCHASE') ? '-' : '+'} ₦{transaction.amountPaid}

@@ -4,14 +4,12 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
-  Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, Eye, EyeSlash } from "iconsax-react-native";
+import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../../constants/SPACING";
 import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
@@ -20,6 +18,11 @@ import Button from "../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { services } from "@/services";
 import { RouteProp, useRoute } from "@react-navigation/native";
+import { RegularText } from "@/components/common/Text";
+import Label from "@/components/common/ui/forms/Label";
+import { BasicPasswordInput } from "@/components/common/ui/forms/BasicPasswordInput";
+import BasicInput from "@/components/common/ui/forms/BasicInput";
+// import OtpInput from "../../components/common/ui/forms/OtpInput";
 
 const ChangePinScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -76,13 +79,14 @@ const ChangePinScreen: React.FC<{
             const errorMessage =
               err.response?.data?.message || err.message || "An error occurred";
 
+            console.error("Failed to update pin:", errorMessage); // Log the error message
             handleShowFlash({
               message: errorMessage,
               type: "danger",
             });
           });
       } catch (error: any) {
-        console.error("Failed to update pin:", error.message);
+        console.error("Failed to update pin:", error.message); // Log the error message
         handleShowFlash({
           message: "Failed to update pin. Please try again.",
           type: "danger",
@@ -103,83 +107,39 @@ const ChangePinScreen: React.FC<{
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={[styles.headerText]} allowFontScaling={false}>
+            <RegularText color="black" size="large">
               Change {pinType === "transactionPin" ? "Transaction" : "Security"}{" "}
               Pin
-            </Text>
+            </RegularText>
           </View>
 
           <View className="">
             <View>
-              <Text style={styles.label} allowFontScaling={false}>
-                Current Pin
-              </Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter current pin"
-                  placeholderTextColor="#BABFC3"
-                  allowFontScaling={false}
-                  secureTextEntry={!showPin}
-                  value={formValues.currPin}
-                  onChangeText={(value) => handleInputChange(value, "currPin")}
-                />
-                <TouchableOpacity onPress={togglePinVisibility}>
-                  {showPin ? (
-                    <Eye color="#000" size={20} />
-                  ) : (
-                    <EyeSlash color="#000" size={20} />
-                  )}
-                </TouchableOpacity>
-              </View>
+              <Label text="Current Pin" marked={false} />
+              <BasicPasswordInput
+                style={styles.input}
+                placeholder="Enter current pin"
+                value={formValues.currPin}
+                onChangeText={(value) => handleInputChange(value, "currPin")}
+              />
             </View>
             <View className="mt-4">
-              <Text style={styles.label} allowFontScaling={false}>
-                New Pin
-              </Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter new pin"
-                  placeholderTextColor="#BABFC3"
-                  allowFontScaling={false}
-                  secureTextEntry={!showPin}
-                  value={formValues.newPin}
-                  onChangeText={(value) => handleInputChange(value, "newPin")}
-                />
-                <TouchableOpacity onPress={togglePinVisibility}>
-                  {showPin ? (
-                    <Eye color="#000" size={20} />
-                  ) : (
-                    <EyeSlash color="#000" size={20} />
-                  )}
-                </TouchableOpacity>
-              </View>
+              <Label text="New Pin" marked={false} />
+              <BasicPasswordInput
+                style={styles.input}
+                placeholder="Enter new pin"
+                value={formValues.newPin}
+                onChangeText={(value) => handleInputChange(value, "newPin")}
+              />
             </View>
             <View className="mt-4">
-              <Text style={styles.label} allowFontScaling={false}>
-                Confirm Pin
-              </Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter confirmation pin"
-                  placeholderTextColor="#BABFC3"
-                  allowFontScaling={false}
-                  secureTextEntry={!showPin}
-                  value={formValues.confirmPin}
-                  onChangeText={(value) =>
-                    handleInputChange(value, "confirmPin")
-                  }
-                />
-                <TouchableOpacity onPress={togglePinVisibility}>
-                  {showPin ? (
-                    <Eye color="#000" size={20} />
-                  ) : (
-                    <EyeSlash color="#000" size={20} />
-                  )}
-                </TouchableOpacity>
-              </View>
+              <Label text="Confirm Pin" marked={false} />
+              <BasicPasswordInput
+                style={styles.input}
+                placeholder="Enter confirmation pin"
+                value={formValues.confirmPin}
+                onChangeText={(value) => handleInputChange(value, "confirmPin")}
+              />
             </View>
             <Button
               title={"Save Changes"}

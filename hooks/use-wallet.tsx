@@ -27,12 +27,9 @@ const useWallet = () => {
     mutate: mutateAllTransactions,
     size: currentPage,
     setSize: setCurrentPage,
-  } = useSWRInfinite(
-    (pageIndex) => `transaction/all?page=${pageIndex + 1}`,
-    {
-      revalidateFirstPage: false,
-    }
-  );
+  } = useSWRInfinite((pageIndex) => `transaction/all?page=${pageIndex + 1}`, {
+    revalidateFirstPage: false,
+  });
 
   const refreshAll = () => {
     mutateDashboard();
@@ -43,11 +40,11 @@ const useWallet = () => {
   const isLoading = isDashboardLoading || isReservedAccountsLoading;
 
   // Correct the extraction of the transactions array from dashboard
-  const dashboardTransactions = dashboardData?.transacton || []; 
+  const dashboardTransactions = dashboardData?.transacton || [];
 
   // Filter the COMMISSION to not show amount in the transaction history
   const filteredDashboardTransactions = dashboardTransactions.filter(
-    (trx) => trx.transactionType !== "COMMISSION"
+    (trx: { transactionType: string }) => trx.transactionType !== "COMMISSION"
   );
 
   const balance = dashboardData?.wallet?.balance || 0;
@@ -55,10 +52,15 @@ const useWallet = () => {
 
   // Extract and properly format transactions from infinite loading
   const allTransactionsData = allTransactionsPages
-    ? [].concat(...allTransactionsPages.map((page) => 
-        // Apply the same filter to remove COMMISSION transactions
-        (page.data || []).filter(trx => trx.transactionType !== "COMMISSION")
-      ))
+    ? [].concat(
+        ...allTransactionsPages.map((page) =>
+          // Apply the same filter to remove COMMISSION transactions
+          (page.data || []).filter(
+            (trx: { transactionType: string }) =>
+              trx.transactionType !== "COMMISSION"
+          )
+        )
+      )
     : [];
 
   const pagination = allTransactionsPages?.[0]?.pagination || {
@@ -76,13 +78,23 @@ const useWallet = () => {
 
   // Mapping dashboard transactions to required fields for other views
   const formattedTransactions = filteredDashboardTransactions.map(
-    (trx) => ({
+    (trx: {
+      amountPaid: any;
+      paidOn: string | number | Date;
+      _id: any;
+      paymentMethod: any;
+      transactionReference: any;
+      paymentStatus: any;
+      transactionType: any;
+      updatedAt: any;
+      metadata: any;
+    }) => ({
       amount: trx.amountPaid || 0,
       created_at: new Date(trx.paidOn).toLocaleString(),
       id: trx._id || "",
-      ownerId: dashboardData?.user?._id || "", 
+      ownerId: dashboardData?.user?._id || "",
       purpose: trx.paymentMethod || "",
-      referenceId: trx.transactionReference || "", 
+      referenceId: trx.transactionReference || "",
       status: trx.paymentStatus || "",
       tranxType: trx.transactionType || "",
       updated_at: trx.updatedAt || "",

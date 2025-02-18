@@ -19,6 +19,7 @@ import Airtel from "../assets/svg/airtelbig.svg";
 import Mtn from "../assets/svg/mtnbig.svg";
 import Eti from "../assets/svg/9mobilebig.svg";
 import Glo from "../assets/svg/globig.svg";
+import { DownloadReceiptButton } from "@/components/DownloadReceipt";
 
 type TransactionSummaryRouteParams = {
   transaction: {
@@ -208,12 +209,7 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
               </View>
             </View>
 
-            <TouchableOpacity style={styles.button}>
-              <DocumentDownload color="#000" />
-              <Text style={styles.buttonText} allowFontScaling={false}>
-                Download Receipt
-              </Text>
-            </TouchableOpacity>
+            <DownloadReceiptButton transaction={transaction} />
           </View>
         </View>
       </ScrollView>
