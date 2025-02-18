@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   TextInput,
   View,
@@ -29,6 +29,13 @@ const OtpInput: React.FC<OtpInputProps> = ({
   boxIsFocused,
   setBoxIsFocused,
 }) => {
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      boxRefs.current[0]?.focus();
+    }, 500); // Small delay to ensure the keyboard opens
+
+    return () => clearTimeout(timeout);
+  }, []);
   return (
     <View style={styles.inputContainer}>
       <View style={styles.inputRow}>

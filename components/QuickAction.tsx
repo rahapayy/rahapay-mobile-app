@@ -9,8 +9,6 @@ import {
 import React, { useContext } from "react";
 import COLORS from "../constants/colors";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { More } from "iconsax-react-native";
-import SPACING from "../constants/SPACING";
 import {
   AirtimeIcon,
   DataIcon,
@@ -52,7 +50,7 @@ const QuickAction: React.FC<{
   ];
 
   return (
-    <View className="">
+    <View className="mt-4">
       <BoldText color="black" size="medium">
         Quick Action
       </BoldText>

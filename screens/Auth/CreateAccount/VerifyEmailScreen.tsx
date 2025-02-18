@@ -189,7 +189,6 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
 
   return (
     <SafeAreaView className="flex-1">
-      <ScrollView>
         <View className="p-4">
           <ProgressIndicator
             navigation={navigation}
@@ -247,7 +246,6 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
             </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
     </SafeAreaView>
   );
 };

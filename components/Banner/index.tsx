@@ -1,14 +1,23 @@
-import { View, ImageBackground, FlatList, Share } from "react-native";
+import {
+  View,
+  ImageBackground,
+  FlatList,
+  Share,
+  Image,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 import React, { useContext } from "react";
 import { SemiBoldText } from "../common/Text";
 import Button from "../common/ui/buttons/Button";
 import { SPACING } from "../../constants/ui";
-import AtIcon from "../../assets/svg/@ at the rate 1.svg";
 import { useAuth } from "../../services/AuthContext";
 import { Skeleton } from "@rneui/themed";
 import COLORS from "@/constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+const { width, height } = Dimensions.get("window");
 
 const banners = [
   {
@@ -29,7 +38,11 @@ const banners = [
   },
 ];
 
-const Banner = ({ navigation }: { navigation: NativeStackNavigationProp<any, ""> }) => {
+const Banner = ({
+  navigation,
+}: {
+  navigation: NativeStackNavigationProp<any, "">;
+}) => {
   const { userInfo, isLoading } = useAuth();
   const filteredBanners = userInfo?.userName
     ? banners.filter((b) => b.id !== "1")
@@ -37,7 +50,7 @@ const Banner = ({ navigation }: { navigation: NativeStackNavigationProp<any, "">
 
   const handleInviteFriends = async () => {
     await Share.share({
-      message: 'https://example.com/invite-link',
+      message: "https://example.com/invite-link",
     });
   };
 
@@ -82,7 +95,11 @@ const Banner = ({ navigation }: { navigation: NativeStackNavigationProp<any, "">
             <View className="rounded-xl overflow-hidden mx-2">
               <ImageBackground
                 source={item.image}
-                className="p-4 w-80 h-32"
+                className="p-4"
+                style={{
+                  width: width / 1.3,
+                  height: height / -2,
+                }}
                 resizeMode="cover"
               >
                 <View>
@@ -112,9 +129,10 @@ const Banner = ({ navigation }: { navigation: NativeStackNavigationProp<any, "">
                 )}
 
                 {item.showIcon && (
-                  <View className="absolute right-0 bottom-0">
-                    <AtIcon />
-                  </View>
+                  <Image
+                    source={require("@/assets/animation/at.gif")}
+                    style={styles.animation}
+                  />
                 )}
               </ImageBackground>
             </View>
@@ -124,5 +142,15 @@ const Banner = ({ navigation }: { navigation: NativeStackNavigationProp<any, "">
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  animation: {
+    position: "absolute",
+    right: -40,
+    bottom: -50,
+    width: 150,
+    height: 150,
+  },
+});
 
 export default Banner;

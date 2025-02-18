@@ -21,13 +21,11 @@ const HomeScreen: React.FC<{
       <Card navigation={navigation} />
       <View
         style={{
-          marginTop: SPACING,
           paddingHorizontal: GLOBAL_PADDING_HORIZONTAL,
-          paddingBottom: SPACING * 40,
         }}
       >
-        <QuickAction navigation={navigation} />
         <ScrollView showsVerticalScrollIndicator={false}>
+          <QuickAction navigation={navigation} />
           <Banner navigation={navigation} />
           <RecentTransaction navigation={navigation} />
         </ScrollView>

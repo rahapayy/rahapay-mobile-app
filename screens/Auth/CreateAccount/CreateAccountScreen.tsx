@@ -196,7 +196,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
         }}
       >
         {(formikProps) => (
-          <View className="flex-1 px-4">
+          <View className="flex-1 p-4">
             <ProgressIndicator
               navigation={navigation}
               currentStep={0}

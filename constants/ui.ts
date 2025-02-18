@@ -3,7 +3,7 @@ import { DimensionValue } from "react-native";
 export const SPACING: number = 10;
 export const GLOBAL_PADDING_TOP: DimensionValue = "6%";
 export const GLOBAL_PADDING_BOTTOM: DimensionValue = "8%";
-export const GLOBAL_PADDING_HORIZONTAL: DimensionValue = "4%";
+export const GLOBAL_PADDING_HORIZONTAL: DimensionValue = "3%";
 
 export const COLORS = {
   brand: {
