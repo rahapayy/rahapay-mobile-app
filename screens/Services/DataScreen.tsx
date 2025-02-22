@@ -195,7 +195,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
       {[1, 2, 3, 4].map((_, index) => (
         <Skeleton
           key={index}
-          width={63}
+          width={60}
           height={60}
           style={{
             backgroundColor: COLORS.grey100,
@@ -368,7 +368,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                       )}
                     />
                   ) : (
-                    <RegularText color="lightGrey" className="mb-4">
+                    <RegularText color="mediumGrey" className="mb-4">
                       No saved beneficiaries found.
                     </RegularText>
                   )}

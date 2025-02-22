@@ -1,0 +1,1 @@
+// services/hooks/electricity.ts

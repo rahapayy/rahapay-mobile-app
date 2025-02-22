@@ -80,9 +80,11 @@ export type RootStackParamList = {
   };
   ReviewElectricitySummaryScreen: {
     disco: string;
-    planId: string;
+    id: string;
+    customerName: string;
+    selectedService: string;
     planName: string;
-    meterType: string;
+    meterType: "PREPAID" | "POSTPAID";
     meterNumber: string;
     amount: string;
     phoneNumber: string;

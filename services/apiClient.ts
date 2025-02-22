@@ -1,3 +1,4 @@
+// service/apiClient.ts
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { getItem, removeItem, setItem } from "@/utils/storage";
 import { AuthServices } from "./modules";
@@ -7,6 +8,7 @@ import AirtimeService from "./modules/airtime";
 import DataService from "./modules/data";
 import BeneficiaryService from "./modules/beneficiary";
 import CableService from "./modules/cable";
+import ElectricityService from "./modules/electricity";
 
 export const axiosInstance = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
@@ -132,4 +134,5 @@ export const services = {
   dataService: new DataService(axiosInstance),
   beneficiaryService: new BeneficiaryService(axiosInstance),
   cableService: new CableService(axiosInstance),
+  electricityService: new ElectricityService(axiosInstance),
 };

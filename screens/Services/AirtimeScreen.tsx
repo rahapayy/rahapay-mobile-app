@@ -29,6 +29,7 @@ import Label from "@/components/common/ui/forms/Label";
 import { services } from "@/services";
 import { Beneficiary } from "@/services/modules/beneficiary";
 import { Skeleton } from "@rneui/base";
+import BackButton from "@/components/common/ui/buttons/BackButton";
 
 const AirtimeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -167,7 +168,7 @@ const AirtimeScreen: React.FC<{
       {[1, 2, 3, 4].map((_, index) => (
         <Skeleton
           key={index}
-          width={63}
+          width={60}
           height={60}
           style={{
             backgroundColor: COLORS.grey100,
@@ -278,12 +279,7 @@ const AirtimeScreen: React.FC<{
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="p-4">
           <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.leftIcon}
-            >
-              <ArrowLeft color={"#000"} size={24} />
-            </TouchableOpacity>
+            <BackButton navigation={navigation} />
             <Text style={[styles.headerText]} allowFontScaling={false}>
               Airtime Top-up
             </Text>
@@ -497,7 +493,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: Platform.OS === "ios" ? SPACING : SPACING * 2,
     paddingBottom: SPACING * 3,
   },
   leftIcon: {
@@ -508,6 +503,7 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.medium,
     fontFamily: "Outfit-Regular",
     flex: 1,
+    marginLeft: SPACING,
   },
   tabsContainer: {
     flexDirection: "row",

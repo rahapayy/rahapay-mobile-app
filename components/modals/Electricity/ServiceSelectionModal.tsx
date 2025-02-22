@@ -13,12 +13,12 @@ import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import { CloseCircle, TickCircle } from "iconsax-react-native";
-import useSWR from "swr";
+import { services } from "@/services";
 
 interface ServiceSelectionModalProps {
   visible: boolean;
   onClose: () => void;
-  onSelectService: (service: string, planId: string) => void;
+  onSelectService: (service: string, id: string) => void;
 }
 
 const ServiceSelectionModal: React.FC<ServiceSelectionModalProps> = ({
@@ -26,22 +26,39 @@ const ServiceSelectionModal: React.FC<ServiceSelectionModalProps> = ({
   onClose,
   onSelectService,
 }) => {
-  const { data, error, isLoading } = useSWR(`/electricity`);
-  const [services, setServices] = useState<Array<{ disco_name: string; plan_id: string }>>([]);
+  const [servicesList, setServicesList] = useState<
+    Array<{ name: string; id: string }>
+  >([]);
   const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (data) {
-      const availableServices = Array.isArray(data.plan)
-        ? data.plan.map((item: { disco_name: string; plan_id: string }) => ({
-            disco_name: item.disco_name,
-            plan_id: item.plan_id,
-          }))
-        : [];
-      setServices(availableServices);
-      console.log("Available services:", availableServices);
-    }
-  }, [data]);
+    const fetchDiscos = async () => {
+      setIsLoading(true);
+      try {
+        const response = await services.electricityService.getDiscos();
+
+        const availableServices = (response.data || []).map(
+          (item: { name: string; id: string }) => {
+            return {
+              name: item.name,
+              id: item.id,
+            };
+          }
+        );
+
+        setServicesList(availableServices);
+      } catch (err) {
+        console.error("Error fetching electricity discos:", err);
+        setError("Error loading services.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDiscos();
+  }, []);
 
   if (isLoading) {
     return (
@@ -52,10 +69,9 @@ const ServiceSelectionModal: React.FC<ServiceSelectionModalProps> = ({
   }
 
   if (error) {
-    console.error("Error fetching electricity services:", error);
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Error loading services.</Text>
+        <Text>{error}</Text>
       </View>
     );
   }
@@ -66,6 +82,7 @@ const ServiceSelectionModal: React.FC<ServiceSelectionModalProps> = ({
       transparent={true}
       visible={visible}
       onRequestClose={onClose}
+      onDismiss={onClose}
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
@@ -82,21 +99,20 @@ const ServiceSelectionModal: React.FC<ServiceSelectionModalProps> = ({
             contentContainerStyle={styles.serviceScrollViewContent}
           >
             <View style={styles.serviceContainer}>
-              {services.map((service) => (
+              {servicesList.map((service) => (
                 <TouchableOpacity
-                  key={service.plan_id}
+                  key={service.id}
                   style={styles.serviceBox}
                   onPress={() => {
-                    setSelectedService(service.disco_name);
-                    onSelectService(service.disco_name, service.plan_id); // Ensure planId is passed here
-                    console.log("Selected plan:", service);
+                    setSelectedService(service.name);
+                    onSelectService(service.name, service.id);
                     onClose();
                   }}
                 >
                   <Text style={styles.serviceName} allowFontScaling={false}>
-                    {service.disco_name}
+                    {service.name}
                   </Text>
-                  {selectedService === service.disco_name && (
+                  {selectedService === service.name && (
                     <TickCircle
                       color={COLORS.violet400}
                       variant="Bold"

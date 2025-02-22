@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#BABFC3",
+    borderColor: "#DFDFDF",
     borderRadius: 10,
     overflow: "hidden",
   },
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   separator: {
     width: 1,
     height: "70%",
-    backgroundColor: "#BABFC3",
+    backgroundColor: "#DFDFDF",
   },
   input: {
     flex: 1,

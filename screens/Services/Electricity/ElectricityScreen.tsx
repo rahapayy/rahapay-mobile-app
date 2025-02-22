@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -9,54 +10,130 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, ArrowRight2 } from "iconsax-react-native";
+import { ArrowLeft, ArrowRight2, TickCircle } from "iconsax-react-native";
 import SPACING from "../../../constants/SPACING";
 import FONT_SIZE from "../../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../constants/colors";
 import Button from "../../../components/common/ui/buttons/Button";
-import { TextInput } from "react-native";
 import ServiceSelectionModal from "../../../components/modals/Electricity/ServiceSelectionModal";
-import { MediumText } from "../../../components/common/Text";
+import {
+  MediumText,
+  RegularText,
+  BoldText,
+} from "../../../components/common/Text";
+import BasicInput from "@/components/common/ui/forms/BasicInput";
+import Label from "@/components/common/ui/forms/Label";
+import { services } from "@/services";
+import { handleShowFlash } from "@/components/FlashMessageComponent";
 
 const ElectricityScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [selectedPlan, setSelectedPlan] = useState<{
-    plan_id: string;
-    plan_price: number;
-    plan_name: string;
-  } | null>(null);
+  const [id, setId] = useState<string | null>(null);
   const [meterNumber, setMeterNumber] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
   const [serviceModalVisible, setServiceModalVisible] =
     useState<boolean>(false);
-  const [meterType, setMeterType] = useState<"prepaid" | "postpaid">("prepaid");
+  const [meterType, setMeterType] = useState<"PREPAID" | "POSTPAID">("PREPAID");
+  const [isValidating, setIsValidating] = useState(false);
+  const [isValidated, setIsValidated] = useState(false);
+  const [customerName, setCustomerName] = useState<string>("");
+  const [validationError, setValidationError] = useState<string | null>(null); // New state for persistent error
 
-  const handleServiceSelect = (service: string, planId: string) => {
+  const handleServiceSelect = (service: string, id: string) => {
     setSelectedService(service);
-    setSelectedPlan({ plan_id: planId, plan_price: 0, plan_name: service });
+    setId(id);
+    setMeterNumber("");
+    setCustomerName("");
+    setIsValidated(false);
+    setValidationError(null);
   };
 
-  const dismissKeyboard = () => {
-    Keyboard.dismiss();
-  };
   const validateAmountInput = (text: string) => {
-    // Regular expression to ensure input is a valid number (positive, with optional decimal)
     if (/^\d*\.?\d*$/.test(text)) {
       setAmount(text);
     }
   };
 
-  const isFormValid =
-    meterNumber &&
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
+  useEffect(() => {
+    if (meterNumber && id && !isValidating) {
+      const timer = setTimeout(() => {
+        handleValidateMeter();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [meterNumber, id, meterType]);
+
+  const handleValidateMeter = async () => {
+    setIsValidating(true);
+    setValidationError(null); // Clear previous error before validating
+    try {
+      const response = await services.electricityService.validateMeter({
+        meterNumber,
+        meterId: id!,
+        meterType,
+      });
+      setCustomerName(response.data.name || "Unknown");
+      setIsValidated(true);
+    } catch (error: any) {
+      setCustomerName("");
+      setIsValidated(false);
+      const errorMsg =
+        error.response?.data?.msg || "Failed to validate meter number.";
+      setValidationError(errorMsg); // Set persistent error message
+      handleShowFlash({
+        message: errorMsg,
+        type: "danger",
+      });
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  const navigateToReview = () => {
+    navigation.navigate("ReviewElectricitySummaryScreen", {
+      meterNumber,
+      amount: parseFloat(amount),
+      selectedService,
+      meterType,
+      id,
+      customerName,
+    });
+  };
+
+  const handleProceed = () => {
+    if (canNavigate) {
+      navigateToReview();
+    }
+  };
+
+  const canNavigate =
+    isValidated &&
     amount &&
-    !isNaN(parseFloat(amount)) && // Ensure amount is a valid number
-    parseFloat(amount) > 0 && // Ensure amount is a positive number
-    selectedPlan;
+    !isNaN(parseFloat(amount)) &&
+    parseFloat(amount) > 0 &&
+    selectedService &&
+    !isValidating;
+
+  const shadowStyle = Platform.select({
+    ios: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+    },
+    android: {
+      elevation: 5,
+    },
+  });
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
@@ -77,7 +154,10 @@ const ElectricityScreen: React.FC<{
           </View>
 
           <View className="justify-center px-4">
-            <View className="bg-white shadow-md rounded-lg py-4 px-4">
+            <View
+              className="bg-white shadow-md rounded-lg py-4 px-4"
+              style={shadowStyle}
+            >
               <Text style={styles.titleText} allowFontScaling={false}>
                 Select an electricity provider
               </Text>
@@ -105,11 +185,16 @@ const ElectricityScreen: React.FC<{
             <TouchableOpacity
               style={[
                 styles.meterTypeButton,
-                meterType === "prepaid" && styles.selectedMeterTypeButton,
+                meterType === "PREPAID" && styles.selectedMeterTypeButton,
               ]}
-              onPress={() => setMeterType("prepaid")}
+              onPress={() => {
+                setMeterType("PREPAID");
+                setCustomerName("");
+                setIsValidated(false);
+                setValidationError(null);
+              }}
             >
-              <MediumText color={meterType === "prepaid" ? "primary" : "black"}>
+              <MediumText color={meterType === "PREPAID" ? "primary" : "black"}>
                 Prepaid
               </MediumText>
             </TouchableOpacity>
@@ -117,12 +202,17 @@ const ElectricityScreen: React.FC<{
             <TouchableOpacity
               style={[
                 styles.meterTypeButton,
-                meterType === "postpaid" && styles.selectedMeterTypeButton,
+                meterType === "POSTPAID" && styles.selectedMeterTypeButton,
               ]}
-              onPress={() => setMeterType("postpaid")}
+              onPress={() => {
+                setMeterType("POSTPAID");
+                setCustomerName("");
+                setIsValidated(false);
+                setValidationError(null);
+              }}
             >
               <MediumText
-                color={meterType === "postpaid" ? "primary" : "black"}
+                color={meterType === "POSTPAID" ? "primary" : "black"}
               >
                 Postpaid
               </MediumText>
@@ -130,30 +220,51 @@ const ElectricityScreen: React.FC<{
           </View>
 
           <View className="py-4 justify-center px-4">
-            <View className="bg-white shadow-md rounded-lg px-4 py-4 mb-2">
+            <View
+              className="bg-white shadow-md rounded-lg px-4 py-4 mb-2"
+              style={shadowStyle}
+            >
               <View className="mb-4">
-                <Text style={styles.label} allowFontScaling={false}>
-                  Meter Number
-                </Text>
-                <TextInput
-                  style={styles.textInput}
+                <Label text="Meter Number" marked={false} />
+                <BasicInput
                   placeholder="Enter your meter number"
-                  allowFontScaling={false}
-                  placeholderTextColor={"#00000080"}
                   value={meterNumber}
-                  onChangeText={setMeterNumber}
+                  onChangeText={(text) => {
+                    setMeterNumber(text);
+                    setCustomerName("");
+                    setIsValidated(false);
+                    setValidationError(null);
+                  }}
                   keyboardType="numeric"
                 />
+                {isValidating ? (
+                  <View className="flex-row items-center mt-2">
+                    <ActivityIndicator size="small" color={COLORS.violet400} />
+                    <RegularText color="mediumGrey" marginLeft={5} size="small">
+                      Verifying meter details
+                    </RegularText>
+                  </View>
+                ) : customerName ? (
+                  <View className="flex-row items-center mt-2">
+                    <TickCircle
+                      size={20}
+                      variant="Bold"
+                      color={COLORS.green300}
+                    />
+                    <BoldText color="green" marginLeft={3} size="small">
+                      {customerName}
+                    </BoldText>
+                  </View>
+                ) : validationError ? (
+                  <RegularText color="error" marginTop={5} size="small">
+                    {validationError}
+                  </RegularText>
+                ) : null}
               </View>
               <View className="mb-4">
-                <Text style={styles.label} allowFontScaling={false}>
-                  Amount
-                </Text>
-                <TextInput
-                  style={styles.textInput}
+                <Label text="Amount" marked={false} />
+                <BasicInput
                   placeholder="Enter amount"
-                  allowFontScaling={false}
-                  placeholderTextColor={"#00000080"}
                   value={amount}
                   onChangeText={validateAmountInput}
                   keyboardType="numeric"
@@ -164,33 +275,12 @@ const ElectricityScreen: React.FC<{
             <Button
               style={[
                 styles.proceedButton,
-                !isFormValid && styles.disabledButton,
+                !canNavigate && styles.disabledButton,
               ]}
-              title={"Proceed"}
+              title="Confirm & Proceed"
               textColor="#fff"
-              disabled={!isFormValid}
-              onPress={() => {
-                const numericAmount = parseFloat(amount);
-                console.log("Meter Number:", meterNumber);
-                console.log("Amount:", numericAmount);
-                console.log("Selected Service:", selectedService);
-                console.log("Meter Type:", meterType);
-                console.log("Plan ID:", selectedPlan?.plan_id);
-                console.log("Plan Name:", selectedPlan?.plan_name);
-
-                if (isFormValid) {
-                  navigation.navigate("ReviewElectricitySummaryScreen", {
-                    meterNumber,
-                    amount: numericAmount,
-                    selectedService,
-                    meterType,
-                    planId: selectedPlan?.plan_id,
-                    planName: selectedPlan?.plan_name,
-                  });
-                } else {
-                  console.log("Form is invalid.");
-                }
-              }}
+              disabled={!canNavigate}
+              onPress={handleProceed}
             />
           </View>
         </ScrollView>
@@ -229,28 +319,11 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     marginBottom: SPACING * 2,
   },
-  textInput: {
-    backgroundColor: "#F5F5F5",
-    borderRadius: 10,
-    borderColor: "#DFDFDF",
-    padding: SPACING * 1.5,
-    width: "100%",
-    fontFamily: "Outfit-Regular",
-  },
-  label: {
-    fontFamily: "Outfit-Regular",
-    marginBottom: 10,
-    fontSize: RFValue(12),
-  },
   proceedButton: {
     marginTop: SPACING * 4,
   },
   disabledButton: {
     backgroundColor: COLORS.violet200,
-  },
-  planText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(12),
   },
   meterTypeButton: {
     backgroundColor: "white",
