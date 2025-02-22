@@ -44,7 +44,8 @@ const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { selectedOperator, selectedPlan, phoneNumber } = route.params;
+  const { selectedOperator, selectedPlan, phoneNumber, saveBeneficiary } =
+    route.params;
 
   const handleSwipeConfirm = async (reset: () => void) => {
     try {
@@ -52,6 +53,7 @@ const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
         planId: route.params.selectedPlan.plan_id,
         networkType: route.params.selectedOperator.toLowerCase(),
         phoneNumber: route.params.phoneNumber,
+        saveBeneficiary,
       };
 
       const response = await services.dataService.purchaseData(payload);

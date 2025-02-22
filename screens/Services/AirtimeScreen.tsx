@@ -39,7 +39,8 @@ const AirtimeScreen: React.FC<{
   const [phoneNumber, setPhoneNumber] = useState("");
   const [amountError, setAmountError] = useState(false);
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
-  const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(false);
+  const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(true); // Start as true for initial load
+  const [saveBeneficiary, setSaveBeneficiary] = useState(false);
 
   const amounts = [100, 200, 500, 1000, 2000, 3000, 5000];
 
@@ -50,9 +51,7 @@ const AirtimeScreen: React.FC<{
     const fetchBeneficiaries = async () => {
       setIsBeneficiariesLoading(true);
       try {
-        const response = await services.beneficiaryService.getBeneficiaries(
-          "airtime"
-        );
+        const response = await services.beneficiaryService.getBeneficiaries("airtime");
         setBeneficiaries(response.data?.beneficiaries || []);
       } catch (error) {
         console.error("Failed to fetch airtime beneficiaries:", error);
@@ -84,6 +83,7 @@ const AirtimeScreen: React.FC<{
       selectedOperator,
       phoneNumber,
       amount: sanitizedAmount,
+      saveBeneficiary,
     });
   };
 
@@ -91,31 +91,14 @@ const AirtimeScreen: React.FC<{
 
   const prefixes: { [key in OperatorType]: string[] } = {
     Airtel: ["0802", "0808", "0708", "0812", "0902", "0907", "0901", "0904"],
-    Mtn: [
-      "0803",
-      "0806",
-      "0703",
-      "0706",
-      "0810",
-      "0813",
-      "0814",
-      "0816",
-      "0903",
-      "0906",
-      "0916",
-      "0913",
-    ],
+    Mtn: ["0803", "0806", "0703", "0706", "0810", "0813", "0814", "0816", "0903", "0906", "0916", "0913"],
     "9Mobile": ["0809", "0817", "0818", "0909", "0908"],
     Glo: ["0805", "0807", "0705", "0811", "0815", "0905"],
   };
 
   const detectOperator = (number: string) => {
     for (let operator in prefixes) {
-      if (
-        prefixes[operator as OperatorType].some((prefix) =>
-          number.startsWith(prefix)
-        )
-      ) {
+      if (prefixes[operator as OperatorType].some((prefix) => number.startsWith(prefix))) {
         setSelectedOperator(operator);
         return;
       }
@@ -124,13 +107,134 @@ const AirtimeScreen: React.FC<{
   };
 
   const handleBeneficiarySelect = (beneficiary: Beneficiary) => {
-    setPhoneNumber(beneficiary.number); // Use 'number' instead of 'phoneNumber'
+    setPhoneNumber(beneficiary.number);
+    // Auto-select the network provider based on networkType, fallback to detectOperator if needed
     if (beneficiary.networkType) {
-      setSelectedOperator(beneficiary.networkType);
+      const normalizedNetworkType = beneficiary.networkType.toLowerCase();
+      const networkMap: { [key: string]: OperatorType } = {
+        "mtn": "Mtn",
+        "airtel": "Airtel",
+        "9mobile": "9Mobile",
+        "glo": "Glo",
+      };
+      const selectedNetwork = networkMap[normalizedNetworkType];
+      if (selectedNetwork) {
+        setSelectedOperator(selectedNetwork);
+      } else {
+        detectOperator(beneficiary.number); // Fallback if networkType is invalid
+      }
     } else {
-      detectOperator(beneficiary.number);
+      detectOperator(beneficiary.number); // Fallback if no networkType
     }
   };
+
+  const renderNetworkSkeleton = () => (
+    <View className="flex-row p-2 bg-white rounded-xl items-center justify-between">
+      {[1, 2, 3, 4].map((_, index) => (
+        <Skeleton
+          key={index}
+          width={63}
+          height={60}
+          style={{
+            backgroundColor: COLORS.grey100,
+            marginHorizontal: SPACING,
+            borderRadius: 10,
+          }}
+          skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+          animation="wave"
+        />
+      ))}
+    </View>
+  );
+
+  const renderNetworkProviders = () => (
+    <View className="flex-row p-2 bg-white rounded-xl items-center justify-between">
+      <TouchableOpacity
+        onPress={() => setSelectedOperator("Airtel")}
+        style={[selectedOperator === "Airtel" && styles.selectedOperator]}
+      >
+        <View>
+          <Airtel />
+          {selectedOperator === "Airtel" && (
+            <TickCircle
+              size={18}
+              variant="Bold"
+              color="#fff"
+              style={{
+                zIndex: 1,
+                position: "absolute",
+                top: 0,
+                right: 0,
+              }}
+            />
+          )}
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => setSelectedOperator("Mtn")}
+        style={[selectedOperator === "Mtn" && styles.selectedOperator]}
+      >
+        <View>
+          <Mtn />
+          {selectedOperator === "Mtn" && (
+            <TickCircle
+              size={18}
+              variant="Bold"
+              color="#fff"
+              style={{
+                zIndex: 1,
+                position: "absolute",
+                top: 0,
+                right: 0,
+              }}
+            />
+          )}
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => setSelectedOperator("9Mobile")}
+        style={[selectedOperator === "9Mobile" && styles.selectedOperator]}
+      >
+        <View>
+          <Eti />
+          {selectedOperator === "9Mobile" && (
+            <TickCircle
+              size={18}
+              variant="Bold"
+              color="#fff"
+              style={{
+                zIndex: 1,
+                position: "absolute",
+                top: 0,
+                right: 0,
+              }}
+            />
+          )}
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => setSelectedOperator("Glo")}
+        style={[selectedOperator === "Glo" && styles.selectedOperator]}
+      >
+        <View>
+          <Glo />
+          {selectedOperator === "Glo" && (
+            <TickCircle
+              size={18}
+              variant="Bold"
+              color="#fff"
+              style={{
+                zIndex: 1,
+                position: "absolute",
+                top: 0,
+                right: 0,
+              }}
+            />
+          )}
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -191,58 +295,61 @@ const AirtimeScreen: React.FC<{
             <View style={styles.tabContent}>
               {activeTab === "Local" ? (
                 <View>
-                  {beneficiaries.length > 0 && (
-                    <View>
-                      <Text style={styles.headText} allowFontScaling={false}>
-                        Saved Beneficiaries
-                      </Text>
-                      {isBeneficiariesLoading ? (
-                        <View className="flex-row mb-2 gap-1">
-                          <Skeleton
-                            width={100}
-                            height={25}
-                            style={{
-                              backgroundColor: COLORS.grey100,
-
-                              borderRadius: 10,
-                            }}
-                            skeletonStyle={{ backgroundColor: COLORS.grey50 }}
-                            animation="wave"
-                          />
-                          <Skeleton
-                            width={100}
-                            height={25}
-                            style={{
-                              backgroundColor: COLORS.grey100,
-                              borderRadius: 10,
-                            }}
-                            skeletonStyle={{ backgroundColor: COLORS.grey50 }}
-                            animation="wave"
-                          />
-                        </View>
-                      ) : (
-                        <FlatList
-                          data={beneficiaries}
-                          horizontal
-                          showsHorizontalScrollIndicator={false}
-                          keyExtractor={(item, index) => index.toString()}
-                          renderItem={({ item: beneficiary, index }) => (
-                            <TouchableOpacity
-                              key={index}
-                              className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2"
-                              onPress={() =>
-                                handleBeneficiarySelect(beneficiary)
-                              }
-                            >
-                              <RegularText color="black" size="small">
-                                {beneficiary.number}
-                              </RegularText>
-                            </TouchableOpacity>
-                          )}
+                  <View>
+                    <RegularText
+                      color="black"
+                      marginBottom={8}
+                      allowFontScaling={false}
+                    >
+                      Saved Beneficiaries
+                    </RegularText>
+                    {isBeneficiariesLoading ? (
+                      <View className="flex-row mb-2 gap-1">
+                        <Skeleton
+                          width={100}
+                          height={25}
+                          style={{
+                            backgroundColor: COLORS.grey100,
+                            borderRadius: 10,
+                          }}
+                          skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                          animation="wave"
                         />
-                      )}
-                    </View>
-                  )}
+                        <Skeleton
+                          width={100}
+                          height={25}
+                          style={{
+                            backgroundColor: COLORS.grey100,
+                            borderRadius: 10,
+                          }}
+                          skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                          animation="wave"
+                        />
+                      </View>
+                    ) : beneficiaries.length > 0 ? (
+                      <FlatList
+                        data={beneficiaries}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({ item: beneficiary, index }) => (
+                          <TouchableOpacity
+                            key={index}
+                            className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2"
+                            onPress={() => handleBeneficiarySelect(beneficiary)}
+                          >
+                            <RegularText color="black" size="small">
+                              {beneficiary.number} {beneficiary.networkType ? `| ${beneficiary.networkType}` : ""}
+                            </RegularText>
+                          </TouchableOpacity>
+                        )}
+                      />
+                    ) : (
+                      <RegularText color="gray" className="mb-4">
+                        No saved beneficiaries found.
+                      </RegularText>
+                    )}
+                  </View>
 
                   <View className="mt-3 mb-4">
                     <Label text="Phone Number" marked={false} />
@@ -261,122 +368,23 @@ const AirtimeScreen: React.FC<{
                   </View>
 
                   <Label text="Select Network Provider" marked={false} />
-                  <View className="flex-row p-2 bg-white rounded-xl items-center justify-between">
-                    <TouchableOpacity
-                      onPress={() => setSelectedOperator("Airtel")}
-                      style={[
-                        selectedOperator === "Airtel" &&
-                          styles.selectedOperator,
-                      ]}
-                    >
-                      <View>
-                        <Airtel />
-                        {selectedOperator === "Airtel" && (
-                          <TickCircle
-                            size={18}
-                            variant="Bold"
-                            color="#fff"
-                            style={{
-                              zIndex: 1,
-                              position: "absolute",
-                              top: 0,
-                              right: 0,
-                            }}
-                          />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => setSelectedOperator("Mtn")}
-                      style={[
-                        selectedOperator === "Mtn" && styles.selectedOperator,
-                      ]}
-                    >
-                      <View>
-                        <Mtn />
-                        {selectedOperator === "Mtn" && (
-                          <TickCircle
-                            size={18}
-                            variant="Bold"
-                            color="#fff"
-                            style={{
-                              zIndex: 1,
-                              position: "absolute",
-                              top: 0,
-                              right: 0,
-                            }}
-                          />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => setSelectedOperator("9Mobile")}
-                      style={[
-                        selectedOperator === "9Mobile" &&
-                          styles.selectedOperator,
-                      ]}
-                    >
-                      <View>
-                        <Eti />
-                        {selectedOperator === "9Mobile" && (
-                          <TickCircle
-                            size={18}
-                            variant="Bold"
-                            color="#fff"
-                            style={{
-                              zIndex: 1,
-                              position: "absolute",
-                              top: 0,
-                              right: 0,
-                            }}
-                          />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => setSelectedOperator("Glo")}
-                      style={[
-                        selectedOperator === "Glo" && styles.selectedOperator,
-                      ]}
-                    >
-                      <View>
-                        <Glo />
-                        {selectedOperator === "Glo" && (
-                          <TickCircle
-                            size={18}
-                            variant="Bold"
-                            color="#fff"
-                            style={{
-                              zIndex: 1,
-                              position: "absolute",
-                              top: 0,
-                              right: 0,
-                            }}
-                          />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                  </View>
+                  {isBeneficiariesLoading ? renderNetworkSkeleton() : renderNetworkProviders()}
 
-                  <View>
-                    <View className="mt-4">
-                      <CurrencyInput
-                        value={amount}
-                        error={amountError}
-                        errorMessage="Amount must be at least 100"
-                        onChange={(text) => {
-                          setAmount(text);
-                          setAmountError(false);
-                        }}
-                      />
-                    </View>
+                  <View className="mt-4">
+                    <CurrencyInput
+                      value={amount}
+                      error={amountError}
+                      errorMessage="Amount must be at least 100"
+                      onChange={(text) => {
+                        setAmount(text);
+                        setAmountError(false);
+                      }}
+                    />
                   </View>
 
                   <View className="bg-[#EEEBF9] rounded-xl">
                     <View className="p-4">
-                      <Text style={styles.topupText} allowFontScaling={false}>
-                        Topup
-                      </Text>
+                      <RegularText color="black">Topup</RegularText>
                       <View className="flex-row flex-wrap">
                         {amounts.map((amount, index) => (
                           <TouchableOpacity
@@ -384,12 +392,7 @@ const AirtimeScreen: React.FC<{
                             onPress={() => setAmount(amount.toString())}
                             className="bg-white rounded p-2 m-2"
                           >
-                            <Text
-                              style={styles.amountText}
-                              allowFontScaling={false}
-                            >
-                              ₦{amount}
-                            </Text>
+                            <RegularText color="black">₦{amount}</RegularText>
                           </TouchableOpacity>
                         ))}
                       </View>
@@ -397,22 +400,23 @@ const AirtimeScreen: React.FC<{
                   </View>
 
                   <View className="mb-4">
-                    <View className="flex-row items-center gap-2 mt-2">
-                      <Text
-                        style={styles.beneficiaryText}
-                        allowFontScaling={false}
-                      >
+                    <View className="flex-row items-center mt-2">
+                      <RegularText color="black" marginRight={6}>
                         Save as beneficiary
-                      </Text>
-                      <Switch />
+                      </RegularText>
+                      <Switch
+                        value={saveBeneficiary}
+                        onValueChange={setSaveBeneficiary}
+                        trackColor={{ false: COLORS.grey100, true: COLORS.violet200 }}
+                        thumbColor={saveBeneficiary ? COLORS.violet400 : COLORS.grey100}
+                        style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+                      />
                     </View>
                   </View>
                   <Button
                     title="Proceed"
                     style={{
-                      backgroundColor: isButtonDisabled
-                        ? COLORS.violet200
-                        : COLORS.violet400,
+                      backgroundColor: isButtonDisabled ? COLORS.violet200 : COLORS.violet400,
                       marginTop: SPACING * 2,
                     }}
                     onPress={handleProceed}

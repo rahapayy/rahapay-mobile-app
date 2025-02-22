@@ -7,17 +7,11 @@ import {
   TouchableOpacity,
   View,
   Platform,
-  TextInput,
   Switch,
   FlatList,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import {
-  ArrowDown2,
-  ArrowLeft,
-  ProfileCircle,
-  TickCircle,
-} from "iconsax-react-native";
+import { ArrowDown2, ArrowLeft, TickCircle } from "iconsax-react-native";
 import SPACING from "../../constants/SPACING";
 import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
@@ -33,6 +27,8 @@ import { DataPlan } from "@/services/modules/data";
 import { services } from "@/services";
 import { RegularText } from "@/components/common/Text";
 import { Beneficiary } from "@/services/modules/beneficiary";
+import Label from "@/components/common/ui/forms/Label";
+import BasicInput from "@/components/common/ui/forms/BasicInput";
 
 interface DataScreenProps {
   navigation: NativeStackNavigationProp<any>;
@@ -52,9 +48,12 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
-  const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(false);
+  const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(true); // Start as true for initial load
+  const [saveBeneficiary, setSaveBeneficiary] = useState(false);
 
-  // Fetch airtime beneficiaries
+  const isButtonDisabled = !selectedOperator || !phoneNumber || !selectedPlan;
+
+  // Fetch data beneficiaries
   useEffect(() => {
     const fetchBeneficiaries = async () => {
       setIsBeneficiariesLoading(true);
@@ -64,7 +63,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
         );
         setBeneficiaries(response.data?.beneficiaries || []);
       } catch (error) {
-        console.error("Failed to fetch airtime beneficiaries:", error);
+        console.error("Failed to fetch data beneficiaries:", error);
         setBeneficiaries([]);
       } finally {
         setIsBeneficiariesLoading(false);
@@ -73,25 +72,6 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
 
     fetchBeneficiaries();
   }, []);
-
-  const handleBeneficiarySelect = (beneficiary: Beneficiary) => {
-    setPhoneNumber(beneficiary.number); // Use 'number' instead of 'phoneNumber'
-    if (beneficiary.networkType) {
-      setSelectedOperator(beneficiary.networkType);
-    } else {
-      detectOperator(beneficiary.number);
-    }
-  };
-
-  const onSelectPackage = (plan: DataPlan) => {
-    setSelectedPlan({
-      plan: plan.plan_name,
-      days: plan.validity,
-      plan_id: plan.plan_id,
-      amount: parseFloat(plan.amount),
-    });
-    setModalVisible(false);
-  };
 
   // Fetch data plans when operator changes
   useEffect(() => {
@@ -115,8 +95,51 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
 
     fetchDataPlans();
   }, [selectedOperator]);
-  // Check if all required fields are filled
-  const isButtonDisabled = !selectedOperator || !phoneNumber || !selectedPlan;
+
+  const handleBeneficiarySelect = (beneficiary: Beneficiary) => {
+    setPhoneNumber(beneficiary.number);
+    // Auto-select the network provider based on networkType, fallback to detectOperator if needed
+    if (beneficiary.networkType) {
+      const normalizedNetworkType = beneficiary.networkType.toLowerCase();
+      const networkMap: { [key: string]: OperatorType } = {
+        mtn: "Mtn",
+        airtel: "Airtel",
+        "9mobile": "9Mobile",
+        glo: "Glo",
+      };
+      const selectedNetwork = networkMap[normalizedNetworkType];
+      if (selectedNetwork) {
+        setSelectedOperator(selectedNetwork);
+      } else {
+        detectOperator(beneficiary.number); // Fallback if networkType is invalid
+      }
+    } else {
+      detectOperator(beneficiary.number); // Fallback if no networkType
+    }
+  };
+
+  const onSelectPackage = (plan: DataPlan) => {
+    setSelectedPlan({
+      plan: plan.plan_name,
+      days: plan.validity,
+      plan_id: plan.plan_id,
+      amount: parseFloat(plan.amount),
+    });
+    setModalVisible(false);
+  };
+
+  const handleProceed = () => {
+    if (!selectedPlan) return;
+
+    navigation.navigate("ReviewDataSummaryScreen", {
+      selectedOperator,
+      selectedPlan,
+      phoneNumber,
+      saveBeneficiary,
+    });
+  };
+
+  type OperatorType = "Airtel" | "Mtn" | "9Mobile" | "Glo";
 
   const prefixes: { [key in OperatorType]: string[] } = {
     Airtel: ["0802", "0808", "0708", "0812", "0902", "0907", "0901", "0904"],
@@ -138,8 +161,6 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
     Glo: ["0805", "0807", "0705", "0811", "0815", "0905"],
   };
 
-  type OperatorType = "Airtel" | "Mtn" | "9Mobile" | "Glo";
-
   const detectOperator = (number: string) => {
     for (let operator in prefixes) {
       if (
@@ -151,9 +172,116 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
         return;
       }
     }
-
     setSelectedOperator("");
   };
+
+  const renderNetworkSkeleton = () => (
+    <View className="flex-row p-2 bg-white rounded-xl items-center justify-between">
+      {[1, 2, 3, 4].map((_, index) => (
+        <Skeleton
+          key={index}
+          width={63}
+          height={60}
+          style={{
+            backgroundColor: COLORS.grey100,
+            marginHorizontal: SPACING,
+            borderRadius: 10,
+          }}
+          skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+          animation="wave"
+        />
+      ))}
+    </View>
+  );
+
+  const renderNetworkProviders = () => (
+    <View className="flex-row p-2 bg-white rounded-xl items-center justify-between">
+      <TouchableOpacity
+        onPress={() => setSelectedOperator("Airtel")}
+        style={[selectedOperator === "Airtel" && styles.selectedOperator]}
+      >
+        <View>
+          <Airtel />
+          {selectedOperator === "Airtel" && (
+            <TickCircle
+              size={18}
+              variant="Bold"
+              color="#fff"
+              style={{
+                zIndex: 1,
+                position: "absolute",
+                top: 0,
+                right: 0,
+              }}
+            />
+          )}
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => setSelectedOperator("Mtn")}
+        style={[selectedOperator === "Mtn" && styles.selectedOperator]}
+      >
+        <View>
+          <Mtn />
+          {selectedOperator === "Mtn" && (
+            <TickCircle
+              size={18}
+              variant="Bold"
+              color="#fff"
+              style={{
+                zIndex: 1,
+                position: "absolute",
+                top: 0,
+                right: 0,
+              }}
+            />
+          )}
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => setSelectedOperator("9Mobile")}
+        style={[selectedOperator === "9Mobile" && styles.selectedOperator]}
+      >
+        <View>
+          <Eti />
+          {selectedOperator === "9Mobile" && (
+            <TickCircle
+              size={18}
+              variant="Bold"
+              color="#fff"
+              style={{
+                zIndex: 1,
+                position: "absolute",
+                top: 0,
+                right: 0,
+              }}
+            />
+          )}
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => setSelectedOperator("Glo")}
+        style={[selectedOperator === "Glo" && styles.selectedOperator]}
+      >
+        <View>
+          <Glo />
+          {selectedOperator === "Glo" && (
+            <TickCircle
+              size={18}
+              variant="Bold"
+              color="#fff"
+              style={{
+                zIndex: 1,
+                position: "absolute",
+                top: 0,
+                right: 0,
+              }}
+            />
+          )}
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <SafeAreaView className="flex-1">
@@ -173,191 +301,88 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
           <View className="p-4">
             <View style={styles.tabContent}>
               <View>
-                {beneficiaries.length > 0 && (
-                  <View>
-                    <Text style={styles.headText} allowFontScaling={false}>
-                      Saved Beneficiaries
-                    </Text>
-                    {isBeneficiariesLoading ? (
-                      <View className="flex-row mb-2 gap-1">
-                        <Skeleton
-                          width={100}
-                          height={25}
-                          style={{
-                            backgroundColor: COLORS.grey100,
-
-                            borderRadius: 10,
-                          }}
-                          skeletonStyle={{ backgroundColor: COLORS.grey50 }}
-                          animation="wave"
-                        />
-                        <Skeleton
-                          width={100}
-                          height={25}
-                          style={{
-                            backgroundColor: COLORS.grey100,
-                            borderRadius: 10,
-                          }}
-                          skeletonStyle={{ backgroundColor: COLORS.grey50 }}
-                          animation="wave"
-                        />
-                      </View>
-                    ) : (
-                      <FlatList
-                        data={beneficiaries}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={({ item: beneficiary, index }) => (
-                          <TouchableOpacity
-                            key={index}
-                            className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2"
-                            onPress={() => handleBeneficiarySelect(beneficiary)}
-                          >
-                            <RegularText color="black" size="small">
-                              {beneficiary.number}
-                            </RegularText>
-                          </TouchableOpacity>
-                        )}
+                <View className="mb-2">
+                  <RegularText color="black" marginBottom={5}>
+                    Saved Beneficiaries
+                  </RegularText>
+                  {isBeneficiariesLoading ? (
+                    <View className="flex-row mb-2 gap-1">
+                      <Skeleton
+                        width={100}
+                        height={25}
+                        style={{
+                          backgroundColor: COLORS.grey100,
+                          borderRadius: 10,
+                        }}
+                        skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                        animation="wave"
                       />
-                    )}
-                  </View>
-                )}
+                      <Skeleton
+                        width={100}
+                        height={25}
+                        style={{
+                          backgroundColor: COLORS.grey100,
+                          borderRadius: 10,
+                        }}
+                        skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                        animation="wave"
+                      />
+                    </View>
+                  ) : beneficiaries.length > 0 ? (
+                    <FlatList
+                      data={beneficiaries}
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      keyExtractor={(item, index) => index.toString()}
+                      renderItem={({ item: beneficiary, index }) => (
+                        <TouchableOpacity
+                          key={index}
+                          className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2"
+                          onPress={() => handleBeneficiarySelect(beneficiary)}
+                        >
+                          <RegularText color="black" size="small">
+                            {beneficiary.number}{" "}
+                            {beneficiary.networkType
+                              ? `| ${beneficiary.networkType}`
+                              : ""}
+                          </RegularText>
+                        </TouchableOpacity>
+                      )}
+                    />
+                  ) : (
+                    <RegularText color="lightGrey" className="mb-4">
+                      No saved beneficiaries found.
+                    </RegularText>
+                  )}
+                </View>
 
                 <View className="mb-4">
-                  <Text style={styles.label} allowFontScaling={false}>
-                    Phone Number
-                  </Text>
-                  <View style={styles.inputContainer}>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Enter phone number"
-                      placeholderTextColor="#9BA1A8"
-                      allowFontScaling={false}
-                      value={phoneNumber}
-                      keyboardType="numeric"
-                      onChangeText={(text) => {
-                        setPhoneNumber(text);
-                        detectOperator(text);
-                      }}
-                      autoComplete="off"
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                    />
-                    {/* <TouchableOpacity>
-                      <ProfileCircle color={COLORS.violet400} />
-                    </TouchableOpacity> */}
-                  </View>
+                  <Label text="Phone Number" marked={false} />
+                  <BasicInput
+                    placeholder="Enter phone number"
+                    value={phoneNumber}
+                    keyboardType="numeric"
+                    onChangeText={(text) => {
+                      setPhoneNumber(text);
+                      detectOperator(text);
+                    }}
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
                 </View>
 
-                {/* Select Network Provider */}
-                <Text style={styles.headText} allowFontScaling={false}>
-                  Select Network Provider
-                </Text>
-                <View className="flex-row p-2 bg-white rounded-xl  items-center justify-between">
-                  <TouchableOpacity
-                    onPress={() => setSelectedOperator("Airtel")}
-                    style={[
-                      selectedOperator === "Airtel" && styles.selectedOperator,
-                    ]}
-                  >
-                    <View>
-                      <Airtel />
-                      {selectedOperator === "Airtel" && (
-                        <TickCircle
-                          size={18}
-                          variant="Bold"
-                          color="#fff"
-                          style={{
-                            zIndex: 1,
-                            position: "absolute",
-                            top: 0,
-                            right: 0,
-                          }}
-                        />
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => setSelectedOperator("Mtn")}
-                    style={[
-                      selectedOperator === "Mtn" && styles.selectedOperator,
-                    ]}
-                  >
-                    <View>
-                      <Mtn />
-                      {selectedOperator === "Mtn" && (
-                        <TickCircle
-                          size={18}
-                          variant="Bold"
-                          color="#fff"
-                          style={{
-                            zIndex: 1,
-                            position: "absolute",
-                            top: 0,
-                            right: 0,
-                          }}
-                        />
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => setSelectedOperator("9Mobile")}
-                    style={[
-                      selectedOperator === "9Mobile" && styles.selectedOperator,
-                    ]}
-                  >
-                    <View>
-                      <Eti />
-                      {selectedOperator === "9Mobile" && (
-                        <TickCircle
-                          size={18}
-                          variant="Bold"
-                          color="#fff"
-                          style={{
-                            zIndex: 1,
-                            position: "absolute",
-                            top: 0,
-                            right: 0,
-                          }}
-                        />
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => setSelectedOperator("Glo")}
-                    style={[
-                      selectedOperator === "Glo" && styles.selectedOperator,
-                    ]}
-                  >
-                    <View>
-                      <Glo />
-                      {selectedOperator === "Glo" && (
-                        <TickCircle
-                          size={18}
-                          variant="Bold"
-                          color="#fff"
-                          style={{
-                            zIndex: 1,
-                            position: "absolute",
-                            top: 0,
-                            right: 0,
-                          }}
-                        />
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                </View>
+                <Label text="Select Network Provider" marked={false} />
+                {isBeneficiariesLoading
+                  ? renderNetworkSkeleton()
+                  : renderNetworkProviders()}
 
-                {/* Inputs */}
-                <View className="mb-6">
+                <View className="mb-2">
                   <View className="mt-4">
-                    <Text style={styles.label} allowFontScaling={false}>
-                      Plan
-                    </Text>
+                    <Label text="Plan" marked={false} />
                     <TouchableOpacity
                       style={[!selectedOperator && {}]}
-                      className="p-3 flex-row items-center border border-gray-300 rounded-xl"
+                      className="p-3 flex-row items-center border border-[#BABFC3] rounded-xl"
                       onPress={() => {
                         if (selectedOperator) {
                           setModalVisible(true);
@@ -383,37 +408,36 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                   </View>
                 </View>
 
-                {/* Save as Beneficiary Toogle */}
                 <View className="mb-4">
-                  <View className="flex-row items-center gap-2 mt-2">
-                    <Text
-                      style={styles.beneficiaryText}
-                      allowFontScaling={false}
-                    >
+                  <View className="flex-row items-center mt-2">
+                    <RegularText color="black" marginRight={6}>
                       Save as beneficiary
-                    </Text>
-                    <Switch />
+                    </RegularText>
+                    <Switch
+                      value={saveBeneficiary}
+                      onValueChange={setSaveBeneficiary}
+                      trackColor={{
+                        false: COLORS.grey100,
+                        true: COLORS.violet200,
+                      }}
+                      thumbColor={
+                        saveBeneficiary ? COLORS.violet400 : COLORS.grey100
+                      }
+                      style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+                    />
                   </View>
                 </View>
               </View>
             </View>
             <Button
-              title={"Proceed"}
+              title="Proceed"
               className="mt-10"
               style={{
                 backgroundColor: isButtonDisabled
                   ? COLORS.violet200
                   : COLORS.violet400,
               }}
-              onPress={() => {
-                if (selectedPlan) {
-                  navigation.navigate("ReviewDataSummaryScreen", {
-                    selectedOperator,
-                    selectedPlan,
-                    phoneNumber,
-                  });
-                }
-              }}
+              onPress={handleProceed}
               disabled={isButtonDisabled}
               textColor="#fff"
             />
@@ -455,11 +479,6 @@ const styles = StyleSheet.create({
     marginTop: SPACING,
     fontFamily: "Outfit-Regular",
   },
-  contentText: {
-    fontSize: RFValue(18),
-    fontFamily: "Outfit-Regular",
-    color: "#000",
-  },
   headText: {
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(12),
@@ -487,10 +506,6 @@ const styles = StyleSheet.create({
     height: Platform.OS === "ios" ? 30 : 33,
     fontFamily: "Outfit-Regular",
   },
-  topupText: {
-    fontFamily: "Outfit-Regular",
-  },
-
   beneficiaryText: {
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(12),

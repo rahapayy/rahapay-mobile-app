@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   Dimensions,
   FlatList,
+  ActivityIndicator
 } from "react-native";
-import LoadingIndicator from "./LoadingIndicator";
 import { DataPlan } from "@/services/modules/data";
 import COLORS from "@/constants/colors";
 
@@ -128,7 +128,7 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
             ))}
           </View>
 
-          {isLoading && <LoadingIndicator />}
+          {isLoading && <ActivityIndicator size="large" color={COLORS.violet200} />}
 
           {error && <Text style={styles.errorText}>{error}</Text>}
 

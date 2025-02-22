@@ -34,7 +34,8 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { selectedOperator, phoneNumber, amount } = route.params;
+  const { selectedOperator, phoneNumber, amount, saveBeneficiary = false } =
+    route.params;
 
   const handleSwipeConfirm = async (reset: () => void) => {
     try {
@@ -42,6 +43,7 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
         amount,
         networkType: selectedOperator.toLowerCase(),
         phoneNumber,
+        saveBeneficiary,
       };
 
       const response = await services.airtimeService.purchaseAirtime(payload);
@@ -51,7 +53,7 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
         status: response.status,
       });
     } catch (error: unknown) {
-      console.error("Onboarding Error:", error);
+      console.error("Airtime Error:", error);
       if (error instanceof AxiosError) {
         handleShowFlash({
           message:

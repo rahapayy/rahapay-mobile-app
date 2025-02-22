@@ -6,6 +6,7 @@ export interface DataPurchasePayload {
   planId: string;
   networkType: string;
   phoneNumber: string;
+  saveBeneficiary: boolean;
 }
 
 export interface DataPurchaseResponse {

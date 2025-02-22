@@ -44,12 +44,14 @@ export type RootStackParamList = {
       plan_id: string;
       amount: number;
     };
+    saveBeneficiary: boolean;
     phoneNumber: string;
   };
   ReviewAirtimeSummaryScreen: {
     selectedOperator: string;
     phoneNumber: string;
     amount: number;
+    saveBeneficiary: boolean;
   };
   TransactionStatusScreen: {
     status: "pending" | "failed" | "success";
