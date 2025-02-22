@@ -37,7 +37,7 @@ const QuickAction: React.FC<{
   const actionItems = [
     { icon: AirtimeIcon, title: "Airtime", navigateTo: "AirtimeScreen" },
     { icon: DataIcon, title: "Data", navigateTo: "DataScreen" },
-    { icon: TvIcon, title: "TV", isComingSoon: true },
+    { icon: TvIcon, title: "TV", navigateTo: "TvSubscriptionScreen" },
     { icon: ElectricityIcon, title: "Electricity", isComingSoon: true },
   ];
 

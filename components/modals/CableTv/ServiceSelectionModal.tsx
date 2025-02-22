@@ -30,7 +30,7 @@ const ServiceSelectionModal: React.FC<ServiceSelectionModalProps> = ({
   const services = [
     { name: "Dstv", icon: <Dstv width={32} height={32} /> },
     { name: "Gotv", icon: <Gotv width={32} height={32} /> },
-    { name: "Startimes", icon: <Startimes width={32} height={32} /> },
+    { name: "Startime", icon: <Startimes width={32} height={32} /> },
   ];
 
   return (

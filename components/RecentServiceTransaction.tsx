@@ -186,7 +186,7 @@ const RecentServiceTransaction: React.FC<{
         <TouchableOpacity
           onPress={() => navigation.navigate("TransactionHistoryScreen")}
         >
-          <LightText color="light">View More</LightText>
+          <LightText color="mediumGrey">View More</LightText>
         </TouchableOpacity>
       </View>
 

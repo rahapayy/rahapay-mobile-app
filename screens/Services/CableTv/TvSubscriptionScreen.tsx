@@ -10,26 +10,33 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, ArrowRight2 } from "iconsax-react-native";
+import { ArrowLeft, ArrowRight2, TickCircle } from "iconsax-react-native";
 import SPACING from "../../../constants/SPACING";
 import FONT_SIZE from "../../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
 import Dstv from "../../../assets/svg/dstv.svg";
-
+import Gotv from "../../../assets/svg/gotv.svg";
+import Startimes from "../../../assets/svg/startimes.svg";
 import COLORS from "../../../constants/colors";
-import useSWR from "swr";
 import PlanSelectionModal from "../../../components/modals/CableTv/PlanSelectionModal";
 import Button from "../../../components/common/ui/buttons/Button";
-import { TextInput } from "react-native";
 import ServiceSelectionModal from "../../../components/modals/CableTv/ServiceSelectionModal";
-import { MediumText } from "../../../components/common/Text";
+import {
+  BoldText,
+  MediumText,
+  RegularText,
+} from "../../../components/common/Text";
+import { services } from "@/services";
+import { handleShowFlash } from "@/components/FlashMessageComponent";
+import Label from "@/components/common/ui/forms/Label";
+import BasicInput from "@/components/common/ui/forms/BasicInput";
 
 const TvSubscriptionScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const [selectedService, setSelectedService] = useState<string>("Dstv");
+  const [selectedService, setSelectedService] = useState<string>("DSTV");
   const [selectedServiceIcon, setSelectedServiceIcon] = useState<JSX.Element>(
     <Dstv width={32} height={32} />
   );
@@ -38,61 +45,121 @@ const TvSubscriptionScreen: React.FC<{
   const [serviceModalVisible, setServiceModalVisible] =
     useState<boolean>(false);
   const [selectedPlan, setSelectedPlan] = useState<{
-    plan_id: string;
-    plan_price: number;
-    plan_name: string;
+    planId: string;
+    price: number;
+    planName: string;
   } | null>(null);
+  const [customerName, setCustomerName] = useState<string>("");
+  const [plans, setPlans] = useState<any[]>([]);
+  const [isPlansLoading, setIsPlansLoading] = useState(true);
+  const [isValidating, setIsValidating] = useState(false);
+  const [isValidated, setIsValidated] = useState(false);
 
-  const { data, error, isLoading } = useSWR(`/cable/`);
+  useEffect(() => {
+    const fetchPlans = async () => {
+      setIsPlansLoading(true);
+      try {
+        const response = await services.cableService.getCablePlans(
+          selectedService
+        );
+        setPlans(response.data || []);
+      } catch (error) {
+        console.error("Error fetching cable plans:", error);
+        handleShowFlash({
+          message: "Failed to load cable plans. Please try again.",
+          type: "danger",
+        });
+      } finally {
+        setIsPlansLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, [selectedService]);
 
   const handleServiceSelect = (service: string, icon: JSX.Element) => {
-    setSelectedService(service);
+    setSelectedService(service.toUpperCase());
     setSelectedServiceIcon(icon);
+    setSelectedPlan(null);
+    setCardNumber("");
+    setCustomerName("");
+    setIsValidated(false);
   };
 
-  if (error) {
-    return (
-      <SafeAreaView
-        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-      >
-        <Text>Error loading data.</Text>
-      </SafeAreaView>
-    );
-  }
+  const handlePlanSelect = (plan: {
+    planId: string;
+    price: number;
+    planName: string;
+  }) => {
+    setSelectedPlan(plan);
+  };
 
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator color={COLORS.violet300} size={"large"} />
-      </View>
-    );
-  }
+  const handleValidateIuc = async () => {
+    setIsValidating(true);
+    try {
+      const response = await services.cableService.validateCableIuc({
+        smartCardNo: cardNumber,
+        cableName: selectedService,
+      });
+      setCustomerName(response.data.customerName || "Unknown");
+      setIsValidated(true);
+      return true;
+    } catch (error: any) {
+      setCustomerName("");
+      setIsValidated(false);
+      handleShowFlash({
+        message:
+          error.response?.data?.msg || "Failed to validate smartcard number.",
+        type: "danger",
+      });
+      return false;
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  const handleProceed = async () => {
+    if (!selectedPlan) return;
+
+    // If not validated yet, validate first
+    if (!isValidated) {
+      await handleValidateIuc();
+      return;
+    }
+
+    // If already validated, proceed to next screen
+    navigation.navigate("ReviewCableTvSummaryScreen", {
+      service: selectedService,
+      planId: selectedPlan.planId,
+      price: selectedPlan.price,
+      cardNumber,
+      planName: selectedPlan.planName,
+      customerName,
+    });
+  };
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
 
-  const isCardNumberValid = cardNumber.length === 10;
+  const shadowStyle = Platform.select({
+    ios: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+    },
+    android: {
+      elevation: 5,
+    },
+  });
 
-  const handlePlanSelect = (plan: {
-    plan_id: string;
-    plan_price: number;
-    plan_name: string;
-  }) => {
-    setSelectedPlan(plan);
-  };
-
-  const filteredPlans = data
-    ? data.filter(
-        (plan: { cable_name: string }) =>
-          plan.cable_name.toLowerCase() === selectedService?.toLowerCase()
-      )
-    : [];
+  const canProceed = selectedPlan !== null;
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <View className="justify-center items-center">
             <View style={styles.header}>
               <TouchableOpacity
@@ -108,7 +175,10 @@ const TvSubscriptionScreen: React.FC<{
           </View>
 
           <View className="justify-center px-4">
-            <View className="bg-white shadow-md rounded-lg py-4 px-4">
+            <View
+              className="bg-white rounded-lg py-4 px-4"
+              style={[shadowStyle]}
+            >
               <Text style={styles.titleText} allowFontScaling={false}>
                 Select a service you need
               </Text>
@@ -134,53 +204,59 @@ const TvSubscriptionScreen: React.FC<{
           </View>
 
           <View className="py-4 justify-center px-4">
-            <View className="bg-white shadow-md rounded-lg px-4 py-4 mb-2">
+            <View
+              className="bg-white rounded-lg px-4 py-4 mb-2"
+              style={[shadowStyle]}
+            >
               <View className="mb-4">
-                <Text style={styles.label} allowFontScaling={false}>
-                  Select a Plan
-                </Text>
+                <Label marked={false} text="Select a Plan" />
                 <TouchableOpacity
-                  style={styles.textInput}
+                  className="p-3 flex-row items-center border border-[#DFDFDF] rounded-lg"
                   onPress={() => setModalVisible(true)}
                 >
-                  <Text style={styles.planText} allowFontScaling={false}>
-                    {selectedPlan ? selectedPlan.plan_name : "Select a plan"}
-                  </Text>
+                  <RegularText color="mediumGrey" size="small">
+                    {selectedPlan ? selectedPlan.planName : "Select a plan"}
+                  </RegularText>
                 </TouchableOpacity>
               </View>
               <View className="mb-4">
-                <Text style={styles.label} allowFontScaling={false}>
-                  Smartcard Number
-                </Text>
-                <TextInput
-                  style={[
-                    styles.textInput,
-                    !isCardNumberValid && cardNumber.length > 0
-                      ? styles.invalidInput
-                      : null,
-                  ]}
+                <Label text="Smartcard Number" marked={false} />
+                <BasicInput
                   placeholder="Enter your card number"
-                  allowFontScaling={false}
-                  placeholderTextColor={"#00000080"}
                   value={cardNumber}
-                  onChangeText={setCardNumber}
+                  onChangeText={(text) => {
+                    setCardNumber(text);
+                    setCustomerName("");
+                    setIsValidated(false);
+                  }}
                   keyboardType="numeric"
-                  maxLength={10}
                 />
-                {!isCardNumberValid && cardNumber.length > 0 && (
-                  <Text style={styles.errorText} allowFontScaling={false}>
-                    Smartcard number must be exactly 10 digits
-                  </Text>
-                )}
+                {isValidating ? (
+                  <View className="flex-row items-center mt-2">
+                    <ActivityIndicator size="small" color={COLORS.violet400} />
+                    <RegularText color="mediumGrey" marginLeft={5} size="small">
+                      Verifying account details
+                    </RegularText>
+                  </View>
+                ) : customerName ? (
+                  <View className="flex-row items-center mt-2">
+                    <TickCircle
+                      size={20}
+                      variant="Bold"
+                      color={COLORS.green300}
+                    />
+                    <BoldText color="green" marginLeft={3} size="small">
+                      {customerName}
+                    </BoldText>
+                  </View>
+                ) : null}
               </View>
               <View className="mb-4">
-                <Text style={styles.label} allowFontScaling={false}>
-                  Amount
-                </Text>
-                <View style={styles.textInput}>
-                  <Text style={styles.price} allowFontScaling={false}>{`₦${
-                    selectedPlan ? selectedPlan.plan_price : 0
-                  }`}</Text>
+                <Label text="Amount" marked={false} />
+                <View className="p-3 flex-row items-center border border-[#DFDFDF] rounded-lg">
+                  <MediumText color="black">
+                    ₦{selectedPlan ? selectedPlan.price : 0}
+                  </MediumText>
                 </View>
               </View>
             </View>
@@ -188,27 +264,19 @@ const TvSubscriptionScreen: React.FC<{
             <Button
               style={[
                 styles.proceedButton,
-                (!isCardNumberValid || !selectedPlan) && styles.disabledButton,
+                !canProceed && styles.disabledButton,
               ]}
-              title={"Proceed"}
+              title={isValidating ? "Validating..." : "Proceed"}
               textColor="#fff"
-              disabled={!isCardNumberValid || !selectedPlan}
-              onPress={() =>
-                navigation.navigate("ReviewCableTvSummaryScreen", {
-                  service: selectedService,
-                  planId: selectedPlan?.plan_id,
-                  planPrice: selectedPlan?.plan_price,
-                  cardNumber,
-                  planName: selectedPlan?.plan_name,
-                })
-              }
+              disabled={!canProceed}
+              onPress={handleProceed}
             />
           </View>
         </ScrollView>
         <PlanSelectionModal
           visible={modalVisible}
           onClose={() => setModalVisible(false)}
-          plans={filteredPlans}
+          plans={plans}
           onSelectPlan={handlePlanSelect}
         />
         <ServiceSelectionModal
@@ -245,66 +313,13 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     marginBottom: SPACING * 2,
   },
-  serviceContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    flexWrap: "wrap",
-  },
-  boxSelect: {
-    backgroundColor: COLORS.white,
-    borderRadius: 8,
-    padding: SPACING * 2,
-    alignItems: "center",
-    marginBottom: SPACING,
-    flexBasis: "47%",
-    margin: SPACING / 2,
-  },
-  selectedBox: {
-    borderColor: COLORS.violet400,
-    borderWidth: 1,
-  },
-  serviceText: {
-    marginTop: SPACING,
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(10),
-  },
-  textInput: {
-    backgroundColor: "#F5F5F5",
-    borderRadius: 10,
-    borderColor: "#DFDFDF",
-    padding: SPACING * 1.5,
-    width: "100%",
-    fontFamily: "Outfit-Regular",
-  },
-  label: {
-    fontFamily: "Outfit-Regular",
-    marginBottom: 10,
-    fontSize: RFValue(12),
-  },
-  changePlan: {
-    fontFamily: "Outfit-Medium",
-    color: COLORS.violet400,
-    fontSize: RFValue(10),
-  },
   proceedButton: {
     marginTop: SPACING * 4,
   },
   disabledButton: {
     backgroundColor: COLORS.violet200,
   },
-  invalidInput: {
-    borderColor: COLORS.red300,
-  },
-  errorText: {
-    color: COLORS.red300,
-    fontSize: RFValue(10),
-    marginTop: 5,
-  },
   price: {
     fontFamily: "Outfit-Medium",
-  },
-  planText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(12),
   },
 });

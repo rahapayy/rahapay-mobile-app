@@ -53,6 +53,18 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
 
   const isButtonDisabled = !selectedOperator || !phoneNumber || !selectedPlan;
 
+  const shadowStyle = Platform.select({
+    ios: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+    },
+    android: {
+      elevation: 5,
+    },
+  });
+
   // Fetch data beneficiaries
   useEffect(() => {
     const fetchBeneficiaries = async () => {
@@ -176,7 +188,10 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
   };
 
   const renderNetworkSkeleton = () => (
-    <View className="flex-row p-2 bg-white rounded-xl items-center justify-between">
+    <View
+      className="flex-row p-2 bg-white rounded-xl items-center justify-between"
+      style={[shadowStyle]}
+    >
       {[1, 2, 3, 4].map((_, index) => (
         <Skeleton
           key={index}
@@ -195,7 +210,10 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
   );
 
   const renderNetworkProviders = () => (
-    <View className="flex-row p-2 bg-white rounded-xl items-center justify-between">
+    <View
+      className="flex-row p-2 bg-white rounded-xl items-center justify-between"
+      style={[shadowStyle]}
+    >
       <TouchableOpacity
         onPress={() => setSelectedOperator("Airtel")}
         style={[selectedOperator === "Airtel" && styles.selectedOperator]}
@@ -284,8 +302,8 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView className="flex-1">
-      <ScrollView>
+    <SafeAreaView className="flex-1 bg-[#F7F7F7]">
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <View style={styles.header}>
             <TouchableOpacity
@@ -301,12 +319,12 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
           <View className="p-4">
             <View style={styles.tabContent}>
               <View>
-                <View className="mb-2">
+                <View className="mb-4">
                   <RegularText color="black" marginBottom={5}>
                     Saved Beneficiaries
                   </RegularText>
                   {isBeneficiariesLoading ? (
-                    <View className="flex-row mb-2 gap-1">
+                    <View className="flex-row mb-4 gap-1">
                       <Skeleton
                         width={100}
                         height={25}
@@ -356,7 +374,12 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                   )}
                 </View>
 
-                <View className="mb-4">
+                <Label text="Select Network Provider" marked={false} />
+                {isBeneficiariesLoading
+                  ? renderNetworkSkeleton()
+                  : renderNetworkProviders()}
+
+                <View className="mt-4">
                   <Label text="Phone Number" marked={false} />
                   <BasicInput
                     placeholder="Enter phone number"
@@ -372,17 +395,12 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                   />
                 </View>
 
-                <Label text="Select Network Provider" marked={false} />
-                {isBeneficiariesLoading
-                  ? renderNetworkSkeleton()
-                  : renderNetworkProviders()}
-
                 <View className="mb-2">
                   <View className="mt-4">
                     <Label text="Plan" marked={false} />
                     <TouchableOpacity
                       style={[!selectedOperator && {}]}
-                      className="p-3 flex-row items-center border border-[#BABFC3] rounded-xl"
+                      className="py-2 px-2 flex-row items-center border border-[#DFDFDF] rounded-md"
                       onPress={() => {
                         if (selectedOperator) {
                           setModalVisible(true);
@@ -421,7 +439,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                         true: COLORS.violet200,
                       }}
                       thumbColor={
-                        saveBeneficiary ? COLORS.violet400 : COLORS.grey100
+                        saveBeneficiary ? COLORS.violet400 : COLORS.white
                       }
                       style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
                     />

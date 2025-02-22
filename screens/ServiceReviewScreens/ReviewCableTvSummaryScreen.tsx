@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Platform,
   SafeAreaView,
@@ -18,9 +18,9 @@ import Gotv from "../../assets/svg/gotv.svg";
 import Startimes from "../../assets/svg/startimes.svg";
 import SwipeButton from "../../components/SwipeButton";
 import { RFValue } from "react-native-responsive-fontsize";
-import useApi from "../../services/apiClient";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { RootStackParamList } from "../../types/RootStackParams";
+import { services } from "@/services";
 
 type ReviewCableTvSummaryScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -31,72 +31,65 @@ const ReviewCableTvSummaryScreen: React.FC<ReviewCableTvSummaryScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { service, planId, planPrice, cardNumber, planName } = route.params;
-
-  const { mutateAsync } = useApi.post("/cable");
+  const { service, planId, price, cardNumber, planName, customerName } =
+    route.params;
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSwipeConfirm = async (reset: () => void) => {
+    setIsLoading(true);
     try {
-      const response = await mutateAsync({
-        planId: planId,
-        service: service.toLowerCase(),
-        iuc: cardNumber,
-      });
+      const payload = {
+        cableName: service.toUpperCase(), // Match API case (e.g., "STARTIME")
+        planId,
+        smartCardNo: cardNumber,
+        customerName: "Unknown", // Optional field, adjust as needed
+      };
 
-      if (response.data.success) {
+      const response = await services.cableService.purchaseCable(payload);
+
+      if (response.status === "success") {
         navigation.navigate("TransactionStatusScreen", {
-          status: "successful",
+          status: "success",
         });
       } else {
-        navigation.navigate("TransactionStatusScreen", { status: "failed" });
+        handleShowFlash({
+          message: response.msg || "Cable subscription failed.",
+          type: "danger",
+        });
       }
-    } catch (err: unknown) {
-      console.error("Error processing cable TV subscription:", err);
-      if (err instanceof Error) {
-        if (err.message.includes("Network")) {
-          handleShowFlash({
-            message:
-              "Network error. Please check your connection and try again.",
-            type: "danger",
-          });
-        } else if (err.message.includes("Timeout")) {
-          handleShowFlash({
-            message: "Request timed out. Please try again later.",
-            type: "danger",
-          });
-        } else {
-          handleShowFlash({
-            message: "An unexpected error occurred. Please try again.",
-            type: "danger",
-          });
-        }
-      } else if (err instanceof Object && "response" in err) {
-        const response = (err as any).response;
-        if (response?.status === 503) {
-          handleShowFlash({
-            message:
-              "The server is currently unavailable. Please try again later.",
-            type: "danger",
-          });
-        } else if (response?.status === 400) {
-          handleShowFlash({
-            message: "Bad request. Please check the input values.",
-            type: "danger",
-          });
-        } else {
-          handleShowFlash({
-            message: "An error occurred. Please try again.",
-            type: "danger",
-          });
-        }
+    } catch (error: any) {
+      console.error("Error processing cable TV subscription:", error);
+      if (error.message?.includes("Network")) {
+        handleShowFlash({
+          message: "Network error. Please check your connection and try again.",
+          type: "danger",
+        });
+      } else if (error.message?.includes("Timeout")) {
+        handleShowFlash({
+          message: "Request timed out. Please try again later.",
+          type: "danger",
+        });
+      } else if (error.response?.status === 503) {
+        handleShowFlash({
+          message:
+            "The server is currently unavailable. Please try again later.",
+          type: "danger",
+        });
+      } else if (error.response?.status === 400) {
+        handleShowFlash({
+          message: "Bad request. Please check the input values.",
+          type: "danger",
+        });
       } else {
         handleShowFlash({
-          message: "An unknown error occurred. Please try again.",
+          message:
+            error.response?.data?.msg || "An error occurred. Please try again.",
           type: "danger",
         });
       }
     } finally {
-      reset(); // Reset the swipe button state after the API call completes
+      setIsLoading(false);
+      reset();
     }
   };
 
@@ -117,19 +110,23 @@ const ReviewCableTvSummaryScreen: React.FC<ReviewCableTvSummaryScreenProps> = ({
           </View>
 
           <View className="justify-center items-center mt-10">
-            {/* Image */}
-
-            {service === "Dstv" && <Dstv width={100} height={100} />}
-            {service === "Gotv" && <Gotv width={100} height={100} />}
-            {service === "Startime" && <Startimes width={100} height={100} />}
+            {service.toLowerCase() === "dstv" && (
+              <Dstv width={100} height={100} />
+            )}
+            {service.toLowerCase() === "gotv" && (
+              <Gotv width={100} height={100} />
+            )}
+            {service.toLowerCase() === "startime" && (
+              <Startimes width={100} height={100} />
+            )}
             <Text style={styles.itemText} allowFontScaling={false}>
-              {service}
+              {service} Subscription
             </Text>
           </View>
           <View className="p-4">
             <View style={styles.container}>
               <Text style={styles.headText} allowFontScaling={false}>
-                Transaction summary
+                Transaction Summary
               </Text>
 
               <View className="justify-between items-center flex-row">
@@ -137,7 +134,15 @@ const ReviewCableTvSummaryScreen: React.FC<ReviewCableTvSummaryScreenProps> = ({
                   Amount
                 </Text>
                 <Text style={styles.descriptionText} allowFontScaling={false}>
-                  ₦{planPrice}
+                  ₦{price}
+                </Text>
+              </View>
+              <View className="justify-between items-center flex-row">
+                <Text style={styles.titleText} allowFontScaling={false}>
+                  Account Name
+                </Text>
+                <Text style={styles.descriptionText} allowFontScaling={false}>
+                  {customerName}
                 </Text>
               </View>
               <View className="justify-between items-center flex-row">
@@ -150,7 +155,7 @@ const ReviewCableTvSummaryScreen: React.FC<ReviewCableTvSummaryScreenProps> = ({
               </View>
               <View className="justify-between items-center flex-row">
                 <Text style={styles.titleText} allowFontScaling={false}>
-                  Recipient
+                  Smartcard Number
                 </Text>
                 <Text style={styles.descriptionText} allowFontScaling={false}>
                   {cardNumber}
@@ -164,12 +169,10 @@ const ReviewCableTvSummaryScreen: React.FC<ReviewCableTvSummaryScreenProps> = ({
                   {new Date().toLocaleString()}
                 </Text>
               </View>
-
               <View className="justify-between items-center flex-row">
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Status
                 </Text>
-                {/* Transaction status */}
                 <View className="p-2 bg-[#FFEFC3] rounded-2xl">
                   <Text style={styles.completedText} allowFontScaling={false}>
                     Pending
@@ -206,14 +209,6 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     flex: 1,
   },
-  headerTextDark: {
-    color: COLORS.white,
-  },
-  headTextContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   itemText: {
     fontSize: FONT_SIZE.small,
     fontFamily: "Outfit-Medium",
@@ -245,24 +240,4 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: "#FFCC3D",
   },
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderStyle: "dotted",
-    borderColor: "#000",
-    paddingVertical: SPACING,
-    paddingHorizontal: SPACING * 3,
-    borderRadius: 8,
-    marginTop: SPACING * 2,
-  },
-  buttonText: {
-    marginLeft: SPACING,
-    color: "#000",
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.medium,
-  },
 });
-
-// ReviewCableTvSummaryScreen

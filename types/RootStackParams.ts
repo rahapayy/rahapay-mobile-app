@@ -62,9 +62,10 @@ export type RootStackParamList = {
   ReviewCableTvSummaryScreen: {
     service: string;
     planId: string;
-    planPrice: number;
+    price: number;
     cardNumber: string;
     planName: string;
+    customerName: string;
   };
   EducationServiceType: {
     exam: string;
