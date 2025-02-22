@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   SectionList,
 } from "react-native";
-import { ArrowLeft, DocumentText, WalletAdd1 } from "iconsax-react-native";
+import { ArrowLeft, WalletAdd1 } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import LottieView from "lottie-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -196,7 +196,7 @@ const AllTransactionsScreen: React.FC<{
                 styles.valueText,
                 {
                   color: item.transactionType.includes("PURCHASE")
-                    ? "red"
+                    ? "black"
                     : "black",
                 },
               ]}

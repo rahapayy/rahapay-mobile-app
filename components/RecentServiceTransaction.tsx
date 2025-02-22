@@ -10,7 +10,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import LottieView from "lottie-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Skeleton } from "@rneui/themed";
-import { DocumentText, WalletAdd1 } from "iconsax-react-native";
+import { WalletAdd1 } from "iconsax-react-native";
 import useWallet from "../hooks/use-wallet";
 import { BoldText, LightText } from "./common/Text";
 import COLORS from "../constants/colors";
@@ -20,8 +20,30 @@ import Mtn from "../assets/svg/mtnbig.svg";
 import Eti from "../assets/svg/9mobilebig.svg";
 import Glo from "../assets/svg/globig.svg";
 
+// Define the Transaction interface
+interface Transaction {
+  _id: string;
+  paidOn: string | number | Date;
+  transactionType: string;
+  amountPaid: number | string;
+  paymentStatus: string;
+  purpose?: string;
+  referenceId?: string;
+  metadata?: {
+    networkType?: string;
+    phoneNumber?: string;
+  };
+}
+
+// Define the navigation prop type
+type RootStackParamList = {
+  TransactionHistoryScreen: undefined;
+  TransactionSummaryScreen: { transaction: any }; // You can refine this further
+};
+
+// Component
 const RecentServiceTransaction: React.FC<{
-  navigation: NativeStackNavigationProp<any, "">;
+  navigation: NativeStackNavigationProp<RootStackParamList>;
 }> = ({ navigation }) => {
   const { getAllTransactions } = useWallet();
   const { transactions, isLoading } = getAllTransactions();
@@ -30,12 +52,14 @@ const RecentServiceTransaction: React.FC<{
   // Get the 3 most recent transactions using useMemo
   const recentTransactions = useMemo(() => {
     if (transactions.length === 0) return [];
-    
+
     // Sort transactions by date (most recent first)
     const sortedTransactions = [...transactions].sort((a, b) => {
-      return new Date(b.paidOn || 0).getTime() - new Date(a.paidOn || 0).getTime();
+      return (
+        new Date(b.paidOn || 0).getTime() - new Date(a.paidOn || 0).getTime()
+      );
     });
-    
+
     // Return only the first 3 transactions
     return sortedTransactions.slice(0, 3);
   }, [transactions]);
@@ -49,12 +73,10 @@ const RecentServiceTransaction: React.FC<{
     provider: string | undefined,
     tranxType: string
   ) => {
-    // If it's a wallet funding transaction, return the WalletAdd1 icon
     if (tranxType === "WALLET_FUNDING") {
       return <WalletAdd1 size={24} color={COLORS.violet400} />;
     }
 
-    // Get provider from metadata if available
     if (provider?.toLowerCase() === "airtel") {
       return <Airtel width={40} height={40} />;
     } else if (provider?.toLowerCase() === "mtn") {
@@ -64,8 +86,6 @@ const RecentServiceTransaction: React.FC<{
     } else if (provider?.toLowerCase() === "glo") {
       return <Glo width={40} height={40} />;
     }
-
-    // Default icon if no match
   };
 
   const renderLoadingSkeleton = () => (
@@ -76,10 +96,7 @@ const RecentServiceTransaction: React.FC<{
             circle
             width={40}
             height={40}
-            style={{
-              backgroundColor: COLORS.grey100,
-              marginRight: 10,
-            }}
+            style={{ backgroundColor: COLORS.grey100, marginRight: 10 }}
             skeletonStyle={{ backgroundColor: COLORS.grey50 }}
             animation="wave"
           />
@@ -88,20 +105,14 @@ const RecentServiceTransaction: React.FC<{
               <Skeleton
                 width={RFValue(80)}
                 height={RFValue(16)}
-                style={{
-                  backgroundColor: COLORS.grey100,
-                  marginRight: 10,
-                }}
+                style={{ backgroundColor: COLORS.grey100, marginRight: 10 }}
                 skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                 animation="wave"
               />
               <Skeleton
                 width={RFValue(60)}
                 height={RFValue(16)}
-                style={{
-                  backgroundColor: COLORS.grey100,
-                  marginRight: 10,
-                }}
+                style={{ backgroundColor: COLORS.grey100, marginRight: 10 }}
                 skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                 animation="wave"
               />
@@ -110,20 +121,14 @@ const RecentServiceTransaction: React.FC<{
               <Skeleton
                 width={RFValue(120)}
                 height={RFValue(12)}
-                style={{
-                  backgroundColor: COLORS.grey100,
-                  marginRight: 10,
-                }}
+                style={{ backgroundColor: COLORS.grey100, marginRight: 10 }}
                 skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                 animation="wave"
               />
               <Skeleton
                 width={RFValue(40)}
                 height={RFValue(12)}
-                style={{
-                  backgroundColor: COLORS.grey100,
-                  marginRight: 10,
-                }}
+                style={{ backgroundColor: COLORS.grey100, marginRight: 10 }}
                 skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                 animation="wave"
               />
@@ -148,26 +153,15 @@ const RecentServiceTransaction: React.FC<{
     </View>
   );
 
-  const mapTransactionToSummaryFormat = (transaction: {
-    paidOn: string | number | Date;
-    purpose: any;
-    transactionType: any;
-    amountPaid: any;
-    paymentStatus: any;
-    referenceId: any;
-    _id: any;
-    metadata: { networkType: any; phoneNumber: any };
-  }) => {
-    // Format the date string from transaction.paidOn
-    const formattedDate = new Date(transaction.paidOn).toLocaleString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+  const mapTransactionToSummaryFormat = (transaction: Transaction) => {
+    const formattedDate = new Date(transaction.paidOn).toLocaleString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
 
-    // Map to the expected format for TransactionSummaryScreen
     return {
       purpose: transaction.purpose || transaction.transactionType,
       amount: transaction.amountPaid,
@@ -179,7 +173,7 @@ const RecentServiceTransaction: React.FC<{
         ...transaction.metadata,
         networkType: transaction.metadata?.networkType,
         phoneNumber: transaction.metadata?.phoneNumber,
-      }
+      },
     };
   };
 
@@ -197,86 +191,103 @@ const RecentServiceTransaction: React.FC<{
       </View>
 
       <View>
-        {isLoading ? (
-          renderLoadingSkeleton()
-        ) : hasTransaction ? (
-          recentTransactions.map((transaction) => {
-            const formattedTime = new Date(transaction.paidOn).toLocaleTimeString('en-US', {
-              hour: '2-digit',
-              minute: '2-digit',
-            });
-            
-            // Extract network type from metadata if available
-            const networkType = transaction.metadata?.networkType;
-            
-            return (
-              <TouchableOpacity
-                key={transaction._id}
-                onPress={() =>
-                  navigation.navigate("TransactionSummaryScreen", { 
-                    transaction: mapTransactionToSummaryFormat(transaction)
-                  })
-                }
-                style={styles.transactionItem}
-              >
-                <View style={styles.iconContainer}>
-                  {renderServiceIcon(networkType, transaction.transactionType)}
-                </View>
-                <View style={styles.transactionTextContainer}>
-                  <View style={styles.transactionTextRow}>
-                    <Text style={styles.item} allowFontScaling={false}>
-                      {transaction.transactionType}
-                    </Text>
-                    <Text 
-                      style={[
-                        styles.valueText, 
-                        { color: transaction.transactionType.includes('PURCHASE') ? 'black' : 'black' }
-                      ]} 
-                      allowFontScaling={false}>
-                      {transaction.transactionType.includes('PURCHASE') ? '-' : '+'} ₦{transaction.amountPaid}
-                    </Text>
+        {isLoading
+          ? renderLoadingSkeleton()
+          : hasTransaction
+          ? recentTransactions.map((transaction) => {
+              const formattedTime = new Date(
+                transaction.paidOn
+              ).toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+
+              const networkType = transaction.metadata?.networkType;
+
+              return (
+                <TouchableOpacity
+                  key={transaction._id}
+                  onPress={() =>
+                    navigation.navigate("TransactionSummaryScreen", {
+                      transaction: mapTransactionToSummaryFormat(transaction),
+                    })
+                  }
+                  style={styles.transactionItem}
+                >
+                  <View style={styles.iconContainer}>
+                    {renderServiceIcon(
+                      networkType,
+                      transaction.transactionType
+                    )}
                   </View>
-                  <View style={styles.transactionTextRow}>
-                    <Text style={styles.date} allowFontScaling={false}>
-                      {formattedTime}
-                    </Text>
-                    <View 
-                      style={[
-                        styles.statusContainer, 
-                        {
-                          backgroundColor: 
-                            transaction.paymentStatus === 'SUCCESS' || transaction.paymentStatus === 'SUCCESSFUL' 
-                              ? '#E6F9F1' 
-                              : '#FFEDE9'
-                        }
-                      ]}>
-                      <Text 
+                  <View style={styles.transactionTextContainer}>
+                    <View style={styles.transactionTextRow}>
+                      <Text style={styles.item} allowFontScaling={false}>
+                        {transaction.transactionType}
+                      </Text>
+                      <Text
                         style={[
-                          styles.completedText,
+                          styles.valueText,
                           {
-                            color: 
-                              transaction.paymentStatus === 'SUCCESS' || transaction.paymentStatus === 'SUCCESSFUL' 
-                                ? '#06C270' 
-                                : '#FF3B30'
-                          }
-                        ]} 
-                        allowFontScaling={false}>
-                        {transaction.paymentStatus}
+                            color: transaction.transactionType.includes(
+                              "PURCHASE"
+                            )
+                              ? "black"
+                              : "black",
+                          },
+                        ]}
+                        allowFontScaling={false}
+                      >
+                        {transaction.transactionType.includes("PURCHASE")
+                          ? "-"
+                          : "+"}{" "}
+                        ₦{transaction.amountPaid}
                       </Text>
                     </View>
+                    <View style={styles.transactionTextRow}>
+                      <Text style={styles.date} allowFontScaling={false}>
+                        {formattedTime}
+                      </Text>
+                      <View
+                        style={[
+                          styles.statusContainer,
+                          {
+                            backgroundColor:
+                              transaction.paymentStatus === "SUCCESS" ||
+                              transaction.paymentStatus === "SUCCESSFUL"
+                                ? "#E6F9F1"
+                                : "#FFEDE9",
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.completedText,
+                            {
+                              color:
+                                transaction.paymentStatus === "SUCCESS" ||
+                                transaction.paymentStatus === "SUCCESSFUL"
+                                  ? "#06C270"
+                                  : "#FF3B30",
+                            },
+                          ]}
+                          allowFontScaling={false}
+                        >
+                          {transaction.paymentStatus}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            );
-          })
-        ) : (
-          renderEmptyState()
-        )}
+                </TouchableOpacity>
+              );
+            })
+          : renderEmptyState()}
       </View>
     </View>
   );
 };
 
+// Styles remain unchanged
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -292,10 +303,10 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 10,
-    backgroundColor: '#F7F9FC',
+    backgroundColor: "#F7F9FC",
   },
   transactionItem: {
     flexDirection: "row",

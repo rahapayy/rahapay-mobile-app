@@ -243,10 +243,10 @@ const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
       {/* Header Section */}
       <View style={styles.receiptHeader}>
         {/* If you have a RahaPay logo, use Image; otherwise, use Text */}
-        {/* <View style={styles.logoContainer}>
+        <View style={styles.logoContainer}>
           <Text style={styles.logoText}>RahaPay</Text>
         </View>
-        <Text style={styles.receiptTitle}>Transaction Receipt</Text> */}
+        <Text style={styles.receiptTitle}>Transaction Receipt</Text>
       </View>
 
       {/* Amount Section */}
@@ -291,19 +291,6 @@ const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
           to bring you more services soon.
         </RegularText>
       </View>
-
-      {/* Download Button */}
-      {/* <TouchableOpacity
-        style={styles.downloadButton}
-        onPress={handleDownload}
-        disabled={isDownloading}
-        activeOpacity={0.7}
-      >
-        <DocumentDownload size={20} color="#3E7BFA" />
-        <Text style={styles.downloadButtonText}>
-          {isDownloading ? "Downloading..." : "Download Receipt"}
-        </Text>
-      </TouchableOpacity> */}
     </View>
   );
 };

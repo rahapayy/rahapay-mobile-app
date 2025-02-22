@@ -1,21 +1,19 @@
+import axios, { AxiosError } from "axios";
 import { handleShowFlash } from "../components/FlashMessageComponent";
 
-export const handleError = (error: any) => {
-  const errorMessage =
-    error instanceof Error ? error.message : "Something went wrong";
-  if (Array.isArray(error.data?.error)) {
-    error.data.error.forEach((el: any) =>
-      handleShowFlash({
-        message: "Something went wrong",
-        type: "info",
-        description: errorMessage,
-      })
-    );
+export const handleError = (error: unknown) => {
+  if (error instanceof AxiosError) {
+    // Extract the backend error message if available.
+    const errorMessage =
+      error.response?.data.message || "Something went wrong";
+    handleShowFlash({
+      message: errorMessage,
+      type: "danger",
+    });
   } else {
     handleShowFlash({
-      message: "Something went wrong",
-      type: "info",
-      description: errorMessage,
+      message: error instanceof Error ? error.message : "Something went wrong",
+      type: "danger",
     });
   }
 };

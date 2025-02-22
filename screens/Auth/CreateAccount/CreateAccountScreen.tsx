@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useContext, useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "../../../constants/colors";
 import SPACING from "../../../constants/SPACING";
@@ -40,13 +40,8 @@ const validationSchema = Yup.object().shape({
   phoneNumber: Yup.string().required("Phone number is required"),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
-    .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .matches(/[a-z]/, "Password must contain at least one lowercase letter")
+    .matches(/[a-zA-Z]/, "Password must contain at least one letter")
     .matches(/[0-9]/, "Password must contain at least one number")
-    .matches(
-      /[!@#$%^&*(),.?":{}|<>]/,
-      "Password must contain at least one special character"
-    )
     .required("Password is required"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Passwords must match")
@@ -72,13 +67,8 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
   const passwordRequirements = useMemo(
     () => [
       { text: "At least 8 characters", regex: /.{8,}/ },
-      { text: "At least one uppercase letter", regex: /[A-Z]/ },
-      { text: "At least one lowercase letter", regex: /[a-z]/ },
+      { text: "At least one letter", regex: /[a-zA-Z]/ },
       { text: "At least one number", regex: /[0-9]/ },
-      {
-        text: "At least one special character",
-        regex: /[!@#$%^&*(),.?":{}|<>]/,
-      },
     ],
     []
   );
@@ -182,6 +172,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                   "An error occurred during account creation.",
                 type: "danger",
               });
+              console.error(error.response?.data.message);
             } else {
               handleShowFlash({
                 message: "An unexpected error occurred. Please try again.",
@@ -311,7 +302,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
               </View>
 
               <View
-                // className="mt-2"
+              // className="mt-2"
               >
                 {renderInputField(
                   "Re-type Password",

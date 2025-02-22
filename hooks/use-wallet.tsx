@@ -2,6 +2,58 @@ import { useAuth } from "@/services/AuthContext";
 import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
 
+// Define the Transaction type based on your API response and usage
+interface Transaction {
+  _id: string;
+  paidOn: string | number | Date;
+  amountPaid: number | string;
+  paymentStatus: string;
+  transactionType: string;
+  paymentMethod?: string;
+  transactionReference?: string;
+  updatedAt?: string | number | Date;
+  metadata?: {
+    networkType?: string;
+    phoneNumber?: string;
+  };
+}
+
+// Define the Wallet type
+interface Wallet {
+  balance: number;
+  [key: string]: any; // Adjust based on actual wallet properties
+}
+
+// Define the Dashboard response type
+interface DashboardData {
+  transacton: Transaction[]; // Note: 'transacton' seems to be a typo in your code, should it be 'transactions'?
+  wallet: Wallet;
+  user: {
+    _id: string;
+  };
+}
+
+// Define the Pagination type
+interface Pagination {
+  currentPage: number;
+  totalPages: number;
+}
+
+// Define the AllTransactions page type
+interface AllTransactionsPage {
+  data: Transaction[];
+  pagination: Pagination;
+}
+
+// Define the return type of getAllTransactions
+interface GetAllTransactionsResult {
+  transactions: Transaction[];
+  pagination: Pagination;
+  isLoading: boolean;
+  currentPage: number;
+  setCurrentPage: (size: number | ((size: number) => number)) => void;
+}
+
 const useWallet = () => {
   const { userInfo } = useAuth();
 
@@ -10,8 +62,7 @@ const useWallet = () => {
     data: dashboardData,
     isValidating: isDashboardLoading,
     mutate: mutateDashboard,
-  } = useSWR(`user/dashboard/me`, {
-    // refreshInterval: 5000, // Refresh every 5 seconds
+  } = useSWR<DashboardData>(`user/dashboard/me`, {
     revalidateOnFocus: true,
   });
 
@@ -27,9 +78,12 @@ const useWallet = () => {
     mutate: mutateAllTransactions,
     size: currentPage,
     setSize: setCurrentPage,
-  } = useSWRInfinite((pageIndex) => `transaction/all?page=${pageIndex + 1}`, {
-    revalidateFirstPage: false,
-  });
+  } = useSWRInfinite<AllTransactionsPage>(
+    (pageIndex) => `transaction/all?page=${pageIndex + 1}`,
+    {
+      revalidateFirstPage: false,
+    }
+  );
 
   const refreshAll = () => {
     mutateDashboard();
@@ -44,7 +98,7 @@ const useWallet = () => {
 
   // Filter the COMMISSION to not show amount in the transaction history
   const filteredDashboardTransactions = dashboardTransactions.filter(
-    (trx: { transactionType: string }) => trx.transactionType !== "COMMISSION"
+    (trx: Transaction) => trx.transactionType !== "COMMISSION"
   );
 
   const balance = dashboardData?.wallet?.balance || 0;
@@ -52,12 +106,10 @@ const useWallet = () => {
 
   // Extract and properly format transactions from infinite loading
   const allTransactionsData = allTransactionsPages
-    ? [].concat(
+    ? ([] as Transaction[]).concat(
         ...allTransactionsPages.map((page) =>
-          // Apply the same filter to remove COMMISSION transactions
           (page.data || []).filter(
-            (trx: { transactionType: string }) =>
-              trx.transactionType !== "COMMISSION"
+            (trx: Transaction) => trx.transactionType !== "COMMISSION"
           )
         )
       )
@@ -68,7 +120,7 @@ const useWallet = () => {
     totalPages: 1,
   };
 
-  const getAllTransactions = () => ({
+  const getAllTransactions = (): GetAllTransactionsResult => ({
     transactions: allTransactionsData,
     pagination,
     isLoading: isAllTransactionsLoading,
@@ -78,17 +130,7 @@ const useWallet = () => {
 
   // Mapping dashboard transactions to required fields for other views
   const formattedTransactions = filteredDashboardTransactions.map(
-    (trx: {
-      amountPaid: any;
-      paidOn: string | number | Date;
-      _id: any;
-      paymentMethod: any;
-      transactionReference: any;
-      paymentStatus: any;
-      transactionType: any;
-      updatedAt: any;
-      metadata: any;
-    }) => ({
+    (trx: Transaction) => ({
       amount: trx.amountPaid || 0,
       created_at: new Date(trx.paidOn).toLocaleString(),
       id: trx._id || "",

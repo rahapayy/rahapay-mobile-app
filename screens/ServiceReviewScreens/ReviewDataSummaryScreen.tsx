@@ -24,6 +24,7 @@ import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { RootStackParamList } from "../../types/RootStackParams";
 import { DataPurchasePayload } from "@/services/modules/data";
 import { services } from "@/services";
+import { AxiosError } from "axios";
 
 type ReviewDataSummaryScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -54,18 +55,27 @@ const ReviewDataSummaryScreen: React.FC<ReviewDataSummaryScreenProps> = ({
       };
 
       const response = await services.dataService.purchaseData(payload);
-      // const response = await services.airtimeService.purchaseAirtime(payload);
+      console.log(response);
 
       navigation.navigate("TransactionStatusScreen", {
         status: response.status,
-        message: response.msg,
-        amount: response.amount,
       });
-    } catch (error: any) {
-      navigation.navigate("TransactionStatusScreen", {
-        status: "failed",
-        message: error.response?.data?.msg || "Data purchase failed",
-      });
+    } catch (error: unknown) {
+      console.error("Onboarding Error:", error);
+      if (error instanceof AxiosError) {
+        handleShowFlash({
+          message:
+            error.response?.data?.message ||
+            "An error occurred during account creation.",
+          type: "danger",
+        });
+        console.error(error.response?.data.message);
+      } else {
+        handleShowFlash({
+          message: "An unexpected error occurred. Please try again.",
+          type: "danger",
+        });
+      }
     } finally {
       reset();
     }

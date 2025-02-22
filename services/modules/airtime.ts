@@ -8,12 +8,19 @@ export interface IAirtimePurchasePayload {
   phoneNumber: string;
 }
 
-interface AirtimeResponse {
+interface AirtimeErrorResponse {
+  statusCode: number;
+  message: string;
+  error: string;
+}
+
+interface AirtimeSuccessResponse {
   status: "success" | "failed";
   msg: string;
   amount: string;
 }
 
+type AirtimeResponse = AirtimeSuccessResponse | AirtimeErrorResponse;
 class AirtimeService {
   constructor(private readonly baseService: AxiosInstance) {}
 

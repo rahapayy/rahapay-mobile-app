@@ -9,6 +9,7 @@ import {
   Platform,
   TextInput,
   Switch,
+  FlatList,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {
@@ -28,9 +29,10 @@ import Glo from "../../assets/svg/glo.svg";
 import Button from "../../components/common/ui/buttons/Button";
 import SelectDataPlanModal from "../../components/SelectDataPlanModal";
 import { Skeleton } from "@rneui/base";
-import { useDataPlans } from "@/services/hooks/data";
 import { DataPlan } from "@/services/modules/data";
 import { services } from "@/services";
+import { RegularText } from "@/components/common/Text";
+import { Beneficiary } from "@/services/modules/beneficiary";
 
 interface DataScreenProps {
   navigation: NativeStackNavigationProp<any>;
@@ -49,6 +51,37 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
   } | null>(null);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
+  const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(false);
+
+  // Fetch airtime beneficiaries
+  useEffect(() => {
+    const fetchBeneficiaries = async () => {
+      setIsBeneficiariesLoading(true);
+      try {
+        const response = await services.beneficiaryService.getBeneficiaries(
+          "data"
+        );
+        setBeneficiaries(response.data?.beneficiaries || []);
+      } catch (error) {
+        console.error("Failed to fetch airtime beneficiaries:", error);
+        setBeneficiaries([]);
+      } finally {
+        setIsBeneficiariesLoading(false);
+      }
+    };
+
+    fetchBeneficiaries();
+  }, []);
+
+  const handleBeneficiarySelect = (beneficiary: Beneficiary) => {
+    setPhoneNumber(beneficiary.number); // Use 'number' instead of 'phoneNumber'
+    if (beneficiary.networkType) {
+      setSelectedOperator(beneficiary.networkType);
+    } else {
+      detectOperator(beneficiary.number);
+    }
+  };
 
   const onSelectPackage = (plan: DataPlan) => {
     setSelectedPlan({
@@ -140,17 +173,56 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
           <View className="p-4">
             <View style={styles.tabContent}>
               <View>
-                {/* <Text style={styles.headText} allowFontScaling={false}>
-                  Saved Beneficiaries
-                </Text>
-                <View className="flex-row mb-4 gap-2">
-                  <TouchableOpacity className="bg-[#EEEBF9] p-3 rounded-2xl">
-                    <Text>+234 0862753934</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity className="bg-[#EEEBF9] p-3 rounded-2xl">
-                    <Text>+234 0862753934</Text>
-                  </TouchableOpacity>
-                </View> */}
+                {beneficiaries.length > 0 && (
+                  <View>
+                    <Text style={styles.headText} allowFontScaling={false}>
+                      Saved Beneficiaries
+                    </Text>
+                    {isBeneficiariesLoading ? (
+                      <View className="flex-row mb-2 gap-1">
+                        <Skeleton
+                          width={100}
+                          height={25}
+                          style={{
+                            backgroundColor: COLORS.grey100,
+
+                            borderRadius: 10,
+                          }}
+                          skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                          animation="wave"
+                        />
+                        <Skeleton
+                          width={100}
+                          height={25}
+                          style={{
+                            backgroundColor: COLORS.grey100,
+                            borderRadius: 10,
+                          }}
+                          skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                          animation="wave"
+                        />
+                      </View>
+                    ) : (
+                      <FlatList
+                        data={beneficiaries}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({ item: beneficiary, index }) => (
+                          <TouchableOpacity
+                            key={index}
+                            className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2"
+                            onPress={() => handleBeneficiarySelect(beneficiary)}
+                          >
+                            <RegularText color="black" size="small">
+                              {beneficiary.number}
+                            </RegularText>
+                          </TouchableOpacity>
+                        )}
+                      />
+                    )}
+                  </View>
+                )}
 
                 <View className="mb-4">
                   <Text style={styles.label} allowFontScaling={false}>
@@ -312,7 +384,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                 </View>
 
                 {/* Save as Beneficiary Toogle */}
-                {/* <View className="mb-4">
+                <View className="mb-4">
                   <View className="flex-row items-center gap-2 mt-2">
                     <Text
                       style={styles.beneficiaryText}
@@ -322,7 +394,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                     </Text>
                     <Switch />
                   </View>
-                </View> */}
+                </View>
               </View>
             </View>
             <Button

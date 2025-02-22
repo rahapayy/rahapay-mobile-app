@@ -10,9 +10,7 @@ import {
 } from "iconsax-react-native";
 import HomeScreen from "../screens/HomeScreen";
 import ServicesScreen from "../screens/ServicesScreen";
-import WalletScreen from "../screens/WalletScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import * as Animatable from 'react-native-animatable';
 import CardsScreen from "../screens/CardsScreen";
 
 const Tab = createBottomTabNavigator();
@@ -30,9 +28,7 @@ interface TabBarLabelProps extends TextProps {
 
 const TabBarLabel: React.FC<TabBarLabelProps> = ({ focused, title }) => {
   return (
-    <Animatable.Text
-      animation={focused ? "fadeInUp" : "fadeOutDown"}
-      duration={300}
+    <Text
       style={[
         styles.tabBarLabel,
         {
@@ -46,35 +42,24 @@ const TabBarLabel: React.FC<TabBarLabelProps> = ({ focused, title }) => {
       allowFontScaling={false}
     >
       {title}
-    </Animatable.Text>
+    </Text>
   );
 };
 
-interface AnimatedIconProps {
+interface IconProps {
   focused: boolean;
   IconComponent: React.ElementType;
 }
 
-const AnimatedIcon: React.FC<AnimatedIconProps> = ({
-  focused,
-  IconComponent,
-}) => {
+const TabIcon: React.FC<IconProps> = ({ focused, IconComponent }) => {
   return (
-    <Animatable.View
-      animation={focused ? "pulse" : undefined}
-      iterationCount={focused ? "infinite" : 1}
-      duration={1000}
-    >
-      <IconComponent
-        size={27}
-        color={
-          focused
-            ? customColors.activeTintColor
-            : customColors.inactiveTintColor
-        }
-        variant={focused ? "Bold" : "Linear"}
-      />
-    </Animatable.View>
+    <IconComponent
+      size={27}
+      color={
+        focused ? customColors.activeTintColor : customColors.inactiveTintColor
+      }
+      variant={focused ? "Bold" : "Linear"}
+    />
   );
 };
 
@@ -89,7 +74,7 @@ const BottomTab: React.FC = () => {
           shadowOpacity: 0,
           borderTopColor: "transparent",
           height: "11%",
-          position: "absolute"
+          position: "absolute",
         },
         tabBarActiveTintColor: customColors.activeTintColor,
         tabBarInactiveTintColor: customColors.inactiveTintColor,
@@ -100,10 +85,11 @@ const BottomTab: React.FC = () => {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <AnimatedIcon focused={focused} IconComponent={Home} />
+            <TabIcon focused={focused} IconComponent={Home} />
           ),
-          tabBarLabel: ({ focused }) =>
-            focused ? <TabBarLabel focused={focused} title="Home" /> : null,
+          tabBarLabel: ({ focused }) => (
+            <TabBarLabel focused={focused} title="Home" />
+          ), // Removed conditional
           headerShown: false,
         }}
       />
@@ -112,10 +98,11 @@ const BottomTab: React.FC = () => {
         component={ServicesScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <AnimatedIcon focused={focused} IconComponent={MoreSquare} />
+            <TabIcon focused={focused} IconComponent={MoreSquare} />
           ),
-          tabBarLabel: ({ focused }) =>
-            focused ? <TabBarLabel focused={focused} title="Services" /> : null,
+          tabBarLabel: ({ focused }) => (
+            <TabBarLabel focused={focused} title="Services" />
+          ), // Removed conditional
           headerShown: false,
         }}
       />
@@ -124,10 +111,11 @@ const BottomTab: React.FC = () => {
         component={CardsScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <AnimatedIcon focused={focused} IconComponent={Cards} />
+            <TabIcon focused={focused} IconComponent={Cards} />
           ),
-          tabBarLabel: ({ focused }) =>
-            focused ? <TabBarLabel focused={focused} title="Card" /> : null,
+          tabBarLabel: ({ focused }) => (
+            <TabBarLabel focused={focused} title="Card" />
+          ), // Removed conditional
           headerShown: false,
         }}
       />
@@ -136,10 +124,11 @@ const BottomTab: React.FC = () => {
         component={ProfileScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <AnimatedIcon focused={focused} IconComponent={Profile} />
+            <TabIcon focused={focused} IconComponent={Profile} />
           ),
-          tabBarLabel: ({ focused }) =>
-            focused ? <TabBarLabel focused={focused} title="Profile" /> : null,
+          tabBarLabel: ({ focused }) => (
+            <TabBarLabel focused={focused} title="Profile" />
+          ), // Removed conditional
           headerShown: false,
         }}
       />
@@ -150,7 +139,7 @@ const BottomTab: React.FC = () => {
 const styles = StyleSheet.create({
   tabBarLabel: {
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: "Outfit-Medium",
     paddingBottom: 5,
   },
 });

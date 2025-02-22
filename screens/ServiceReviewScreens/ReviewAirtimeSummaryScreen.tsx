@@ -1,7 +1,5 @@
 import React from "react";
 import {
-  Alert,
-  Image,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -24,20 +22,13 @@ import SwipeButton from "../../components/SwipeButton";
 import { IAirtimePurchasePayload } from "@/services/modules/airtime";
 import { RootStackParamList } from "../../types/RootStackParams";
 import { services } from "@/services";
+import { handleShowFlash } from "@/components/FlashMessageComponent";
+import { AxiosError } from "axios";
 
 type ReviewAirtimeSummaryScreenProps = NativeStackScreenProps<
   RootStackParamList,
   "ReviewAirtimeSummaryScreen"
 >;
-
-interface AxiosError {
-  response?: {
-    status: number;
-    data?: {
-      message?: string;
-    };
-  };
-}
 
 const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
   navigation,
@@ -48,23 +39,33 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
   const handleSwipeConfirm = async (reset: () => void) => {
     try {
       const payload: IAirtimePurchasePayload = {
-        amount: route.params.amount,
-        networkType: route.params.selectedOperator.toLowerCase(),
-        phoneNumber: route.params.phoneNumber,
+        amount,
+        networkType: selectedOperator.toLowerCase(),
+        phoneNumber,
       };
 
       const response = await services.airtimeService.purchaseAirtime(payload);
-      
+      console.log(response);
+
       navigation.navigate("TransactionStatusScreen", {
         status: response.status,
-        message: response.msg,
-        amount: response.amount
       });
-    } catch (error: any) {
-      navigation.navigate("TransactionStatusScreen", {
-        status: "failed",
-        message: error.response?.msg || "Transaction failed",
-      });
+    } catch (error: unknown) {
+      console.error("Onboarding Error:", error);
+      if (error instanceof AxiosError) {
+        handleShowFlash({
+          message:
+            error.response?.data?.message ||
+            "An error occurred during account creation.",
+          type: "danger",
+        });
+        console.error(error.response?.data.message);
+      } else {
+        handleShowFlash({
+          message: "An unexpected error occurred. Please try again.",
+          type: "danger",
+        });
+      }
     } finally {
       reset();
     }

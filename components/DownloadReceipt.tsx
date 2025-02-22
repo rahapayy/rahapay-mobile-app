@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  View,
 } from "react-native";
 import { DocumentDownload } from "iconsax-react-native";
 import * as FileSystem from "expo-file-system";
@@ -17,22 +18,37 @@ import { Transaction } from "../types/transaction";
 
 // Function to generate receipt content
 const generateReceiptContent = (transaction: Transaction): string => {
-  // Format the receipt content as plain text
+  // Format the receipt content as plain text matching the UI structure
   const content = `
-TRANSACTION RECEIPT
--------------------
-Transaction Type: ${transaction.tranxType.replace("_", " ")}
-Amount: ₦ ${transaction.amount.toLocaleString("en-US", {
+----------------------------------------
+           RahaPay
+      Transaction Receipt
+----------------------------------------
+
+Amount: ₦${transaction.amount.toLocaleString("en-US", {
     minimumFractionDigits: 2,
   })}
+Status: ${
+    transaction.status.charAt(0).toUpperCase() +
+    transaction.status.slice(1).toLowerCase()
+  }
 Date: ${formatDate(transaction.created_at)}
-Reference ID: ${transaction.referenceId}
-Status: ${transaction.status.toUpperCase()}
+
+----------------------------------------
 
 ${generateTransactionSpecificDetails(transaction)}
+Transaction No.: ${transaction.referenceId}
 
-Thank you for using our service!
+----------------------------------------
+Support
+customerservice@rahapay.com
+----------------------------------------
+
+Experience a better life with RahaPay. For now, we specialize in
+making bill payments easy and convenient for you. We're working
+hard to bring you more services soon.
 `;
+
   return content;
 };
 
@@ -55,7 +71,7 @@ Paid with: ${transaction.purpose || "N/A"}`;
       return `Funding Source: ${transaction.purpose || "Unknown Source"}`;
 
     default:
-      return "";
+      return `Transaction Type: ${transaction.tranxType.replace("_", " ")}`;
   }
 };
 
@@ -83,7 +99,6 @@ const requestStoragePermission = async (): Promise<boolean> => {
 
 // Main download receipt function
 const downloadReceipt = async (transaction: Transaction): Promise<void> => {
-  // Check permission first (Android only)
   const hasPermission = await requestStoragePermission();
   if (!hasPermission) {
     Alert.alert(
@@ -94,27 +109,16 @@ const downloadReceipt = async (transaction: Transaction): Promise<void> => {
   }
 
   try {
-    // Generate receipt content
     const content = generateReceiptContent(transaction);
-
-    // Create the file name based on transaction details
     const fileName = `receipt_${transaction.tranxType}_${transaction.referenceId}.txt`;
-
-    // Get the file path (in app's cache directory)
     const filePath = `${FileSystem.cacheDirectory}${fileName}`;
 
-    // Write the receipt content to the file
     await FileSystem.writeAsStringAsync(filePath, content);
 
-    // Share or save the file
     if (Platform.OS === "ios") {
-      // On iOS, use sharing
       await Sharing.shareAsync(filePath);
     } else {
-      // On Android, save to downloads
       const downloadDir = `${FileSystem.documentDirectory}Download/`;
-
-      // Create downloads directory if it doesn't exist
       const dirInfo = await FileSystem.getInfoAsync(downloadDir);
       if (!dirInfo.exists) {
         await FileSystem.makeDirectoryAsync(downloadDir, {
@@ -165,6 +169,17 @@ const DownloadReceiptButton: React.FC<DownloadReceiptButtonProps> = ({
   );
 };
 
+// InfoRow Component to match the UI structure (for reference, not used in text)
+const InfoRow: React.FC<{ label: string; value: string }> = ({
+  label,
+  value,
+}) => (
+  <View style={styles.infoRow}>
+    <Text style={styles.infoLabel}>{label}</Text>
+    <Text style={styles.infoValue}>{value}</Text>
+  </View>
+);
+
 const styles = StyleSheet.create({
   button: {
     flexDirection: "row",
@@ -183,6 +198,62 @@ const styles = StyleSheet.create({
     color: "#000",
     fontFamily: "Outfit-Regular",
     fontSize: FONT_SIZE.medium,
+  },
+  receiptContainer: {
+    backgroundColor: "#fff",
+    padding: SPACING * 2,
+    borderRadius: 8,
+  },
+  receiptHeader: {
+    alignItems: "center",
+  },
+  logoContainer: {
+    marginBottom: SPACING,
+  },
+  logoText: {
+    fontSize: FONT_SIZE.large,
+    fontFamily: "Outfit-Bold",
+    color: "#5136C1",
+  },
+  receiptTitle: {
+    fontSize: FONT_SIZE.large,
+    fontFamily: "Outfit-Medium",
+    color: "#000",
+  },
+  amountContainer: {
+    alignItems: "center",
+    marginVertical: SPACING * 2,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#E0E0E0",
+    marginVertical: SPACING,
+  },
+  detailsContainer: {
+    marginVertical: SPACING,
+  },
+  infoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: SPACING / 2,
+  },
+  infoLabel: {
+    fontFamily: "Outfit-Regular",
+    fontSize: FONT_SIZE.medium,
+    color: "#8E9AAF",
+  },
+  infoValue: {
+    fontFamily: "Outfit-Medium",
+    fontSize: FONT_SIZE.medium,
+    color: "#000",
+  },
+  supportContainer: {
+    alignItems: "center",
+    marginTop: SPACING * 2,
+  },
+  footer: {
+    marginTop: SPACING * 2,
+    alignItems: "center",
   },
 });
 

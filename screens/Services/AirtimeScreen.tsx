@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -8,6 +8,7 @@ import {
   View,
   Platform,
   Switch,
+  FlatList,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, TickCircle } from "iconsax-react-native";
@@ -25,6 +26,9 @@ import { RegularText } from "@/components/common/Text";
 import CurrencyInput from "@/components/common/ui/forms/CurrencyInput";
 import BasicInput from "@/components/common/ui/forms/BasicInput";
 import Label from "@/components/common/ui/forms/Label";
+import { services } from "@/services";
+import { Beneficiary } from "@/services/modules/beneficiary";
+import { Skeleton } from "@rneui/base";
 
 const AirtimeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -34,14 +38,34 @@ const AirtimeScreen: React.FC<{
   const [selectedOperator, setSelectedOperator] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [amountError, setAmountError] = useState(false);
+  const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
+  const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(false);
 
   const amounts = [100, 200, 500, 1000, 2000, 3000, 5000];
 
-  // Check if all required fields are filled
   const isButtonDisabled = !selectedOperator || !phoneNumber || !amount;
 
+  // Fetch airtime beneficiaries
+  useEffect(() => {
+    const fetchBeneficiaries = async () => {
+      setIsBeneficiariesLoading(true);
+      try {
+        const response = await services.beneficiaryService.getBeneficiaries(
+          "airtime"
+        );
+        setBeneficiaries(response.data?.beneficiaries || []);
+      } catch (error) {
+        console.error("Failed to fetch airtime beneficiaries:", error);
+        setBeneficiaries([]);
+      } finally {
+        setIsBeneficiariesLoading(false);
+      }
+    };
+
+    fetchBeneficiaries();
+  }, []);
+
   const handleProceed = () => {
-    // Validate and sanitize the amount
     const sanitizedAmount = parseFloat(amount);
 
     if (isNaN(sanitizedAmount) || sanitizedAmount <= 0) {
@@ -53,7 +77,7 @@ const AirtimeScreen: React.FC<{
       setAmountError(true);
       return;
     } else {
-      setAmountError(false); // Reset the error if the amount is >= 100
+      setAmountError(false);
     }
 
     navigation.navigate("ReviewAirtimeSummaryScreen", {
@@ -96,9 +120,18 @@ const AirtimeScreen: React.FC<{
         return;
       }
     }
-
     setSelectedOperator("");
   };
+
+  const handleBeneficiarySelect = (beneficiary: Beneficiary) => {
+    setPhoneNumber(beneficiary.number); // Use 'number' instead of 'phoneNumber'
+    if (beneficiary.networkType) {
+      setSelectedOperator(beneficiary.networkType);
+    } else {
+      detectOperator(beneficiary.number);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
@@ -133,7 +166,6 @@ const AirtimeScreen: React.FC<{
                   <View style={styles.activeTabIndicator} />
                 )}
               </TouchableOpacity>
-
               <TouchableOpacity
                 style={[
                   styles.tab,
@@ -158,21 +190,61 @@ const AirtimeScreen: React.FC<{
 
             <View style={styles.tabContent}>
               {activeTab === "Local" ? (
-                // Local tab
                 <View>
-                  {/* <Text style={styles.headText} allowFontScaling={false}>
-                    Saved Beneficiaries
-                  </Text>
-                  <View className="flex-row mb-4 gap-2">
-                    <TouchableOpacity className="bg-[#EEEBF9] p-3 rounded-2xl">
-                      <Text>My number</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity className="bg-[#EEEBF9] p-3 rounded-2xl">
-                      <Text>+234 0862753934</Text>
-                    </TouchableOpacity>
-                  </View> */}
+                  {beneficiaries.length > 0 && (
+                    <View>
+                      <Text style={styles.headText} allowFontScaling={false}>
+                        Saved Beneficiaries
+                      </Text>
+                      {isBeneficiariesLoading ? (
+                        <View className="flex-row mb-2 gap-1">
+                          <Skeleton
+                            width={100}
+                            height={25}
+                            style={{
+                              backgroundColor: COLORS.grey100,
 
-                  <View className="mt-2 mb-4">
+                              borderRadius: 10,
+                            }}
+                            skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                            animation="wave"
+                          />
+                          <Skeleton
+                            width={100}
+                            height={25}
+                            style={{
+                              backgroundColor: COLORS.grey100,
+                              borderRadius: 10,
+                            }}
+                            skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                            animation="wave"
+                          />
+                        </View>
+                      ) : (
+                        <FlatList
+                          data={beneficiaries}
+                          horizontal
+                          showsHorizontalScrollIndicator={false}
+                          keyExtractor={(item, index) => index.toString()}
+                          renderItem={({ item: beneficiary, index }) => (
+                            <TouchableOpacity
+                              key={index}
+                              className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2"
+                              onPress={() =>
+                                handleBeneficiarySelect(beneficiary)
+                              }
+                            >
+                              <RegularText color="black" size="small">
+                                {beneficiary.number}
+                              </RegularText>
+                            </TouchableOpacity>
+                          )}
+                        />
+                      )}
+                    </View>
+                  )}
+
+                  <View className="mt-3 mb-4">
                     <Label text="Phone Number" marked={false} />
                     <BasicInput
                       placeholder="Enter phone number"
@@ -188,9 +260,8 @@ const AirtimeScreen: React.FC<{
                     />
                   </View>
 
-                  {/* Select Network Provider */}
                   <Label text="Select Network Provider" marked={false} />
-                  <View className="flex-row p-2 bg-white rounded-xl  items-center justify-between">
+                  <View className="flex-row p-2 bg-white rounded-xl items-center justify-between">
                     <TouchableOpacity
                       onPress={() => setSelectedOperator("Airtel")}
                       style={[
@@ -287,7 +358,6 @@ const AirtimeScreen: React.FC<{
                     </TouchableOpacity>
                   </View>
 
-                  {/* Inputs */}
                   <View>
                     <View className="mt-4">
                       <CurrencyInput
@@ -296,26 +366,23 @@ const AirtimeScreen: React.FC<{
                         errorMessage="Amount must be at least 100"
                         onChange={(text) => {
                           setAmount(text);
-                          // detectOperator(text);
                           setAmountError(false);
                         }}
                       />
                     </View>
                   </View>
-                  {/* Top up suggestion box */}
-                  <View className="bg-[#EEEBF9] rounded-xl ">
+
+                  <View className="bg-[#EEEBF9] rounded-xl">
                     <View className="p-4">
                       <Text style={styles.topupText} allowFontScaling={false}>
                         Topup
                       </Text>
-
-                      {/* Top up amount */}
                       <View className="flex-row flex-wrap">
                         {amounts.map((amount, index) => (
                           <TouchableOpacity
                             key={index}
                             onPress={() => setAmount(amount.toString())}
-                            className={"bg-white rounded p-2 m-2"}
+                            className="bg-white rounded p-2 m-2"
                           >
                             <Text
                               style={styles.amountText}
@@ -329,8 +396,7 @@ const AirtimeScreen: React.FC<{
                     </View>
                   </View>
 
-                  {/* Save as Beneficiary Toogle */}
-                  {/* <View className="mb-4">
+                  <View className="mb-4">
                     <View className="flex-row items-center gap-2 mt-2">
                       <Text
                         style={styles.beneficiaryText}
@@ -340,9 +406,9 @@ const AirtimeScreen: React.FC<{
                       </Text>
                       <Switch />
                     </View>
-                  </View> */}
+                  </View>
                   <Button
-                    title={"Proceed"}
+                    title="Proceed"
                     style={{
                       backgroundColor: isButtonDisabled
                         ? COLORS.violet200
@@ -355,37 +421,6 @@ const AirtimeScreen: React.FC<{
                   />
                 </View>
               ) : (
-                // International tab
-                // <View>
-                //   <Text style={styles.headText} allowFontScaling={false}>
-                //     Saved Beneficiaries
-                //   </Text>
-                //   <View className="flex-row mb-4 gap-2">
-                //     <View className="bg-[#EEEBF9] p-3 rounded-2xl">
-                //       <Text>My number</Text>
-                //     </View>
-                //     <View className="bg-[#EEEBF9] p-3 rounded-2xl">
-                //       <Text>+234 0862753934</Text>
-                //     </View>
-                //   </View>
-
-                //   <View className="mt-4 mb-6">
-                //     <Text style={styles.label} allowFontScaling={false}>
-                //       Phone Number
-                //     </Text>
-                //     <View style={styles.inputContainer}>
-                //       <TextInput
-                //         style={styles.input}
-                //         placeholder="Enter phone number"
-                //         placeholderTextColor="#BABFC3"
-                //         allowFontScaling={false}
-                //       />
-                //       <TouchableOpacity>
-                //         <ProfileCircle color={COLORS.violet400} />
-                //       </TouchableOpacity>
-                //     </View>
-                //   </View>
-                // </View>
                 <View className="justify-center items-center">
                   <ComingSoon />
                   <Text style={styles.comingsoonText}>
@@ -448,11 +483,6 @@ const styles = StyleSheet.create({
   tabContent: {
     marginTop: SPACING,
     fontFamily: "Outfit-Regular",
-  },
-  contentText: {
-    fontSize: RFValue(18),
-    fontFamily: "Outfit-Regular",
-    color: "#000",
   },
   headText: {
     fontFamily: "Outfit-Regular",
