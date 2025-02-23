@@ -2,7 +2,10 @@
   "expo": {
     "name": "RahaPay",
     "slug": "rahapay-mobile-app",
-    "version": "1.0.0",
+    "version": "0.0.1",
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -12,7 +15,9 @@
       "preventAutoHide": true
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "enabled": true,
+      "fallbackToCacheTimeout": 0,
+      "checkAutomatically": "ON_LOAD"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -22,15 +27,17 @@
       "bundleIdentifier": "com.app.rahapay",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "buildNumber": "0.0.1-alpha.1"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#5136C1"
       },
-       "googleServicesFile": "./android/app/google-services.json",
-      "package": "com.app.rahapay"
+      "googleServicesFile": "./android/app/google-services.json",
+      "package": "com.app.rahapay",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -57,6 +64,7 @@
       "eas": {
         "projectId": "6c9dcd70-fdd4-4f28-a0d5-e1d1a6680543"
       }
-    }
+    },
+    "description": "RahaPay Mobile App - Pre-release version for testing"
   }
 }
