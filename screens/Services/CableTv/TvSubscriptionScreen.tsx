@@ -9,6 +9,8 @@ import {
   View,
   Keyboard,
   TouchableWithoutFeedback,
+  FlatList,
+  Switch,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -32,6 +34,8 @@ import { services } from "@/services";
 import { handleShowFlash } from "@/components/FlashMessageComponent";
 import Label from "@/components/common/ui/forms/Label";
 import BasicInput from "@/components/common/ui/forms/BasicInput";
+import { Beneficiary } from "@/services/modules/beneficiary";
+import { Skeleton } from "@rneui/base";
 
 const TvSubscriptionScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -54,6 +58,28 @@ const TvSubscriptionScreen: React.FC<{
   const [isPlansLoading, setIsPlansLoading] = useState(true);
   const [isValidating, setIsValidating] = useState(false);
   const [isValidated, setIsValidated] = useState(false);
+  const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
+  const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(true); // Start as true for initial load
+  const [saveBeneficiary, setSaveBeneficiary] = useState(false);
+
+  useEffect(() => {
+    const fetchBeneficiaries = async () => {
+      setIsBeneficiariesLoading(true);
+      try {
+        const response = await services.beneficiaryService.getBeneficiaries(
+          "cable"
+        );
+        setBeneficiaries(response.data?.beneficiaries || []);
+      } catch (error) {
+        console.error("Failed to fetch airtime beneficiaries:", error);
+        setBeneficiaries([]);
+      } finally {
+        setIsBeneficiariesLoading(false);
+      }
+    };
+
+    fetchBeneficiaries();
+  }, []);
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -135,6 +161,7 @@ const TvSubscriptionScreen: React.FC<{
       cardNumber,
       planName: selectedPlan.planName,
       customerName,
+      saveBeneficiary
     });
   };
 
@@ -156,6 +183,20 @@ const TvSubscriptionScreen: React.FC<{
 
   const canProceed = selectedPlan !== null;
 
+  const handleBeneficiarySelect = (beneficiary: Beneficiary) => {
+    setCardNumber(beneficiary.number);
+    // Auto-select the network provider based on networkType, fallback to detectOperator if needed
+    if (beneficiary.networkType) {
+      const normalizedNetworkType = beneficiary.networkType.toLowerCase();
+      const networkMap: { [key: string]: string } = {
+        dstv: "Dstv",
+        airtel: "Gotv",
+        startime: "Startime",
+      };
+      const selectedNetwork = networkMap[normalizedNetworkType];
+    }
+  };
+
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -172,6 +213,65 @@ const TvSubscriptionScreen: React.FC<{
                 Cable TV Subscription
               </Text>
             </View>
+          </View>
+
+          <View className="px-4 mb-2">
+            <RegularText
+              color="black"
+              marginBottom={8}
+              allowFontScaling={false}
+            >
+              Saved Beneficiaries
+            </RegularText>
+            {isBeneficiariesLoading ? (
+              <View className="flex-row mb-2 gap-1">
+                <Skeleton
+                  width={100}
+                  height={25}
+                  style={{
+                    backgroundColor: COLORS.grey100,
+                    borderRadius: 10,
+                  }}
+                  skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                  animation="wave"
+                />
+                <Skeleton
+                  width={100}
+                  height={25}
+                  style={{
+                    backgroundColor: COLORS.grey100,
+                    borderRadius: 10,
+                  }}
+                  skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                  animation="wave"
+                />
+              </View>
+            ) : beneficiaries.length > 0 ? (
+              <FlatList
+                data={beneficiaries}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item: beneficiary, index }) => (
+                  <TouchableOpacity
+                    key={index}
+                    className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2"
+                    onPress={() => handleBeneficiarySelect(beneficiary)}
+                  >
+                    <RegularText color="black" size="small">
+                      {beneficiary.number}{" "}
+                      {beneficiary.networkType
+                        ? `| ${beneficiary.networkType}`
+                        : ""}
+                    </RegularText>
+                  </TouchableOpacity>
+                )}
+              />
+            ) : (
+              <RegularText color="mediumGrey" className="mb-4">
+                No saved beneficiaries found.
+              </RegularText>
+            )}
           </View>
 
           <View className="justify-center px-4">
@@ -258,6 +358,26 @@ const TvSubscriptionScreen: React.FC<{
                     ₦{selectedPlan ? selectedPlan.price : 0}
                   </MediumText>
                 </View>
+              </View>
+            </View>
+
+            <View className="mb-4">
+              <View className="flex-row items-center mt-2">
+                <RegularText color="black" marginRight={6}>
+                  Save as beneficiary
+                </RegularText>
+                <Switch
+                  value={saveBeneficiary}
+                  onValueChange={setSaveBeneficiary}
+                  trackColor={{
+                    false: COLORS.grey100,
+                    true: COLORS.violet200,
+                  }}
+                  thumbColor={saveBeneficiary ? COLORS.violet400 : COLORS.white}
+                  style={{
+                    transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
+                  }}
+                />
               </View>
             </View>
 

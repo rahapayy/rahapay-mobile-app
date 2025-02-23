@@ -27,8 +27,15 @@ type ReviewElectricitySummaryScreenProps = NativeStackScreenProps<
 const ReviewElectricitySummaryScreen: React.FC<
   ReviewElectricitySummaryScreenProps
 > = ({ navigation, route }) => {
-  const { meterNumber, amount, selectedService, meterType, id, customerName } =
-    route.params;
+  const {
+    meterNumber,
+    amount,
+    selectedService,
+    meterType,
+    id,
+    customerName,
+    saveBeneficiary,
+  } = route.params;
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSwipeConfirm = async (reset: () => void) => {
@@ -38,6 +45,7 @@ const ReviewElectricitySummaryScreen: React.FC<
         meterNumber,
         amount: parseFloat(amount),
         discoId: id,
+        saveBeneficiary
       };
 
       const response = await services.electricityService.purchaseElectricity(

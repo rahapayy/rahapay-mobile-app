@@ -88,6 +88,7 @@ export type RootStackParamList = {
     meterNumber: string;
     amount: string;
     phoneNumber: string;
+    saveBeneficiary: boolean;
   };
   ReviewEducationSummaryScreen: {
     exam: string;
