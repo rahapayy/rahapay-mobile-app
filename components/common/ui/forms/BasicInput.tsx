@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderRadius: 8,
-    borderColor: "#BABFC3",
+    borderColor: "#DFDFDF",
     paddingHorizontal: SPACING,
     paddingVertical: Platform.OS === "ios" ? 14 : 8,
   },

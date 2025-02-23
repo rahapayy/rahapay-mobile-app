@@ -16,32 +16,29 @@ import Button from "../../../components/common/ui/buttons/Button";
 import FONT_SIZE from "../../../constants/font-size";
 import { services } from "../../../services/apiClient";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import { RootStackParamList } from "../../../types/RootStackParams";
+import { AuthStackParamList } from "../../../types/RootStackParams"; // Ensure this path is correct
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import { LightText, MediumText, SemiBoldText } from "../../../components/common/Text";
 import { BasicPasswordInput } from "../../../components/common/ui/forms/BasicPasswordInput";
 import Label from "../../../components/common/ui/forms/Label";
-import { IResetPasswordDto } from "@/services/dtos";
+import { IResetPasswordDto } from "@/services/dtos"; // Ensure this path is correct
 
+// Define the props type explicitly
 type CreateNewPasswordScreenProps = {
-  navigation: NativeStackNavigationProp<
-    RootStackParamList,
-    "CreateNewPasswordScreen"
-  >;
-  route: { params: { resetToken: string } };
+  navigation: NativeStackNavigationProp<AuthStackParamList, "CreateNewPasswordScreen">;
+  route: {
+    params: { resetToken: string };
+  };
 };
 
-const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({
+// Define the component without React.FC for better type control
+const CreateNewPasswordScreen = ({
   navigation,
   route,
-}) => {
-  // console.log(resetToken);
-
+}: CreateNewPasswordScreenProps) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // IResetPasswordDto
 
   const handleButtonClick = async () => {
     if (password !== confirmPassword) {
@@ -86,9 +83,7 @@ const CreateNewPasswordScreen: React.FC<CreateNewPasswordScreenProps> = ({
   return (
     <SafeAreaView className="flex-1">
       <View className="flex-1 p-4">
-        <BackButton
-          navigation={navigation as NativeStackNavigationProp<any, "">}
-        />
+        <BackButton navigation={navigation as NativeStackNavigationProp<any, "">} />
 
         <View className="mt-4">
           <SemiBoldText color="black" size="xlarge" marginBottom={5}>

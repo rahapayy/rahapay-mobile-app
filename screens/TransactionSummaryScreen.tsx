@@ -14,7 +14,7 @@ import SPACING from "../constants/SPACING";
 import FONT_SIZE from "../constants/font-size";
 import COLORS from "../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
-import { RootStackParamList } from "../types/RootStackParams";
+import { AppStackParamList } from "../types/RootStackParams";
 import Airtel from "../assets/svg/airtelbig.svg";
 import Mtn from "../assets/svg/mtnbig.svg";
 import Eti from "../assets/svg/9mobilebig.svg";
@@ -38,10 +38,10 @@ type TransactionSummaryRouteParams = {
 
 type TransactionSummaryScreenProps = {
   navigation: NativeStackNavigationProp<
-    RootStackParamList,
+    AppStackParamList,
     "TransactionSummaryScreen"
   >;
-  route: RouteProp<RootStackParamList, "TransactionSummaryScreen">;
+  route: RouteProp<AppStackParamList, "TransactionSummaryScreen">;
 };
 
 const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({

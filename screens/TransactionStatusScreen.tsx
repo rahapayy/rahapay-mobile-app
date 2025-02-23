@@ -8,15 +8,15 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import Button from "../components/common/ui/buttons/Button";
 import { ReceiptText, Timer, Warning2 } from "iconsax-react-native";
-import { RootStackParamList } from "../types/RootStackParams";
+import { AppStackParamList } from "../types/RootStackParams";
 import useWallet from "@/hooks/use-wallet";
 
 type TransactionStatusScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+  AppStackParamList,
   "TransactionStatusScreen"
 >;
 type TransactionStatusScreenRouteProp = RouteProp<
-  RootStackParamList,
+  AppStackParamList,
   "TransactionStatusScreen"
 >;
 

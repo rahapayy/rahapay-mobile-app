@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 
-export type RootStackParamList = {
+// App Stack (Main application screens)
+export type AppStackParamList = {
   HomeScreen: undefined;
   AirtimeScreen: undefined;
   DataScreen: undefined;
@@ -62,9 +63,10 @@ export type RootStackParamList = {
   ReviewCableTvSummaryScreen: {
     service: string;
     planId: string;
-    planPrice: number;
+    price: number;
     cardNumber: string;
     planName: string;
+    customerName: string;
   };
   EducationServiceType: {
     exam: string;
@@ -79,12 +81,15 @@ export type RootStackParamList = {
   };
   ReviewElectricitySummaryScreen: {
     disco: string;
-    planId: string;
+    id: string;
+    customerName: string;
+    selectedService: string;
     planName: string;
-    meterType: string;
+    meterType: "PREPAID" | "POSTPAID";
     meterNumber: string;
     amount: string;
     phoneNumber: string;
+    saveBeneficiary: boolean;
   };
   ReviewEducationSummaryScreen: {
     exam: string;
@@ -94,14 +99,19 @@ export type RootStackParamList = {
     phoneNumber: string;
     quantity: number;
   };
-  Onboarding: undefined;
-  WelcomeScreen: undefined;
   ServicesScreen: undefined;
   WalletScreen: undefined;
   CardScreen: undefined;
   ProfileScreen: undefined;
   EditTagScreen: undefined;
   CreateTagScreen: undefined;
+  TicketScreen: undefined;
+};
+
+// Auth Stack (Authentication-related screens)
+export type AuthStackParamList = {
+  Onboarding: undefined;
+  WelcomeScreen: undefined;
   CreateAccountScreen: undefined;
   VerifyEmailScreen: undefined;
   ExistingUserScreen: undefined;
@@ -114,5 +124,7 @@ export type RootStackParamList = {
   SuccessfulScreen: undefined;
   EnterCodeScreen: undefined;
   CreateTransactionPinScreen: undefined;
-  TicketScreen: undefined;
 };
+
+// Combined Route Stack
+export type RouteStackParamList = AppStackParamList & AuthStackParamList;

@@ -38,4 +38,7 @@ export const COLORS = {
     white: "#fff",
     black: "#000",
   },
+  success: {
+    green: "#4CAF50", // Added success green text color
+  },
 };

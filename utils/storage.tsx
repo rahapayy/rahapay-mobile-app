@@ -51,4 +51,5 @@ export const removeItem = async (
 export const StorageKeys = {
   ACCESS_TOKEN: "accessToken",
   REFRESH_TOKEN: "refreshToken",
+  ONBOARDED: "onboarded",
 };

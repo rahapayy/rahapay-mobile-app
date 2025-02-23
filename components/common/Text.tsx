@@ -13,6 +13,7 @@ const fontColors = {
   lightGrey: COLORS.grey[300],
   mediumGrey: COLORS.grey[400],
   white: "#fff",
+  green: COLORS.success.green,
 };
 
 const fontSize = {
@@ -37,7 +38,8 @@ interface CustomTextProps extends TextProps {
     | "grey"
     | "lightGrey"
     | "error"
-    | "mediumGrey";
+    | "mediumGrey"
+    | "green";
   size?:
     | "large"
     | "xlarge"

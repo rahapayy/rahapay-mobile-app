@@ -19,6 +19,9 @@ import Airtel from "../assets/svg/airtelbig.svg";
 import Mtn from "../assets/svg/mtnbig.svg";
 import Eti from "../assets/svg/9mobilebig.svg";
 import Glo from "../assets/svg/globig.svg";
+import Dstv from "../assets/svg/dstv.svg";
+import Gotv from "../assets/svg/gotv.svg";
+import Startimes from "../assets/svg/startimes.svg";
 
 // Define the Transaction interface
 interface Transaction {
@@ -85,6 +88,12 @@ const RecentServiceTransaction: React.FC<{
       return <Eti width={40} height={40} />;
     } else if (provider?.toLowerCase() === "glo") {
       return <Glo width={40} height={40} />;
+    } else if (provider?.toLowerCase() === "dstv") {
+      return <Dstv width={40} height={40} />;
+    } else if (provider?.toLowerCase() === "gotv") {
+      return <Gotv width={40} height={40} />;
+    } else if (provider?.toLowerCase() === "startime") {
+      return <Startimes width={40} height={40} />;
     }
   };
 
@@ -186,7 +195,7 @@ const RecentServiceTransaction: React.FC<{
         <TouchableOpacity
           onPress={() => navigation.navigate("TransactionHistoryScreen")}
         >
-          <LightText color="light">View More</LightText>
+          <LightText color="mediumGrey">View More</LightText>
         </TouchableOpacity>
       </View>
 

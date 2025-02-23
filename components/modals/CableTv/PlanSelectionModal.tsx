@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Modal,
   StyleSheet,
@@ -8,6 +8,7 @@ import {
   ScrollView,
   Dimensions,
   TextInput,
+  Keyboard,
 } from "react-native";
 import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
@@ -17,11 +18,11 @@ import { CloseCircle, SearchNormal1 } from "iconsax-react-native";
 interface PlanSelectionModalProps {
   visible: boolean;
   onClose: () => void;
-  plans: { plan_id: string; plan_price: number; plan_name: string }[];
+  plans: { planId: string; price: number; planName: string }[];
   onSelectPlan: (plan: {
-    plan_id: string;
-    plan_price: number;
-    plan_name: string;
+    planId: string;
+    price: number;
+    planName: string;
   }) => void;
 }
 
@@ -33,9 +34,15 @@ const PlanSelectionModal: React.FC<PlanSelectionModalProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredPlans = plans.filter((plan) =>
-    plan.plan_name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredPlans = useMemo(() => {
+    return plans.filter((plan) =>
+      plan.planName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [plans, searchQuery]);
+
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
 
   return (
     <Modal
@@ -43,14 +50,24 @@ const PlanSelectionModal: React.FC<PlanSelectionModalProps> = ({
       transparent={true}
       visible={visible}
       onRequestClose={onClose}
+      accessible={true}
+      accessibilityLabel="Plan Selection Modal"
     >
-      <View style={styles.modalOverlay}>
+      <TouchableOpacity
+        style={styles.modalOverlay}
+        activeOpacity={1}
+        onPress={dismissKeyboard}
+      >
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle} allowFontScaling={false}>
               Select a Plan
             </Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <TouchableOpacity
+              onPress={onClose}
+              style={styles.closeButton}
+              accessibilityLabel="Close Modal"
+            >
               <CloseCircle color={COLORS.violet400} size={24} />
             </TouchableOpacity>
           </View>
@@ -66,6 +83,7 @@ const PlanSelectionModal: React.FC<PlanSelectionModalProps> = ({
               value={searchQuery}
               onChangeText={setSearchQuery}
               allowFontScaling={false}
+              accessibilityLabel="Search Plans Input"
             />
           </View>
           <ScrollView
@@ -73,27 +91,34 @@ const PlanSelectionModal: React.FC<PlanSelectionModalProps> = ({
             contentContainerStyle={styles.planScrollViewContent}
           >
             <View style={styles.planContainer}>
-              {filteredPlans.map((plan) => (
-                <TouchableOpacity
-                  key={plan.plan_id}
-                  style={styles.planBox}
-                  onPress={() => {
-                    onSelectPlan(plan);
-                    onClose();
-                  }}
-                >
-                  <Text style={styles.planName} allowFontScaling={false}>
-                    {plan.plan_name}
-                  </Text>
-                  <Text style={styles.planPrice} allowFontScaling={false}>
-                    ₦{plan.plan_price}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              {filteredPlans.length > 0 ? (
+                filteredPlans.map((plan) => (
+                  <TouchableOpacity
+                    key={plan.planId}
+                    style={styles.planBox}
+                    onPress={() => {
+                      onSelectPlan(plan);
+                      onClose();
+                    }}
+                    accessibilityLabel={`Select ${plan.planName} for ₦${plan.price}`}
+                  >
+                    <Text style={styles.planName} allowFontScaling={false}>
+                      {plan.planName}
+                    </Text>
+                    <Text style={styles.planPrice} allowFontScaling={false}>
+                      ₦{plan.price}
+                    </Text>
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text style={styles.noPlansText} allowFontScaling={false}>
+                  No plans match your search.
+                </Text>
+              )}
             </View>
           </ScrollView>
         </View>
-      </View>
+      </TouchableOpacity>
     </Modal>
   );
 };
@@ -164,8 +189,8 @@ const styles = StyleSheet.create({
     padding: SPACING,
     borderRadius: 10,
     marginBottom: SPACING,
-    width: (width - SPACING * 5) / 3, // Subtracting total horizontal padding and dividing by 3 for three columns
-    aspectRatio: 0.7, // Slightly increased height while maintaining width
+    width: (width - SPACING * 5) / 3, // Three columns
+    aspectRatio: 0.7,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -181,5 +206,12 @@ const styles = StyleSheet.create({
     color: COLORS.violet400,
     fontFamily: "Outfit-SemiBold",
     textAlign: "center",
+  },
+  noPlansText: {
+    fontSize: RFValue(12),
+    fontFamily: "Outfit-Regular",
+    color: COLORS.black400,
+    textAlign: "center",
+    padding: SPACING * 2,
   },
 });

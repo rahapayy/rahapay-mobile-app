@@ -21,13 +21,13 @@ import Glo from "../../assets/svg/globig.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 import SwipeButton from "../../components/SwipeButton";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
-import { RootStackParamList } from "../../types/RootStackParams";
+import { AppStackParamList } from "../../types/RootStackParams";
 import { DataPurchasePayload } from "@/services/modules/data";
 import { services } from "@/services";
 import { AxiosError } from "axios";
 
 type ReviewDataSummaryScreenProps = NativeStackScreenProps<
-  RootStackParamList,
+  AppStackParamList,
   "ReviewDataSummaryScreen"
 >;
 

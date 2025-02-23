@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Platform,
   SafeAreaView,
@@ -15,95 +15,57 @@ import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import SwipeButton from "../../components/SwipeButton";
-import useApi from "../../services/apiClient";
+import { services } from "@/services";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
-import { RootStackParamList } from "../../types/RootStackParams";
+import { AppStackParamList } from "../../types/RootStackParams";
 
 type ReviewElectricitySummaryScreenProps = NativeStackScreenProps<
-  RootStackParamList,
+  AppStackParamList,
   "ReviewElectricitySummaryScreen"
 >;
 
 const ReviewElectricitySummaryScreen: React.FC<
   ReviewElectricitySummaryScreenProps
 > = ({ navigation, route }) => {
-  const { disco, meterNumber, amount, planId, planName } = route.params;
-
-  const { mutateAsync } = useApi.post("/electricity");
+  const {
+    meterNumber,
+    amount,
+    selectedService,
+    meterType,
+    id,
+    customerName,
+    saveBeneficiary,
+  } = route.params;
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSwipeConfirm = async (reset: () => void) => {
+    setIsLoading(true);
     try {
-      // Making the API call
-      const response = await mutateAsync({
-        discoId: planId,
+      const payload = {
         meterNumber,
-        amount,
-      });
+        amount: parseFloat(amount),
+        discoId: id,
+        saveBeneficiary,
+      };
 
-      console.log(response);
+      const response = await services.electricityService.purchaseElectricity(
+        payload
+      );
 
-      // Checking the response for success or failure
-      if (response.data.success) {
+      if (response.status === "success") {
         navigation.navigate("TransactionStatusScreen", {
-          status: "successful",
+          status: "success",
         });
       } else {
         handleShowFlash({
-          message: "Transaction failed. Please try again.",
-          type: "danger",
-        });
-        navigation.navigate("TransactionStatusScreen", { status: "failed" });
-      }
-    } catch (err: unknown) {
-      console.error("Error processing electricity payment:", err);
-
-      // Handling different types of errors
-      if (err instanceof Error) {
-        if (err.message.includes("Network")) {
-          handleShowFlash({
-            message:
-              "Network error. Please check your connection and try again.",
-            type: "danger",
-          });
-        } else if (err.message.includes("Timeout")) {
-          handleShowFlash({
-            message: "Request timed out. Please try again later.",
-            type: "danger",
-          });
-        } else {
-          handleShowFlash({
-            message: "An unexpected error occurred. Please try again.",
-            type: "danger",
-          });
-        }
-      } else if (err instanceof Object && "response" in err) {
-        // Handle specific status codes or response errors
-        const response = (err as any).response;
-        if (response?.status === 503) {
-          handleShowFlash({
-            message:
-              "The server is currently unavailable. Please try again later.",
-            type: "danger",
-          });
-        } else if (response?.status === 400) {
-          handleShowFlash({
-            message: "Bad request. Please check the input values.",
-            type: "danger",
-          });
-        } else {
-          handleShowFlash({
-            message: "An error occurred. Please try again.",
-            type: "danger",
-          });
-        }
-      } else {
-        handleShowFlash({
-          message: "An unknown error occurred. Please try again.",
+          message: response.msg || "Transaction failed. Please try again.",
           type: "danger",
         });
       }
+    } catch (error: any) {
+      console.error("Error response from server:", error); // Log error response from server
     } finally {
-      // Resetting the swipe button regardless of success or failure
+      setIsLoading(false);
       reset();
     }
   };
@@ -132,36 +94,24 @@ const ReviewElectricitySummaryScreen: React.FC<
             }}
           >
             <Text style={styles.itemText} allowFontScaling={false}>
-              {planName} Bill
+              {selectedService} Bill ({meterType})
             </Text>
           </View>
           <View style={{ padding: 16 }}>
             <View style={styles.container}>
               <Text style={styles.headText} allowFontScaling={false}>
-                Transaction summary
+                Transaction Summary
               </Text>
 
-              <View
-                style={{
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  flexDirection: "row",
-                }}
-              >
+              <View style={styles.row}>
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Amount
                 </Text>
                 <Text style={styles.descriptionText} allowFontScaling={false}>
-                  ₦ {amount}
+                  ₦{amount}
                 </Text>
               </View>
-              <View
-                style={{
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  flexDirection: "row",
-                }}
-              >
+              <View style={styles.row}>
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Meter Number
                 </Text>
@@ -169,13 +119,31 @@ const ReviewElectricitySummaryScreen: React.FC<
                   {meterNumber}
                 </Text>
               </View>
-              <View
-                style={{
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  flexDirection: "row",
-                }}
-              >
+              <View style={styles.row}>
+                <Text style={styles.titleText} allowFontScaling={false}>
+                  Account Name
+                </Text>
+                <Text style={styles.descriptionText} allowFontScaling={false}>
+                  {customerName}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.titleText} allowFontScaling={false}>
+                  Disco
+                </Text>
+                <Text style={styles.descriptionText} allowFontScaling={false}>
+                  {selectedService}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.titleText} allowFontScaling={false}>
+                  Meter Type
+                </Text>
+                <Text style={styles.descriptionText} allowFontScaling={false}>
+                  {meterType}
+                </Text>
+              </View>
+              <View style={styles.row}>
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Date
                 </Text>
@@ -183,31 +151,18 @@ const ReviewElectricitySummaryScreen: React.FC<
                   {new Date().toLocaleString()}
                 </Text>
               </View>
-
-              <View
-                style={{
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  flexDirection: "row",
-                }}
-              >
+              <View style={styles.row}>
                 <Text style={styles.titleText} allowFontScaling={false}>
                   Status
                 </Text>
-                <View
-                  style={{
-                    padding: 8,
-                    backgroundColor: "#FFEFC3",
-                    borderRadius: 16,
-                  }}
-                >
+                <View style={styles.statusContainer}>
                   <Text style={styles.completedText} allowFontScaling={false}>
                     Pending
                   </Text>
                 </View>
               </View>
             </View>
-            <View style={{ marginTop: 24 }}>
+            <View style={styles.swipeButtonContainer}>
               <SwipeButton onConfirm={handleSwipeConfirm} />
             </View>
           </View>
@@ -266,5 +221,18 @@ const styles = StyleSheet.create({
   completedText: {
     fontFamily: "Outfit-Regular",
     color: "#FFCC3D",
+  },
+  statusContainer: {
+    padding: 8,
+    backgroundColor: "#FFEFC3",
+    borderRadius: 16,
+  },
+  row: {
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  swipeButtonContainer: {
+    marginTop: SPACING * 5,
   },
 });

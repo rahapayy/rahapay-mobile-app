@@ -26,7 +26,7 @@ import EducationScreen from "../screens/Services/Education/EducationScreen";
 import CustomerCareScreen from "../screens/CustomerCareScreen";
 import ReviewCableTvSummaryScreen from "../screens/ServiceReviewScreens/ReviewCableTvSummaryScreen";
 import ReviewElectricitySummaryScreen from "../screens/ServiceReviewScreens/ReviewElectricitySummaryScreen";
-import { RootStackParamList } from "../types/RootStackParams";
+import { AppStackParamList } from "../types/RootStackParams";
 import EducationServiceType from "../screens/Services/Education/EducationServiceType";
 import EducationDetailsScreen from "../screens/Services/Education/EducationDetailsScreen";
 import ReviewEducationSummaryScreen from "../screens/ServiceReviewScreens/ReviewEducationSummaryScreem";
@@ -36,11 +36,11 @@ import BettingSuccess from "../screens/Services/Betting/BettingSuccess";
 import CreateTagScreen from "../screens/Profile/CreateTagScreen";
 import TicketScreen from "../screens/Services/TicketScreen";
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<AppStackParamList>();
 
 const AppStack = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName="HomeScreen">
       <Stack.Screen
         name="HomeScreen"
         component={BottomTab}

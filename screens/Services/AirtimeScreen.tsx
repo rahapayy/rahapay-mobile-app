@@ -29,6 +29,7 @@ import Label from "@/components/common/ui/forms/Label";
 import { services } from "@/services";
 import { Beneficiary } from "@/services/modules/beneficiary";
 import { Skeleton } from "@rneui/base";
+import BackButton from "@/components/common/ui/buttons/BackButton";
 
 const AirtimeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -46,12 +47,26 @@ const AirtimeScreen: React.FC<{
 
   const isButtonDisabled = !selectedOperator || !phoneNumber || !amount;
 
+  const shadowStyle = Platform.select({
+    ios: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+    },
+    android: {
+      elevation: 5,
+    },
+  });
+
   // Fetch airtime beneficiaries
   useEffect(() => {
     const fetchBeneficiaries = async () => {
       setIsBeneficiariesLoading(true);
       try {
-        const response = await services.beneficiaryService.getBeneficiaries("airtime");
+        const response = await services.beneficiaryService.getBeneficiaries(
+          "airtime"
+        );
         setBeneficiaries(response.data?.beneficiaries || []);
       } catch (error) {
         console.error("Failed to fetch airtime beneficiaries:", error);
@@ -91,14 +106,31 @@ const AirtimeScreen: React.FC<{
 
   const prefixes: { [key in OperatorType]: string[] } = {
     Airtel: ["0802", "0808", "0708", "0812", "0902", "0907", "0901", "0904"],
-    Mtn: ["0803", "0806", "0703", "0706", "0810", "0813", "0814", "0816", "0903", "0906", "0916", "0913"],
+    Mtn: [
+      "0803",
+      "0806",
+      "0703",
+      "0706",
+      "0810",
+      "0813",
+      "0814",
+      "0816",
+      "0903",
+      "0906",
+      "0916",
+      "0913",
+    ],
     "9Mobile": ["0809", "0817", "0818", "0909", "0908"],
     Glo: ["0805", "0807", "0705", "0811", "0815", "0905"],
   };
 
   const detectOperator = (number: string) => {
     for (let operator in prefixes) {
-      if (prefixes[operator as OperatorType].some((prefix) => number.startsWith(prefix))) {
+      if (
+        prefixes[operator as OperatorType].some((prefix) =>
+          number.startsWith(prefix)
+        )
+      ) {
         setSelectedOperator(operator);
         return;
       }
@@ -112,10 +144,10 @@ const AirtimeScreen: React.FC<{
     if (beneficiary.networkType) {
       const normalizedNetworkType = beneficiary.networkType.toLowerCase();
       const networkMap: { [key: string]: OperatorType } = {
-        "mtn": "Mtn",
-        "airtel": "Airtel",
+        mtn: "Mtn",
+        airtel: "Airtel",
         "9mobile": "9Mobile",
-        "glo": "Glo",
+        glo: "Glo",
       };
       const selectedNetwork = networkMap[normalizedNetworkType];
       if (selectedNetwork) {
@@ -129,11 +161,14 @@ const AirtimeScreen: React.FC<{
   };
 
   const renderNetworkSkeleton = () => (
-    <View className="flex-row p-2 bg-white rounded-xl items-center justify-between">
+    <View
+      className="flex-row p-2 bg-white rounded-xl items-center justify-between mb-4"
+      style={[shadowStyle]}
+    >
       {[1, 2, 3, 4].map((_, index) => (
         <Skeleton
           key={index}
-          width={63}
+          width={60}
           height={60}
           style={{
             backgroundColor: COLORS.grey100,
@@ -148,7 +183,10 @@ const AirtimeScreen: React.FC<{
   );
 
   const renderNetworkProviders = () => (
-    <View className="flex-row p-2 bg-white rounded-xl items-center justify-between">
+    <View
+      className="flex-row p-2 bg-white rounded-xl items-center justify-between mb-4"
+      style={[shadowStyle]}
+    >
       <TouchableOpacity
         onPress={() => setSelectedOperator("Airtel")}
         style={[selectedOperator === "Airtel" && styles.selectedOperator]}
@@ -238,15 +276,10 @@ const AirtimeScreen: React.FC<{
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View className="p-4">
           <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.leftIcon}
-            >
-              <ArrowLeft color={"#000"} size={24} />
-            </TouchableOpacity>
+            <BackButton navigation={navigation} />
             <Text style={[styles.headerText]} allowFontScaling={false}>
               Airtime Top-up
             </Text>
@@ -339,19 +372,27 @@ const AirtimeScreen: React.FC<{
                             onPress={() => handleBeneficiarySelect(beneficiary)}
                           >
                             <RegularText color="black" size="small">
-                              {beneficiary.number} {beneficiary.networkType ? `| ${beneficiary.networkType}` : ""}
+                              {beneficiary.number}{" "}
+                              {beneficiary.networkType
+                                ? `| ${beneficiary.networkType}`
+                                : ""}
                             </RegularText>
                           </TouchableOpacity>
                         )}
                       />
                     ) : (
-                      <RegularText color="gray" className="mb-4">
+                      <RegularText color="mediumGrey" className="mb-4">
                         No saved beneficiaries found.
                       </RegularText>
                     )}
                   </View>
 
-                  <View className="mt-3 mb-4">
+                  <View className="mt-3">
+                    <Label text="Select Network Provider" marked={false} />
+                    {isBeneficiariesLoading
+                      ? renderNetworkSkeleton()
+                      : renderNetworkProviders()}
+
                     <Label text="Phone Number" marked={false} />
                     <BasicInput
                       placeholder="Enter phone number"
@@ -366,9 +407,6 @@ const AirtimeScreen: React.FC<{
                       autoCorrect={false}
                     />
                   </View>
-
-                  <Label text="Select Network Provider" marked={false} />
-                  {isBeneficiariesLoading ? renderNetworkSkeleton() : renderNetworkProviders()}
 
                   <View className="mt-4">
                     <CurrencyInput
@@ -407,16 +445,25 @@ const AirtimeScreen: React.FC<{
                       <Switch
                         value={saveBeneficiary}
                         onValueChange={setSaveBeneficiary}
-                        trackColor={{ false: COLORS.grey100, true: COLORS.violet200 }}
-                        thumbColor={saveBeneficiary ? COLORS.violet400 : COLORS.grey100}
-                        style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+                        trackColor={{
+                          false: COLORS.grey100,
+                          true: COLORS.violet200,
+                        }}
+                        thumbColor={
+                          saveBeneficiary ? COLORS.violet400 : COLORS.white
+                        }
+                        style={{
+                          transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
+                        }}
                       />
                     </View>
                   </View>
                   <Button
                     title="Proceed"
                     style={{
-                      backgroundColor: isButtonDisabled ? COLORS.violet200 : COLORS.violet400,
+                      backgroundColor: isButtonDisabled
+                        ? COLORS.violet200
+                        : COLORS.violet400,
                       marginTop: SPACING * 2,
                     }}
                     onPress={handleProceed}
@@ -446,7 +493,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: Platform.OS === "ios" ? SPACING : SPACING * 2,
     paddingBottom: SPACING * 3,
   },
   leftIcon: {
@@ -457,6 +503,7 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.medium,
     fontFamily: "Outfit-Regular",
     flex: 1,
+    marginLeft: SPACING,
   },
   tabsContainer: {
     flexDirection: "row",

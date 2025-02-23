@@ -21,7 +21,6 @@ interface ActionItem {
   icon: React.ElementType;
   title: string;
   navigateTo?: string;
-  isComingSoon?: boolean;
 }
 
 const QuickAction: React.FC<{
@@ -37,8 +36,8 @@ const QuickAction: React.FC<{
   const actionItems = [
     { icon: AirtimeIcon, title: "Airtime", navigateTo: "AirtimeScreen" },
     { icon: DataIcon, title: "Data", navigateTo: "DataScreen" },
-    { icon: TvIcon, title: "TV", isComingSoon: true },
-    { icon: ElectricityIcon, title: "Electricity", isComingSoon: true },
+    { icon: TvIcon, title: "TV", navigateTo: "TvSubscriptionScreen" },
+    { icon: ElectricityIcon, title: "Electricity", navigateTo: "ElectricityScreen" },
   ];
 
   return (
@@ -53,21 +52,12 @@ const QuickAction: React.FC<{
             onPress={() =>
               item.navigateTo && navigation.navigate(item.navigateTo)
             }
-            className={`bg-white justify-center items-center rounded-2xl relative ${
-              item.isComingSoon ? "opacity-50" : ""
-            }`}
+            className={`bg-white justify-center items-center rounded-2xl`}
             style={{ width: cardSize, height: cardSize * 1.1 }}
           >
             <item.icon fill={fill} width={24} height={24} />
-            {item.isComingSoon && (
-              <View className="absolute -top-2 -right-0 bg-violet-200 p-1 rounded-md">
-                <RegularText color="black" size="xsmall" center>
-                  Coming Soon!
-                </RegularText>
-              </View>
-            )}
             <RegularText
-              color={item.isComingSoon ? "mediumGrey" : "black"}
+              color="black"
               marginTop={8}
               size="base"
             >

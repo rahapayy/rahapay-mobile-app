@@ -13,7 +13,7 @@ class BeneficiaryService {
   constructor(private readonly baseService: AxiosInstance) {}
 
   async getBeneficiaries(
-    service: "airtime" | "data"
+    service: "airtime" | "data" | "cable" | "electricity"
   ): Promise<IResponse<Beneficiary[]>> {
     const response = await this.baseService.get(
       `/beneficiary/me?service=${service}`

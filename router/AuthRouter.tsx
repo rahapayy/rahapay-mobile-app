@@ -14,9 +14,9 @@ import SuccessfulScreen from "../screens/Auth/CreateAccount/SuccessfulScreen";
 import CreatePinScreen from "../screens/Auth/CreateAccount/CreatePinScreen";
 import CreateTransactionPinScreen from "../screens/Auth/CreateAccount/CreateTransactionPinScreen";
 import ExistingUserScreen from "../screens/Auth/Login/ExistingUserScreen";
-import { RootStackParamList } from "../types/RootStackParams";
+import { AuthStackParamList } from "../types/RootStackParams";
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<AuthStackParamList>();
 
 const AuthRoute = () => {
   const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
@@ -25,12 +25,12 @@ const AuthRoute = () => {
   }, []);
 
   const checkIfAlreadyOnboarded = async () => {
-    let onboarded = await getItem("onboarded");
+    let onboarded = await getItem("ONBOARDED");
     if (onboarded == "1") {
       setShowOnboarding(false);
     } else {
       setShowOnboarding(true);
-      await setItem("onboarded", "1");
+      await setItem("ONBOARDED", "1");
     }
   };
 
@@ -39,7 +39,7 @@ const AuthRoute = () => {
   }
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName="LoginScreen">
       {showOnboarding && (
         <>
           <Stack.Screen
