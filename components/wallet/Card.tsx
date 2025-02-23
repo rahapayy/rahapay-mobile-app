@@ -28,6 +28,7 @@ import { BoldText, RegularText, SemiBoldText } from "../common/Text";
 import { useAuth } from "../../services/AuthContext";
 import { ActivityIndicator, PanResponder } from "react-native";
 import { Skeleton } from "@rneui/themed";
+import { Image } from "react-native";
 
 const { height: screenHeight } = Dimensions.get("window");
 
@@ -111,6 +112,7 @@ const Card: React.FC<{
       source={require("../../assets/images/bg.png")}
       style={styles.backgroundImage}
     >
+      {/* <Image source={require("assets/images/layer.png")}/> */}
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container} {...panResponder.panHandlers}>
           {isRefreshing && (
@@ -226,7 +228,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
     overflow: "hidden",
-    // backgroundColor: COLORS.violet400,
+    backgroundColor: COLORS.violet400,
     height: screenHeight * 0.35,
     paddingBottom: 20,
   },
