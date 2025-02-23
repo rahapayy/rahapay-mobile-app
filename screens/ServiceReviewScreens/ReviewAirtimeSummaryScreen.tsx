@@ -20,13 +20,13 @@ import Glo from "../../assets/svg/globig.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 import SwipeButton from "../../components/SwipeButton";
 import { IAirtimePurchasePayload } from "@/services/modules/airtime";
-import { RootStackParamList } from "../../types/RootStackParams";
+import { AppStackParamList } from "../../types/RootStackParams";
 import { services } from "@/services";
 import { handleShowFlash } from "@/components/FlashMessageComponent";
 import { AxiosError } from "axios";
 
 type ReviewAirtimeSummaryScreenProps = NativeStackScreenProps<
-  RootStackParamList,
+  AppStackParamList,
   "ReviewAirtimeSummaryScreen"
 >;
 

@@ -17,10 +17,10 @@ import { RFValue } from "react-native-responsive-fontsize";
 import SwipeButton from "../../components/SwipeButton";
 import useApi from "../../services/apiClient";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
-import { RootStackParamList } from "../../types/RootStackParams";
+import { AppStackParamList } from "../../types/RootStackParams";
 
 type ReviewEducationSummaryScreenProps = NativeStackScreenProps<
-  RootStackParamList,
+  AppStackParamList,
   "ReviewEducationSummaryScreen"
 >;
 

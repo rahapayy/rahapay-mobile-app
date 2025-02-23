@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../types/RootStackParams";
+import { AppStackParamList } from "../../../types/RootStackParams";
 import SPACING from "../../../constants/SPACING";
 import FONT_SIZE from "../../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -17,7 +17,7 @@ import Button from "../../../components/common/ui/buttons/Button";
 import { ArrowLeft } from "iconsax-react-native";
 
 type EducationDetailsScreenProps = NativeStackScreenProps<
-  RootStackParamList,
+  AppStackParamList,
   "EducationDetailsScreen"
 >;
 

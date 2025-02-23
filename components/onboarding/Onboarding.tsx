@@ -39,13 +39,13 @@ const Onboarding: React.FC<{
         slidesRef.current.scrollToIndex({ index: currentIndex + 1 });
       }
     } else {
-      await setItem("onboarded", "1");
+      await setItem("ONBOARDED", "1");
       navigation.navigate("WelcomeScreen");
     }
   };
 
   const skip = async () => {
-    await setItem("onboarded", "1");
+    await setItem("ONBOARDED", "1");
     navigation.navigate("WelcomeScreen");
   };
 

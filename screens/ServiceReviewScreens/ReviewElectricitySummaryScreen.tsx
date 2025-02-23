@@ -17,10 +17,10 @@ import { RFValue } from "react-native-responsive-fontsize";
 import SwipeButton from "../../components/SwipeButton";
 import { services } from "@/services";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
-import { RootStackParamList } from "../../types/RootStackParams";
+import { AppStackParamList } from "../../types/RootStackParams";
 
 type ReviewElectricitySummaryScreenProps = NativeStackScreenProps<
-  RootStackParamList,
+  AppStackParamList,
   "ReviewElectricitySummaryScreen"
 >;
 
@@ -45,7 +45,7 @@ const ReviewElectricitySummaryScreen: React.FC<
         meterNumber,
         amount: parseFloat(amount),
         discoId: id,
-        saveBeneficiary
+        saveBeneficiary,
       };
 
       const response = await services.electricityService.purchaseElectricity(

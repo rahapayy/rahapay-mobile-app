@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 
-export type RootStackParamList = {
+// App Stack (Main application screens)
+export type AppStackParamList = {
   HomeScreen: undefined;
   AirtimeScreen: undefined;
   DataScreen: undefined;
@@ -98,14 +99,19 @@ export type RootStackParamList = {
     phoneNumber: string;
     quantity: number;
   };
-  Onboarding: undefined;
-  WelcomeScreen: undefined;
   ServicesScreen: undefined;
   WalletScreen: undefined;
   CardScreen: undefined;
   ProfileScreen: undefined;
   EditTagScreen: undefined;
   CreateTagScreen: undefined;
+  TicketScreen: undefined;
+};
+
+// Auth Stack (Authentication-related screens)
+export type AuthStackParamList = {
+  Onboarding: undefined;
+  WelcomeScreen: undefined;
   CreateAccountScreen: undefined;
   VerifyEmailScreen: undefined;
   ExistingUserScreen: undefined;
@@ -118,5 +124,7 @@ export type RootStackParamList = {
   SuccessfulScreen: undefined;
   EnterCodeScreen: undefined;
   CreateTransactionPinScreen: undefined;
-  TicketScreen: undefined;
 };
+
+// Combined Route Stack
+export type RouteStackParamList = AppStackParamList & AuthStackParamList;

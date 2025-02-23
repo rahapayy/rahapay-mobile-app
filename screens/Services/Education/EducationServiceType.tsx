@@ -6,7 +6,7 @@ import {
   View,
 } from "react-native";
 import React, { useState } from "react";
-import { RootStackParamList } from "../../../types/RootStackParams";
+import { AppStackParamList } from "../../../types/RootStackParams";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
@@ -16,7 +16,7 @@ import { ArrowLeft } from "iconsax-react-native";
 import Button from "../../../components/common/ui/buttons/Button";
 
 type EducationServiceTypeProps = NativeStackScreenProps<
-  RootStackParamList,
+  AppStackParamList,
   "EducationServiceType"
 >;
 

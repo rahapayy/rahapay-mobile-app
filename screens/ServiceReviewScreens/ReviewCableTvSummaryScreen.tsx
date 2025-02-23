@@ -19,11 +19,11 @@ import Startimes from "../../assets/svg/startimes.svg";
 import SwipeButton from "../../components/SwipeButton";
 import { RFValue } from "react-native-responsive-fontsize";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
-import { RootStackParamList } from "../../types/RootStackParams";
+import { AppStackParamList } from "../../types/RootStackParams";
 import { services } from "@/services";
 
 type ReviewCableTvSummaryScreenProps = NativeStackScreenProps<
-  RootStackParamList,
+  AppStackParamList,
   "ReviewCableTvSummaryScreen"
 >;
 
