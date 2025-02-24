@@ -109,7 +109,7 @@ export const NotificationProvider = ({ children }) => {
   };
 
   // New function to check and update device token
-  const checkAndUpdateDeviceToken = async (newToken?: string) => {
+  const checkAndUpdateDeviceToken = async (newToken) => {
     if (!notificationsEnabled || !isAuthenticated || !userInfo) return;
 
     const backendDeviceToken = userInfo.deviceToken; // From AuthContext
