@@ -20,7 +20,7 @@
       "channel": "development-simulator"
     },
     "test": {
-      "distribution": "store",
+      "distribution": "internal",
       "android": {
         "buildType": "apk"
       },
@@ -48,15 +48,15 @@
     "test": {
       "ios": {
         "appleId": "shedrachjonah22@gmail.com",
-        "ascAppId": "367d0cfa-1475-4062-8ce2-436d9f7b7508",
-        "appleTeamId": "D84VV5F569"
+        "ascAppId": "367d0cfa-1475-4062-8ce2-436d9f7b7508",   
+        "appleTeamId": "D84VV5F569"         
       }
     },
     "production": {
       "ios": {
-        "appleId": "shedrachjonah22@gmail.com",
-        "ascAppId": "367d0cfa-1475-4062-8ce2-436d9f7b7508",
-        "appleTeamId": "D84VV5F569"
+        "appleId": "shedrachjonah22@gmail.com", 
+        "ascAppId": "367d0cfa-1475-4062-8ce2-436d9f7b7508",    
+        "appleTeamId": "D84VV5F569"        
       }
     }
   }
