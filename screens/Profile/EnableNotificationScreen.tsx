@@ -7,33 +7,85 @@ import {
   TouchableOpacity,
   View,
   Platform,
+  Alert,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, Notification, SmsNotification } from "iconsax-react-native";
 import SPACING from "../../constants/SPACING";
 import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
-import { NotificationContext } from "../../context/NotificationContext";
+import { NotificationContext } from "../../context/NotificationContext"; // Adjust path as needed
+import * as Notifications from "expo-notifications";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const EnableNotificationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const { notificationsEnabled, setNotificationsEnabled } =
     useContext(NotificationContext);
-
-  const togglePushNotificationSwitch = () => {
-    setNotificationsEnabled((previousState: any) => !previousState);
-  };
-
-  const [isPushNotificationEnabled, setIsPushNotificationEnabled] =
-    useState(false);
   const [isSmsNotificationEnabled, setIsSmsNotificationEnabled] =
     useState(false);
 
-  const toggleSmsNotificationSwitch = () => {
-    setIsSmsNotificationEnabled((previousState) => !previousState);
+  useEffect(() => {
+    const syncInitialState = async () => {
+      try {
+        // Load persisted SMS notification preference
+        const smsEnabled = await AsyncStorage.getItem(
+          "isSmsNotificationEnabled"
+        );
+        if (smsEnabled !== null) {
+          setIsSmsNotificationEnabled(JSON.parse(smsEnabled));
+        }
+        // No need to override notificationsEnabled here; trust the context
+      } catch (error) {
+        console.error("Error syncing initial state:", error);
+      }
+    };
+    syncInitialState();
+  }, []);
+
+  const togglePushNotificationSwitch = async (newValue: boolean) => {
+    if (newValue) {
+      const { status } = await Notifications.getPermissionsAsync();
+      if (status !== "granted") {
+        const { status: newStatus } =
+          await Notifications.requestPermissionsAsync();
+        if (newStatus === "granted") {
+          setNotificationsEnabled(true);
+        } else {
+          Alert.alert(
+            "Permission Denied",
+            "Notifications cannot be enabled without permission."
+          );
+          return; // Keep switch off if permission denied
+        }
+      } else {
+        setNotificationsEnabled(true);
+      }
+    } else {
+      Alert.alert(
+        "Confirm Disable",
+        "Are you sure you want to disable push notifications?",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Yes", onPress: () => setNotificationsEnabled(false) },
+        ]
+      );
+    }
+  };
+
+  const toggleSmsNotificationSwitch = async (newValue: boolean) => {
+    setIsSmsNotificationEnabled(newValue);
+    try {
+      await AsyncStorage.setItem(
+        "isSmsNotificationEnabled",
+        JSON.stringify(newValue)
+      );
+    } catch (error) {
+      console.error("Error saving SMS notification preference:", error);
+    }
   };
 
   return (
@@ -47,7 +99,7 @@ const EnableNotificationScreen: React.FC<{
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={[styles.headerText]} allowFontScaling={false}>
+            <Text style={styles.headerText} allowFontScaling={false}>
               Notification
             </Text>
           </View>
@@ -66,11 +118,8 @@ const EnableNotificationScreen: React.FC<{
               </View>
               <Switch
                 thumbColor={COLORS.white}
-                trackColor={{
-                  false: COLORS.black100,
-                  true: COLORS.violet400,
-                }}
-                value={notificationsEnabled}
+                trackColor={{ false: COLORS.black100, true: COLORS.violet400 }}
+                value={notificationsEnabled} // Reflects context state
                 onValueChange={togglePushNotificationSwitch}
               />
             </View>
@@ -87,10 +136,7 @@ const EnableNotificationScreen: React.FC<{
               </View>
               <Switch
                 thumbColor={COLORS.white}
-                trackColor={{
-                  false: COLORS.black100,
-                  true: COLORS.violet400,
-                }}
+                trackColor={{ false: COLORS.black100, true: COLORS.violet400 }}
                 value={isSmsNotificationEnabled}
                 onValueChange={toggleSmsNotificationSwitch}
               />

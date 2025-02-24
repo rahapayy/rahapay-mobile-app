@@ -5,6 +5,7 @@ import {
   View,
   Keyboard,
   TouchableWithoutFeedback,
+  ScrollView,
 } from "react-native";
 import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -12,7 +13,11 @@ import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
 import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
-import { LightText, MediumText, SemiBoldText } from "../../../components/common/Text";
+import {
+  LightText,
+  MediumText,
+  SemiBoldText,
+} from "../../../components/common/Text";
 import OtpInput from "../../../components/common/ui/forms/OtpInput";
 import Label from "../../../components/common/ui/forms/Label";
 import ProgressIndicator from "../../../components/ProgressIndicator";
@@ -53,7 +58,7 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
 
       const response = await services.authServiceToken.createPin(payload);
       console.log(response);
-      
+
       handleShowFlash({
         message: "Transaction PIN created successfully!",
         type: "success",
@@ -82,58 +87,60 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={{ flex: 1 }}>
-        <View style={{ padding: 16, flex: 1 }}>
-          <ProgressIndicator
-            navigation={navigation}
-            currentStep={2}
-            totalSteps={4}
-          />
+        <ScrollView>
+          <View style={{ padding: 16, flex: 1 }}>
+            <ProgressIndicator
+              navigation={navigation}
+              currentStep={2}
+              totalSteps={4}
+            />
 
-          <View style={{ marginTop: 16 }}>
-            <SemiBoldText color="black" size="xlarge" marginBottom={5}>
-              Create Your Transaction PIN
-            </SemiBoldText>
-            <LightText color="mediumGrey" size="base">
-              Use this pin for secure transactions
-            </LightText>
-          </View>
+            <View style={{ marginTop: 16 }}>
+              <SemiBoldText color="black" size="xlarge" marginBottom={5}>
+                Create Your Transaction PIN
+              </SemiBoldText>
+              <LightText color="mediumGrey" size="base">
+                Use this pin for secure transactions
+              </LightText>
+            </View>
 
-          <View className="flex-1">
-            <View style={styles.inputContainer}>
-              <Label text="Enter Transaction PIN" marked={false} />
-              <View className="justify-center items-center ">
-                <OtpInput
-                  length={4}
-                  value={boxes}
-                  onChange={setBoxes}
-                  secureTextEntry
-                  autoFocus={true}
-                />
+            <View className="flex-1">
+              <View style={styles.inputContainer}>
+                <Label text="Enter Transaction PIN" marked={false} />
+                <View className="justify-center items-center ">
+                  <OtpInput
+                    length={4}
+                    value={boxes}
+                    onChange={setBoxes}
+                    secureTextEntry
+                    autoFocus={true}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Label text="Confirm Transaction PIN" marked={false} />
+                <View className="justify-center items-center">
+                  <OtpInput
+                    length={4}
+                    value={confirmBoxes}
+                    onChange={setConfirmBoxes}
+                    secureTextEntry
+                    autoFocus={false}
+                  />
+                </View>
               </View>
             </View>
 
-            <View style={styles.inputContainer}>
-              <Label text="Confirm Transaction PIN" marked={false} />
-              <View className="justify-center items-center">
-                <OtpInput
-                  length={4}
-                  value={confirmBoxes}
-                  onChange={setConfirmBoxes}
-                  secureTextEntry
-                  autoFocus={false}
-                />
-              </View>
-            </View>
+            <Button
+              title="Confirm"
+              onPress={handleConfirmPin}
+              isLoading={loading}
+              style={{ marginTop: SPACING * 10 }}
+              textColor="#fff"
+            />
           </View>
-
-          <Button
-            title="Confirm"
-            onPress={handleConfirmPin}
-            isLoading={loading}
-            style={{ marginTop: SPACING * 4 }}
-            textColor="#fff"
-          />
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

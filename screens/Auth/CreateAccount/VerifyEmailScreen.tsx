@@ -21,12 +21,13 @@ import {
   MediumText,
   SemiBoldText,
 } from "../../../components/common/Text";
-import OtpInput from "../../../components/OtpInput";
 import ProgressIndicator from "../../../components/ProgressIndicator";
 import { IVerifyEmailDto } from "@/services/dtos";
 import { services } from "@/services";
 import { setItem } from "@/utils/storage";
 import { useAuth } from "@/services/AuthContext";
+import OtpInput from "@/components/common/ui/forms/OtpInput";
+import SectionDivider from "@/components/SectionDivider";
 
 type VerifyEmailScreenRouteParams = {
   email: string;
@@ -47,7 +48,6 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
 
   const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
   const boxRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
-  const [boxIsFocused, setBoxIsFocused] = useState(new Array(6).fill(false));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isInputFilled, setIsInputFilled] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(60);
@@ -71,41 +71,6 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
   useEffect(() => {
     boxRefs.current[0]?.focus();
   }, []);
-
-  const handleInput = (text: string, index: number) => {
-    if (/^\d{0,1}$/.test(text)) {
-      const newBoxes = [...boxes];
-      newBoxes[index] = text;
-      setBoxes(newBoxes);
-
-      const allBoxesCleared = newBoxes.every((box) => box === "");
-
-      if (text === "" && index > 0) {
-        boxRefs.current[index - 1]?.focus();
-      } else if (index < 5 && !allBoxesCleared) {
-        boxRefs.current[index + 1]?.focus();
-      } else if (allBoxesCleared) {
-        boxRefs.current[0]?.focus();
-      }
-    }
-  };
-
-  const handlePaste = (text: string) => {
-    if (/^\d{6}$/.test(text)) {
-      const newBoxes = text.split("");
-      setBoxes(newBoxes);
-      boxRefs.current[5]?.focus();
-    }
-  };
-
-  const handleKeyPress = (index: number, event: any) => {
-    if (event.nativeEvent.key === "Backspace" && index > 0) {
-      const newBoxes = [...boxes];
-      newBoxes[index - 1] = "";
-      setBoxes(newBoxes);
-      boxRefs.current[index - 1]?.focus();
-    }
-  };
 
   const handleButtonClick = async () => {
     const otp = boxes.join("");
@@ -209,15 +174,15 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
           </LightText>
         </View>
 
-        <OtpInput
-          boxes={boxes}
-          boxRefs={boxRefs}
-          handleInput={handleInput}
-          handlePaste={handlePaste}
-          handleKeyPress={handleKeyPress}
-          boxIsFocused={boxIsFocused}
-          setBoxIsFocused={setBoxIsFocused}
-        />
+        <View className="mt-4 mb-6">
+          <OtpInput
+            length={6}
+            value={boxes}
+            onChange={setBoxes}
+            secureTextEntry
+            autoFocus={true}
+          />
+        </View>
 
         <Button
           title={"Verify Account"}

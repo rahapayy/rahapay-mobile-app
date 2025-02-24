@@ -16,7 +16,7 @@ interface Slide {
 }
 
 const Onboarding: React.FC<{
-  navigation: NativeStackNavigationProp<any, "WelcomeScreen">;
+  navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollx = useRef(new Animated.Value(0)).current;
@@ -33,21 +33,21 @@ const Onboarding: React.FC<{
     }
   };
 
-  const next = async () => {
-    if (currentIndex < slides.length - 1) {
-      if (slidesRef.current) {
-        slidesRef.current.scrollToIndex({ index: currentIndex + 1 });
-      }
-    } else {
-      await setItem("ONBOARDED", "1");
-      navigation.navigate("WelcomeScreen");
-    }
-  };
+  // const next = async () => {
+  //   if (currentIndex < slides.length - 1) {
+  //     if (slidesRef.current) {
+  //       slidesRef.current.scrollToIndex({ index: currentIndex + 1 });
+  //     }
+  //   } else {
+  //     await setItem("ONBOARDED", "1");
+  //     navigation.navigate("WelcomeScreen");
+  //   }
+  // };
 
-  const skip = async () => {
-    await setItem("ONBOARDED", "1");
-    navigation.navigate("WelcomeScreen");
-  };
+  // const skip = async () => {
+  //   await setItem("ONBOARDED", "1");
+  //   navigation.navigate("WelcomeScreen");
+  // };
 
   const viewableItemsChanged = useRef(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
@@ -78,7 +78,6 @@ const Onboarding: React.FC<{
   }, [currentIndex]);
 
   const onCreateAccountPress = () => {
-    // navigation.navigate("CreateTagScreen");
     navigation.navigate("CreateAccountScreen");
   };
 
@@ -116,7 +115,7 @@ const Onboarding: React.FC<{
 
       <View style={styles.buttonContainer}>
         <NextButton
-          scrollTo={next}
+          // scrollTo={next}
           onCreateAccountPress={onCreateAccountPress}
           onLoginPress={onLoginPress}
         />

@@ -13,7 +13,7 @@ import { services } from "@/services";
 const SuccessfulScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { setIsAuthenticated, setUserInfo } = useAuth();
+  const { setIsAuthenticated, setUserInfo, isLoading } = useAuth();
 
   const handleCompletion = async () => {
     try {
@@ -53,6 +53,7 @@ const SuccessfulScreen: React.FC<{
           onPress={handleCompletion}
           style={styles.button}
           textColor="#fff"
+          isLoading={isLoading}
         />
       </View>
     </SafeAreaView>

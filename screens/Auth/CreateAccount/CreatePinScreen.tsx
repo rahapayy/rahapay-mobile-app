@@ -5,6 +5,7 @@ import {
   View,
   Keyboard,
   TouchableWithoutFeedback,
+  ScrollView,
 } from "react-native";
 import React, { useState, useContext } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -89,59 +90,61 @@ const CreatePinScreen: React.FC<CreatePinScreenProps> = ({ navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={{ flex: 1 }}>
-        <View style={{ padding: 16, flex: 1 }}>
-          <ProgressIndicator
-            navigation={navigation}
-            currentStep={3}
-            totalSteps={4}
-          />
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={{ padding: 16, flex: 1 }}>
+            <ProgressIndicator
+              navigation={navigation}
+              currentStep={3}
+              totalSteps={4}
+            />
 
-          <View className="flex-1">
-            <View style={{ marginTop: 16 }}>
-              <SemiBoldText color="black" size="xlarge" marginBottom={5}>
-                Create Your Security PIN
-              </SemiBoldText>
-              <LightText color="mediumGrey" size="base">
-                This PIN will be used to secure your account and authorize
-                important actions
-              </LightText>
-            </View>
+            <View className="flex-1">
+              <View style={{ marginTop: 16 }}>
+                <SemiBoldText color="black" size="xlarge" marginBottom={5}>
+                  Create Your Security PIN
+                </SemiBoldText>
+                <LightText color="mediumGrey" size="base">
+                  This PIN will be used to secure your account and authorize
+                  important actions
+                </LightText>
+              </View>
 
-            <View style={styles.inputContainer}>
-              <Label text="Enter Security PIN" marked={false} />
-              <View className="justify-center items-center">
-                <OtpInput
-                  length={6}
-                  value={boxes}
-                  onChange={setBoxes}
-                  secureTextEntry
-                  autoFocus={true}
-                />
+              <View style={styles.inputContainer}>
+                <Label text="Enter Security PIN" marked={false} />
+                <View className="justify-center items-center">
+                  <OtpInput
+                    length={6}
+                    value={boxes}
+                    onChange={setBoxes}
+                    secureTextEntry
+                    autoFocus={true}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Label text="Confirm Security PIN" marked={false} />
+                <View className="justify-center items-center">
+                  <OtpInput
+                    length={6}
+                    value={confirmBoxes}
+                    onChange={setConfirmBoxes}
+                    secureTextEntry
+                    autoFocus={false}
+                  />
+                </View>
               </View>
             </View>
 
-            <View style={styles.inputContainer}>
-              <Label text="Confirm Security PIN" marked={false} />
-              <View className="justify-center items-center">
-                <OtpInput
-                  length={6}
-                  value={confirmBoxes}
-                  onChange={setConfirmBoxes}
-                  secureTextEntry
-                  autoFocus={false}
-                />
-              </View>
-            </View>
+            <Button
+              title="Confirm"
+              onPress={handleConfirmPin}
+              isLoading={loading}
+              style={{ marginTop: SPACING * 10 }}
+              textColor="#fff"
+            />
           </View>
-
-          <Button
-            title="Confirm"
-            onPress={handleConfirmPin}
-            isLoading={loading}
-            style={{ marginTop: SPACING * 4 }}
-            textColor="#fff"
-          />
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );
@@ -153,7 +156,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "column",
     paddingVertical: SPACING * 1.5,
-    paddingHorizontal: SPACING * 2,
+    paddingHorizontal: SPACING * 1.5,
     borderRadius: 10,
     backgroundColor: COLORS.white,
     marginTop: SPACING * 2,
