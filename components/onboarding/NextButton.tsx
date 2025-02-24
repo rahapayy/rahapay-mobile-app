@@ -14,13 +14,13 @@ import { RegularText } from "../common/Text";
 const { height: windowHeight, width: windowWidth } = Dimensions.get("window");
 
 interface NextButtonProps {
-  scrollTo: () => void;
+  // scrollTo: () => void;
   onLoginPress: () => void;
   onCreateAccountPress: () => void;
 }
 
 const NextButton: FC<NextButtonProps> = ({
-  scrollTo,
+  // scrollTo,
   onLoginPress,
   onCreateAccountPress,
 }) => {

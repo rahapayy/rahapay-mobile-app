@@ -39,7 +39,7 @@ const AuthRoute = () => {
   }
 
   return (
-    <Stack.Navigator initialRouteName="LoginScreen">
+    <Stack.Navigator>
       {showOnboarding && (
         <>
           <Stack.Screen
@@ -50,12 +50,17 @@ const AuthRoute = () => {
         </>
       )}
       <Stack.Screen
+        name="LoginScreen"
+        component={LoginScreen}
+        options={{ headerShown: false }}
+      />
+      {/* <Stack.Screen
         name="WelcomeScreen"
         component={WelcomeScreen}
         options={{
           headerShown: false,
         }}
-      />
+      /> */}
       <Stack.Screen
         name="CreateAccountScreen"
         component={CreateAccountScreen}
@@ -79,11 +84,6 @@ const AuthRoute = () => {
       <Stack.Screen
         name="CreateNewPasswordScreen"
         component={CreateNewPasswordScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="LoginScreen"
-        component={LoginScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

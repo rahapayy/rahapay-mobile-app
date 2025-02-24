@@ -18,6 +18,7 @@ const HomeScreen: React.FC<{
 }> = ({ navigation }) => {
   const { userInfo } = useAuth();
   // console.log(userInfo);
+  // console.log(userInfo?.deviceToken);
 
   return (
     <>

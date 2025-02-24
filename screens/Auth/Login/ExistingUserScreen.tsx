@@ -1,211 +1,226 @@
-import React, { useContext, useEffect, useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
-import FaceId from "../../../assets/svg/mingcute_faceid-line.svg";
-import COLORS from "../../../constants/colors";
-import SPACING from "../../../constants/SPACING";
-import Backspace from "../../../assets/svg/solar_backspace-linear.svg";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { AuthContext } from "../../../services/AuthContext";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  StatusBar,
+  Alert,
+  AppState,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import * as LocalAuthentication from "expo-local-authentication";
+import { RFValue } from "react-native-responsive-fontsize";
+import { Ionicons } from "@expo/vector-icons"; // For the face ID icon (or use your icon library)
+import { getItem, setItem } from "@/utils/storage";
+import COLORS from "@/constants/colors";
+import SPACING from "@/constants/SPACING";
+import { useAuth } from "@/services/AuthContext";
 
-type ExistingUserScreenProps = {
-  navigation: NativeStackNavigationProp<any>;
-};
+const ExistingUserScreen = () => {
+  const navigation = useNavigation();
+  const { isAuthenticated, userInfo,  } = useAuth();
+  const [showBiometricOption, setShowBiometricOption] = useState(false);
+  const [lastActiveTime, setLastActiveTime] = useState<Date | null>(null);
 
-const ExistingUserScreen: React.FC<ExistingUserScreenProps> = ({
-  navigation,
-}) => {
-  const [pin, setPin] = useState<string>("");
-  const { userDetails } = useContext(AuthContext);
+  // Load last active time from AsyncStorage or set current time on mount
+  useEffect(() => {
+    const loadLastActiveTime = async () => {
+      try {
+        const savedTime = await getItem("LASTACTIVETIME");
+        if (savedTime) {
+          setLastActiveTime(new Date(savedTime));
+        } else {
+          setLastActiveTime(new Date());
+          await setItem("LASTACTIVETIME", new Date().toISOString());
+        }
+      } catch (error) {
+        console.error("Error loading last active time:", error);
+      }
+    };
 
-  const handlePinPress = (value: string) => {
-    if (pin.length < 4) {
-      setPin(pin + value);
+    loadLastActiveTime();
+
+    // Listen for app state changes to update last active time
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
+    return () => subscription.remove();
+  }, []);
+
+  // Handle app state changes (background/foreground)
+  const handleAppStateChange = async (nextAppState: string) => {
+    if (nextAppState === "background") {
+      await setItem("LASTACTIVETIME", new Date().toISOString());
+    } else if (nextAppState === "active") {
+      checkInactivity();
     }
   };
 
-  const handleBackspace = () => {
-    setPin(pin.slice(0, -1));
+  // Check if user has been inactive for 1 minute
+  const checkInactivity = () => {
+    if (!lastActiveTime) return;
+
+    const now = new Date();
+    const timeDiff = (now.getTime() - lastActiveTime.getTime()) / 1000; // In seconds
+    const isInactiveForOneMinute = timeDiff >= 60; // 1 minute for testing
+
+    if (isInactiveForOneMinute) {
+      setShowBiometricOption(true);
+    }
   };
 
-  const renderPinDots = () => {
-    let dots = [];
-    for (let i = 0; i < 4; i++) {
-      dots.push(
-        <View
-          key={i}
-          style={[styles.dot, { opacity: i < pin.length ? 1 : 0.2 }]}
-        />
+  // Handle biometric login
+  const handleBiometricLogin = async () => {
+    try {
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: "Authenticate with Face ID",
+        cancelLabel: "Cancel",
+      });
+
+      if (result.success) {
+        Alert.alert("Success", "Logged in with Face ID!");
+        navigation.navigate("AppStack" as never); // Navigate to app stack after success
+        setShowBiometricOption(false); // Hide biometric option after success
+        await setItem("LASTACTIVETIME", new Date().toISOString()); // Update last active time
+      } else {
+        Alert.alert(
+          "Authentication Failed",
+          "Please try again or log in with password."
+        );
+      }
+    } catch (error) {
+      console.error("Biometric authentication error:", error);
+      Alert.alert(
+        "Error",
+        "Biometric authentication failed. Please try again."
       );
     }
-    return dots;
   };
 
-  const handleBiometricAuth = async () => {
-  
+  // Handle switch account or login with password
+  const handleSwitchAccount = () => {
+    navigation.navigate("LoginScreen" as never); // Navigate back to login
   };
 
-  const handlePinSubmit = async () => {
-  
+  const handleLoginWithPassword = () => {
+    navigation.navigate("LoginScreen" as never); // Navigate to password login
   };
-
-  useEffect(() => {
-    if (pin.length === 4) {
-      handlePinSubmit();
-    }
-  }, [pin]);
-
-  const fullName = userDetails?.fullName || "";
-  const firstName = fullName.split(" ")[0];
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require("../../../assets/images/avatar.png")}
-        style={styles.logo}
-      />
-      <Text style={styles.welcomeText}>Welcome back {firstName}!</Text>
-      <Text style={styles.subText}>
-        Enter the pin associated with your account
-      </Text>
-      <View style={styles.pinContainer}>{renderPinDots()}</View>
-      <View style={styles.keypad}>
-        {(
-          [
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9",
-            "face",
-            "0",
-            "backspace",
-          ] as const
-        ).map((key, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.key}
-            onPress={() => {
-              if (key === "backspace") {
-                handleBackspace();
-              } else if (key !== "face") {
-                handlePinPress(key);
-              } else {
-                handleBiometricAuth();
-              }
-            }}
-          >
-            {key === "face" ? (
-              <FaceId style={styles.icon} />
-            ) : key === "backspace" ? (
-              <Backspace style={styles.icon} />
-            ) : (
-              <Text style={styles.keyText}>{key}</Text>
-            )}
-          </TouchableOpacity>
-        ))}
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+
+      {/* App Logo */}
+      <View style={styles.logoContainer}>
+        <Text style={styles.logoText}>RahaPay</Text>
       </View>
-      <View className="flex-row gap-2">
-        <Text style={styles.resetText}>Having troubles remembering pin?</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("ResetPinScreen")}>
-          <Text style={styles.linkText}>Reset Pin</Text>
-        </TouchableOpacity>
+
+      {/* User Info Circle */}
+      <View style={styles.userCircle}>
+        <Text style={styles.userCircleText}>R</Text>
       </View>
-      <View className="flex-row gap-2 mt-2">
-        <Text style={styles.switchAccountText} allowFontScaling={false}>
-          Not you?
+
+      {/* User Info */}
+      <Text style={styles.userName}>Jonah (806****308)</Text>
+
+      {/* Face ID Login Button */}
+      <TouchableOpacity
+        style={styles.biometricButton}
+        onPress={handleBiometricLogin}
+        disabled={!showBiometricOption}
+      >
+        <Ionicons name="scan" size={24} color={COLORS.green300} />
+        <Text style={styles.biometricText}>
+          {showBiometricOption
+            ? "Click to Login with Face ID"
+            : "Click to Login with Face ID"}
         </Text>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("CreateAccountScreen")}
-        >
-          <Text style={styles.linkText} allowFontScaling={false}>
-            Switch Account
-          </Text>
+      </TouchableOpacity>
+
+      {/* Switch Account and Login with Password */}
+      <View style={styles.actionsContainer}>
+        <TouchableOpacity onPress={handleSwitchAccount}>
+          <Text style={styles.actionText}>Switch Account</Text>
+        </TouchableOpacity>
+        <Text style={styles.separator}> | </Text>
+        <TouchableOpacity onPress={handleLoginWithPassword}>
+          <Text style={styles.actionText}>Login with Password</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
 
-export default ExistingUserScreen;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
-    padding: 16,
-    marginTop: SPACING,
+    paddingHorizontal: SPACING * 2,
   },
-  logo: {
-    width: 80,
-    height: 80,
-    marginBottom: 16,
+  logoContainer: {
+    marginBottom: SPACING * 4,
   },
-  welcomeText: {
-    fontSize: 24,
+  logoText: {
+    fontSize: RFValue(24),
     fontFamily: "Outfit-Bold",
-    marginBottom: 8,
-  },
-  subText: {
-    fontSize: 16,
-    color: "#7D7D7D",
-    marginBottom: 32,
-    fontFamily: "Outfit-Regular",
-  },
-  pinContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 32,
-  },
-  dot: {
-    width: 16,
-    height: 16,
-    borderRadius: 10,
-    backgroundColor: COLORS.violet400,
-    margin: 8,
-  },
-  keypad: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    marginBottom: 32,
-    gap: 10,
-  },
-  key: {
-    width: 80,
-    height: 80,
-    alignItems: "center",
-    justifyContent: "center",
-    margin: 8,
-    borderRadius: 40,
-    backgroundColor: "#F2F2F2",
-  },
-  keyText: {
-    fontSize: 24,
-    fontFamily: "Outfit-Bold",
-  },
-  icon: {
-    width: 24,
-    height: 24,
-  },
-  resetText: {
-    fontSize: 14,
-    color: "#7D7D7D",
-    fontFamily: "Outfit-Regular",
-  },
-  linkText: {
     color: COLORS.violet400,
-    fontFamily: "Outfit-Bold",
   },
-  switchAccountText: {
-    fontSize: 14,
-    color: "#7D7D7D",
-    marginTop: 8,
+  userCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: COLORS.black100,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: SPACING * 2,
+  },
+  userCircleText: {
+    fontSize: RFValue(24),
+    fontFamily: "Outfit-Bold",
+    color: COLORS.violet400,
+  },
+  userName: {
+    fontSize: RFValue(16),
     fontFamily: "Outfit-Regular",
+    color: "#000",
+    marginBottom: SPACING * 3,
+  },
+  biometricButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    paddingVertical: SPACING * 2,
+    paddingHorizontal: SPACING * 3,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: COLORS.green300,
+    marginBottom: SPACING * 4,
+  },
+  biometricText: {
+    fontSize: RFValue(14),
+    fontFamily: "Outfit-Regular",
+    color: COLORS.green400,
+    marginLeft: SPACING,
+  },
+  actionsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  actionText: {
+    fontSize: RFValue(12),
+    fontFamily: "Outfit-Regular",
+    color: COLORS.green400,
+  },
+  separator: {
+    fontSize: RFValue(12),
+    fontFamily: "Outfit-Regular",
+    color: COLORS.green400,
+    marginHorizontal: SPACING / 2,
   },
 });
+
+export default ExistingUserScreen;

@@ -1,5 +1,12 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { View, TextInput, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import React, { useRef, useState, useEffect } from "react";
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Platform,
+} from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../../constants/SPACING";
 import COLORS from "../../../../constants/colors";
@@ -9,7 +16,10 @@ interface OtpInputProps {
   value: string[];
   onChange: (value: string[]) => void;
   secureTextEntry?: boolean;
-  autoFocus?: boolean; // New prop
+  autoFocus?: boolean;
+  disabled?: boolean;
+  error?: boolean;
+  onComplete?: (otp: string) => void;
 }
 
 const OtpInput: React.FC<OtpInputProps> = ({
@@ -17,78 +27,110 @@ const OtpInput: React.FC<OtpInputProps> = ({
   value,
   onChange,
   secureTextEntry = false,
-  autoFocus = false, // Default to false
+  autoFocus = true, // Changed default to true for auto keyboard
+  disabled = false,
+  error = false,
+  onComplete,
 }) => {
-  const inputRefs = useRef<Array<TextInput | null>>(new Array(length).fill(null));
-  const [inputFocused, setInputFocused] = useState(new Array(length).fill(false));
+  const inputRefs = useRef<Array<TextInput | null>>(Array(length).fill(null));
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
 
+  // Auto-focus first input and show keyboard on mount
   useEffect(() => {
-    if (autoFocus) {
+    if (autoFocus && !disabled) {
+      // Focus the first input
       inputRefs.current[0]?.focus();
+      // Ensure keyboard is shown (redundant on most platforms, but safe)
+      Keyboard.dismiss(); // Reset any existing keyboard state
+      setTimeout(() => inputRefs.current[0]?.focus(), 100); // Small delay to ensure focus
     }
-  }, [autoFocus]);
+  }, [autoFocus, disabled]);
+
+  // Trigger onComplete when OTP is fully entered
+  useEffect(() => {
+    if (value.every((digit) => digit !== "") && onComplete) {
+      onComplete(value.join(""));
+    }
+  }, [value, onComplete]);
 
   const handleInput = (text: string, index: number) => {
-    if (/^\d{0,1}$/.test(text)) {
-      const newValue = [...value];
-      newValue[index] = text;
-      onChange(newValue);
+    if (!/^\d?$/.test(text) || disabled) return;
 
-      if (text !== '' && index < length - 1) {
-        inputRefs.current[index + 1]?.focus();
-      }
+    const newValue = [...value];
+    newValue[index] = text;
+    onChange(newValue);
+
+    if (text && index < length - 1) {
+      inputRefs.current[index + 1]?.focus();
+    } else if (!text && index > 0) {
+      inputRefs.current[index - 1]?.focus();
     }
   };
 
   const handleKeyPress = (event: any, index: number) => {
-    if (event.nativeEvent.key === 'Backspace' && index > 0 && value[index] === '') {
+    if (disabled) return;
+
+    const key = event.nativeEvent.key;
+    if (key === "Backspace" && value[index] === "" && index > 0) {
       const newValue = [...value];
-      newValue[index - 1] = '';
+      newValue[index - 1] = "";
       onChange(newValue);
       inputRefs.current[index - 1]?.focus();
     }
   };
 
-  const handlePaste = (text: string) => {
-    if (text.length === length && /^\d+$/.test(text)) {
-      onChange(text.split(''));
+  const handlePaste = (event: any) => {
+    if (disabled) return;
+
+    const text = Platform.OS === "web" ? event.nativeEvent.text : event;
+    if (text.length >= length && /^\d+$/.test(text)) {
+      const newValue = text.slice(0, length).split("");
+      onChange(newValue);
       inputRefs.current[length - 1]?.focus();
     }
   };
 
+  const handleFocus = (index: number) => {
+    if (!disabled) {
+      setFocusedIndex(index);
+    }
+  };
+
+  const handleBlur = () => {
+    setFocusedIndex(null);
+  };
+
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={styles.inputRow}>
-        {value.map((digit, index) => (
+      <View style={styles.container}>
+        {Array.from({ length }).map((_, index) => (
           <TextInput
             key={index}
             ref={(ref) => (inputRefs.current[index] = ref)}
             style={[
               styles.inputBox,
-              inputFocused[index] && styles.inputBoxFocused,
+              focusedIndex === index && styles.inputBoxFocused,
+              error && styles.inputBoxError,
+              disabled && styles.inputBoxDisabled,
             ]}
             keyboardType="numeric"
-            value={digit}
+            maxLength={1}
+            value={value[index] || ""}
             secureTextEntry={secureTextEntry}
             allowFontScaling={false}
-            onChangeText={(text) => {
-              if (text.length > 1) {
-                handlePaste(text);
-              } else {
-                handleInput(text, index);
+            editable={!disabled}
+            onChangeText={(text) => handleInput(text, index)}
+            onKeyPress={(e) => handleKeyPress(e, index)}
+            onFocus={() => handleFocus(index)}
+            onBlur={handleBlur}
+            onSubmitEditing={() => {
+              if (index < length - 1) {
+                inputRefs.current[index + 1]?.focus();
               }
             }}
-            onKeyPress={(event) => handleKeyPress(event, index)}
-            onFocus={() => setInputFocused((prev) => {
-              const newFocused = [...prev];
-              newFocused[index] = true;
-              return newFocused;
-            })}
-            onBlur={() => setInputFocused((prev) => {
-              const newFocused = [...prev];
-              newFocused[index] = false;
-              return newFocused;
-            })}
+            accessibilityLabel={`OTP digit ${index + 1}`}
+            returnKeyType={index === length - 1 ? "done" : "next"}
+            blurOnSubmit={index === length - 1}
           />
         ))}
       </View>
@@ -97,24 +139,34 @@ const OtpInput: React.FC<OtpInputProps> = ({
 };
 
 const styles = StyleSheet.create({
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  container: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: SPACING / 2,
   },
   inputBox: {
-    width: 40,
-    height: 40,
-    textAlign: 'center',
-    borderRadius: 10,
-    margin: SPACING / 3,
-    borderWidth: 1,
-    borderColor: '#DFDFDF',
-    fontSize: RFValue(10),
-    fontWeight: 'bold',
+    width: RFValue(45),
+    height: RFValue(45),
+    textAlign: "center",
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: COLORS.grey100,
+    fontSize: RFValue(16),
+    fontFamily: "System",
+    color: COLORS.black400,
+    backgroundColor: "none",
   },
   inputBoxFocused: {
     borderColor: COLORS.violet400,
-    borderWidth: 1,
+  },
+  inputBoxError: {
+    borderColor: COLORS.red500,
+  },
+  inputBoxDisabled: {
+    borderColor: COLORS.grey200,
+    backgroundColor: COLORS.grey100,
+    opacity: 0.6,
   },
 });
 

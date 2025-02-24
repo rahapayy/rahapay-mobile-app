@@ -1,16 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import {
-  SafeAreaView,
-  StyleSheet,
-  TextInput,
-  View,
-} from "react-native";
+import { SafeAreaView, StyleSheet, TextInput, View } from "react-native";
 import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
 import Button from "../../../components/common/ui/buttons/Button";
-import  { services } from "../../../services/apiClient";
+import { services } from "../../../services/apiClient";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import BackButton from "../../../components/common/ui/buttons/BackButton";
 import {
@@ -18,8 +13,8 @@ import {
   MediumText,
   SemiBoldText,
 } from "../../../components/common/Text";
-import OtpInput from "../../../components/OtpInput";
 import { IVerifyResetDto } from "@/services/dtos";
+import OtpInput from "@/components/common/ui/forms/OtpInput";
 
 type EnterCodeScreenRouteParams = {
   email: string;
@@ -31,7 +26,7 @@ const EnterCodeScreen: React.FC<{
   const route =
     useRoute<RouteProp<{ params: EnterCodeScreenRouteParams }, "params">>();
   const email = route.params.email;
-  
+
   const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const boxRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
@@ -47,41 +42,6 @@ const EnterCodeScreen: React.FC<{
 
     return () => clearTimeout(timer);
   }, [resendCountdown]);
-
-  const handlePaste = (text: string) => {
-    if (/^\d{6}$/.test(text)) {
-      const newBoxes = text.split("");
-      setBoxes(newBoxes);
-      boxRefs.current[5]?.focus();
-    }
-  };
-
-  const handleInput = (text: string, index: number) => {
-    if (/^\d{0,1}$/.test(text)) {
-      const newBoxes = [...boxes];
-      newBoxes[index] = text;
-      setBoxes(newBoxes);
-
-      const allBoxesCleared = newBoxes.every((box) => box === "");
-
-      if (text === "" && index > 0) {
-        boxRefs.current[index - 1]?.focus();
-      } else if (index < 5 && !allBoxesCleared) {
-        boxRefs.current[index + 1]?.focus();
-      } else if (allBoxesCleared) {
-        boxRefs.current[0]?.focus();
-      }
-    }
-  };
-
-  const handleKeyPress = (index: number, event: any) => {
-    if (event.nativeEvent.key === "Backspace" && index > 0) {
-      const newBoxes = [...boxes];
-      newBoxes[index - 1] = "";
-      setBoxes(newBoxes);
-      boxRefs.current[index - 1]?.focus();
-    }
-  };
 
   // const requestOtpHandler = async () => {
   //   setIsSubmitting(true);
@@ -171,13 +131,11 @@ const EnterCodeScreen: React.FC<{
           </View>
 
           <OtpInput
-            boxes={boxes}
-            boxRefs={boxRefs}
-            handleInput={handleInput}
-            handlePaste={handlePaste}
-            handleKeyPress={handleKeyPress}
-            boxIsFocused={boxIsFocused}
-            setBoxIsFocused={setBoxIsFocused}
+            value={boxes}
+            length={6}
+            onChange={setBoxes}
+            secureTextEntry
+            autoFocus={true}
           />
           <View className="justify-center items-center mt-6">
             <LightText color="light">Didn't receive an OTP?</LightText>
