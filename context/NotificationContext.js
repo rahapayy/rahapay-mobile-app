@@ -1,15 +1,10 @@
-import React, {
-  createContext,
-  useState,
-  useEffect,
-  useRef,
-} from 'react';
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
-import { Platform, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { services } from '../services/apiClient';
-import { useAuth } from '../services/AuthContext';
+import React, { createContext, useState, useEffect, useRef } from "react";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
+import { Platform, Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { services } from "../services/apiClient";
+import { useAuth } from "../services/AuthContext";
 
 export const NotificationContext = createContext();
 
@@ -22,7 +17,7 @@ Notifications.setNotificationHandler({
 });
 
 export const NotificationProvider = ({ children }) => {
-  const [expoPushToken, setExpoPushToken] = useState('');
+  const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -32,35 +27,42 @@ export const NotificationProvider = ({ children }) => {
 
   const { isAuthenticated, userInfo } = useAuth(); // userInfo contains backend user data
 
-  // Load persisted state and check permissions on mount
+  // Initialize notifications and load persisted state
   useEffect(() => {
-    const loadPersistedState = async () => {
+    const initializeNotifications = async () => {
       try {
-        const enabled = await AsyncStorage.getItem('notificationsEnabled');
+        // Load persisted state
+        const enabled = await AsyncStorage.getItem("notificationsEnabled");
         if (enabled !== null) {
           setNotificationsEnabled(JSON.parse(enabled));
         }
         await loadPersistedNotifications();
 
-        if (isAuthenticated) {
+        if (isAuthenticated && userInfo) {
           await checkIfPermissionRequested();
-          await checkAndUpdateDeviceToken(); // Check device token on load
+          if (notificationsEnabled) {
+            await setupNotifications(); // Ensure token is set first
+            await checkAndUpdateDeviceToken(); // Then check and send
+          }
         }
       } catch (error) {
-        console.error('Error loading persisted state:', error);
+        console.error("Error initializing notifications:", error);
       }
     };
-    loadPersistedState();
-  }, [isAuthenticated, userInfo]); // Add userInfo to dependencies
+    initializeNotifications();
+  }, [isAuthenticated, userInfo]);
 
   // Persist notificationsEnabled whenever it changes
   useEffect(() => {
-    AsyncStorage.setItem('notificationsEnabled', JSON.stringify(notificationsEnabled)).catch((error) =>
-      console.error('Error saving notificationsEnabled:', error)
+    AsyncStorage.setItem(
+      "notificationsEnabled",
+      JSON.stringify(notificationsEnabled)
+    ).catch((error) =>
+      console.error("Error saving notificationsEnabled:", error)
     );
   }, [notificationsEnabled]);
 
-  // Setup notifications when enabled
+  // Setup listeners when notifications are enabled
   useEffect(() => {
     if (notificationsEnabled) {
       setupNotifications();
@@ -80,72 +82,90 @@ export const NotificationProvider = ({ children }) => {
     const token = await registerForPushNotificationsAsync();
     if (token) {
       setExpoPushToken(token);
-      console.log('Device token:', token);
+      console.log("Device token generated:", token);
       await checkAndUpdateDeviceToken(token); // Check and send token after setup
     }
 
-    notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
-      setNotification(notification);
-      setNotifications((prev) => {
-        const updated = [...prev, notification];
-        persistNotifications(updated);
-        console.log('Updated notifications (foreground):', updated);
-        return updated;
-      });
-      console.log('Notification received in foreground:', notification);
-    });
-
-    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log('Notification response received:', response);
-      if (response?.notification) {
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification);
         setNotifications((prev) => {
-          const updated = [...prev, response.notification];
+          const updated = [...prev, notification];
           persistNotifications(updated);
-          console.log('Updated notifications (response):', updated);
+          console.log("Updated notifications (foreground):", updated);
           return updated;
         });
-      }
-    });
+        console.log("Notification received in foreground:", notification);
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log("Notification response received:", response);
+        if (response?.notification) {
+          setNotifications((prev) => {
+            const updated = [...prev, response.notification];
+            persistNotifications(updated);
+            console.log("Updated notifications (response):", updated);
+            return updated;
+          });
+        }
+      });
   };
 
-  // New function to check and update device token
-  const checkAndUpdateDeviceToken = async (newToken?: string) => {
+  // Check and update device token with retry logic
+  const checkAndUpdateDeviceToken = async (newToken) => {
+    console.log("Checking device token. Enabled:", notificationsEnabled, "Authenticated:", isAuthenticated);
     if (!notificationsEnabled || !isAuthenticated || !userInfo) return;
 
-    const backendDeviceToken = userInfo.deviceToken; // From AuthContext
-    const currentToken = newToken || expoPushToken;
+    const backendDeviceToken = userInfo.deviceToken;
+    let currentToken = newToken || expoPushToken;
 
-    // If no device token in backend or it differs from current token
-    if (!backendDeviceToken || (currentToken && backendDeviceToken !== currentToken)) {
-      const tokenToSend = currentToken || (await registerForPushNotificationsAsync());
-      if (tokenToSend) {
-        await sendDeviceTokenToBackend(tokenToSend);
-        setExpoPushToken(tokenToSend); // Update local state
+    if (!currentToken) {
+      currentToken = await registerForPushNotificationsAsync();
+      if (!currentToken) {
+        console.log("Failed to generate a token for sending.");
+        return;
       }
+    }
+
+    console.log("Backend token:", backendDeviceToken, "Current token:", currentToken);
+
+    if (
+      !backendDeviceToken ||
+      (currentToken && backendDeviceToken !== currentToken)
+    ) {
+      console.log("Token to send:", currentToken);
+      await sendDeviceTokenToBackend(currentToken);
+      setExpoPushToken(currentToken);
+    } else {
+      console.log("No update needed; tokens match or backend token exists.");
     }
   };
 
   const persistNotifications = async (notificationsToPersist) => {
     try {
-      await AsyncStorage.setItem('persistedNotifications', JSON.stringify(notificationsToPersist));
+      await AsyncStorage.setItem(
+        "persistedNotifications",
+        JSON.stringify(notificationsToPersist)
+      );
     } catch (error) {
-      console.error('Error persisting notifications:', error);
+      console.error("Error persisting notifications:", error);
     }
   };
 
   const loadPersistedNotifications = async () => {
     try {
-      const saved = await AsyncStorage.getItem('persistedNotifications');
+      const saved = await AsyncStorage.getItem("persistedNotifications");
       if (saved) {
         setNotifications(JSON.parse(saved));
       }
     } catch (error) {
-      console.error('Error loading notifications:', error);
+      console.error("Error loading notifications:", error);
     }
   };
 
   const checkIfPermissionRequested = async () => {
-    const value = await AsyncStorage.getItem('hasAskedForPermission');
+    const value = await AsyncStorage.getItem("hasAskedForPermission");
     if (value === null) {
       showPermissionAlert();
     } else {
@@ -155,21 +175,21 @@ export const NotificationProvider = ({ children }) => {
 
   const showPermissionAlert = () => {
     Alert.alert(
-      'Enable Notifications',
-      'Would you like to enable push notifications to stay updated?',
+      "Enable Notifications",
+      "Would you like to enable push notifications to stay updated?",
       [
         {
-          text: 'No',
+          text: "No",
           onPress: () => {
-            AsyncStorage.setItem('hasAskedForPermission', 'true');
+            AsyncStorage.setItem("hasAskedForPermission", "true");
             setHasAskedForPermission(true);
           },
-          style: 'cancel',
+          style: "cancel",
         },
         {
-          text: 'Yes',
+          text: "Yes",
           onPress: () => {
-            AsyncStorage.setItem('hasAskedForPermission', 'true');
+            AsyncStorage.setItem("hasAskedForPermission", "true");
             setHasAskedForPermission(true);
             setNotificationsEnabled(true);
           },
@@ -181,39 +201,42 @@ export const NotificationProvider = ({ children }) => {
 
   const sendDeviceTokenToBackend = async (token) => {
     try {
+      console.log("Attempting to send token:", token);
       const response = await services.notificationService.sendDeviceToken(token);
-      console.log('Device token sent to backend:', response);
+      console.log("Device token sent successfully:", response);
     } catch (error) {
-      console.error('Error sending device token to backend:', error);
-      Alert.alert('Error', 'Failed to sync device token with server.');
+      console.error("Failed to send token:", error.response?.data || error.message);
+      Alert.alert("Error", "Failed to sync device token. Retrying in 5 seconds...");
+      setTimeout(() => sendDeviceTokenToBackend(token), 5000); // Retry after 5s
     }
   };
 
   async function registerForPushNotificationsAsync() {
     let token;
-    if (Platform.OS === 'android') {
-      await Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
+    if (Platform.OS === "android") {
+      await Notifications.setNotificationChannelAsync("default", {
+        name: "default",
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF231F7C',
+        lightColor: "#FF231F7C",
       });
     }
 
     if (Device.isDevice) {
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
-      if (existingStatus !== 'granted') {
+      if (existingStatus !== "granted") {
         const { status } = await Notifications.requestPermissionsAsync();
         finalStatus = status;
       }
-      if (finalStatus !== 'granted') {
-        alert('Failed to get push token for push notification!');
+      if (finalStatus !== "granted") {
+        console.log("Push notification permissions not granted.");
+        alert("Failed to get push token for push notification!");
         return;
       }
       token = (await Notifications.getExpoPushTokenAsync()).data;
     } else {
-      alert('Must use a physical device for Push Notifications');
+      alert("Must use a physical device for Push Notifications");
     }
 
     return token;
