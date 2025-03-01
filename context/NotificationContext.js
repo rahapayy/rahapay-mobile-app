@@ -112,9 +112,8 @@ export const NotificationProvider = ({ children }) => {
       });
   };
 
-  // Check and update device token with retry logic
+  // New function to check and update device token
   const checkAndUpdateDeviceToken = async (newToken) => {
-    console.log("Checking device token. Enabled:", notificationsEnabled, "Authenticated:", isAuthenticated);
     if (!notificationsEnabled || !isAuthenticated || !userInfo) return;
 
     const backendDeviceToken = userInfo.deviceToken;

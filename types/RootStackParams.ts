@@ -106,6 +106,7 @@ export type AppStackParamList = {
   EditTagScreen: undefined;
   CreateTagScreen: undefined;
   TicketScreen: undefined;
+  ExistingUserScreen: undefined
 };
 
 // Auth Stack (Authentication-related screens)
