@@ -11,6 +11,7 @@ import { NotificationProvider } from "./context/NotificationContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Router from "./router/Router";
 import { AuthProvider } from "./services/AuthContext";
+import "./global.css"
 
 const queryClient = new QueryClient();
 

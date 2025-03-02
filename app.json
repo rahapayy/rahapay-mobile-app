@@ -45,6 +45,7 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "userInterfaceStyle": "automatic",
     "plugins": [
       "expo-font",
       "expo-localization",
