@@ -16,13 +16,12 @@ import FONT_SIZE from "../constants/font-size";
 import COLORS from "../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import LottieView from "lottie-react-native";
-import { NotificationContext } from "../context/NotificationContext";
-import { Skeleton } from "@rneui/themed";
+import { useNotification } from "../context/NotificationContext";
 
 const NotificationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { notifications } = useContext(NotificationContext);
+  const { notifications } = useNotification();
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
