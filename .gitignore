@@ -15,8 +15,3 @@ config.ts
 # macOS
 .DS_Store
 
-/android
-/ios
-
-/android
-/ios
