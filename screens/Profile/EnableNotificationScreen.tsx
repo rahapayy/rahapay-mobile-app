@@ -16,15 +16,14 @@ import SPACING from "../../constants/SPACING";
 import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
-import { NotificationContext } from "../../context/NotificationContext"; // Adjust path as needed
+import { useNotification } from "../../context/NotificationContext";
 import * as Notifications from "expo-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const EnableNotificationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { notificationsEnabled, setNotificationsEnabled } =
-    useContext(NotificationContext);
+  const { notificationsEnabled, setNotificationsEnabled } = useNotification();
   const [isSmsNotificationEnabled, setIsSmsNotificationEnabled] =
     useState(false);
 
