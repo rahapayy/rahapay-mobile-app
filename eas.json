@@ -7,8 +7,8 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "ios": {
-        "resourceClass": "m-medium"
+      "env": {
+        "APP_VARIANT": "development"
       },
       "channel": "development"
     },
@@ -19,44 +19,24 @@
       },
       "channel": "development-simulator"
     },
-    "test": {
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      },
-      "ios": {
-        "resourceClass": "m-medium"
-      },
-      "channel": "test-0.0.1-alpha",
-      "autoIncrement": true
-    },
     "preview": {
       "distribution": "internal",
-      "ios": {
-        "resourceClass": "m-medium"
+      "env": {
+        "APP_VARIANT": "development"
       },
       "channel": "preview"
     },
     "production": {
-      "ios": {
-        "resourceClass": "m-medium"
-      },
+      "autoIncrement": true,
       "channel": "production"
     }
   },
   "submit": {
-    "test": {
-      "ios": {
-        "appleId": "shedrachjonah22@gmail.com",
-        "ascAppId": "367d0cfa-1475-4062-8ce2-436d9f7b7508",   
-        "appleTeamId": "D84VV5F569"         
-      }
-    },
     "production": {
       "ios": {
-        "appleId": "shedrachjonah22@gmail.com", 
-        "ascAppId": "367d0cfa-1475-4062-8ce2-436d9f7b7508",    
-        "appleTeamId": "D84VV5F569"        
+        "appleId": "shedrachjonah22@gmail.com",
+        "ascAppId": "367d0cfa-1475-4062-8ce2-436d9f7b7508",
+        "appleTeamId": "D84VV5F569"
       }
     }
   }

@@ -7,18 +7,18 @@ import React, {
   ReactNode,
 } from "react";
 import * as Device from "expo-device";
+import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import { Platform, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Subscription } from "expo-modules-core";
 
-// Assuming these are defined elsewhere in your project
 import { services } from "../services/apiClient";
 import { useAuth } from "../services/AuthContext";
 
 // Define types for the context
 interface NotificationContextType {
-  expoPushToken: string;
+  expoPushToken: string | null;
   notification: Notifications.Notification | null;
   notifications: Notifications.Notification[];
   notificationsEnabled: boolean;
@@ -26,6 +26,7 @@ interface NotificationContextType {
   hasAskedForPermission: boolean;
   requestNotificationPermissions: () => void;
   checkAndUpdateDeviceToken: (newToken?: string) => Promise<void>;
+  error: Error | null;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(
@@ -36,7 +37,9 @@ const NotificationContext = createContext<NotificationContextType | undefined>(
 export const useNotification = () => {
   const context = useContext(NotificationContext);
   if (context === undefined) {
-    throw new Error("useNotification must be used within a NotificationProvider");
+    throw new Error(
+      "useNotification must be used within a NotificationProvider"
+    );
   }
   return context;
 };
@@ -58,7 +61,7 @@ Notifications.setNotificationHandler({
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   children,
 }) => {
-  const [expoPushToken, setExpoPushToken] = useState<string>("");
+  const [expoPushToken, setExpoPushToken] = useState<string | null>(null); // Changed to string | null
   const [notification, setNotification] =
     useState<Notifications.Notification | null>(null);
   const [notifications, setNotifications] = useState<
@@ -68,6 +71,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     useState<boolean>(false);
   const [hasAskedForPermission, setHasAskedForPermission] =
     useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null); // Added error state
 
   const notificationListener = useRef<Subscription>();
   const responseListener = useRef<Subscription>();
@@ -89,11 +93,11 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
           await checkIfPermissionRequested();
           if (notificationsEnabled) {
             await setupNotifications();
-            await checkAndUpdateDeviceToken();
           }
         }
       } catch (error) {
         console.error("Error initializing notifications:", error);
+        setError(error instanceof Error ? error : new Error(String(error)));
       }
     };
     initializeNotifications();
@@ -117,7 +121,9 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
 
     return () => {
       if (notificationListener.current) {
-        Notifications.removeNotificationSubscription(notificationListener.current);
+        Notifications.removeNotificationSubscription(
+          notificationListener.current
+        );
       }
       if (responseListener.current) {
         Notifications.removeNotificationSubscription(responseListener.current);
@@ -126,11 +132,14 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   }, [notificationsEnabled]);
 
   const setupNotifications = async () => {
-    const token = await registerForPushNotificationsAsync();
-    if (token) {
+    try {
+      const token = await registerForPushNotificationsAsync();
       setExpoPushToken(token);
       console.log("Device token generated:", token);
       await checkAndUpdateDeviceToken(token);
+    } catch (e) {
+      setError(e instanceof Error ? e : new Error(String(e)));
+      console.error("Setup notifications failed:", e);
     }
 
     notificationListener.current =
@@ -163,12 +172,14 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     if (!notificationsEnabled || !isAuthenticated || !userInfo) return;
 
     const backendDeviceToken = userInfo.deviceToken;
-    let currentToken = newToken || expoPushToken;
+    let currentToken = newToken || expoPushToken || null;
 
     if (!currentToken) {
-      currentToken = await registerForPushNotificationsAsync();
-      if (!currentToken) {
-        console.log("Failed to generate a token for sending.");
+      try {
+        currentToken = await registerForPushNotificationsAsync();
+      } catch (e) {
+        setError(e instanceof Error ? e : new Error(String(e)));
+        console.log("Failed to generate a token for sending:", e);
         return;
       }
     }
@@ -257,8 +268,10 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       const response = await services.notificationService.sendDeviceToken(
         token
       );
+      // console.log(token);
+
       console.log("Device token sent successfully:", response);
-    } catch (error) {
+    } catch (error: any) {
       console.error(
         "Failed to send token:",
         error.response?.data || error.message
@@ -271,8 +284,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     }
   };
 
-  async function registerForPushNotificationsAsync(): Promise<string | undefined> {
-    let token: string | undefined;
+  async function registerForPushNotificationsAsync(): Promise<string> {
     if (Platform.OS === "android") {
       await Notifications.setNotificationChannelAsync("default", {
         name: "default",
@@ -291,16 +303,30 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         finalStatus = status;
       }
       if (finalStatus !== "granted") {
-        console.log("Push notification permissions not granted.");
-        alert("Failed to get push token for push notification!");
-        return;
+        throw new Error(
+          "Permission not granted to get push token for push notification!"
+        );
       }
-      token = (await Notifications.getExpoPushTokenAsync()).data;
+      const projectId =
+        Constants?.expoConfig?.extra?.eas?.projectId ??
+        Constants?.easConfig?.projectId;
+      if (!projectId) {
+        throw new Error("Project ID not found");
+      }
+      try {
+        const pushTokenString = (
+          await Notifications.getExpoPushTokenAsync({
+            projectId,
+          })
+        ).data;
+        console.log("Push token:", pushTokenString);
+        return pushTokenString;
+      } catch (e: unknown) {
+        throw new Error(`${e}`);
+      }
     } else {
-      alert("Must use a physical device for Push Notifications");
+      throw new Error("Must use physical device for push notifications");
     }
-
-    return token;
   }
 
   const requestNotificationPermissions = () => {
@@ -320,6 +346,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         hasAskedForPermission,
         requestNotificationPermissions,
         checkAndUpdateDeviceToken,
+        error,
       }}
     >
       {children}

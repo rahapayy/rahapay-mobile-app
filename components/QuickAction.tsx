@@ -1,6 +1,5 @@
 import {
   StyleSheet,
-  Text,
   TouchableOpacity,
   useWindowDimensions,
   View,
@@ -15,19 +14,20 @@ import {
   TvIcon,
 } from "./common/ui/icons";
 import { BoldText, RegularText } from "./common/Text";
-import { AuthContext } from "../services/AuthContext";
+import { useAuth } from "../services/AuthContext";
 
 interface ActionItem {
   icon: React.ElementType;
   title: string;
   navigateTo?: string;
+  isComingSoon?: boolean;
 }
 
 const QuickAction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const { width: screenWidth } = useWindowDimensions();
-  const { isLoading } = useContext(AuthContext);
+  const { isLoading } = useAuth();
 
   // Set a fixed card size to maintain consistency across screens
   const cardSize = Math.min((screenWidth - 64) / 4, 100);
@@ -36,8 +36,12 @@ const QuickAction: React.FC<{
   const actionItems = [
     { icon: AirtimeIcon, title: "Airtime", navigateTo: "AirtimeScreen" },
     { icon: DataIcon, title: "Data", navigateTo: "DataScreen" },
-    { icon: TvIcon, title: "TV", navigateTo: "TvSubscriptionScreen" },
-    { icon: ElectricityIcon, title: "Electricity", navigateTo: "ElectricityScreen" },
+    { icon: TvIcon, title: "TV", isComingSoon: true },
+    {
+      icon: ElectricityIcon,
+      title: "Electricity",
+      isComingSoon: true,
+    },
   ];
 
   return (
@@ -56,6 +60,13 @@ const QuickAction: React.FC<{
             style={{ width: cardSize, height: cardSize * 1.1 }}
           >
             <item.icon fill={fill} width={24} height={24} />
+            {item.isComingSoon && (
+              <View style={styles.badgeContainer}>
+                <RegularText color="black" size="xsmall" center>
+                  Coming Soon!
+                </RegularText>
+              </View>
+            )}
             <RegularText
               color="black"
               marginTop={8}
@@ -71,3 +82,18 @@ const QuickAction: React.FC<{
 };
 
 export default QuickAction;
+
+
+const styles = StyleSheet.create({
+  disabledCard: {
+    opacity: 0.5,
+  },
+  badgeContainer: {
+    position: "absolute",
+    top: -10,
+    right: 0,
+    backgroundColor: COLORS.violet200,
+    padding: 3,
+    borderRadius: 10
+  },
+});
