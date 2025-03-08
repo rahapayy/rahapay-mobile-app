@@ -2,7 +2,6 @@ import { useAuth } from "@/services/AuthContext";
 import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
 
-// Define the Transaction type based on your API response and usage
 interface Transaction {
   _id: string;
   paidOn: string | number | Date;
@@ -18,34 +17,29 @@ interface Transaction {
   };
 }
 
-// Define the Wallet type
 interface Wallet {
   balance: number;
-  [key: string]: any; // Adjust based on actual wallet properties
+  [key: string]: any;
 }
 
-// Define the Dashboard response type
 interface DashboardData {
-  transacton: Transaction[]; // Note: 'transacton' seems to be a typo in your code, should it be 'transactions'?
+  transacton: Transaction[]; // Note: still contains typo from original
   wallet: Wallet;
   user: {
     _id: string;
   };
 }
 
-// Define the Pagination type
 interface Pagination {
   currentPage: number;
   totalPages: number;
 }
 
-// Define the AllTransactions page type
 interface AllTransactionsPage {
   data: Transaction[];
   pagination: Pagination;
 }
 
-// Define the return type of getAllTransactions
 interface GetAllTransactionsResult {
   transactions: Transaction[];
   pagination: Pagination;
@@ -57,7 +51,6 @@ interface GetAllTransactionsResult {
 const useWallet = () => {
   const { userInfo } = useAuth();
 
-  // Fetch data from both endpoints
   const {
     data: dashboardData,
     isValidating: isDashboardLoading,
@@ -93,25 +86,16 @@ const useWallet = () => {
 
   const isLoading = isDashboardLoading || isReservedAccountsLoading;
 
-  // Correct the extraction of the transactions array from dashboard
+  // Remove filtering from dashboard transactions
   const dashboardTransactions = dashboardData?.transacton || [];
-
-  // Filter the COMMISSION to not show amount in the transaction history
-  const filteredDashboardTransactions = dashboardTransactions.filter(
-    (trx: Transaction) => trx.transactionType !== "COMMISSION"
-  );
 
   const balance = dashboardData?.wallet?.balance || 0;
   const account = dashboardData?.wallet || {};
 
-  // Extract and properly format transactions from infinite loading
+  // Remove filtering from all transactions
   const allTransactionsData = allTransactionsPages
     ? ([] as Transaction[]).concat(
-        ...allTransactionsPages.map((page) =>
-          (page.data || []).filter(
-            (trx: Transaction) => trx.transactionType !== "COMMISSION"
-          )
-        )
+        ...allTransactionsPages.map((page) => page.data || [])
       )
     : [];
 
@@ -128,8 +112,7 @@ const useWallet = () => {
     setCurrentPage,
   });
 
-  // Mapping dashboard transactions to required fields for other views
-  const formattedTransactions = filteredDashboardTransactions.map(
+  const formattedTransactions = dashboardTransactions.map(
     (trx: Transaction) => ({
       amount: trx.amountPaid || 0,
       created_at: new Date(trx.paidOn).toLocaleString(),

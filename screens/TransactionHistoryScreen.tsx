@@ -14,7 +14,6 @@ import { ArrowLeft, WalletAdd1 } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import LottieView from "lottie-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { Skeleton } from "@rneui/themed";
 import useWallet from "../hooks/use-wallet";
 import { MediumText } from "../components/common/Text";
 import SPACING from "../constants/SPACING";
@@ -32,16 +31,13 @@ const AllTransactionsScreen: React.FC<{
     getAllTransactions();
   const [hasTransaction, setHasTransaction] = useState(false);
 
-  // Use useMemo to compute grouped transactions instead of storing in state
   const groupedTransactions = useMemo(() => {
     if (transactions.length === 0) return [];
 
-    // Sort transactions by date (most recent first)
     const sortedTransactions = [...transactions].sort((a, b) => {
       return new Date(b.paidOn).getTime() - new Date(a.paidOn).getTime();
     });
 
-    // Group transactions by date section
     const groups: { [key: string]: any[] } = {};
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -75,7 +71,6 @@ const AllTransactionsScreen: React.FC<{
       ) {
         sectionTitle = "This Month";
       } else {
-        // Format as Month Year for older transactions
         sectionTitle = transactionDate.toLocaleDateString("en-US", {
           month: "long",
           year: "numeric",
@@ -89,14 +84,12 @@ const AllTransactionsScreen: React.FC<{
       groups[sectionTitle].push(transaction);
     });
 
-    // Convert groups object to array format required by SectionList
     return Object.keys(groups).map((key) => ({
       title: key,
       data: groups[key],
     }));
-  }, [transactions]); // Only recalculate when transactions change
+  }, [transactions]);
 
-  // Just update hasTransaction flag when transactions change
   useEffect(() => {
     setHasTransaction(transactions.length > 0);
   }, [transactions]);
@@ -111,12 +104,10 @@ const AllTransactionsScreen: React.FC<{
     provider: string | undefined,
     tranxType: string
   ) => {
-    // If it's a wallet funding transaction, return the WalletAdd1 icon
     if (tranxType === "WALLET_FUNDING") {
       return <WalletAdd1 size={24} color={COLORS.violet400} />;
     }
 
-    // Get provider from metadata if available
     if (provider?.toLowerCase() === "airtel") {
       return <Airtel width={40} height={40} />;
     } else if (provider?.toLowerCase() === "mtn") {
@@ -126,9 +117,6 @@ const AllTransactionsScreen: React.FC<{
     } else if (provider?.toLowerCase() === "glo") {
       return <Glo width={40} height={40} />;
     }
-
-    // Default icon if no match
-    // return <DocumentText size={24} color={COLORS.gray400} />;
   };
 
   const mapTransactionToSummaryFormat = (transaction: {
@@ -141,7 +129,6 @@ const AllTransactionsScreen: React.FC<{
     _id: any;
     metadata: { networkType: any; phoneNumber: any };
   }) => {
-    // Format the date string from transaction.paidOn
     const formattedDate = new Date(transaction.paidOn).toLocaleString("en-US", {
       month: "long",
       day: "numeric",
@@ -150,7 +137,6 @@ const AllTransactionsScreen: React.FC<{
       minute: "2-digit",
     });
 
-    // Map to the expected format for TransactionSummaryScreen
     return {
       purpose: transaction.purpose || transaction.transactionType,
       amount: transaction.amountPaid,
@@ -182,7 +168,6 @@ const AllTransactionsScreen: React.FC<{
         }
         style={styles.transactionItem}
       >
-        {/* Rest of the component remains the same */}
         <View style={styles.iconContainer}>
           {renderServiceIcon(networkType, item.transactionType)}
         </View>
@@ -254,57 +239,18 @@ const AllTransactionsScreen: React.FC<{
     </View>
   );
 
-  const renderLoadingSkeleton = () => (
-    <View className="px-4">
-      {[1, 2, 3, 4, 5, 6].map((item) => (
-        <View key={item} style={styles.transactionItem}>
-          <Skeleton
-            circle
-            width={40}
-            height={40}
-            style={styles.skeletonImage}
-            animation="wave"
-          />
-          <View style={styles.transactionTextContainer}>
-            <View style={styles.transactionTextRow}>
-              <Skeleton
-                width={RFValue(80)}
-                height={RFValue(16)}
-                style={styles.skeletonText}
-                animation="wave"
-              />
-              <Skeleton
-                width={RFValue(60)}
-                height={RFValue(16)}
-                style={styles.skeletonText}
-                animation="wave"
-              />
-            </View>
-            <View style={[styles.transactionTextRow, { marginTop: 8 }]}>
-              <Skeleton
-                width={RFValue(120)}
-                height={RFValue(12)}
-                style={styles.skeletonText}
-                animation="wave"
-              />
-              <Skeleton
-                width={RFValue(40)}
-                height={RFValue(12)}
-                style={styles.skeletonText}
-                animation="wave"
-              />
-            </View>
-          </View>
-        </View>
-      ))}
+  const renderLoadingState = () => (
+    <View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color={COLORS.violet400} />
+      <Text style={styles.loadingText}>Loading Transactions...</Text>
     </View>
   );
 
   const renderFooter = () => {
     if (isLoading && currentPage > 1) {
       return (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="small" color="#000" />
+        <View style={styles.footerLoadingContainer}>
+          <ActivityIndicator size="small" color={COLORS.violet400} />
         </View>
       );
     }
@@ -341,9 +287,8 @@ const AllTransactionsScreen: React.FC<{
         </View>
       </View>
 
-      {/* Always show skeleton while loading, not just on first page */}
-      {isLoading ? (
-        renderLoadingSkeleton()
+      {isLoading && currentPage === 1 ? (
+        renderLoadingState()
       ) : (
         <SectionList
           sections={groupedTransactions}
@@ -439,13 +384,18 @@ const styles = StyleSheet.create({
     color: "#06C270",
     fontSize: RFValue(10),
   },
-  skeletonImage: {
-    marginRight: 10,
-  },
-  skeletonText: {
-    borderRadius: 4,
-  },
   loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(14),
+    color: "#515966",
+  },
+  footerLoadingContainer: {
     padding: 20,
     justifyContent: "center",
     alignItems: "center",
