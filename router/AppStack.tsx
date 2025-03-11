@@ -35,6 +35,7 @@ import SelectPinChangeScreen from "../screens/Profile/SelectPinChangeScreen";
 import BettingSuccess from "../screens/Services/Betting/BettingSuccess";
 import CreateTagScreen from "../screens/Profile/CreateTagScreen";
 import TicketScreen from "../screens/Services/TicketScreen";
+import NotificationDetailScreen from "@/screens/notification/NotificationDetailScreen";
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
@@ -211,6 +212,11 @@ const AppStack = () => {
       <Stack.Screen
         name="TicketScreen"
         component={TicketScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="NotificationDetail"
+        component={NotificationDetailScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

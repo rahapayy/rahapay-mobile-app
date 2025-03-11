@@ -4,7 +4,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import React, { useContext } from "react";
+import React from "react";
 import COLORS from "../constants/colors";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {

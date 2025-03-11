@@ -1,3 +1,4 @@
+// NotificationScreen.tsx
 import {
   Image,
   Platform,
@@ -8,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useContext } from "react";
+import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../constants/SPACING";
@@ -17,17 +18,62 @@ import COLORS from "../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import LottieView from "lottie-react-native";
 import { useNotification } from "../context/NotificationContext";
+import * as Notifications from "expo-notifications"; // Add this import
 
 const NotificationScreen: React.FC<{
-  navigation: NativeStackNavigationProp<any, "">;
+  navigation: NativeStackNavigationProp<any, "Notifications">;
 }> = ({ navigation }) => {
   const { notifications } = useNotification();
+
+  const renderNotificationItem = (
+    notification: Notifications.Notification, // Now properly typed
+    index: React.Key | null | undefined
+  ) => {
+    const { title, body, data } = notification.request.content;
+    const timestamp = data?.timestamp || notification.date;
+    const displayDate = new Date(timestamp).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    return (
+      <TouchableOpacity
+        key={index}
+        onPress={() =>
+          navigation.navigate("NotificationDetail", { notification })
+        }
+        style={styles.transactionItem}
+      >
+        <Image
+          source={require("../assets/images/small-logo.png")}
+          style={styles.transactionImage}
+        />
+        <View style={styles.transactionTextContainer}>
+          <View style={styles.transactionTextRow}>
+            <Text style={styles.item} allowFontScaling={false} numberOfLines={1}>
+              {title || "New Notification"}
+            </Text>
+            <Text style={styles.valueText} allowFontScaling={false}>
+              {displayDate}
+            </Text>
+          </View>
+          <View style={styles.transactionTextRow}>
+            <Text style={styles.date} allowFontScaling={false} numberOfLines={1}>
+              {body || "Notification content"}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
         <View>
-          {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
@@ -40,71 +86,11 @@ const NotificationScreen: React.FC<{
             </Text>
           </View>
 
-          {/* Notification List */}
           {notifications.length > 0 ? (
             <View style={{ padding: SPACING }}>
-              {notifications.map(
-                (
-                  notification: {
-                    request: { content: { title: any; body: any; data: any } };
-                    date: any;
-                  },
-                  index: React.Key | null | undefined
-                ) => {
-                  // Extract details from the notification payload.
-                  const { title, body, data } = notification.request.content;
-                  const timestamp = data?.timestamp || notification.date;
-                  const displayDate = new Date(timestamp).toLocaleDateString(
-                    "en-US",
-                    {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }
-                  );
-
-                  return (
-                    <View
-                      key={index}
-                      // onPress={() =>
-                      //   navigation.navigate("TransactionSummaryScreen")
-                      // }
-                      style={styles.transactionItem}
-                    >
-                      <Image
-                        source={require("../assets/images/small-logo.png")}
-                        style={styles.transactionImage}
-                      />
-                      <View style={styles.transactionTextContainer}>
-                        <View style={styles.transactionTextRow}>
-                          <Text style={styles.item} allowFontScaling={false}>
-                            {title || "New Notification"}
-                          </Text>
-                          <Text
-                            style={styles.valueText}
-                            allowFontScaling={false}
-                          >
-                            {displayDate}
-                          </Text>
-                        </View>
-                        <View style={styles.transactionTextRow}>
-                          <Text style={styles.date} allowFontScaling={false}>
-                            {body || "Notification content"}
-                          </Text>
-                          {/* <Text style={styles.completedText} allowFontScaling={false}>
-                          View
-                        </Text> */}
-                        </View>
-                      </View>
-                    </View>
-                  );
-                }
-              )}
+              {notifications.map(renderNotificationItem)}
             </View>
           ) : (
-            // Fallback if no notifications
             <View style={styles.noTransactionContainer}>
               <LottieView
                 source={require("../assets/animation/noTransaction.json")}
@@ -160,7 +146,7 @@ const styles = StyleSheet.create({
   transactionItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 5,
+    marginBottom: 14,
     padding: SPACING,
     borderRadius: 10,
     backgroundColor: COLORS.white,
@@ -173,6 +159,7 @@ const styles = StyleSheet.create({
   },
   transactionTextContainer: {
     flex: 1,
+    maxWidth: "80%",
   },
   transactionTextRow: {
     flexDirection: "row",
@@ -187,16 +174,13 @@ const styles = StyleSheet.create({
   item: {
     fontFamily: "Outfit-Medium",
     fontSize: RFValue(12),
+    maxWidth: "70%",
   },
   date: {
     fontFamily: "Outfit-Regular",
     color: "#9BA1A8",
     fontSize: RFValue(10),
-    width: 200,
+    maxWidth: "90%",
     marginTop: 5,
-  },
-  completedText: {
-    fontFamily: "Outfit-Regular",
-    color: COLORS.violet500,
   },
 });

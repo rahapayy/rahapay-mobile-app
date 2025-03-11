@@ -1,6 +1,5 @@
 import {
   View,
-  ImageBackground,
   FlatList,
   Share,
   Image,
@@ -16,14 +15,16 @@ import { Skeleton } from "@rneui/themed";
 import COLORS from "@/constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import Overlay from "@/assets/svg/layer.svg";
+import Image2 from "@/assets/svg/Card.svg";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 const banners = [
   {
     id: "1",
     text: "Create a tag to personalize your account to invite others and earn rewards!",
-    image: require("../../assets/images/bg.png"),
+    backgroundColor: "#5136C1",
     showButton: true,
     buttonText: "Create tag",
     showIcon: true,
@@ -31,7 +32,7 @@ const banners = [
   {
     id: "2",
     text: "Invite your friends and earn exclusive bonuses!",
-    image: require("../../assets/images/bg.png"),
+    backgroundColor: "#5136C1",
     showButton: true,
     buttonText: "Invite now",
     showIcon: false,
@@ -92,49 +93,49 @@ const Banner = ({
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View className="rounded-xl overflow-hidden mx-2">
-              <ImageBackground
-                source={item.image}
-                className="p-4"
-                style={{
-                  width: width / 1.3,
-                  height: height / -2,
-                }}
-                resizeMode="cover"
-              >
-                <View>
+            <View
+              className="rounded-xl overflow-hidden mx-2"
+              style={{
+                backgroundColor: item.backgroundColor,
+                width: width / 1.3,
+                height: RFValue(100), // Fixed height using responsive font size
+              }}
+            >
+              <View className="p-4">
+                <Overlay style={styles.overlay} />
+                <View style={styles.content}>
                   <SemiBoldText color="white" size="base">
                     {item.text}
                   </SemiBoldText>
+
+                  {item.showButton && (
+                    <Button
+                      textColor="black"
+                      title={item.buttonText}
+                      style={{
+                        backgroundColor: "white",
+                        width: 150,
+                        height: 32,
+                        marginTop: SPACING * 2,
+                      }}
+                      onPress={() => {
+                        if (item.id === "1") {
+                          navigation.navigate("CreateTagScreen");
+                        } else if (item.id === "2") {
+                          handleInviteFriends();
+                        }
+                      }}
+                    />
+                  )}
+
+                  {item.showIcon && (
+                    <Image
+                      source={require("@/assets/animation/at.gif")}
+                      style={styles.animation}
+                    />
+                  )}
                 </View>
-
-                {item.showButton && (
-                  <Button
-                    textColor="black"
-                    title={item.buttonText}
-                    style={{
-                      backgroundColor: "white",
-                      width: 150,
-                      height: 32,
-                      marginTop: SPACING * 2,
-                    }}
-                    onPress={() => {
-                      if (item.id === "1") {
-                        navigation.navigate("CreateTagScreen");
-                      } else if (item.id === "2") {
-                        handleInviteFriends();
-                      }
-                    }}
-                  />
-                )}
-
-                {item.showIcon && (
-                  <Image
-                    source={require("@/assets/animation/at.gif")}
-                    style={styles.animation}
-                  />
-                )}
-              </ImageBackground>
+              </View>
             </View>
           )}
         />
@@ -144,6 +145,17 @@ const Banner = ({
 };
 
 const styles = StyleSheet.create({
+  overlay: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    top: 0,
+    left: 0,
+  },
+  content: {
+    position: "relative",
+    zIndex: 1,
+  },
   animation: {
     position: "absolute",
     right: -40,

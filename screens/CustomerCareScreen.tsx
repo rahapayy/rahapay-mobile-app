@@ -18,6 +18,7 @@ import SPACING from "../constants/SPACING";
 import FONT_SIZE from "../constants/font-size";
 import COLORS from "../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
+import { RegularText } from "@/components/common/Text";
 
 const CustomerCareScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -88,7 +89,7 @@ const CustomerCareScreen: React.FC<{
               services
             </Text>
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => navigation.navigate("")}
               style={styles.chatButton}
             >
@@ -96,12 +97,12 @@ const CustomerCareScreen: React.FC<{
               <Text style={styles.chatText} allowFontScaling={false}>
                 Start live Chat
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleCallUs} style={styles.callButton}>
-              <Call color={COLORS.violet400} />
-              <Text style={styles.callText} allowFontScaling={false}>
+            </TouchableOpacity> */}
+            <TouchableOpacity onPress={handleCallUs} style={styles.chatButton}>
+              <Call color={COLORS.white} />
+              <RegularText color="white" marginLeft={10}>
                 Call Us
-              </Text>
+              </RegularText>
             </TouchableOpacity>
           </View>
         </View>

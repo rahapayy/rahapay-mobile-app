@@ -12,11 +12,9 @@ import * as Notifications from "expo-notifications";
 import { Platform, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Subscription } from "expo-modules-core";
-
 import { services } from "../services/apiClient";
 import { useAuth } from "../services/AuthContext";
 
-// Define types for the context
 interface NotificationContextType {
   expoPushToken: string | null;
   notification: Notifications.Notification | null;
@@ -33,7 +31,6 @@ const NotificationContext = createContext<NotificationContextType | undefined>(
   undefined
 );
 
-// Custom hook to use the notification context
 export const useNotification = () => {
   const context = useContext(NotificationContext);
   if (context === undefined) {
@@ -44,12 +41,10 @@ export const useNotification = () => {
   return context;
 };
 
-// Props for the provider
 interface NotificationProviderProps {
   children: ReactNode;
 }
 
-// Configure default notification behavior
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -61,7 +56,7 @@ Notifications.setNotificationHandler({
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   children,
 }) => {
-  const [expoPushToken, setExpoPushToken] = useState<string | null>(null); // Changed to string | null
+  const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
   const [notification, setNotification] =
     useState<Notifications.Notification | null>(null);
   const [notifications, setNotifications] = useState<
@@ -71,18 +66,15 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     useState<boolean>(false);
   const [hasAskedForPermission, setHasAskedForPermission] =
     useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null); // Added error state
+  const [error, setError] = useState<Error | null>(null);
 
   const notificationListener = useRef<Subscription>();
   const responseListener = useRef<Subscription>();
+  const { isAuthenticated, userInfo } = useAuth();
 
-  const { isAuthenticated, userInfo } = useAuth(); // From your AuthContext
-
-  // Initialize notifications and load persisted state
   useEffect(() => {
     const initializeNotifications = async () => {
       try {
-        // Load persisted state
         const enabled = await AsyncStorage.getItem("notificationsEnabled");
         if (enabled !== null) {
           setNotificationsEnabled(JSON.parse(enabled));
@@ -103,7 +95,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     initializeNotifications();
   }, [isAuthenticated, userInfo]);
 
-  // Persist notificationsEnabled whenever it changes
   useEffect(() => {
     AsyncStorage.setItem(
       "notificationsEnabled",
@@ -113,21 +104,14 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     );
   }, [notificationsEnabled]);
 
-  // Setup listeners when notifications are enabled
   useEffect(() => {
     if (notificationsEnabled) {
       setupNotifications();
     }
 
     return () => {
-      if (notificationListener.current) {
-        Notifications.removeNotificationSubscription(
-          notificationListener.current
-        );
-      }
-      if (responseListener.current) {
-        Notifications.removeNotificationSubscription(responseListener.current);
-      }
+      notificationListener.current?.remove();
+      responseListener.current?.remove();
     };
   }, [notificationsEnabled]);
 
@@ -146,6 +130,14 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       Notifications.addNotificationReceivedListener((notification) => {
         setNotification(notification);
         setNotifications((prev) => {
+          // Check for duplicates using request.identifier
+          if (
+            prev.some(
+              (n) => n.request.identifier === notification.request.identifier
+            )
+          ) {
+            return prev; // Skip if already exists
+          }
           const updated = [...prev, notification];
           persistNotifications(updated);
           console.log("Updated notifications (foreground):", updated);
@@ -159,6 +151,16 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         console.log("Notification response received:", response);
         if (response?.notification) {
           setNotifications((prev) => {
+            // Check for duplicates using request.identifier
+            if (
+              prev.some(
+                (n) =>
+                  n.request.identifier ===
+                  response.notification.request.identifier
+              )
+            ) {
+              return prev; // Skip if already exists
+            }
             const updated = [...prev, response.notification];
             persistNotifications(updated);
             console.log("Updated notifications (response):", updated);
@@ -268,8 +270,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       const response = await services.notificationService.sendDeviceToken(
         token
       );
-      // console.log(token);
-
       console.log("Device token sent successfully:", response);
     } catch (error: any) {
       console.error(
@@ -280,7 +280,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         "Error",
         "Failed to sync device token. Retrying in 5 seconds..."
       );
-      setTimeout(() => sendDeviceTokenToBackend(token), 5000); // Retry after 5s
+      setTimeout(() => sendDeviceTokenToBackend(token), 5000);
     }
   };
 
@@ -315,9 +315,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       }
       try {
         const pushTokenString = (
-          await Notifications.getExpoPushTokenAsync({
-            projectId,
-          })
+          await Notifications.getExpoPushTokenAsync({ projectId })
         ).data;
         console.log("Push token:", pushTokenString);
         return pushTokenString;

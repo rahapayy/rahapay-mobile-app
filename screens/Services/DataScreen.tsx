@@ -93,13 +93,19 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await services.dataService.getDataPlans(
-          selectedOperator
-        );
-        setDataPlans(response);
+        const response = await services.dataService.getDataPlans(selectedOperator);
+        // console.log(`Data plans for ${selectedOperator}:`, response); // Debug log
+        // Filter out invalid plans and ensure unique plan_ids
+        const validPlans = response
+          .filter((plan: DataPlan) => plan.plan_id && plan.plan_name && plan.amount && plan.validity)
+          .reduce((unique: DataPlan[], plan: DataPlan) => {
+            return unique.some((p) => p.plan_id === plan.plan_id) ? unique : [...unique, plan];
+          }, []);
+        setDataPlans(validPlans);
       } catch (err) {
         setError("Failed to load data plans. Please try again.");
         console.error("Error fetching data plans:", err);
+        setDataPlans([]);
       } finally {
         setLoading(false);
       }
@@ -379,7 +385,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                   ? renderNetworkSkeleton()
                   : renderNetworkProviders()}
 
-                <View className="mt-4">
+                <View className="mt-6">
                   <Label text="Phone Number" marked={false} />
                   <BasicInput
                     placeholder="Enter phone number"
@@ -400,7 +406,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                     <Label text="Plan" marked={false} />
                     <TouchableOpacity
                       style={[!selectedOperator && {}]}
-                      className="py-2 px-2 flex-row items-center border border-[#DFDFDF] rounded-md"
+                      className="py-3 px-2 flex-row items-center border border-[#DFDFDF] rounded-md"
                       onPress={() => {
                         if (selectedOperator) {
                           setModalVisible(true);

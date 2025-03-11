@@ -7,7 +7,7 @@ import AppStack from "./AppStack";
 import AuthRoute from "./AuthRouter";
 import LoadingIndicator from "../components/LoadingIndicator";
 import { useAuth } from "../services/AuthContext";
-import * as SplashScreen from "expo-splash-screen";
+// import * as SplashScreen from "expo-splash-screen";
 import OfflineScreen from "@/screens/OfflineScreen";
 
 const Stack = createNativeStackNavigator();
@@ -41,12 +41,6 @@ const Router = () => {
     return () => unsubscribe();
   }, [isAppReady]);
 
-  const onLayoutRootView = useCallback(async () => {
-    if (appLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [appLoaded]);
-
   const handleRetry = () => {
     NetInfo.fetch().then((state) => {
       setIsOnline(state.isConnected ?? false);
@@ -62,25 +56,25 @@ const Router = () => {
   }
 
   return (
-    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <NavigationContainer>
-        <Stack.Navigator>
-          {isAuthenticated ? (
-            <Stack.Screen
-              name="AppStack"
-              component={AppStack}
-              options={{ headerShown: false }}
-            />
-          ) : (
-            <Stack.Screen
-              name="AuthRoute"
-              component={AuthRoute}
-              options={{ headerShown: false }}
-            />
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        {isAuthenticated ? (
+          <Stack.Screen
+            name="AppStack"
+            component={AppStack}
+            options={{ headerShown: false }}
+          />
+        ) : (
+          <Stack.Screen
+            name="AuthRoute"
+            component={AuthRoute}
+            options={{ headerShown: false }}
+          />
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
+    //         <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+    // </View>
   );
 };
 

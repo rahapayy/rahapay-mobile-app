@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import * as Notifications from "expo-notifications";
 
 // App Stack (Main application screens)
 export type AppStackParamList = {
@@ -106,7 +107,10 @@ export type AppStackParamList = {
   EditTagScreen: undefined;
   CreateTagScreen: undefined;
   TicketScreen: undefined;
-  ExistingUserScreen: undefined
+  ExistingUserScreen: undefined;
+  NotificationDetail: {
+    notification: Notifications.Notification; // Updated to include notification param
+  };
 };
 
 // Auth Stack (Authentication-related screens)

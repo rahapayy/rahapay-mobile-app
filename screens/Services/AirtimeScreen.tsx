@@ -30,6 +30,7 @@ import { services } from "@/services";
 import { Beneficiary } from "@/services/modules/beneficiary";
 import { Skeleton } from "@rneui/base";
 import BackButton from "@/components/common/ui/buttons/BackButton";
+// import * as Contacts from 'expo-contacts';
 
 const AirtimeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -373,9 +374,9 @@ const AirtimeScreen: React.FC<{
                           >
                             <RegularText color="black" size="small">
                               {beneficiary.number}{" "}
-                              {beneficiary.networkType
+                              {/* {beneficiary.networkType
                                 ? `| ${beneficiary.networkType}`
-                                : ""}
+                                : ""} */}
                             </RegularText>
                           </TouchableOpacity>
                         )}
