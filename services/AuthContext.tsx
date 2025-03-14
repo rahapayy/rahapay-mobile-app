@@ -5,11 +5,13 @@ import React, {
   useContext,
   ReactNode,
   useMemo,
+  useCallback,
 } from "react";
 import { SWRConfig } from "swr";
 import { axiosInstance, services } from "./apiClient";
 import { UserInfoType } from "./dtos";
 import { getItem, removeItem } from "@/utils/storage";
+import { mutate } from "swr"; // Import mutate to clear cache
 
 interface AuthContextType {
   isLoading: boolean;
@@ -18,7 +20,7 @@ interface AuthContextType {
   userInfo: UserInfoType | null;
   setUserInfo: (userInfo: UserInfoType | null) => void;
   isAppReady: boolean;
-  logOut: () => void;
+  logOut: () => Promise<void>;
 }
 
 interface SWRProps {
@@ -27,7 +29,7 @@ interface SWRProps {
 }
 
 type AuthProviderProps = {
-  children: ReactNode; // ReactNode allows for any renderable content
+  children: ReactNode;
 };
 
 export const AuthContext = createContext<AuthContextType>({
@@ -35,27 +37,33 @@ export const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   setIsAuthenticated: () => {},
   userInfo: null,
-  logOut: () => {},
+  logOut: async () => {},
   setUserInfo: () => {},
   isAppReady: false,
 });
 
 const SWR: React.FC<SWRProps> = ({ children, logOut }) => {
+  const fetcher = useCallback(
+    async (url: string) => {
+      try {
+        const response = await axiosInstance.get(url);
+        return response.data;
+      } catch (error: any) {
+        if (error.response?.status === 401) {
+          await logOut(); // Log out on 401
+          throw new Error("Unauthorized"); // Re-throw to let SWR handle the error
+        }
+        throw error;
+      }
+    },
+    [logOut]
+  );
+
   return (
     <SWRConfig
       value={{
-        fetcher: async (url: string) => {
-          try {
-            const response = await axiosInstance.get(url);
-            return response.data;
-          } catch (error: any) {
-            if (error.response?.status === 401) {
-              await logOut();
-            }
-            throw error;
-          }
-        },
-        provider: () => new Map(),
+        fetcher,
+        provider: () => new Map(), // Creates a new cache instance per render
         revalidateOnFocus: false,
         revalidateOnReconnect: false,
       }}
@@ -65,11 +73,8 @@ const SWR: React.FC<SWRProps> = ({ children, logOut }) => {
   );
 };
 
-export default SWR;
-
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
-  const [userDetails, setUserDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAppReady, setIsAppReady] = useState(false);
@@ -80,7 +85,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log("Access token: " + accessToken);
 
       if (accessToken) {
-        // Fetch user details when checking auth
         const userResponse = await services.authServiceToken.getUserDetails();
         setUserInfo(userResponse.data);
       }
@@ -94,17 +98,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Check the authentication state on component mount.
+  // Check authentication state on mount
   useEffect(() => {
     checkAuth();
   }, []);
 
-  const logOut = async () => {
-    // Perform logout logic
-    removeItem("ACCESS_TOKEN", true);
-    removeItem("REFRESH_TOKEN", true);
-    setIsAuthenticated(false);
-  };
+  const logOut = useCallback(async () => {
+    try {
+      // Clear tokens from storage
+      await removeItem("ACCESS_TOKEN", true);
+      await removeItem("REFRESH_TOKEN", true);
+
+      // Clear SWR cache
+      mutate(() => true, undefined, false); // Clears all SWR cache
+      console.log("SWR cache cleared on logout");
+
+      // Reset authentication state
+      setIsAuthenticated(false);
+      setUserInfo(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -113,11 +128,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       userInfo,
       isAppReady,
       logOut,
-      userDetails,
       setIsAuthenticated,
       setUserInfo,
     }),
-    [isLoading, isAuthenticated, userInfo, isAppReady, userDetails]
+    [isLoading, isAuthenticated, userInfo, isAppReady, logOut]
   );
 
   return (

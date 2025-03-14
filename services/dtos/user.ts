@@ -11,7 +11,7 @@ export interface IUpdateProfilePayload {
 }
 
 export interface UserInfoType {
-  id: string;
+  _id: string;
   email: string;
   userName: string;
   fullName: string;
@@ -20,4 +20,6 @@ export interface UserInfoType {
   refreshToken: string;
   expiresAt: number;
   deviceToken?: string;
+  trasactionPin: string;
+  securityPin: string;
 }

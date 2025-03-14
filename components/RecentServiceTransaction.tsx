@@ -38,36 +38,30 @@ interface Transaction {
   };
 }
 
-// Define the navigation prop type
 type RootStackParamList = {
   TransactionHistoryScreen: undefined;
-  TransactionSummaryScreen: { transaction: any }; // You can refine this further
+  TransactionSummaryScreen: { transaction: any };
 };
 
-// Component
 const RecentServiceTransaction: React.FC<{
   navigation: NativeStackNavigationProp<RootStackParamList>;
 }> = ({ navigation }) => {
-  const { getAllTransactions } = useWallet();
+  const { getAllTransactions, error } = useWallet();
   const { transactions, isLoading } = getAllTransactions();
   const [hasTransaction, setHasTransaction] = useState(false);
 
-  // Get the 3 most recent transactions using useMemo
   const recentTransactions = useMemo(() => {
     if (transactions.length === 0) return [];
 
-    // Sort transactions by date (most recent first)
     const sortedTransactions = [...transactions].sort((a, b) => {
       return (
         new Date(b.paidOn || 0).getTime() - new Date(a.paidOn || 0).getTime()
       );
     });
 
-    // Return only the first 3 transactions
     return sortedTransactions.slice(0, 3);
   }, [transactions]);
 
-  // Update hasTransaction flag when transactions change
   useEffect(() => {
     setHasTransaction(transactions.length > 0);
   }, [transactions]);
@@ -162,6 +156,15 @@ const RecentServiceTransaction: React.FC<{
     </View>
   );
 
+  const renderErrorState = () => (
+    <View style={styles.noTransactionContainer}>
+      <Text style={styles.notransactionText}>{error}</Text>
+      <TouchableOpacity onPress={() => getAllTransactions().setCurrentPage(1)}>
+        <Text style={styles.retryText}>Retry</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   const mapTransactionToSummaryFormat = (transaction: Transaction) => {
     const formattedDate = new Date(transaction.paidOn).toLocaleString("en-US", {
       month: "long",
@@ -200,103 +203,103 @@ const RecentServiceTransaction: React.FC<{
       </View>
 
       <View>
-        {isLoading
-          ? renderLoadingSkeleton()
-          : hasTransaction
-          ? recentTransactions.map((transaction) => {
-              const formattedTime = new Date(
-                transaction.paidOn
-              ).toLocaleTimeString("en-US", {
-                hour: "2-digit",
-                minute: "2-digit",
-              });
+        {error ? (
+          renderErrorState()
+        ) : isLoading ? (
+          renderLoadingSkeleton()
+        ) : hasTransaction ? (
+          recentTransactions.map((transaction) => {
+            const formattedTime = new Date(
+              transaction.paidOn
+            ).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
 
-              const networkType = transaction.metadata?.networkType;
+            const networkType = transaction.metadata?.networkType;
 
-              return (
-                <TouchableOpacity
-                  key={transaction._id}
-                  onPress={() =>
-                    navigation.navigate("TransactionSummaryScreen", {
-                      transaction: mapTransactionToSummaryFormat(transaction),
-                    })
-                  }
-                  style={styles.transactionItem}
-                >
-                  <View style={styles.iconContainer}>
-                    {renderServiceIcon(
-                      networkType,
-                      transaction.transactionType
-                    )}
+            return (
+              <TouchableOpacity
+                key={transaction._id}
+                onPress={() =>
+                  navigation.navigate("TransactionSummaryScreen", {
+                    transaction: mapTransactionToSummaryFormat(transaction),
+                  })
+                }
+                style={styles.transactionItem}
+              >
+                <View style={styles.iconContainer}>
+                  {renderServiceIcon(networkType, transaction.transactionType)}
+                </View>
+                <View style={styles.transactionTextContainer}>
+                  <View style={styles.transactionTextRow}>
+                    <Text style={styles.item} allowFontScaling={false}>
+                      {transaction.transactionType}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.valueText,
+                        {
+                          color: transaction.transactionType.includes(
+                            "PURCHASE"
+                          )
+                            ? "black"
+                            : "black",
+                        },
+                      ]}
+                      allowFontScaling={false}
+                    >
+                      {transaction.transactionType.includes("PURCHASE")
+                        ? "-"
+                        : "+"}{" "}
+                      ₦{transaction.amountPaid}
+                    </Text>
                   </View>
-                  <View style={styles.transactionTextContainer}>
-                    <View style={styles.transactionTextRow}>
-                      <Text style={styles.item} allowFontScaling={false}>
-                        {transaction.transactionType}
-                      </Text>
+                  <View style={styles.transactionTextRow}>
+                    <Text style={styles.date} allowFontScaling={false}>
+                      {formattedTime}
+                    </Text>
+                    <View
+                      style={[
+                        styles.statusContainer,
+                        {
+                          backgroundColor:
+                            transaction.paymentStatus === "SUCCESS" ||
+                            transaction.paymentStatus === "SUCCESSFUL"
+                              ? "#E6F9F1"
+                              : "#FFEDE9",
+                        },
+                      ]}
+                    >
                       <Text
                         style={[
-                          styles.valueText,
+                          styles.completedText,
                           {
-                            color: transaction.transactionType.includes(
-                              "PURCHASE"
-                            )
-                              ? "black"
-                              : "black",
+                            color:
+                              transaction.paymentStatus === "SUCCESS" ||
+                              transaction.paymentStatus === "SUCCESSFUL"
+                                ? "#06C270"
+                                : "#FF3B30",
                           },
                         ]}
                         allowFontScaling={false}
                       >
-                        {transaction.transactionType.includes("PURCHASE")
-                          ? "-"
-                          : "+"}{" "}
-                        ₦{transaction.amountPaid}
+                        {transaction.paymentStatus}
                       </Text>
-                    </View>
-                    <View style={styles.transactionTextRow}>
-                      <Text style={styles.date} allowFontScaling={false}>
-                        {formattedTime}
-                      </Text>
-                      <View
-                        style={[
-                          styles.statusContainer,
-                          {
-                            backgroundColor:
-                              transaction.paymentStatus === "SUCCESS" ||
-                              transaction.paymentStatus === "SUCCESSFUL"
-                                ? "#E6F9F1"
-                                : "#FFEDE9",
-                          },
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.completedText,
-                            {
-                              color:
-                                transaction.paymentStatus === "SUCCESS" ||
-                                transaction.paymentStatus === "SUCCESSFUL"
-                                  ? "#06C270"
-                                  : "#FF3B30",
-                            },
-                          ]}
-                          allowFontScaling={false}
-                        >
-                          {transaction.paymentStatus}
-                        </Text>
-                      </View>
                     </View>
                   </View>
-                </TouchableOpacity>
-              );
-            })
-          : renderEmptyState()}
+                </View>
+              </TouchableOpacity>
+            );
+          })
+        ) : (
+          renderEmptyState()
+        )}
       </View>
     </View>
   );
 };
 
-// Styles remain unchanged
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -369,6 +372,12 @@ const styles = StyleSheet.create({
   notransactionText: {
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(14),
+  },
+  retryText: {
+    fontFamily: "Outfit-Medium",
+    fontSize: RFValue(14),
+    color: COLORS.violet400,
+    marginTop: 10,
   },
 });
 

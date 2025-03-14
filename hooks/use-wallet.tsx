@@ -1,4 +1,5 @@
 import { useAuth } from "@/services/AuthContext";
+import { useEffect } from "react";
 import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
 
@@ -23,7 +24,7 @@ interface Wallet {
 }
 
 interface DashboardData {
-  transacton: Transaction[]; // Note: still contains typo from original
+  transactions: Transaction[];
   wallet: Wallet;
   user: {
     _id: string;
@@ -51,11 +52,17 @@ interface GetAllTransactionsResult {
 const useWallet = () => {
   const { userInfo } = useAuth();
 
+  // Use userInfo._id to track user changes
+  const userId = userInfo?._id || "anonymous";
+  // console.log("User ID:", userId);
+
+  // Adjust API endpoints (remove userId from URL, rely on token-based auth)
   const {
     data: dashboardData,
     isValidating: isDashboardLoading,
     mutate: mutateDashboard,
-  } = useSWR<DashboardData>(`user/dashboard/me`, {
+    error: dashboardError,
+  } = useSWR<DashboardData>("user/dashboard/me", {
     revalidateOnFocus: true,
   });
 
@@ -63,7 +70,8 @@ const useWallet = () => {
     data: reservedAccountsData,
     isValidating: isReservedAccountsLoading,
     mutate: mutateReservedAccounts,
-  } = useSWR(`user/reserved-accounts`);
+    error: reservedAccountsError,
+  } = useSWR("user/reserved-accounts");
 
   const {
     data: allTransactionsPages,
@@ -71,12 +79,23 @@ const useWallet = () => {
     mutate: mutateAllTransactions,
     size: currentPage,
     setSize: setCurrentPage,
+    error: transactionsError,
   } = useSWRInfinite<AllTransactionsPage>(
     (pageIndex) => `transaction/all?page=${pageIndex + 1}`,
     {
       revalidateFirstPage: false,
     }
   );
+
+  // Revalidate when userInfo._id changes
+  useEffect(() => {
+    // console.log("User ID changed, revalidating:", userId);
+    if (userId !== "anonymous") {
+      mutateDashboard();
+      mutateReservedAccounts();
+      mutateAllTransactions();
+    }
+  }, [userId, mutateDashboard, mutateReservedAccounts, mutateAllTransactions]);
 
   const refreshAll = () => {
     mutateDashboard();
@@ -86,8 +105,23 @@ const useWallet = () => {
 
   const isLoading = isDashboardLoading || isReservedAccountsLoading;
 
+  // Debug: Log data and errors
+  useEffect(() => {
+    // console.log("Dashboard Data:", dashboardData);
+    // console.log("Dashboard Error:", dashboardError);
+    // console.log("Reserved Accounts Data:", reservedAccountsData);
+    // console.log("Reserved Accounts Error:", reservedAccountsError);
+    // console.log("All Transactions Pages:", allTransactionsPages);
+    // console.log("Transactions Error:", transactionsError);
+  }, [dashboardData, dashboardError, reservedAccountsData, reservedAccountsError, allTransactionsPages, transactionsError]);
+
+  // Handle errors
+  const errorMessage = dashboardError || reservedAccountsError || transactionsError
+    ? "Failed to load wallet data. Please try again later."
+    : null;
+
   // Remove filtering from dashboard transactions
-  const dashboardTransactions = dashboardData?.transacton || [];
+  const dashboardTransactions = dashboardData?.transactions || [];
 
   const balance = dashboardData?.wallet?.balance || 0;
   const account = dashboardData?.wallet || {};
@@ -134,6 +168,7 @@ const useWallet = () => {
     transactions: formattedTransactions,
     isLoading,
     getAllTransactions,
+    error: errorMessage, // Add error message for the UI to display
   };
 };
 

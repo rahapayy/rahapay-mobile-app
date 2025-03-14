@@ -8,7 +8,6 @@ import {
   View,
   Dimensions,
   Platform,
-  Vibration, // Import Vibration API
 } from "react-native";
 import {
   AddCircle,
@@ -27,7 +26,7 @@ import NetInfo from "@react-native-community/netinfo";
 import SPACING from "../../constants/SPACING";
 import { BoldText, RegularText, SemiBoldText } from "../common/Text";
 import { useAuth } from "../../services/AuthContext";
-import { ActivityIndicator, PanResponder } from "react-native";
+import { PanResponder } from "react-native";
 import { Skeleton } from "@rneui/themed";
 import { Image } from "react-native";
 
@@ -38,15 +37,10 @@ const Card: React.FC<{
 }> = ({ navigation }) => {
   const [showBalance, setShowBalance] = useState(true);
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = React.useCallback(async () => {
-    setIsRefreshing(true);
-    // Trigger vibration when refresh starts
-    Vibration.vibrate(Platform.OS === "android" ? [0, 200] : 200); // 200ms vibration
     await refreshAll();
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulated delay
-    setIsRefreshing(false);
   }, []);
 
   useEffect(() => {
@@ -74,6 +68,7 @@ const Card: React.FC<{
   };
 
   const { userInfo } = useAuth();
+  console.log(userInfo);
 
   const fullName = userInfo?.fullName || "";
   const firstName = fullName.split(" ")[0];
@@ -83,7 +78,7 @@ const Card: React.FC<{
     .join("")
     .toUpperCase();
 
-  const { refreshAll, balance } = useWallet();
+  const { refreshAll, balance, isLoading, error } = useWallet(); // Updated to use isLoading
 
   const panResponder = React.useRef(
     PanResponder.create({
@@ -117,14 +112,6 @@ const Card: React.FC<{
     >
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container} {...panResponder.panHandlers}>
-          {isRefreshing && (
-            <View
-              style={[styles.spinnerContainer, shadowStyle]}
-              className="rounded-full"
-            >
-              <ActivityIndicator size="small" color={COLORS.violet400} />
-            </View>
-          )}
           <View style={styles.header}>
             <View style={styles.headerContent}>
               <TouchableOpacity
@@ -175,28 +162,15 @@ const Card: React.FC<{
           </View>
 
           <View style={styles.balanceValueContainer}>
-            {isRefreshing ? (
+            {isLoading ? (
               <Skeleton
                 animation="wave"
                 width={100}
                 height={RFValue(26)}
-                style={{ backgroundColor: COLORS.grey100, borderRadius: 8 }}
-                skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                style={{ backgroundColor: COLORS.violet100, borderRadius: 8 }}
+                skeletonStyle={{ backgroundColor: COLORS.violet50 }}
               />
-            ) : isConnected ? (
-              showBalance ? (
-                <BoldText color="white" size="xxlarge">
-                  ₦{" "}
-                  {balance.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                  })}
-                </BoldText>
-              ) : (
-                <BoldText color="white" size="xxlarge">
-                  ******
-                </BoldText>
-              )
-            ) : (
+            ) : isConnected === false ? (
               <View style={styles.errorContainer}>
                 <Text style={styles.errorText} allowFontScaling={false}>
                   Service Unavailable
@@ -205,6 +179,26 @@ const Card: React.FC<{
                   Please check your internet connection and try again.
                 </Text>
               </View>
+            ) : error ? (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText} allowFontScaling={false}>
+                  {error}
+                </Text>
+                <TouchableOpacity onPress={handleRefresh}>
+                  <Text style={styles.retryText}>Retry</Text>
+                </TouchableOpacity>
+              </View>
+            ) : showBalance ? (
+              <BoldText color="white" size="xxlarge">
+                ₦{" "}
+                {balance.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                })}
+              </BoldText>
+            ) : (
+              <BoldText color="white" size="xxlarge">
+                ******
+              </BoldText>
             )}
           </View>
 
@@ -294,11 +288,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: RFValue(12),
   },
-  spinnerContainer: {
-    backgroundColor: "white",
-    padding: SPACING,
-    position: "absolute",
-    top: "50%",
-    left: "50%",
+  retryText: {
+    fontFamily: "Outfit-Medium",
+    fontSize: RFValue(14),
+    color: COLORS.violet400,
+    marginTop: 10,
   },
 });
