@@ -23,7 +23,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.app.rahapay",
-      "buildNumber": "7",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSFaceIDUsageDescription": "Allow RahaPay to use Face ID for secure login"
@@ -36,7 +35,6 @@
       },
       "package": "com.app.rahapay",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 1,
       "permissions": [
         "android.permission.USE_BIOMETRIC",
         "android.permission.USE_FINGERPRINT"
@@ -49,6 +47,14 @@
     "plugins": [
       "expo-font",
       "expo-localization",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
+          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ],
       [
         "expo-notifications",
         {

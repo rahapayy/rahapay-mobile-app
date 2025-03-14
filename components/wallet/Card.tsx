@@ -8,6 +8,7 @@ import {
   View,
   Dimensions,
   Platform,
+  Vibration, // Import Vibration API
 } from "react-native";
 import {
   AddCircle,
@@ -41,6 +42,8 @@ const Card: React.FC<{
 
   const handleRefresh = React.useCallback(async () => {
     setIsRefreshing(true);
+    // Trigger vibration when refresh starts
+    Vibration.vibrate(Platform.OS === "android" ? [0, 200] : 200); // 200ms vibration
     await refreshAll();
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulated delay
     setIsRefreshing(false);
@@ -112,7 +115,6 @@ const Card: React.FC<{
       source={require("../../assets/images/bg.png")}
       style={styles.backgroundImage}
     >
-      {/* <Image source={require("assets/images/layer.png")}/> */}
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container} {...panResponder.panHandlers}>
           {isRefreshing && (
@@ -257,21 +259,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 8,
   },
-  avatarText: {
-    fontFamily: "Outfit-SemiBold",
-    color: "#fff",
-    fontSize: RFValue(16),
-  },
-  greetingText: {
-    fontFamily: "Outfit-SemiBold",
-    color: "#fff",
-    fontSize: RFValue(16),
-  },
-  greetingSubText: {
-    fontFamily: "Outfit-Regular",
-    color: "#fff",
-    fontSize: RFValue(12),
-  },
   balanceContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -281,25 +268,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  availableBalanceText: {
-    fontFamily: "Outfit-Regular",
-    color: "#fff",
-    marginLeft: 4,
-    fontSize: RFValue(14),
-  },
   eyeIcon: {
     marginLeft: 10,
   },
-  balanceSkeleton: {
-    borderRadius: 4,
-    marginVertical: 4,
-  },
   balanceValueContainer: {},
-  balanceValue: {
-    fontFamily: "Outfit-SemiBold",
-    color: "#fff",
-    fontSize: RFValue(30),
-  },
   fundWalletButton: {
     backgroundColor: "#fff",
     justifyContent: "center",
@@ -307,12 +279,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     flexDirection: "row",
-  },
-  fundWalletText: {
-    fontFamily: "Outfit-Regular",
-    color: COLORS.violet400,
-    marginLeft: 4,
-    fontSize: RFValue(14),
   },
   errorContainer: {
     marginTop: SPACING,

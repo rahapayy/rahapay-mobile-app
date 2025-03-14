@@ -1,4 +1,3 @@
-// NotificationScreen.tsx
 import {
   Image,
   Platform,
@@ -18,7 +17,7 @@ import COLORS from "../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import LottieView from "lottie-react-native";
 import { useNotification } from "../context/NotificationContext";
-import * as Notifications from "expo-notifications"; // Add this import
+import * as Notifications from "expo-notifications";
 
 const NotificationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "Notifications">;
@@ -26,11 +25,20 @@ const NotificationScreen: React.FC<{
   const { notifications } = useNotification();
 
   const renderNotificationItem = (
-    notification: Notifications.Notification, // Now properly typed
+    notification: Notifications.Notification,
     index: React.Key | null | undefined
   ) => {
     const { title, body, data } = notification.request.content;
-    const timestamp = data?.timestamp || notification.date;
+    // Debug the notification object to check the date/timestamp
+    console.log("Notification Data:", notification);
+
+    // Use data.timestamp if available, fall back to notification.date, and handle invalid cases
+    let timestamp = data?.timestamp
+      ? new Date(data.timestamp).toISOString() // Convert to ISO string if it's a valid date
+      : notification.date instanceof Date && !isNaN(notification.date.getTime())
+      ? notification.date
+      : new Date(); // Fallback to current date if invalid
+
     const displayDate = new Date(timestamp).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",

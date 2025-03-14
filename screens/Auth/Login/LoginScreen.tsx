@@ -92,7 +92,8 @@ const LoginScreen: React.FC<{
           });
         } else {
           handleShowFlash({
-            message: "Biometric verified. Please enter your credentials to proceed.",
+            message:
+              "Biometric verified. Please enter your credentials to proceed.",
             type: "danger",
           });
         }
@@ -134,6 +135,12 @@ const LoginScreen: React.FC<{
 
         setIsAuthenticated(true);
         setUserInfo(userResponse.data);
+
+        // Add success flash message
+        handleShowFlash({
+          message: "Login successful! Welcome back!",
+          type: "success",
+        });
       }
     } catch (error: any) {
       const errorMessage =
@@ -143,7 +150,7 @@ const LoginScreen: React.FC<{
       console.error("Login error:", errorMessage);
 
       handleShowFlash({
-        message: "Invalid username or password",
+        message: errorMessage,
         type: "danger",
       });
     } finally {
@@ -209,11 +216,15 @@ const LoginScreen: React.FC<{
                           placeholder="Password"
                         />
                         {touched.password && errors.password && (
-                          <Text style={styles.errorText}>{errors.password}</Text>
+                          <Text style={styles.errorText}>
+                            {errors.password}
+                          </Text>
                         )}
                       </View>
                       <TouchableOpacity
-                        onPress={() => navigation.navigate("ResetPasswordScreen")}
+                        onPress={() =>
+                          navigation.navigate("ResetPasswordScreen")
+                        }
                         className="mt-4 justify-center items-end"
                       >
                         <RegularText color="black" size="base">
@@ -245,7 +256,9 @@ const LoginScreen: React.FC<{
                           Don't have an account?{" "}
                         </LightText>
                         <TouchableOpacity
-                          onPress={() => navigation.navigate("CreateAccountScreen")}
+                          onPress={() =>
+                            navigation.navigate("CreateAccountScreen")
+                          }
                         >
                           <BoldText color="primary" size="base">
                             Create Account

@@ -208,11 +208,12 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
                 </View>
               </View>
             </View>
-
-            <DownloadReceiptButton transaction={transaction} />
           </View>
         </View>
       </ScrollView>
+      <View className="px-4 mb-4">
+        <DownloadReceiptButton transaction={transaction} />
+      </View>
     </SafeAreaView>
   );
 };

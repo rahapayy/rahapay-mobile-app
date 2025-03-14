@@ -20,9 +20,17 @@ const NotificationDetailScreen: React.FC<NotificationDetailScreenProps> = ({
 }) => {
   const { notification } = route.params;
   const { title, body, data } = notification.request.content;
-  const timestamp = data?.timestamp || notification.date;
-  const displayDate = new Date(timestamp).toLocaleString("en-US", {
-    month: "long",
+  console.log("Notification Data:", notification);
+
+  // Use data.timestamp if available, fall back to notification.date, and handle invalid cases
+  let timestamp = data?.timestamp
+    ? new Date(data.timestamp).toISOString() // Convert to ISO string if it's a valid date
+    : notification.date instanceof Date && !isNaN(notification.date.getTime())
+    ? notification.date
+    : new Date(); // Fallback to current date if invalid
+
+  const displayDate = new Date(timestamp).toLocaleDateString("en-US", {
+    month: "short",
     day: "numeric",
     year: "numeric",
     hour: "2-digit",
