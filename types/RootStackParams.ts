@@ -1,3 +1,5 @@
+// types/RootStackParams.ts
+
 import { ReactNode } from "react";
 import * as Notifications from "expo-notifications";
 
@@ -36,6 +38,10 @@ export type AppStackParamList = {
   SelectPinChangeScreen: undefined;
   EnableNotificationScreen: undefined;
   HelpAndSupportScreen: undefined;
+  TransferDispute: undefined;
+  ReportNewIssue: undefined;
+  SelectQuestionType: { businessType: string }; // Updated to accept businessType
+  DisputeSubmission: { businessType: string; questionType: string }; // Already correct
   PersonalInformationScreen: undefined;
   ReferralScreen: undefined;
   ReviewDataSummaryScreen: {

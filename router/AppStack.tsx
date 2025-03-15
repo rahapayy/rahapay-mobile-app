@@ -14,7 +14,7 @@ import AgentAccountVerificationScreen from "../screens/Profile/AgentAccountVerif
 import ChangePasswordScreen from "../screens/Profile/ChangePasswordScreen";
 import ChangePinScreen from "../screens/Profile/ChangePinScreen";
 import EnableNotificationScreen from "../screens/Profile/EnableNotificationScreen";
-import HelpAndSupportScreen from "../screens/Profile/HelpAndSupportScreen";
+import HelpAndSupportScreen from "../screens/Profile/help/HelpAndSupportScreen";
 import PersonalInformationScreen from "../screens/Profile/PersonalInformationScreen";
 import ReferralScreen from "../screens/Profile/ReferralScreen";
 import TransactionStatusScreen from "../screens/TransactionStatusScreen";
@@ -36,6 +36,10 @@ import BettingSuccess from "../screens/Services/Betting/BettingSuccess";
 import CreateTagScreen from "../screens/Profile/CreateTagScreen";
 import TicketScreen from "../screens/Services/TicketScreen";
 import NotificationDetailScreen from "@/screens/notification/NotificationDetailScreen";
+import TransferDisputeScreen from "@/screens/Profile/help/TransferDisputeScreen";
+import ReportNewIssueScreen from "@/screens/Profile/help/ReportNewIssueScreen";
+import SelectQuestionTypeScreen from "@/screens/Profile/help/SelectQuestionTypeScreen";
+import DisputeSubmissionScreen from "@/screens/Profile/help/DisputeSubmissionScreen";
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
@@ -217,6 +221,26 @@ const AppStack = () => {
       <Stack.Screen
         name="NotificationDetail"
         component={NotificationDetailScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TransferDispute"
+        component={TransferDisputeScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ReportNewIssue"
+        component={ReportNewIssueScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="SelectQuestionType"
+        component={SelectQuestionTypeScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="DisputeSubmission"
+        component={DisputeSubmissionScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
