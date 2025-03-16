@@ -28,12 +28,25 @@ const Card: React.FC<CardProps> = ({
 
   return (
     <View
-      className={`${
-        borderOnly ? "bg-transparent" : "bg-white"
-      } p-4 rounded-xl border border-[#E4E7EC] ${className}`}
-      style={[borderOnly ? {} : shadowStyle, style]}
+      style={{
+        margin: 4,
+        overflow: "visible",
+      }}
     >
-      {children}
+      <View
+        className={`${
+          borderOnly ? "bg-transparent" : "bg-white"
+        } p-4 rounded-xl border border-[#E4E7EC] ${className}`}
+        style={[
+          borderOnly ? {} : shadowStyle,
+          style,
+          {
+            padding: 16,
+          },
+        ]}
+      >
+        {children}
+      </View>
     </View>
   );
 };

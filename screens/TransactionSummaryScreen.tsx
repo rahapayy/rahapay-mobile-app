@@ -20,6 +20,8 @@ import Mtn from "../assets/svg/mtnbig.svg";
 import Eti from "../assets/svg/9mobilebig.svg";
 import Glo from "../assets/svg/globig.svg";
 import { DownloadReceiptButton } from "@/components/DownloadReceipt";
+import Card from "@/components/common/ui/Card";
+import Button from "@/components/common/ui/buttons/Button";
 
 type TransactionSummaryRouteParams = {
   transaction: {
@@ -177,9 +179,9 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
 
           <View className="p-4">
             <View style={styles.container}>
-              <Text style={styles.headText} allowFontScaling={false}>
+              {/* <Text style={styles.headText} allowFontScaling={false}>
                 Transaction Summary
-              </Text>
+              </Text> */}
 
               <View style={styles.row}>
                 <Text style={styles.titleText}>Amount</Text>
@@ -188,6 +190,12 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
                   {transaction.amount.toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                   })}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.titleText}>Transaction No.</Text>
+                <Text style={styles.descriptionText}>
+                  {transaction.referenceId}
                 </Text>
               </View>
               <View style={styles.row}>
@@ -211,8 +219,15 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
           </View>
         </View>
       </ScrollView>
-      <View className="px-4 mb-4">
+      <View className="px-4 mb-6">
         <DownloadReceiptButton transaction={transaction} />
+        <Button
+          borderOnly
+          textColor="black"
+          title="Report an issue"
+          onPress={() => navigation.navigate("HelpAndSupportScreen")}
+          className="mt-3"
+        />
       </View>
     </SafeAreaView>
   );

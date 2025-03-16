@@ -308,7 +308,7 @@ const DownloadReceiptButton: React.FC<DownloadReceiptButtonProps> = ({
         activeOpacity={0.8}
       >
         <DocumentDownload color={COLORS.white} size={24} />
-        <RegularText color="white" size="large" marginLeft={SPACING}>
+        <RegularText color="white" size="base" marginLeft={SPACING}>
           Download Receipt
         </RegularText>
       </TouchableOpacity>

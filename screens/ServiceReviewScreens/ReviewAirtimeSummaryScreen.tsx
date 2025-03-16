@@ -34,8 +34,12 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { selectedOperator, phoneNumber, amount, saveBeneficiary = false } =
-    route.params;
+  const {
+    selectedOperator,
+    phoneNumber,
+    amount,
+    saveBeneficiary = false,
+  } = route.params;
 
   const handleSwipeConfirm = async (reset: () => void) => {
     try {
@@ -52,22 +56,17 @@ const ReviewAirtimeSummaryScreen: React.FC<ReviewAirtimeSummaryScreenProps> = ({
       navigation.navigate("TransactionStatusScreen", {
         status: response.status,
       });
-    } catch (error: unknown) {
-      console.error("Airtime Error:", error);
-      if (error instanceof AxiosError) {
-        handleShowFlash({
-          message:
-            error.response?.data?.message ||
-            "An error occurred during account creation.",
-          type: "danger",
-        });
-        console.error(error.response?.data.message);
-      } else {
-        handleShowFlash({
-          message: "An unexpected error occurred. Please try again.",
-          type: "danger",
-        });
-      }
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message instanceof Array
+          ? error.response.data.message[0]
+          : error.response?.data?.message || "An unexpected error occurred";
+      console.error("airtime purchase error:", errorMessage);
+
+      handleShowFlash({
+        message: errorMessage,
+        type: "danger",
+      });
     } finally {
       reset();
     }
