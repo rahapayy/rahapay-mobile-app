@@ -15,6 +15,7 @@ import { mutate } from "swr"; // Import mutate to clear cache
 
 interface AuthContextType {
   isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   isAuthenticated: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   userInfo: UserInfoType | null;
@@ -34,6 +35,7 @@ type AuthProviderProps = {
 
 export const AuthContext = createContext<AuthContextType>({
   isLoading: false,
+  setIsLoading: () => {},
   isAuthenticated: false,
   setIsAuthenticated: () => {},
   userInfo: null,
@@ -108,6 +110,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Clear tokens from storage
       await removeItem("ACCESS_TOKEN", true);
       await removeItem("REFRESH_TOKEN", true);
+      await removeItem("IS_LOCKED", true);
 
       // Clear SWR cache
       mutate(() => true, undefined, false); // Clears all SWR cache
@@ -130,6 +133,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       logOut,
       setIsAuthenticated,
       setUserInfo,
+      setIsLoading,
     }),
     [isLoading, isAuthenticated, userInfo, isAppReady, logOut]
   );

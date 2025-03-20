@@ -29,6 +29,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ProgressIndicator from "../../../components/ProgressIndicator";
 import { IOnboardingDto } from "@/services/dtos";
 import { services } from "@/services";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface CreateAccountScreenProps {
   navigation: NativeStackNavigationProp<any, "">;
@@ -63,28 +64,22 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
   const countryCode = "+234";
 
   const passwordRequirements = useMemo(
-    () => [
-      { text: "At least 8 characters", regex: /.{8,}/ },
-    ],
+    () => [{ text: "At least 8 characters", regex: /.{8,}/ }],
     []
   );
 
   const handlePasswordChange = useCallback(
     (value: string, setFieldValue: (field: string, value: any) => void) => {
       setFieldValue("password", value);
-
       const newMetRequirements = new Set<number>();
       passwordRequirements.forEach((req, index) => {
-        if (req.regex.test(value)) {
-          newMetRequirements.add(index);
-        }
+        if (req.regex.test(value)) newMetRequirements.add(index);
       });
       setMetRequirements(newMetRequirements);
       setShowRequirements(
         value.length > 0 &&
           newMetRequirements.size < passwordRequirements.length
       );
-
       setVisibleSections((prev) => ({
         ...prev,
         confirmPassword: value !== "",
@@ -145,11 +140,17 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
               referral: values.referral.trim(),
             };
 
-            // const userId = userInfo?.data?.id;
-
             const response = await services.authService.onboarding(payload);
             const userId = response.data.id;
-            console.log(userId);
+
+            await AsyncStorage.setItem(
+              "ONBOARDING_STATE",
+              JSON.stringify({
+                email: values.email,
+                userId,
+                step: "verifyEmail",
+              })
+            );
 
             handleShowFlash({
               message: "Sign up successful! Please verify your email.",
@@ -160,15 +161,26 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
               id: userId,
             });
           } catch (error: unknown) {
-            console.error("Onboarding Error:", error);
             if (error instanceof AxiosError) {
-              handleShowFlash({
-                message:
-                  error.response?.data?.message ||
-                  "An error occurred during account creation.",
-                type: "danger",
-              });
-              console.error(error.response?.data.message);
+              const errorMessage = error.response?.data?.message;
+              if (error.response?.status === 409) {
+                handleShowFlash({
+                  message:
+                    "This email is already registered. Please verify it.",
+                  type: "info",
+                });
+                navigation.navigate("VerifyEmailScreen", {
+                  email: values.email,
+                  id: error.response?.data?.id || "",
+                });
+              } else {
+                handleShowFlash({
+                  message:
+                    errorMessage ||
+                    "An error occurred during account creation.",
+                  type: "danger",
+                });
+              }
             } else {
               handleShowFlash({
                 message: "An unexpected error occurred. Please try again.",
@@ -185,9 +197,8 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
             <ProgressIndicator
               navigation={navigation}
               currentStep={0}
-              totalSteps={4}
+              totalSteps={3}
             />
-
             <KeyboardAwareScrollView
               contentContainerStyle={{ flexGrow: 1 }}
               enableOnAndroid={true}
@@ -202,25 +213,18 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                   Just a few more details to set up your account.
                 </LightText>
               </View>
-
-              <View>
-                {renderInputField(
-                  "Full Name",
-                  "fullName",
-                  "e.g John Doe",
-                  formikProps
-                )}
-              </View>
-
-              <View>
-                {renderInputField(
-                  "Email Address",
-                  "email",
-                  "e.g johndoe@email.com",
-                  formikProps
-                )}
-              </View>
-
+              {renderInputField(
+                "Full Name",
+                "fullName",
+                "e.g John Doe",
+                formikProps
+              )}
+              {renderInputField(
+                "Email Address",
+                "email",
+                "e.g johndoe@email.com",
+                formikProps
+              )}
               <View className="mt-4">
                 <Label text="Phone Number" marked={false} />
                 <PhoneNumberInput
@@ -237,7 +241,6 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                     </Text>
                   )}
               </View>
-
               <View className="mt-4">
                 <Label text="Create Password" marked={false} />
                 <BasicInput
@@ -296,19 +299,13 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                   </View>
                 )}
               </View>
-
-              <View
-              // className="mt-2"
-              >
-                {renderInputField(
-                  "Re-type Password",
-                  "confirmPassword",
-                  "Confirm Password",
-                  formikProps,
-                  true
-                )}
-              </View>
-
+              {renderInputField(
+                "Re-type Password",
+                "confirmPassword",
+                "Confirm Password",
+                formikProps,
+                true
+              )}
               {renderInputField(
                 "Referral",
                 "referral",
@@ -328,7 +325,6 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                 textColor="#fff"
                 disabled={!formikProps.isValid || formikProps.isSubmitting}
               />
-
               <View style={styles.alreadyHaveAccountContainer}>
                 <MediumText color="mediumGrey" size="base">
                   Already have an account?{" "}
@@ -352,12 +348,8 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
 export default CreateAccountScreen;
 
 const styles = StyleSheet.create({
-  proceedButton: {
-    marginTop: SPACING * 5,
-  },
-  proceedButtonDisabled: {
-    backgroundColor: COLORS.violet200,
-  },
+  proceedButton: { marginTop: SPACING * 5 },
+  proceedButtonDisabled: { backgroundColor: COLORS.violet200 },
   errorText: {
     color: COLORS.red300,
     fontSize: RFValue(12),
@@ -377,34 +369,14 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 8,
   },
-  requirementNotMet: {
-    backgroundColor: "#FFEBEE",
-    borderColor: "#FF8A80",
-  },
-  requirementMet: {
-    backgroundColor: "#E8F5E9",
-    borderColor: "#A5D6A7",
-  },
-  requirementIcon: {
-    marginRight: 4,
-    fontSize: RFValue(12),
-  },
-  requirementNotMetIcon: {
-    color: "#D32F2F",
-  },
-  requirementMetIcon: {
-    color: "#4CAF50",
-  },
-  requirementText: {
-    fontSize: RFValue(10),
-    fontFamily: "Outfit-Regular",
-  },
-  requirementNotMetText: {
-    color: "#D32F2F",
-  },
-  requirementMetText: {
-    color: "#4CAF50",
-  },
+  requirementNotMet: { backgroundColor: "#FFEBEE", borderColor: "#FF8A80" },
+  requirementMet: { backgroundColor: "#E8F5E9", borderColor: "#A5D6A7" },
+  requirementIcon: { marginRight: 4, fontSize: RFValue(12) },
+  requirementNotMetIcon: { color: "#D32F2F" },
+  requirementMetIcon: { color: "#4CAF50" },
+  requirementText: { fontSize: RFValue(10), fontFamily: "Outfit-Regular" },
+  requirementNotMetText: { color: "#D32F2F" },
+  requirementMetText: { color: "#4CAF50" },
   alreadyHaveAccountContainer: {
     flexDirection: "row",
     justifyContent: "center",

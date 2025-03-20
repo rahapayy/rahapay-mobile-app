@@ -33,7 +33,7 @@ const CurrencyInput: React.FC<CurrencyInputProps> = ({
         <TextInput
           style={[styles.input]}
           placeholder="100 - 500,000"
-          placeholderTextColor={COLORS.text.light}
+          placeholderTextColor="#BABFC3"
           keyboardType="numeric"
           value={value}
           onChangeText={handleChangeText}

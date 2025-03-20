@@ -9,7 +9,7 @@ import {
   showMessage,
 } from "react-native-flash-message";
 import { RFValue } from "react-native-responsive-fontsize";
-import { Ionicons } from "@expo/vector-icons"; // For icons (checkmark and close)
+import { Ionicons } from "@expo/vector-icons"; // For icons
 
 const FlashMessageComponent = ({ message }: MessageComponentProps) => {
   const slideAnim = useRef(new Animated.Value(-100)).current;
@@ -63,6 +63,14 @@ const FlashMessageComponent = ({ message }: MessageComponentProps) => {
       ? "#1E90FF" // Blue for info
       : "#DC2626"; // Dark red for error
 
+  // Define icon based on message type
+  const iconName =
+    message.type === "success"
+      ? "checkmark-circle" // Success: checkmark in a circle
+      : message.type === "info" || message.type === "default"
+      ? "information-circle" // Info/Default: info symbol
+      : "alert-circle"; // Error: alert/warning symbol
+
   return (
     <View style={{ paddingHorizontal: SPACING }}>
       <Animated.View
@@ -84,35 +92,31 @@ const FlashMessageComponent = ({ message }: MessageComponentProps) => {
           shadowRadius: 4,
         }}
       >
-        {/* Left Icon with Sparkles */}
+        {/* Left Icon with Sparkles (only for success) */}
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <View
-            style={{
-              backgroundColor: textIconColor,
-              borderRadius: 20,
-              padding: 5,
-              marginRight: SPACING,
-            }}
-          >
-            <Ionicons
-              name="checkmark"
-              size={RFValue(8)}
-              color="#fff"
-            />
-          </View>
-          {/* Sparkle effect (simulated with small icons) */}
           <Ionicons
-            name="sparkles"
-            size={RFValue(8)}
+            name={iconName}
+            size={RFValue(20)} // Slightly larger for visibility
             color={textIconColor}
-            style={{ position: "absolute", top: -5, left: -5 }}
+            style={{ marginRight: SPACING }}
           />
-          <Ionicons
-            name="sparkles"
-            size={RFValue(8)}
-            color={textIconColor}
-            style={{ position: "absolute", bottom: -5, left: 0 }}
-          />
+          {/* Sparkle effect (only for success) */}
+          {message.type === "success" && (
+            <>
+              <Ionicons
+                name="sparkles"
+                size={RFValue(8)}
+                color={textIconColor}
+                style={{ position: "absolute", top: -5, left: -5 }}
+              />
+              <Ionicons
+                name="sparkles"
+                size={RFValue(8)}
+                color={textIconColor}
+                style={{ position: "absolute", bottom: -5, left: 0 }}
+              />
+            </>
+          )}
         </View>
 
         {/* Message Text */}
@@ -146,11 +150,7 @@ const FlashMessageComponent = ({ message }: MessageComponentProps) => {
             ]).start();
           }}
         >
-          <Ionicons
-            name="close"
-            size={RFValue(16)}
-            color="#333" // Dark gray for the close icon
-          />
+          <Ionicons name="close" size={RFValue(16)} color="#333" />
         </TouchableOpacity>
       </Animated.View>
     </View>

@@ -77,11 +77,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "#DFDFDF",
     paddingHorizontal: SPACING,
-    paddingVertical: Platform.OS === "ios" ? 14 : 8,
+    paddingVertical: Platform.OS === "ios" ? 12 : 8,
   },
   input: {
     flex: 1,
-    fontSize: RFValue(10),
+    fontSize: RFValue(11),
     fontFamily: "Outfit-Regular",
   },
   focusedInput: {

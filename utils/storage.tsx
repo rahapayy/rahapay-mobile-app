@@ -52,5 +52,7 @@ export const StorageKeys = {
   ACCESS_TOKEN: "accessToken",
   REFRESH_TOKEN: "refreshToken",
   ONBOARDED: "onboarded",
-  LASTACTIVETIME: "lastActiveTime"
+  ONBOARDING_STATE: "ONBOARDING_STATE",
+  LAST_BACKGROUND_TIME: "LAST_BACKGROUND_TIME",
+  IS_LOCKED: "IS_LOCKED",
 };

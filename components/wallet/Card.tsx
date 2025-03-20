@@ -28,7 +28,6 @@ import { BoldText, RegularText, SemiBoldText } from "../common/Text";
 import { useAuth } from "../../services/AuthContext";
 import { PanResponder } from "react-native";
 import { Skeleton } from "@rneui/themed";
-import { Image } from "react-native";
 
 const { height: screenHeight } = Dimensions.get("window");
 
@@ -132,11 +131,11 @@ const Card: React.FC<{
               </View>
             </View>
             <View className="flex-row gap-4">
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => navigation.navigate("CustomerCareScreen")}
               >
                 <Headphone color="#fff" size={24} />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <TouchableOpacity
                 onPress={() => navigation.navigate("NotificationScreen")}
               >

@@ -1,23 +1,42 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { View } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NetInfo from "@react-native-community/netinfo";
 import AppStack from "./AppStack";
 import AuthRoute from "./AuthRouter";
 import LoadingIndicator from "../components/LoadingIndicator";
 import { useAuth } from "../services/AuthContext";
-// import * as SplashScreen from "expo-splash-screen";
 import OfflineScreen from "@/screens/OfflineScreen";
+import LockScreen from "@/screens/LockScreen";
+import { RootStackParamList, LockStackParamList } from "../types/RootStackParams";
+import { useLock } from "../context/LockContext";
+import PasswordReauthScreen from "@/screens/PasswordReauthScreen.tsx";
 
-const Stack = createNativeStackNavigator();
+const RootStack = createNativeStackNavigator<RootStackParamList>();
+const LockStack = createNativeStackNavigator<LockStackParamList>();
+
+const LockStackNavigator = () => {
+  return (
+    <LockStack.Navigator>
+      <LockStack.Screen
+        name="LockScreen"
+        component={LockScreen}
+        options={{ headerShown: false }}
+      />
+      <LockStack.Screen
+        name="PasswordReauthScreen"
+        component={PasswordReauthScreen}
+        options={{ headerShown: false }}
+      />
+    </LockStack.Navigator>
+  );
+};
 
 const Router = () => {
   const { isAuthenticated, isAppReady } = useAuth();
+  const { isLocked } = useLock(); // Use the LockContext to get isLocked
   const [appLoaded, setAppLoaded] = useState(false);
-  const [isOnline, setIsOnline] = useState<boolean | null>(null); // Track internet status
+  const [isOnline, setIsOnline] = useState<boolean | null>(null);
 
-  // Check app readiness and initial connectivity
   useEffect(() => {
     const prepareApp = async () => {
       try {
@@ -30,14 +49,11 @@ const Router = () => {
       }
     };
 
-    // Subscribe to network state updates
     const unsubscribe = NetInfo.addEventListener((state) => {
       setIsOnline(state.isConnected ?? false);
     });
 
     prepareApp();
-
-    // Cleanup subscription
     return () => unsubscribe();
   }, [isAppReady]);
 
@@ -56,25 +72,27 @@ const Router = () => {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        {isAuthenticated ? (
-          <Stack.Screen
-            name="AppStack"
-            component={AppStack}
-            options={{ headerShown: false }}
-          />
-        ) : (
-          <Stack.Screen
-            name="AuthRoute"
-            component={AuthRoute}
-            options={{ headerShown: false }}
-          />
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
-    //         <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-    // </View>
+    <RootStack.Navigator>
+      {isLocked && isAuthenticated ? (
+        <RootStack.Screen
+          name="LockStack"
+          component={LockStackNavigator}
+          options={{ headerShown: false }}
+        />
+      ) : isAuthenticated ? (
+        <RootStack.Screen
+          name="AppStack"
+          component={AppStack}
+          options={{ headerShown: false }}
+        />
+      ) : (
+        <RootStack.Screen
+          name="AuthRoute"
+          component={AuthRoute}
+          options={{ headerShown: false }}
+        />
+      )}
+    </RootStack.Navigator>
   );
 };
 

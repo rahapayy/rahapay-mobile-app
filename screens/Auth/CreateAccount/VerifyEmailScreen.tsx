@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -27,12 +26,8 @@ import { services } from "@/services";
 import { setItem } from "@/utils/storage";
 import { useAuth } from "@/services/AuthContext";
 import OtpInput from "@/components/common/ui/forms/OtpInput";
-import SectionDivider from "@/components/SectionDivider";
 
-type VerifyEmailScreenRouteParams = {
-  email: string;
-  id: string;
-};
+type VerifyEmailScreenRouteParams = { email: string; id: string };
 
 interface VerifyEmailScreenProps {
   navigation: NativeStackNavigationProp<any, "">;
@@ -60,11 +55,9 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-
     if (resendCountdown > 0) {
       timer = setTimeout(() => setResendCountdown((prev) => prev - 1), 1000);
     }
-
     return () => clearTimeout(timer);
   }, [resendCountdown]);
 
@@ -78,21 +71,20 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
     if (otp.length === 6) {
       setIsSubmitting(true);
       try {
-        const payload: IVerifyEmailDto = {
-          otp: otp,
-          email,
-        };
-
+        const payload: IVerifyEmailDto = { otp, email };
         const response = await services.authService.verifyEmail(payload);
-        console.log(response);
 
         if (response?.data?.accessToken) {
           await setItem("ACCESS_TOKEN", response.data.accessToken, true);
           await setItem("REFRESH_TOKEN", response.data.refreshToken, true);
 
-          // Fetch user details immediately after verification
           const userResponse = await services.authServiceToken.getUserDetails();
           setUserInfo(userResponse.data);
+
+          await AsyncStorage.setItem(
+            "ONBOARDING_STATE",
+            JSON.stringify({ email, userId: id, step: "createPin" })
+          );
 
           navigation.navigate("CreateTransactionPinScreen");
           handleShowFlash({
@@ -114,10 +106,7 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
             type: "danger",
           });
         } else {
-          handleShowFlash({
-            message: errorMessage,
-            type: "danger",
-          });
+          handleShowFlash({ message: errorMessage, type: "danger" });
         }
       } finally {
         setIsSubmitting(false);
@@ -128,31 +117,23 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
         message: "Please enter the complete OTP",
         type: "warning",
       });
+      setIsLoading(false);
     }
   };
 
   const handleResendOTP = async () => {
     try {
       await services.authService.resendOtp(id);
-      handleShowFlash({
-        message: "OTP resent successfully!",
-        type: "success",
-      });
+      handleShowFlash({ message: "OTP resent successfully!", type: "success" });
       setResendCountdown(60);
     } catch (error) {
-      console.log("Resend OTP Error:", error);
       const err = error as {
         response?: { data?: { message?: string } };
         message: string;
       };
       const errorMessage =
         err.response?.data?.message || err.message || "An error occurred";
-      console.log(errorMessage);
-
-      handleShowFlash({
-        message: errorMessage,
-        type: "danger",
-      });
+      handleShowFlash({ message: errorMessage, type: "danger" });
     }
   };
 
@@ -162,10 +143,9 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
         <ProgressIndicator
           navigation={navigation}
           currentStep={1}
-          totalSteps={4}
+          totalSteps={3}
         />
-
-        <View className="mt-4">
+        <View className="mt-8">
           <SemiBoldText color="black" size="xlarge" marginBottom={5}>
             Verify Email Address
           </SemiBoldText>
@@ -173,8 +153,7 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
             Enter the OTP sent to {email}
           </LightText>
         </View>
-
-        <View className="mt-4 mb-6">
+        <View className="mt-8 mb-10">
           <OtpInput
             length={6}
             value={boxes}
@@ -183,9 +162,8 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
             autoFocus={true}
           />
         </View>
-
         <Button
-          title={"Verify Account"}
+          title="Verify Account"
           onPress={handleButtonClick}
           className="mt-4"
           textColor="#fff"
@@ -193,12 +171,10 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
           disabled={isSubmitting || !isInputFilled || isLoading}
           style={isSubmitting || !isInputFilled ? styles.disabledButton : null}
         />
-
         <View className="justify-center items-center mt-6">
           <Text style={styles.otpText} allowFontScaling={false}>
             Didn't receive an OTP?
           </Text>
-
           <TouchableOpacity
             onPress={handleResendOTP}
             disabled={resendCountdown > 0}
@@ -244,14 +220,8 @@ const styles = StyleSheet.create({
     fontSize: RFValue(19),
     fontWeight: "bold",
   },
-  inputBoxFocused: {
-    borderColor: COLORS.violet400,
-    borderWidth: 1,
-  },
-  otpText: {
-    fontSize: RFValue(13),
-    fontFamily: "Outfit-Regular",
-  },
+  inputBoxFocused: { borderColor: COLORS.violet400, borderWidth: 1 },
+  otpText: { fontSize: RFValue(13), fontFamily: "Outfit-Regular" },
   countdownContainer: {
     marginTop: SPACING * 2,
     backgroundColor: COLORS.violet200,
@@ -259,11 +229,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING * 2,
     borderRadius: 4,
   },
-  countdownText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
-  },
-  disabledButton: {
-    backgroundColor: COLORS.violet200,
-  },
+  countdownText: { fontFamily: "Outfit-Regular", fontSize: RFValue(14) },
+  disabledButton: { backgroundColor: COLORS.violet200 },
 });

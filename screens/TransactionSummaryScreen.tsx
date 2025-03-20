@@ -221,13 +221,13 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
       </ScrollView>
       <View className="px-4 mb-6">
         <DownloadReceiptButton transaction={transaction} />
-        <Button
+        {/* <Button
           borderOnly
           textColor="black"
           title="Report an issue"
           onPress={() => navigation.navigate("HelpAndSupportScreen")}
           className="mt-3"
-        />
+        /> */}
       </View>
     </SafeAreaView>
   );

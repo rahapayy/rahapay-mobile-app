@@ -129,7 +129,17 @@ export const useRefreshToken = () => {
     IErrorResponse<{ message: string }>,
     IRefreshTokenDto
   >({
-    // mutationFn: (payload) => services.authService.refreshToken(payload),
+    mutationFn: async (payload: IRefreshTokenDto) => {
+      // Call the refreshToken service method
+      const response = await services.authService.refreshToken(payload);
+      console.log("Server response:", response);
+      // Wrap the response in the IResponse format if the service doesn't already
+      return {
+        data: response, // Assuming response is IRefreshTokenResponseDto
+        message: "Token refreshed successfully",
+        success: true,
+      } as IResponse<IRefreshTokenResponseDto>;
+    },
     onSuccess: async (response) => response.data,
     onError: handleError,
   });

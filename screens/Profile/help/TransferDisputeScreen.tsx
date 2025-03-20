@@ -77,12 +77,12 @@ const TransferDisputeScreen: React.FC<{
           </Text>
         </View>
       </ScrollView>
-      <Button
+      {/* <Button
         title="Report new issue"
         textColor="white"
         style={styles.reportButton}
         onPress={() => navigation.navigate("ReportNewIssue")}
-      />
+      /> */}
     </SafeAreaView>
   );
 };

@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View, Text } from "react-native";
-import { MediumText } from "../../Text";
+import { RegularText } from "../../Text";
 
 interface Props {
   text: string;
@@ -10,10 +10,10 @@ interface Props {
 const Label: React.FunctionComponent<Props> = ({ text, marked }) => {
   return (
     <View style={styles.row}>
-      <MediumText color="mediumGrey" size="base">
+      <RegularText color="label" size="small">
         {text}
         {marked && <Text style={styles.requiredSymbol}> *</Text>}
-      </MediumText>
+      </RegularText>
     </View>
   );
 };

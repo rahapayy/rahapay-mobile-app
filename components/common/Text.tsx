@@ -14,6 +14,7 @@ const fontColors = {
   mediumGrey: COLORS.grey[400],
   white: "#fff",
   green: COLORS.success.green,
+  label: "#1E1E1E",
 };
 
 const fontSize = {
@@ -39,7 +40,8 @@ interface CustomTextProps extends TextProps {
     | "lightGrey"
     | "error"
     | "mediumGrey"
-    | "green";
+    | "green"
+    | "label";
   size?:
     | "large"
     | "xlarge"

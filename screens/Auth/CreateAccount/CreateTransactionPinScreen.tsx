@@ -23,7 +23,7 @@ import Label from "../../../components/common/ui/forms/Label";
 import ProgressIndicator from "../../../components/ProgressIndicator";
 import { ICreatePinDto } from "@/services/dtos";
 import { services } from "@/services";
-import { getItem, setItem } from "@/utils/storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface CreateTransactionPinScreenProps {
   navigation: NativeStackNavigationProp<any, "">;
@@ -51,26 +51,21 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
     }
 
     try {
-      const payload: ICreatePinDto = {
-        securityPin: pin,
-        transactionPin: pin,
-      };
-
+      const payload: ICreatePinDto = { securityPin: pin, transactionPin: pin };
       const response = await services.authServiceToken.createPin(payload);
-      console.log(response);
+
+      await AsyncStorage.removeItem("ONBOARDING_STATE");
 
       handleShowFlash({
         message: "Transaction PIN created successfully!",
         type: "success",
       });
-
-      navigation.navigate("CreatePinScreen");
+      navigation.navigate("SuccessfulScreen");
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message instanceof Array
           ? error.response.data.message[0]
           : error.response?.data?.message || "An unexpected error occurred";
-      console.error("Create Transaction error:", errorMessage);
       handleShowFlash({
         message: "Failed to create transaction PIN. Please try again.",
         type: "danger",
@@ -92,9 +87,8 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
             <ProgressIndicator
               navigation={navigation}
               currentStep={2}
-              totalSteps={4}
+              totalSteps={3}
             />
-
             <View style={{ marginTop: 16 }}>
               <SemiBoldText color="black" size="xlarge" marginBottom={5}>
                 Create Your Transaction PIN
@@ -103,11 +97,10 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
                 Use this pin for secure transactions
               </LightText>
             </View>
-
             <View className="flex-1">
               <View style={styles.inputContainer}>
                 <Label text="Enter Transaction PIN" marked={false} />
-                <View className="justify-center items-center ">
+                <View className="justify-center items-center">
                   <OtpInput
                     length={4}
                     value={boxes}
@@ -117,7 +110,6 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
                   />
                 </View>
               </View>
-
               <View style={styles.inputContainer}>
                 <Label text="Confirm Transaction PIN" marked={false} />
                 <View className="justify-center items-center">
@@ -131,7 +123,6 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
                 </View>
               </View>
             </View>
-
             <Button
               title="Confirm"
               onPress={handleConfirmPin}

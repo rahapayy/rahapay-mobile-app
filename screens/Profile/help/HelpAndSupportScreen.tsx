@@ -7,9 +7,16 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Linking,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft } from "iconsax-react-native";
+import {
+  ArrowLeft,
+  Whatsapp,
+  Instagram,
+  Facebook,
+  Call,
+} from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "@/constants/colors";
 import SPACING from "@/constants/SPACING";
@@ -28,6 +35,36 @@ const HelpAndSupportScreen: React.FC<{
 
   const fullName = userInfo?.fullName || "";
   const firstName = fullName.split(" ")[0];
+
+  // Social media links (replace with your actual links)
+  const socialLinks = [
+    {
+      name: "WhatsApp",
+      icon: Whatsapp,
+      url: "https://wa.me/+2349167662449",
+      color: "#25D366",
+    },
+    {
+      name: "Facebook",
+      icon: Facebook,
+      url: "https://www.facebook.com/share/1BtBXtvoz2/?mibextid=LQQJ4d",
+      color: "#1877F2",
+    },
+    {
+      name: "Instagram",
+      icon: Instagram,
+      url: "https://www.instagram.com/rahapay_?igsh=bDNidTFic29iYnB2&utm_source=qr",
+      color: "#E1306C",
+    },
+    // { name: "Twitter", icon: Twitter, url: "https://x.com/raha_pay?s=21&t=DXoMQjeLYxVaXBq2dYtRVA", color: "#1DA1F2" },
+    { name: "Phone", icon: Call, url: "tel:+2349167662449", color: "#000000" },
+  ];
+
+  const handleSocialLinkPress = (url: string) => {
+    Linking.openURL(url).catch((err) =>
+      console.error("Failed to open URL:", err)
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -62,24 +99,31 @@ const HelpAndSupportScreen: React.FC<{
         </Text>
         <TouchableOpacity
           style={styles.option}
-          onPress={() => navigation.navigate("TransferDispute")}
+          onPress={() => navigation.navigate("ReportNewIssue")}
         >
           <Text style={styles.optionText} allowFontScaling={false}>
-            Transfer Dispute
+            Report an issue
           </Text>
           <ArrowLeft color="#000" size={24} style={styles.optionIcon} />
         </TouchableOpacity>
-        {/* Add more options as needed */}
-        {/* <View style={styles.banner}>
-          <Text style={styles.bannerText} allowFontScaling={false}>
-            Explore benefits of having our cards
-          </Text>
-          <TouchableOpacity style={styles.learnMoreButton}>
-            <Text style={styles.learnMoreText} allowFontScaling={false}>
-              Learn More
+
+        {/* Social Links Section */}
+        <Text style={styles.sectionTitle} allowFontScaling={false}>
+          Contact Us
+        </Text>
+        {socialLinks.map((link, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.socialOption}
+            onPress={() => handleSocialLinkPress(link.url)}
+          >
+            <link.icon size={24} color={link.color} style={styles.socialIcon} />
+            <Text style={styles.optionText} allowFontScaling={false}>
+              {link.name}
             </Text>
+            <ArrowLeft color="#000" size={24} style={styles.optionIcon} />
           </TouchableOpacity>
-        </View> */}
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
@@ -151,37 +195,30 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
+  socialOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: SPACING * 2,
+    marginHorizontal: SPACING * 2,
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    marginBottom: SPACING,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  socialIcon: {
+    marginRight: SPACING,
+  },
   optionText: {
     fontSize: RFValue(16),
     fontFamily: "Outfit-Regular",
+    flex: 1,
   },
   optionIcon: {
     transform: [{ rotate: "180deg" }],
-  },
-  banner: {
-    backgroundColor: COLORS.violet400,
-    padding: SPACING * 2,
-    marginHorizontal: SPACING * 2,
-    borderRadius: 12,
-    marginTop: SPACING * 2,
-  },
-  bannerText: {
-    color: COLORS.white,
-    fontSize: RFValue(18),
-    fontFamily: "Outfit-Medium",
-    marginBottom: SPACING,
-  },
-  learnMoreButton: {
-    backgroundColor: COLORS.white,
-    paddingVertical: SPACING,
-    paddingHorizontal: SPACING * 2,
-    borderRadius: 8,
-    alignSelf: "flex-start",
-  },
-  learnMoreText: {
-    color: COLORS.violet400,
-    fontSize: RFValue(14),
-    fontFamily: "Outfit-Medium",
   },
 });
 

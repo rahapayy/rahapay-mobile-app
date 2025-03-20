@@ -1,5 +1,3 @@
-// types/RootStackParams.ts
-
 import { ReactNode } from "react";
 import * as Notifications from "expo-notifications";
 
@@ -40,8 +38,8 @@ export type AppStackParamList = {
   HelpAndSupportScreen: undefined;
   TransferDispute: undefined;
   ReportNewIssue: undefined;
-  SelectQuestionType: { businessType: string }; // Updated to accept businessType
-  DisputeSubmission: { businessType: string; questionType: string }; // Already correct
+  SelectQuestionType: { businessType: string };
+  DisputeSubmission: { businessType: string; questionType: string };
   PersonalInformationScreen: undefined;
   ReferralScreen: undefined;
   ReviewDataSummaryScreen: {
@@ -115,7 +113,7 @@ export type AppStackParamList = {
   TicketScreen: undefined;
   ExistingUserScreen: undefined;
   NotificationDetail: {
-    notification: Notifications.Notification; // Updated to include notification param
+    notification: Notifications.Notification;
   };
 };
 
@@ -124,7 +122,7 @@ export type AuthStackParamList = {
   Onboarding: undefined;
   WelcomeScreen: undefined;
   CreateAccountScreen: undefined;
-  VerifyEmailScreen: undefined;
+  VerifyEmailScreen: { email: string; id: string };
   ExistingUserScreen: undefined;
   ForgotPasswordScreen: undefined;
   CreateNewPasswordScreen: { resetToken: string };
@@ -137,5 +135,18 @@ export type AuthStackParamList = {
   CreateTransactionPinScreen: undefined;
 };
 
-// Combined Route Stack
+// Lock Stack (Lock screen-related screens)
+export type LockStackParamList = {
+  LockScreen: { onUnlock: () => void };
+  PasswordReauthScreen: { onUnlock: () => void };
+};
+
+// Root Stack (Top-level navigation)
+export type RootStackParamList = {
+  AuthRoute: undefined;
+  AppStack: undefined;
+  LockStack: undefined;
+};
+
+// Combined Route Stack (for convenience, if needed)
 export type RouteStackParamList = AppStackParamList & AuthStackParamList;

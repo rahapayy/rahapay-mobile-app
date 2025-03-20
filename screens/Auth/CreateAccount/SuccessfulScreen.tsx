@@ -1,4 +1,4 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, StyleSheet, View } from "react-native";
 import React from "react";
 import LottieView from "lottie-react-native";
 import Button from "../../../components/common/ui/buttons/Button";
@@ -7,22 +7,29 @@ import FONT_SIZE from "../../../constants/font-size";
 import SPACING from "../../../constants/SPACING";
 import { MediumText, LightText } from "../../../components/common/Text";
 import { useAuth } from "@/services/AuthContext";
-import { setItem } from "@/utils/storage";
 import { services } from "@/services";
+import { handleShowFlash } from "@/components/FlashMessageComponent";
 
 const SuccessfulScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { setIsAuthenticated, setUserInfo, isLoading } = useAuth();
+  const { setIsAuthenticated, setUserInfo, isLoading, setIsLoading } =
+    useAuth();
 
   const handleCompletion = async () => {
     try {
-      // Final check and navigation
+      setIsLoading(true);
       const userResponse = await services.authServiceToken.getUserDetails();
       setUserInfo(userResponse.data);
       setIsAuthenticated(true);
+      setIsLoading(false);
     } catch (error) {
-      // Handle error
+      setIsLoading(false);
+      console.error("Failed to fetch user details:", error);
+      handleShowFlash({
+        message: "Failed to complete setup. Please try again.",
+        type: "danger",
+      });
     }
   };
 
@@ -46,10 +53,9 @@ const SuccessfulScreen: React.FC<{
           Great news! Your RahaPay account has been created successfully.
         </LightText>
       </View>
-
       <View style={styles.buttonContainer}>
         <Button
-          title={"Continue"}
+          title="Continue"
           onPress={handleCompletion}
           style={styles.button}
           textColor="#fff"
@@ -67,10 +73,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 24,
   },
-  animation: {
-    width: 350,
-    height: 350,
-  },
+  animation: { width: 350, height: 350 },
   headText: {
     fontFamily: "Outfit-Medium",
     fontSize: FONT_SIZE.extraLarge,
@@ -83,13 +86,8 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: "center",
   },
-  buttonContainer: {
-    paddingHorizontal: 24,
-    paddingBottom: SPACING * 4,
-  },
-  button: {
-    width: "100%",
-  },
+  buttonContainer: { paddingHorizontal: 24, paddingBottom: SPACING * 4 },
+  button: { width: "100%" },
 });
 
 export default SuccessfulScreen;

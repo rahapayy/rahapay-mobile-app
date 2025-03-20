@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: RFValue(10),
     fontFamily: "Outfit-Regular",
+    color: "#1E1E1E",
   },
   focusedInput: {
     borderColor: COLORS.violet600,

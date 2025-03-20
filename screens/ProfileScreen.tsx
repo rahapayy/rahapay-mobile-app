@@ -9,6 +9,7 @@ import {
 import React, { useContext, useState } from "react";
 import FONT_SIZE from "../constants/font-size";
 import {
+  Document,
   FingerScan,
   I24Support,
   Key,
@@ -163,6 +164,20 @@ const ProfileScreen: React.FC<{
                 />
                 <LightText color="black" size="base">
                   Referrals
+                </LightText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("TransferDispute")}
+                style={styles.settingsItem}
+              >
+                <Document
+                  variant="Bold"
+                  color={COLORS.violet400}
+                  size={24}
+                  style={{ marginRight: SPACING }}
+                />
+                <LightText color="black" size="base">
+                  Reports
                 </LightText>
               </TouchableOpacity>
             </View>
