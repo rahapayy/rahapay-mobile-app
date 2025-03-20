@@ -36,13 +36,23 @@ const QuickAction: React.FC<{
   const actionItems = [
     { icon: AirtimeIcon, title: "Airtime", navigateTo: "AirtimeScreen" },
     { icon: DataIcon, title: "Data", navigateTo: "DataScreen" },
-    { icon: TvIcon, title: "TV", isComingSoon: true },
+    { icon: TvIcon, title: "TV", navigateTo: "TvSubscriptionScreen" },
     {
       icon: ElectricityIcon,
       title: "Electricity",
       isComingSoon: true,
     },
   ];
+  // const actionItems = [
+  //   { icon: AirtimeIcon, title: "Airtime", navigateTo: "AirtimeScreen" },
+  //   { icon: DataIcon, title: "Data", navigateTo: "DataScreen" },
+  //   { icon: TvIcon, title: "TV", navigatTo: true },
+  //   {
+  //     icon: ElectricityIcon,
+  //     title: "Electricity",
+  //     isComingSoon: true,
+  //   },
+  // ];
 
   return (
     <View className="mt-4">
@@ -67,11 +77,7 @@ const QuickAction: React.FC<{
                 </RegularText>
               </View>
             )}
-            <RegularText
-              color="black"
-              marginTop={8}
-              size="base"
-            >
+            <RegularText color="black" marginTop={8} size="base">
               {item.title}
             </RegularText>
           </TouchableOpacity>
@@ -83,7 +89,6 @@ const QuickAction: React.FC<{
 
 export default QuickAction;
 
-
 const styles = StyleSheet.create({
   disabledCard: {
     opacity: 0.5,
@@ -94,6 +99,6 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: COLORS.violet200,
     padding: 3,
-    borderRadius: 10
+    borderRadius: 10,
   },
 });
