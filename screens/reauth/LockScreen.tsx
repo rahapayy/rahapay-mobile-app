@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
-import { handleShowFlash } from "../components/FlashMessageComponent";
-import { services } from "../services";
-import { useAuth } from "../services/AuthContext";
-import { getItem } from "../utils/storage";
+import { handleShowFlash } from "../../components/FlashMessageComponent";
+import { services } from "../../services";
+import { useAuth } from "../../services/AuthContext";
+import { getItem } from "../../utils/storage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { LockStackParamList } from "../types/RootStackParams";
-import { useLock } from "../context/LockContext";
+import { LockStackParamList } from "../../types/RootStackParams";
+import { useLock } from "../../context/LockContext";
 
 type LockScreenProps = NativeStackScreenProps<LockStackParamList, "LockScreen">;
 

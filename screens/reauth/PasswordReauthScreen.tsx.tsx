@@ -6,13 +6,13 @@ import {
   StyleSheet,
   TextInput,
 } from "react-native";
-import { handleShowFlash } from "../components/FlashMessageComponent";
-import { services } from "../services";
-import { useAuth } from "../services/AuthContext";
-import { setItem } from "../utils/storage";
+import { handleShowFlash } from "../../components/FlashMessageComponent";
+import { services } from "../../services";
+import { useAuth } from "../../services/AuthContext";
+import { setItem } from "../../utils/storage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { LockStackParamList } from "../types/RootStackParams";
-import { useLock } from "../context/LockContext";
+import { LockStackParamList } from "../../types/RootStackParams";
+import { useLock } from "../../context/LockContext";
 
 type PasswordReauthScreenProps = NativeStackScreenProps<
   LockStackParamList,

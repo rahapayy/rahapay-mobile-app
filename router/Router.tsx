@@ -6,10 +6,13 @@ import AuthRoute from "./AuthRouter";
 import LoadingIndicator from "../components/LoadingIndicator";
 import { useAuth } from "../services/AuthContext";
 import OfflineScreen from "@/screens/OfflineScreen";
-import LockScreen from "@/screens/LockScreen";
-import { RootStackParamList, LockStackParamList } from "../types/RootStackParams";
+import LockScreen from "@/screens/reauth/LockScreen";
+import {
+  RootStackParamList,
+  LockStackParamList,
+} from "../types/RootStackParams";
 import { useLock } from "../context/LockContext";
-import PasswordReauthScreen from "@/screens/PasswordReauthScreen.tsx";
+import PasswordReauthScreen from "@/screens/reauth/PasswordReauthScreen.tsx";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const LockStack = createNativeStackNavigator<LockStackParamList>();
