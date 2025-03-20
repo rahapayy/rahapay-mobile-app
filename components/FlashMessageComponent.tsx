@@ -60,7 +60,7 @@ const FlashMessageComponent = ({ message }: MessageComponentProps) => {
     message.type === "success"
       ? "#28A745" // Dark green for success
       : message.type === "info" || message.type === "default"
-      ? "#1E90FF" // Blue for info
+      ? "#fff" // Blue for info
       : "#DC2626"; // Dark red for error
 
   // Define icon based on message type

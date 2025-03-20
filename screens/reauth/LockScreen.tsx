@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Dimensions,
+  Platform,
+} from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { services } from "../../services";
@@ -11,13 +18,19 @@ import { useLock } from "../../context/LockContext";
 import { COLORS } from "@/constants/ui";
 import Button from "@/components/common/ui/buttons/Button";
 import { BoldText, RegularText } from "@/components/common/Text";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+// Using the app's existing icon components instead of iconsax
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 type LockScreenProps = NativeStackScreenProps<LockStackParamList, "LockScreen">;
+const { width } = Dimensions.get("window");
 
 const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
-  const { setIsAuthenticated, setUserInfo, userInfo } = useAuth();
-  const { handleUnlock } = useLock(); // Use the LockContext to get handleUnlock
+  const { setIsAuthenticated, setUserInfo, userInfo, logOut } = useAuth();
+  const { handleUnlock } = useLock();
   const [maskedId, setMaskedId] = useState("");
+  const [biometricType, setBiometricType] = useState<string>("biometric");
+  const insets = useSafeAreaInsets();
 
   const fullName = userInfo?.fullName || "";
   const initials = fullName
@@ -27,15 +40,34 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
     .toUpperCase();
 
   useEffect(() => {
+    // Check biometric type
+    (async () => {
+      const supportedTypes =
+        await LocalAuthentication.supportedAuthenticationTypesAsync();
+      if (
+        supportedTypes.includes(
+          LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION
+        )
+      ) {
+        setBiometricType("Face ID");
+      } else if (
+        supportedTypes.includes(
+          LocalAuthentication.AuthenticationType.FINGERPRINT
+        )
+      ) {
+        setBiometricType("Fingerprint");
+      }
+    })();
+
     // Mask the user's email or phone number
     if (userInfo?.email) {
       const [username, domain] = userInfo.email.split("@");
-      const maskedUsername = username.slice(0, 2) + "****" + username.slice(-2);
+      const maskedUsername = username.slice(0, 2) + "•••" + username.slice(-2);
       setMaskedId(`${maskedUsername}@${domain}`);
     } else if (userInfo?.phoneNumber) {
       const maskedPhone = userInfo.phoneNumber.replace(
         /^(\d{3})(\d{3})(\d{4})$/,
-        "$1****$3"
+        "$1•••$3"
       );
       setMaskedId(maskedPhone);
     }
@@ -46,7 +78,7 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
       const hasHardware = await LocalAuthentication.hasHardwareAsync();
       if (!hasHardware) {
         handleShowFlash({
-          message: "Biometric authentication is not available on this device",
+          message: "This device doesn’t support biometric authentication.",
           type: "info",
         });
         return;
@@ -55,14 +87,15 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
       if (!isEnrolled) {
         handleShowFlash({
-          message: "No biometric data enrolled on this device",
+          message:
+            "No biometric data enrolled. Please set it up in your device settings.",
           type: "info",
         });
         return;
       }
 
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: "Log in with Face ID",
+        promptMessage: `Log in with ${biometricType}`,
         fallbackLabel: "Use Password",
         disableDeviceFallback: false,
       });
@@ -74,10 +107,10 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
           setIsAuthenticated(true);
           setUserInfo(userResponse.data);
           handleShowFlash({
-            message: "Logged in successfully with Face ID",
+            message: `Logged in successfully with ${biometricType}`,
             type: "success",
           });
-          handleUnlock(); // Use handleUnlock from context
+          handleUnlock();
         } else {
           handleShowFlash({
             message: "No access token found. Please log in with password.",
@@ -86,45 +119,90 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
         }
       } else {
         handleShowFlash({
-          message: "Face ID authentication failed",
+          message: `${biometricType} authentication failed`,
           type: "danger",
         });
       }
     } catch (error) {
       console.error("Biometric login error:", error);
       handleShowFlash({
-        message: "An error occurred during Face ID login",
+        message: "An error occurred during biometric login",
         type: "danger",
       });
     }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.avatar}>
-        <BoldText color="white" size="large">
-          {initials}
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top, paddingBottom: insets.bottom },
+      ]}
+    >
+      <View style={styles.profileSection}>
+        <View style={styles.avatarContainer}>
+          <View style={styles.avatar}>
+            <BoldText color="white" size="xlarge">
+              {initials}
+            </BoldText>
+          </View>
+        </View>
+
+        <BoldText color="black" size="large" style={styles.welcomeText}>
+          Welcome back!
         </BoldText>
-      </View>
-      {/* User ID (masked) */}
-      <RegularText color="black">{maskedId}</RegularText>
-      {/* Face ID Icon */}
-      <TouchableOpacity
-        onPress={handleBiometricLogin}
-        style={styles.faceIdButton}
-      >
-        <RegularText color="primary">Click to Login with Biometric</RegularText>
-      </TouchableOpacity>
-      {/* Switch Account and Login with Password Options */}
-      <View style={styles.optionsContainer}>
-        <TouchableOpacity>
-          <RegularText color="primary">Switch Account</RegularText>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("PasswordReauthScreen")}
+        <RegularText
+          color="mediumGrey"
+          size="medium"
+          style={styles.maskedIdText}
         >
-          <RegularText color="primary">Login with Password</RegularText>
+          {maskedId}
+        </RegularText>
+      </View>
+
+      <View style={styles.authSection}>
+        <TouchableOpacity
+          onPress={handleBiometricLogin}
+          style={styles.biometricButton}
+          activeOpacity={0.8}
+        >
+          <View style={styles.biometricButtonCircle}>
+            {biometricType === "Face ID" ? (
+              <MaterialIcons name="face" size={30} color="#FFFFFF" />
+            ) : (
+              <MaterialIcons name="fingerprint" size={30} color="#FFFFFF" />
+            )}
+          </View>
+          <RegularText
+            color="mediumGrey"
+            size="medium"
+            style={styles.biometricText}
+          >
+            Login with {biometricType}
+          </RegularText>
         </TouchableOpacity>
+      </View>
+      <View className="gap-4">
+        <Button
+          onPress={() => navigation.navigate("PasswordReauthScreen")}
+          title="Login with Password"
+          textColor="white"
+          style={styles.passwordButton}
+          iconPosition="left"
+          icon={<MaterialIcons name="lock" size={20} color="#FFFFFF" />}
+        />
+        <View style={styles.optionsContainer}>
+          <TouchableOpacity style={styles.optionButton} onPress={logOut}>
+            <MaterialIcons
+              name="people-alt"
+              size={18}
+              color={COLORS.brand.primary}
+            />
+            <RegularText color="primary" size="base" style={styles.optionText}>
+              Switch Account
+            </RegularText>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -133,48 +211,89 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
     padding: 20,
   },
+  logoContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: 20,
+  },
   logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
+    width: 140,
+    height: 50,
   },
-  faceIdButton: {
-    marginBottom: 20,
+  profileSection: {
+    alignItems: "center",
+    marginTop: 20,
   },
-  faceIdText: {
-    fontSize: 16,
-    color: COLORS.brand.primary,
-    textAlign: "center",
+  avatarContainer: {
+    borderRadius: 50,
+  },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+    backgroundColor: COLORS.brand.primary,
+  },
+  welcomeText: {
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  maskedIdText: {
+    marginBottom: 24,
+  },
+  authSection: {
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  biometricButton: {
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  biometricButtonCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 12,
+    backgroundColor: COLORS.brand.primary,
+  },
+  biometricText: {
+    marginTop: 4,
+  },
+  passwordButton: {
+    width: width * 0.8,
+    height: 50,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   optionsContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    width: "60%",
-    gap: 10,
-  },
-  avatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 50,
-    backgroundColor: COLORS.brand.primary,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 8,
+    // width: "100%",
+    marginBottom: 20,
+  },
+  optionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+  },
+  optionText: {
+    marginLeft: 5,
   },
 });
 
 export default LockScreen;
-
-{
-  /* <Button
-        title=""
-        textColor=""
-        iconPosition="left"
-        icon={< color="" />}
-      /> */
-}

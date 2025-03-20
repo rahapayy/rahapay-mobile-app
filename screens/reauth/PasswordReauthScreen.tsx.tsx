@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
   View,
-  Text,
   TouchableOpacity,
   StyleSheet,
-  TextInput,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { services } from "../../services";
@@ -14,24 +15,30 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { LockStackParamList } from "../../types/RootStackParams";
 import { useLock } from "../../context/LockContext";
 import { BoldText, RegularText } from "@/components/common/Text";
-
 import { BasicPasswordInput } from "@/components/common/ui/forms/BasicPasswordInput";
 import { COLORS } from "@/constants/ui";
 import Button from "@/components/common/ui/buttons/Button";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+// Using the app's existing icon components instead of iconsax
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 type PasswordReauthScreenProps = NativeStackScreenProps<
   LockStackParamList,
   "PasswordReauthScreen"
 >;
 
+const { width } = Dimensions.get("window");
+
 const PasswordReauthScreen: React.FC<PasswordReauthScreenProps> = ({
   navigation,
 }) => {
   const { setIsAuthenticated, setUserInfo, userInfo } = useAuth();
-  const { handleUnlock } = useLock(); // Use the LockContext to get handleUnlock
+  const { handleUnlock } = useLock();
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [maskedId, setMaskedId] = useState("");
+  const insets = useSafeAreaInsets();
 
   const fullName = userInfo?.fullName || "";
   const initials = fullName
@@ -44,18 +51,26 @@ const PasswordReauthScreen: React.FC<PasswordReauthScreenProps> = ({
     // Mask the user's email or phone number
     if (userInfo?.email) {
       const [username, domain] = userInfo.email.split("@");
-      const maskedUsername = username.slice(0, 2) + "****" + username.slice(-2);
+      const maskedUsername = username.slice(0, 2) + "•••" + username.slice(-2);
       setMaskedId(`${maskedUsername}@${domain}`);
     } else if (userInfo?.phoneNumber) {
       const maskedPhone = userInfo.phoneNumber.replace(
         /^(\d{3})(\d{3})(\d{4})$/,
-        "$1****$3"
+        "$1•••$3"
       );
       setMaskedId(maskedPhone);
     }
   }, [userInfo]);
 
   const handlePasswordLogin = async () => {
+    if (!password.trim()) {
+      handleShowFlash({
+        message: "Please enter your password",
+        type: "warning",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const payload = {
@@ -74,7 +89,7 @@ const PasswordReauthScreen: React.FC<PasswordReauthScreenProps> = ({
           message: "Logged in successfully!",
           type: "success",
         });
-        handleUnlock(); // Use handleUnlock from context
+        handleUnlock();
       }
     } catch (error: any) {
       const errorMessage =
@@ -91,34 +106,83 @@ const PasswordReauthScreen: React.FC<PasswordReauthScreenProps> = ({
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={styles.backButton}
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top, paddingBottom: insets.bottom },
+      ]}
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardAvoidView}
       >
-        <Text style={styles.backText}>Back</Text>
-      </TouchableOpacity>
-      <Text style={styles.title}>Enter Password</Text>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="arrow-back" size={24} color={COLORS.brand.primary} />
+        </TouchableOpacity>
 
-      <View style={styles.avatar}>
-        <BoldText color="white" size="large">
-          {initials}
-        </BoldText>
-      </View>
-      {/* User ID (masked) */}
-      <RegularText color="black">{maskedId}</RegularText>
-      <BasicPasswordInput
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Password"
-      />
-      <Button
-        onPress={handlePasswordLogin}
-        title="Login"
-        textColor="white"
-        isLoading={isSubmitting}
-      />
+        <View style={styles.contentContainer}>
+          <View style={styles.headerContainer}>
+            <BoldText color="black" size="large" style={styles.title}>
+              Enter Password
+            </BoldText>
+            <RegularText color="mediumGrey" size="base" style={styles.subtitle}>
+              Please enter your password to unlock
+            </RegularText>
+          </View>
+
+          <View style={styles.profileSection}>
+            <View style={styles.avatar}>
+              <BoldText color="white" size="xlarge">
+                {initials}
+              </BoldText>
+            </View>
+            <BoldText color="black" size="medium" style={styles.userName}>
+              {userInfo?.fullName || "User"}
+            </BoldText>
+            <RegularText color="mediumGrey" size="base">
+              {maskedId}
+            </RegularText>
+          </View>
+
+          <View style={styles.formContainer}>
+            <View style={styles.inputContainer}>
+              <MaterialIcons
+                name="lock-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
+              <BasicPasswordInput
+                style={styles.input}
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Your password"
+              />
+            </View>
+
+            <Button
+              onPress={handlePasswordLogin}
+              title={isSubmitting ? "Logging in..." : "Login"}
+              textColor="white"
+              style={styles.loginButton}
+              isLoading={isSubmitting}
+            />
+          </View>
+
+          <TouchableOpacity
+            style={styles.forgotPasswordButton}
+            activeOpacity={0.7}
+          >
+            <RegularText color="primary" size="base">
+              Forgot Password?
+            </RegularText>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -126,53 +190,85 @@ const PasswordReauthScreen: React.FC<PasswordReauthScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 20,
+    backgroundColor: "#ffffff",
+  },
+  keyboardAvoidView: {
+    flex: 1,
   },
   backButton: {
     position: "absolute",
-    top: 40,
-    left: 20,
+    top: 12,
+    left: 16,
+    padding: 8,
+    zIndex: 10,
   },
-  backText: {
-    fontSize: 16,
-    color: "#00C4B4",
+  contentContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: 24,
+    paddingTop: 60,
+  },
+  headerContainer: {
+    width: "100%",
+    marginBottom: 32,
   },
   title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 8,
+    textAlign: "center",
   },
-  input: {
-    width: "80%",
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    marginBottom: 20,
+  subtitle: {
+    textAlign: "center",
   },
-  submitButton: {
-    backgroundColor: "#00C4B4",
-    padding: 10,
-    borderRadius: 5,
-  },
-  disabledButton: {
-    backgroundColor: "#ccc",
-  },
-  submitText: {
-    color: "#fff",
-    fontSize: 16,
+  profileSection: {
+    alignItems: "center",
+    marginBottom: 32,
   },
   avatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 50,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: COLORS.brand.primary,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 12,
+  },
+  userName: {
+    marginBottom: 4,
+  },
+  formContainer: {
+    width: "100%",
+    marginBottom: 16,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    borderRadius: 12,
+    backgroundColor: "#F9F9F9",
+    paddingHorizontal: 12,
+    height: 56,
+  },
+  inputIcon: {
     marginRight: 8,
+  },
+  input: {
+    flex: 1,
+    height: 56,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    padding: 0,
+  },
+  loginButton: {
+    width: "100%",
+    height: 54,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  forgotPasswordButton: {
+    paddingVertical: 12,
+    marginTop: 8,
   },
 });
 
