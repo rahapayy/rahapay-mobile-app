@@ -20,8 +20,8 @@ interface ButtonProps extends TouchableOpacityProps {
   isLoading?: boolean;
   borderOnly?: boolean;
   subBrand?: boolean;
-  frontIcon?: React.ReactNode;
-  backIcon?: React.ReactNode;
+  icon?: React.ReactNode; // Single icon prop
+  iconPosition?: "left" | "right"; // Specify icon position
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -33,8 +33,8 @@ const Button: React.FC<ButtonProps> = ({
   disabled,
   borderOnly = false,
   subBrand = false,
-  frontIcon,
-  backIcon,
+  icon,
+  iconPosition = "left", // Default to left
   ...rest
 }) => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -52,7 +52,9 @@ const Button: React.FC<ButtonProps> = ({
       {...rest}
     >
       <View style={styles.contentContainer}>
-        {frontIcon && <View style={styles.icon}>{frontIcon}</View>}
+        {icon && iconPosition === "left" && (
+          <View style={styles.icon}>{icon}</View>
+        )}
         {isLoading ? (
           <ActivityIndicator size="small" color="#fff" style={styles.spinner} />
         ) : (
@@ -63,7 +65,9 @@ const Button: React.FC<ButtonProps> = ({
             {title}
           </Text>
         )}
-        {backIcon && <View style={styles.icon}>{backIcon}</View>}
+        {icon && iconPosition === "right" && (
+          <View style={styles.icon}>{icon}</View>
+        )}
       </View>
     </TouchableOpacity>
   );

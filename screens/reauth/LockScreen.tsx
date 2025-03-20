@@ -8,6 +8,9 @@ import { getItem } from "../../utils/storage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { LockStackParamList } from "../../types/RootStackParams";
 import { useLock } from "../../context/LockContext";
+import { COLORS } from "@/constants/ui";
+import Button from "@/components/common/ui/buttons/Button";
+import { BoldText, RegularText } from "@/components/common/Text";
 
 type LockScreenProps = NativeStackScreenProps<LockStackParamList, "LockScreen">;
 
@@ -15,6 +18,13 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
   const { setIsAuthenticated, setUserInfo, userInfo } = useAuth();
   const { handleUnlock } = useLock(); // Use the LockContext to get handleUnlock
   const [maskedId, setMaskedId] = useState("");
+
+  const fullName = userInfo?.fullName || "";
+  const initials = fullName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
 
   useEffect(() => {
     // Mask the user's email or phone number
@@ -91,29 +101,29 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Logo (replace with your app's logo) */}
-      {/* <Image
-        source={require("../assets/logo.png")} // Replace with your logo path
-        style={styles.logo}
-      /> */}
+      <View style={styles.avatar}>
+        <BoldText color="white" size="large">
+          {initials}
+        </BoldText>
+      </View>
       {/* User ID (masked) */}
-      <Text style={styles.userId}>{maskedId}</Text>
+      <RegularText color="black">{maskedId}</RegularText>
       {/* Face ID Icon */}
       <TouchableOpacity
         onPress={handleBiometricLogin}
         style={styles.faceIdButton}
       >
-        <Text style={styles.faceIdText}>Click to Login with Biometric</Text>
+        <RegularText color="primary">Click to Login with Biometric</RegularText>
       </TouchableOpacity>
       {/* Switch Account and Login with Password Options */}
       <View style={styles.optionsContainer}>
         <TouchableOpacity>
-          <Text style={styles.optionText}>Switch Account</Text>
+          <RegularText color="primary">Switch Account</RegularText>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => navigation.navigate("PasswordReauthScreen")}
         >
-          <Text style={styles.optionText}>Login with Password</Text>
+          <RegularText color="primary">Login with Password</RegularText>
         </TouchableOpacity>
       </View>
     </View>
@@ -133,28 +143,38 @@ const styles = StyleSheet.create({
     height: 100,
     marginBottom: 20,
   },
-  userId: {
-    fontSize: 18,
-    color: "#333",
-    marginBottom: 30,
-  },
   faceIdButton: {
     marginBottom: 20,
   },
   faceIdText: {
     fontSize: 16,
-    color: "#00C4B4",
+    color: COLORS.brand.primary,
     textAlign: "center",
   },
   optionsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     width: "60%",
+    gap: 10,
   },
-  optionText: {
-    fontSize: 14,
-    color: "#00C4B4",
+  avatar: {
+    width: 70,
+    height: 70,
+    borderRadius: 50,
+    backgroundColor: COLORS.brand.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 8,
   },
 });
 
 export default LockScreen;
+
+{
+  /* <Button
+        title=""
+        textColor=""
+        iconPosition="left"
+        icon={< color="" />}
+      /> */
+}

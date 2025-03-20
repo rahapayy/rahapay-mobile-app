@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,11 @@ import { setItem } from "../../utils/storage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { LockStackParamList } from "../../types/RootStackParams";
 import { useLock } from "../../context/LockContext";
+import { BoldText, RegularText } from "@/components/common/Text";
+
+import { BasicPasswordInput } from "@/components/common/ui/forms/BasicPasswordInput";
+import { COLORS } from "@/constants/ui";
+import Button from "@/components/common/ui/buttons/Button";
 
 type PasswordReauthScreenProps = NativeStackScreenProps<
   LockStackParamList,
@@ -26,6 +31,29 @@ const PasswordReauthScreen: React.FC<PasswordReauthScreenProps> = ({
   const { handleUnlock } = useLock(); // Use the LockContext to get handleUnlock
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [maskedId, setMaskedId] = useState("");
+
+  const fullName = userInfo?.fullName || "";
+  const initials = fullName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+
+  useEffect(() => {
+    // Mask the user's email or phone number
+    if (userInfo?.email) {
+      const [username, domain] = userInfo.email.split("@");
+      const maskedUsername = username.slice(0, 2) + "****" + username.slice(-2);
+      setMaskedId(`${maskedUsername}@${domain}`);
+    } else if (userInfo?.phoneNumber) {
+      const maskedPhone = userInfo.phoneNumber.replace(
+        /^(\d{3})(\d{3})(\d{4})$/,
+        "$1****$3"
+      );
+      setMaskedId(maskedPhone);
+    }
+  }, [userInfo]);
 
   const handlePasswordLogin = async () => {
     setIsSubmitting(true);
@@ -71,23 +99,26 @@ const PasswordReauthScreen: React.FC<PasswordReauthScreenProps> = ({
         <Text style={styles.backText}>Back</Text>
       </TouchableOpacity>
       <Text style={styles.title}>Enter Password</Text>
-      <TextInput
+
+      <View style={styles.avatar}>
+        <BoldText color="white" size="large">
+          {initials}
+        </BoldText>
+      </View>
+      {/* User ID (masked) */}
+      <RegularText color="black">{maskedId}</RegularText>
+      <BasicPasswordInput
         style={styles.input}
         value={password}
         onChangeText={setPassword}
         placeholder="Password"
-        secureTextEntry
-        autoCapitalize="none"
       />
-      <TouchableOpacity
-        style={[styles.submitButton, isSubmitting && styles.disabledButton]}
+      <Button
         onPress={handlePasswordLogin}
-        disabled={isSubmitting}
-      >
-        <Text style={styles.submitText}>
-          {isSubmitting ? "Logging in..." : "Login"}
-        </Text>
-      </TouchableOpacity>
+        title="Login"
+        textColor="white"
+        isLoading={isSubmitting}
+      />
     </View>
   );
 };
@@ -133,6 +164,15 @@ const styles = StyleSheet.create({
   submitText: {
     color: "#fff",
     fontSize: 16,
+  },
+  avatar: {
+    width: 70,
+    height: 70,
+    borderRadius: 50,
+    backgroundColor: COLORS.brand.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 8,
   },
 });
 
