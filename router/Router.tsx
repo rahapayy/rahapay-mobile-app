@@ -36,29 +36,16 @@ const LockStackNavigator = () => {
 
 const Router = () => {
   const { isAuthenticated, isAppReady } = useAuth();
-  const { isLocked } = useLock(); // Use the LockContext to get isLocked
-  const [appLoaded, setAppLoaded] = useState(false);
+  const { isLocked, isLockStateReady } = useLock();
   const [isOnline, setIsOnline] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const prepareApp = async () => {
-      try {
-        if (isAppReady) {
-          await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate loading time
-          setAppLoaded(true);
-        }
-      } catch (e) {
-        console.warn(e);
-      }
-    };
-
     const unsubscribe = NetInfo.addEventListener((state) => {
       setIsOnline(state.isConnected ?? false);
     });
 
-    prepareApp();
     return () => unsubscribe();
-  }, [isAppReady]);
+  }, []);
 
   const handleRetry = () => {
     NetInfo.fetch().then((state) => {
@@ -66,13 +53,37 @@ const Router = () => {
     });
   };
 
-  if (!appLoaded || isOnline === null) {
+  if (!isAppReady || !isLockStateReady || isOnline === null) {
+    console.log(
+      "Waiting for readiness - isAppReady:",
+      isAppReady,
+      "isLockStateReady:",
+      isLockStateReady,
+      "isOnline:",
+      isOnline
+    );
     return <LoadingIndicator />;
   }
 
   if (!isOnline) {
+    console.log("Offline detected");
     return <OfflineScreen onRetry={handleRetry} />;
   }
+
+  console.log(
+    "Rendering Router - isAuthenticated:",
+    isAuthenticated,
+    "isLocked:",
+    isLocked
+  );
+  console.log(
+    "Navigation decision:",
+    isLocked && isAuthenticated
+      ? "LockStack"
+      : isAuthenticated
+      ? "AppStack"
+      : "AuthRoute"
+  );
 
   return (
     <RootStack.Navigator>

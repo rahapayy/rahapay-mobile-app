@@ -6,7 +6,7 @@ import {
   View,
   Switch,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useEffect, useState } from "react";
 import FONT_SIZE from "../constants/font-size";
 import {
   Document,
@@ -34,6 +34,7 @@ import {
   SemiBoldText,
 } from "../components/common/Text";
 import { AuthContext, useAuth } from "../services/AuthContext";
+import { getItem, setItem } from "@/utils/storage";
 
 const ProfileScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -48,12 +49,25 @@ const ProfileScreen: React.FC<{
     .join("")
     .toUpperCase();
 
-  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
-  const [biometricModalVisible, setBiometricModalVisible] = useState(false);
+
   const [isCloseAccountModalVisible, setIsCloseAccountModalVisible] =
     useState(false);
 
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
+
+
+
+  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
+  const [biometricModalVisible, setBiometricModalVisible] = useState(false);
+
+  // Load biometric preference on mount
+  useEffect(() => {
+    const loadBiometricPreference = async () => {
+      const storedValue = await getItem("BIOMETRIC_ENABLED");
+      setIsBiometricEnabled(storedValue === "true");
+    };
+    loadBiometricPreference();
+  }, []);
 
   const toggleBiometricSwitch = () => {
     setBiometricModalVisible(true);
@@ -63,8 +77,9 @@ const ProfileScreen: React.FC<{
     setBiometricModalVisible(false);
   };
 
-  const handleToggleBiometrics = () => {
-    setIsBiometricEnabled(!isBiometricEnabled);
+  const handleToggleBiometrics = async (newValue: boolean) => {
+    setIsBiometricEnabled(newValue);
+    await setItem("BIOMETRIC_ENABLED", newValue.toString());
     setBiometricModalVisible(false);
   };
 

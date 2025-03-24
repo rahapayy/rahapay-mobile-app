@@ -1,147 +1,192 @@
-import React, { createContext, useContext, useState, useEffect, useRef, ReactNode, useCallback } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AppState } from "react-native";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { AppState, AppStateStatus } from "react-native";
 import { useAuth } from "../services/AuthContext";
+import { getItem, removeItem, setItem } from "@/utils/storage";
+import * as LocalAuthentication from "expo-local-authentication";
 
 interface LockContextType {
   isLocked: boolean;
   setIsLocked: (locked: boolean) => void;
   handleUnlock: () => Promise<void>;
-  resetInactivityTimer: () => void;
+  isLockStateReady: boolean;
 }
 
 const LockContext = createContext<LockContextType | undefined>(undefined);
 
 export const LockProvider = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated } = useAuth();
-  const [isLocked, setIsLocked] = useState(false);
+  const [isLocked, setIsLocked] = useState<boolean>(false);
+  const [isLockStateReady, setIsLockStateReady] = useState(false);
   const [appState, setAppState] = useState(AppState.currentState);
-  const inactivityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 minutes in milliseconds
+  const INACTIVITY_LIMIT = 1 * 60 * 1000; // 1 minute
 
-  // Reset the inactivity timer on user interaction
-  const resetInactivityTimer = useCallback(() => {
-    if (!isAuthenticated) return; // Only reset timer if user is authenticated
+  // Initialize lock state on mount
+  useEffect(() => {
+    const initializeLockState = async () => {
+      try {
+        const isLockedState = await getItem("IS_LOCKED");
+        const backgroundTimestamp = await getItem("BACKGROUND_TIMESTAMP");
+        const currentTime = Date.now();
 
-    if (inactivityTimeoutRef.current) {
-      clearTimeout(inactivityTimeoutRef.current);
-    }
-    inactivityTimeoutRef.current = setTimeout(() => {
-      setIsLocked(true);
-      AsyncStorage.setItem("IS_LOCKED", "true");
-    }, INACTIVITY_LIMIT);
-  }, [isAuthenticated]);
+        console.log("Initializing lock state:");
+        console.log("  isAuthenticated:", isAuthenticated);
+        console.log("  isLockedState:", isLockedState);
+        console.log("  backgroundTimestamp:", backgroundTimestamp);
 
+        if (!isAuthenticated) {
+          setIsLocked(false);
+          await setItem("IS_LOCKED", "false");
+          await removeItem("BACKGROUND_TIMESTAMP");
+          await removeItem("LOCK_TIMESTAMP");
+          console.log("  Not authenticated, set isLocked to false");
+        } else if (backgroundTimestamp) {
+          const backgroundDuration =
+            currentTime - parseInt(backgroundTimestamp);
+          console.log(
+            "  Background duration:",
+            backgroundDuration / 1000,
+            "seconds"
+          );
+          if (backgroundDuration >= INACTIVITY_LIMIT) {
+            setIsLocked(true);
+            await setItem("IS_LOCKED", "true");
+            await setItem("LOCK_TIMESTAMP", currentTime.toString());
+            console.log("  Background > 1 min, set isLocked to true");
+          } else {
+            setIsLocked(false);
+            await setItem("IS_LOCKED", "false");
+            console.log("  Background < 1 min, set isLocked to false");
+          }
+        } else {
+          setIsLocked(isLockedState === "true");
+          console.log(
+            "  No background timestamp, isLocked:",
+            isLockedState === "true"
+          );
+        }
+      } catch (error) {
+        console.log("Error initializing lock state: ", error);
+        setIsLocked(false);
+      } finally {
+        setIsLockStateReady(true);
+        console.log("Lock state initialized, isLocked:", isLocked);
+      }
+    };
+
+    initializeLockState();
+  }, []); // Run only on mount
+
+  // Handle app state changes
   useEffect(() => {
     const subscription = AppState.addEventListener(
       "change",
       handleAppStateChange
     );
-    loadPersistedState();
-
-    // Start the inactivity timer only if the user is authenticated
-    if (isAuthenticated) {
-      resetInactivityTimer();
-    }
 
     return () => {
       subscription.remove();
-      if (inactivityTimeoutRef.current) {
-        clearTimeout(inactivityTimeoutRef.current);
-      }
     };
-  }, [resetInactivityTimer, isAuthenticated]);
+  }, [isAuthenticated, appState]); // Depend on appState to ensure updates
 
-  const handleAppStateChange = async (nextAppState: string) => {
+  const handleAppStateChange = async (nextAppState: AppStateStatus) => {
+    console.log("AppState change detected:", nextAppState);
+    console.log("Previous appState:", appState);
+
     if (appState.match(/inactive|background/) && nextAppState === "active") {
       console.log("App has come to the foreground!");
-      loadPersistedState();
-      if (isAuthenticated) {
-        resetInactivityTimer(); // Reset timer when app comes to foreground, only for authenticated users
-      }
-    } else if (nextAppState === "background" && isAuthenticated) {
-      // Only lock if the user is authenticated
-      await persistAppState();
-      setIsLocked(true);
-      await AsyncStorage.setItem("IS_LOCKED", "true");
-    }
-    setAppState(
-      nextAppState as
-        | "active"
-        | "background"
-        | "inactive"
-        | "unknown"
-        | "extension"
-    );
-  };
+      const backgroundTimestamp = await getItem("BACKGROUND_TIMESTAMP");
+      console.log("Retrieved BACKGROUND_TIMESTAMP:", backgroundTimestamp);
 
-  const persistAppState = async () => {
-    try {
-      const stateToPersist = {};
-      await AsyncStorage.setItem("appState", JSON.stringify(stateToPersist));
-      console.log("App state persisted!");
-    } catch (error) {
-      console.log("Error saving state to AsyncStorage: ", error);
-    }
-  };
+      if (backgroundTimestamp && isAuthenticated) {
+        const currentTime = Date.now();
+        const backgroundDuration = currentTime - parseInt(backgroundTimestamp);
+        console.log(
+          "Background duration:",
+          backgroundDuration / 1000,
+          "seconds"
+        );
 
-  const loadPersistedState = async () => {
-    try {
-      const savedState = await AsyncStorage.getItem("appState");
-      if (savedState) {
-        const parsedState = JSON.parse(savedState);
-        console.log("Restored app state:", parsedState);
-      }
-
-      // Only set isLocked if the user is authenticated
-      const isLockedState = await AsyncStorage.getItem("IS_LOCKED");
-      if (isLockedState === "true" && isAuthenticated) {
-        setIsLocked(true);
-      } else {
-        setIsLocked(false); // Ensure lock is disabled if not authenticated
-        await AsyncStorage.setItem("IS_LOCKED", "false");
-      }
-
-      const onboardingState = await AsyncStorage.getItem("ONBOARDING_STATE");
-      if (onboardingState) {
-        const { email, userId, step } = JSON.parse(onboardingState);
-        if (step === "verifyEmail") {
-          // Navigation will be handled by App.tsx
-        } else if (step === "createPin") {
-          // Navigation will be handled by App.tsx
+        if (backgroundDuration >= INACTIVITY_LIMIT) {
+          console.log("Background duration exceeded 1 minute, locking app");
+          setIsLocked(true);
+          await setItem("IS_LOCKED", "true");
+          await setItem("LOCK_TIMESTAMP", currentTime.toString());
+        } else {
+          console.log("Background duration < 1 minute, keeping unlocked");
+          setIsLocked(false);
+          await setItem("IS_LOCKED", "false");
         }
+      } else {
+        console.log(
+          "No background timestamp or not authenticated, isLocked remains:",
+          isLocked
+        );
       }
-    } catch (error) {
-      console.log("Error loading state from AsyncStorage: ", error);
-    }
-  };
-
-  // Reset isLocked when isAuthenticated changes
-  useEffect(() => {
-    if (isAuthenticated) {
-      // When the user logs in, reset the lock state
-      setIsLocked(false);
-      AsyncStorage.setItem("IS_LOCKED", "false");
-      resetInactivityTimer();
+      await removeItem("BACKGROUND_TIMESTAMP");
+    } else if (nextAppState === "background" && isAuthenticated) {
+      const currentTime = Date.now();
+      console.log(
+        "App going to background, setting BACKGROUND_TIMESTAMP:",
+        currentTime
+      );
+      await setItem("BACKGROUND_TIMESTAMP", currentTime.toString());
     } else {
-      // When the user logs out, clear the lock state and timer
-      setIsLocked(false);
-      AsyncStorage.setItem("IS_LOCKED", "false");
-      if (inactivityTimeoutRef.current) {
-        clearTimeout(inactivityTimeoutRef.current);
-      }
+      console.log("Unhandled AppState transition:", nextAppState);
     }
-  }, [isAuthenticated, resetInactivityTimer]);
+    setAppState(nextAppState);
+  };
 
   const handleUnlock = async () => {
+    const isBiometricEnabled = (await getItem("BIOMETRIC_ENABLED")) === "true";
+    if (isBiometricEnabled) {
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      if (!hasHardware) throw new Error("Biometric hardware not available");
+
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      if (!isEnrolled) throw new Error("No biometric credentials enrolled");
+
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: "Unlock the app",
+        fallbackLabel: "Use PIN",
+      });
+      if (!result.success) throw new Error("Biometric authentication failed");
+    }
     setIsLocked(false);
-    await AsyncStorage.setItem("IS_LOCKED", "false");
-    resetInactivityTimer();
+    await setItem("IS_LOCKED", "false");
+    await removeItem("LOCK_TIMESTAMP");
+    console.log("App unlocked, isLocked:", false);
   };
+
+  // Reset lock state when authentication changes
+  useEffect(() => {
+    const resetLockState = async () => {
+      if (isAuthenticated) {
+        console.log("User authenticated, resetting lock state");
+        setIsLocked(false);
+        await setItem("IS_LOCKED", "false");
+        await removeItem("LOCK_TIMESTAMP");
+        await removeItem("BACKGROUND_TIMESTAMP");
+      } else {
+        console.log("User logged out, clearing lock state");
+        setIsLocked(false);
+        await setItem("IS_LOCKED", "false");
+        await removeItem("LOCK_TIMESTAMP");
+        await removeItem("BACKGROUND_TIMESTAMP");
+      }
+    };
+
+    resetLockState();
+  }, [isAuthenticated]);
 
   return (
     <LockContext.Provider
-      value={{ isLocked, setIsLocked, handleUnlock, resetInactivityTimer }}
+      value={{ isLocked, setIsLocked, handleUnlock, isLockStateReady }}
     >
       {children}
     </LockContext.Provider>
@@ -150,8 +195,6 @@ export const LockProvider = ({ children }: { children: ReactNode }) => {
 
 export const useLock = () => {
   const context = useContext(LockContext);
-  if (!context) {
-    throw new Error("useLock must be used within a LockProvider");
-  }
+  if (!context) throw new Error("useLock must be used within a LockProvider");
   return context;
 };

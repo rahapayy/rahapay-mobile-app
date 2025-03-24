@@ -4,13 +4,63 @@ import COLORS from "../../constants/colors";
 import FONT_SIZE from "../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../constants/SPACING";
+import * as LocalAuthentication from "expo-local-authentication";
+import { handleShowFlash } from "../FlashMessageComponent";
 
 const BiometricModal: React.FC<{
   visible: boolean;
   onClose: () => void;
-  onToggle: () => void;
+  onToggle: (newValue: boolean) => Promise<void>;
   isEnabled: boolean;
 }> = ({ visible, onClose, onToggle, isEnabled }) => {
+
+  const handleBiometricToggle = async () => {
+    try {
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      if (!hasHardware) {
+        handleShowFlash({
+          message: "Biometric hardware not available on this device.",
+          type: "danger",
+        });
+        onClose();
+        return;
+      }
+
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      if (!isEnrolled) {
+        handleShowFlash({
+          message: "No biometric credentials enrolled.",
+          type: "danger",
+        });
+        onClose();
+        return;
+      }
+
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: "Authenticate to toggle biometrics",
+        fallbackLabel: "Use PIN", // Optional: fallback to PIN if biometric fails
+      });
+
+      if (result.success) {
+        await onToggle(!isEnabled); // Toggle the biometric state
+        handleShowFlash({
+          message: `Biometrics ${isEnabled ? "disabled" : "enabled"}`,
+          type: "success",
+        });
+      } else {
+        handleShowFlash({
+          message: "Biometric authentication failed.",
+          type: "danger",
+        });
+      }
+    } catch (error) {
+      handleShowFlash({
+        message: "An error occurred during biometric authentication.",
+        type: "danger",
+      });
+      console.error(error);
+    }
+  };
   return (
     <Modal
       transparent={true}
@@ -30,7 +80,7 @@ const BiometricModal: React.FC<{
                 : "Enable fingerprint authentication for both Login and Transactions?"}
             </Text>
             <View className="flex-row gap-4">
-              <TouchableOpacity style={styles.modalButton} onPress={onToggle}>
+              <TouchableOpacity style={styles.modalButton} onPress={handleBiometricToggle}>
                 <Text style={styles.modalButtonText} allowFontScaling={false}>
                   {isEnabled ? "Disable" : "Yes, Enable"}
                 </Text>
