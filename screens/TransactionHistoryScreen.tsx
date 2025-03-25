@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useMemo } from "react";
 import {
-  FlatList,
   Platform,
   SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  ActivityIndicator,
   SectionList,
+  ActivityIndicator,
 } from "react-native";
 import { ArrowLeft, WalletAdd1 } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -22,6 +21,10 @@ import Airtel from "../assets/svg/airtelbig.svg";
 import Mtn from "../assets/svg/mtnbig.svg";
 import Eti from "../assets/svg/9mobilebig.svg";
 import Glo from "../assets/svg/globig.svg";
+import { Skeleton } from "@rneui/themed";
+import Dstv from "../assets/svg/dstv.svg";
+import Gotv from "../assets/svg/gotv.svg";
+import Startimes from "../assets/svg/startimes.svg";
 
 const AllTransactionsScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -29,6 +32,7 @@ const AllTransactionsScreen: React.FC<{
   const { getAllTransactions } = useWallet();
   const { transactions, pagination, isLoading, currentPage, setCurrentPage } =
     getAllTransactions();
+
   const [hasTransaction, setHasTransaction] = useState(false);
 
   const groupedTransactions = useMemo(() => {
@@ -102,11 +106,28 @@ const AllTransactionsScreen: React.FC<{
 
   const renderServiceIcon = (
     provider: string | undefined,
-    tranxType: string
+    tranxType: string,
+    cableName?: string
   ) => {
     if (tranxType === "WALLET_FUNDING") {
       return <WalletAdd1 size={24} color={COLORS.violet400} />;
     }
+
+    if (tranxType === "CABLE_SUBSCRIPTION" && cableName) {
+      const cableLower = cableName.toLowerCase();
+      switch (cableLower) {
+        case "dstv":
+          return <Dstv width={40} height={40} />;
+        case "gotv":
+          return <Gotv width={40} height={40} />;
+        case "startime": // Matches your log data
+          return <Startimes width={40} height={40} />;
+        default:
+          return null;
+      }
+    }
+
+    if (!provider) return null;
 
     if (provider?.toLowerCase() === "airtel") {
       return <Airtel width={40} height={40} />;
@@ -127,7 +148,7 @@ const AllTransactionsScreen: React.FC<{
     paymentStatus: any;
     referenceId: any;
     _id: any;
-    metadata: { networkType: any; phoneNumber: any };
+    metadata: { networkType: any; phoneNumber: any; cableName?: string };
   }) => {
     const formattedDate = new Date(transaction.paidOn).toLocaleString("en-US", {
       month: "long",
@@ -148,12 +169,14 @@ const AllTransactionsScreen: React.FC<{
         ...transaction.metadata,
         networkType: transaction.metadata?.networkType,
         phoneNumber: transaction.metadata?.phoneNumber,
+        cableName: transaction.metadata?.cableName,
       },
     };
   };
 
   const renderTransactionItem = ({ item }: { item: any }) => {
     const networkType = item.metadata?.networkType;
+    const cableName = item.metadata?.cableName;
     const formattedTime = new Date(item.paidOn).toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
@@ -169,7 +192,7 @@ const AllTransactionsScreen: React.FC<{
         style={styles.transactionItem}
       >
         <View style={styles.iconContainer}>
-          {renderServiceIcon(networkType, item.transactionType)}
+          {renderServiceIcon(networkType, item.transactionType, cableName)}
         </View>
         <View style={styles.transactionTextContainer}>
           <View style={styles.transactionTextRow}>
@@ -180,15 +203,20 @@ const AllTransactionsScreen: React.FC<{
               style={[
                 styles.valueText,
                 {
-                  color: item.transactionType.includes("PURCHASE")
-                    ? "black"
-                    : "black",
+                  color:
+                    item.transactionType.includes("PURCHASE") ||
+                    item.transactionType === "CABLE_SUBSCRIPTION"
+                      ? "black"
+                      : "black",
                 },
               ]}
               allowFontScaling={false}
             >
-              {item.transactionType.includes("PURCHASE") ? "-" : "+"} ₦
-              {item.amountPaid}
+              {item.transactionType.includes("PURCHASE") ||
+              item.transactionType === "CABLE_SUBSCRIPTION"
+                ? "-"
+                : "+"}{" "}
+              ₦{item.amountPaid}
             </Text>
           </View>
           <View style={styles.transactionTextRow}>
@@ -240,9 +268,55 @@ const AllTransactionsScreen: React.FC<{
   );
 
   const renderLoadingState = () => (
-    <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color={COLORS.violet400} />
-      <Text style={styles.loadingText}>Loading Transactions...</Text>
+    <View style={styles.skeletonContainer}>
+      {Array(5)
+        .fill(null)
+        .map((_, index) => (
+          <View key={index} style={styles.transactionItem}>
+            <Skeleton
+              animation="pulse"
+              circle
+              width={40}
+              height={40}
+              style={{ backgroundColor: COLORS.grey100, marginRight: 10 }}
+              skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+            />
+            <View style={styles.transactionTextContainer}>
+              <View style={styles.transactionTextRow}>
+                <Skeleton
+                  animation="pulse"
+                  width={80}
+                  height={14}
+                  style={{ backgroundColor: COLORS.grey100, marginVertical: 2 }}
+                  skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                />
+                <Skeleton
+                  animation="pulse"
+                  width={60}
+                  height={16}
+                  style={{ backgroundColor: COLORS.grey100, marginVertical: 2 }}
+                  skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                />
+              </View>
+              <View style={styles.transactionTextRow}>
+                <Skeleton
+                  animation="pulse"
+                  width={30}
+                  height={12}
+                  style={{ backgroundColor: COLORS.grey100, marginVertical: 2 }}
+                  skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                />
+                <Skeleton
+                  animation="pulse"
+                  width={45}
+                  height={12}
+                  style={{ backgroundColor: COLORS.grey100, marginVertical: 2 }}
+                  skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+                />
+              </View>
+            </View>
+          </View>
+        ))}
     </View>
   );
 
@@ -250,7 +324,7 @@ const AllTransactionsScreen: React.FC<{
     if (isLoading && currentPage > 1) {
       return (
         <View style={styles.footerLoadingContainer}>
-          <ActivityIndicator size="small" color={COLORS.violet400} />
+          <ActivityIndicator color={COLORS.violet400} size={24} />
         </View>
       );
     }
@@ -324,6 +398,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: SPACING * 2,
   },
+  skeletonContainer: {
+    flex: 1,
+    paddingHorizontal: SPACING * 2,
+  },
   sectionHeader: {
     backgroundColor: "#F7F9FC",
     paddingVertical: 8,
@@ -383,17 +461,6 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: "#06C270",
     fontSize: RFValue(10),
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  loadingText: {
-    marginTop: 10,
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
-    color: "#515966",
   },
   footerLoadingContainer: {
     padding: 20,

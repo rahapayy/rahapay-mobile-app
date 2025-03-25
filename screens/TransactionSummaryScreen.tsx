@@ -20,8 +20,9 @@ import Mtn from "../assets/svg/mtnbig.svg";
 import Eti from "../assets/svg/9mobilebig.svg";
 import Glo from "../assets/svg/globig.svg";
 import { DownloadReceiptButton } from "@/components/DownloadReceipt";
-import Card from "@/components/common/ui/Card";
-import Button from "@/components/common/ui/buttons/Button";
+import Dstv from "../assets/svg/dstv.svg";
+import Gotv from "../assets/svg/gotv.svg";
+import Startimes from "../assets/svg/startimes.svg";
 
 type TransactionSummaryRouteParams = {
   transaction: {
@@ -34,6 +35,9 @@ type TransactionSummaryRouteParams = {
     metadata?: {
       networkType?: string;
       phoneNumber?: string;
+      cableName?: string;
+      smartCardNo?: string;
+      planName?: string;
     };
   };
 };
@@ -53,21 +57,37 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
   const { transaction } = route.params;
 
   const networkType = transaction.metadata?.networkType;
+  const cableName = transaction.metadata?.cableName;
 
-  const renderServiceIcon = (provider: string) => {
-    // Ensure the provider name is always in lower case for comparison
+  const renderServiceIcon = (provider: string | undefined) => {
+    if (transaction.tranxType === "CABLE_SUBSCRIPTION" && cableName) {
+      const cableLower = cableName.toLowerCase();
+      switch (cableLower) {
+        case "dstv":
+          return <Dstv width={70} height={70} />;
+        case "gotv":
+          return <Gotv width={70} height={70} />;
+        case "startime": // Assuming "STARTIME" from log should match "startimes"
+          return <Startimes width={70} height={70} />;
+        default:
+          return null;
+      }
+    }
+
+    if (!provider) return null;
+    
     const providerLower = provider.toLowerCase();
     switch (providerLower) {
       case "airtel":
         return <Airtel width={70} height={70} />;
-      case "mtn": // This line is changed to lowercase
+      case "mtn":
         return <Mtn width={70} height={70} />;
       case "9mobile":
         return <Eti width={70} height={70} />;
       case "glo":
         return <Glo width={70} height={70} />;
       default:
-        return;
+        return null;
     }
   };
 
@@ -127,6 +147,12 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
               </Text>
             </View>
             <View style={styles.row}>
+              <Text style={styles.titleText}>Plan</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.metadata?.planName || "N/A"}
+              </Text>
+            </View>
+            <View style={styles.row}>
               <Text style={styles.titleText}>Paid with</Text>
               <Text style={styles.descriptionText}>{transaction.purpose}</Text>
             </View>
@@ -143,7 +169,33 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
             </View>
           </>
         );
-      // Add more cases for other transaction types
+      case "CABLE_SUBSCRIPTION":
+        return (
+          <>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Provider</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.metadata?.cableName || "N/A"}
+              </Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Smart Card Number</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.metadata?.smartCardNo || "N/A"}
+              </Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Plan</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.metadata?.planName || "N/A"}
+              </Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Paid with</Text>
+              <Text style={styles.descriptionText}>{transaction.purpose}</Text>
+            </View>
+          </>
+        );
       default:
         return null;
     }
@@ -170,8 +222,9 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
               <View style={styles.iconContainer}>
                 <WalletAdd1 color={COLORS.violet400} size={40} />
               </View>
-            ) : null}
-            {networkType && renderServiceIcon(networkType)}
+            ) : (
+              renderServiceIcon(networkType || cableName)
+            )}
             <Text style={styles.itemText} allowFontScaling={false}>
               {transaction.tranxType.replace("_", " ")}
             </Text>
@@ -179,10 +232,6 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
 
           <View className="p-4">
             <View style={styles.container}>
-              {/* <Text style={styles.headText} allowFontScaling={false}>
-                Transaction Summary
-              </Text> */}
-
               <View style={styles.row}>
                 <Text style={styles.titleText}>Amount</Text>
                 <Text style={styles.descriptionText}>
@@ -221,13 +270,6 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
       </ScrollView>
       <View className="px-4 mb-6">
         <DownloadReceiptButton transaction={transaction} />
-        {/* <Button
-          borderOnly
-          textColor="black"
-          title="Report an issue"
-          onPress={() => navigation.navigate("HelpAndSupportScreen")}
-          className="mt-3"
-        /> */}
       </View>
     </SafeAreaView>
   );
@@ -278,11 +320,6 @@ const styles = StyleSheet.create({
     borderRadius: SPACING,
     marginTop: SPACING * 4,
   },
-  headText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(16),
-    marginBottom: SPACING,
-  },
   titleText: {
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(14),
@@ -307,23 +344,5 @@ const styles = StyleSheet.create({
   completedText: {
     fontFamily: "Outfit-Regular",
     color: "#06C270",
-  },
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderStyle: "dotted",
-    borderColor: "#000",
-    paddingVertical: SPACING,
-    paddingHorizontal: SPACING * 3,
-    borderRadius: 8,
-    marginTop: SPACING * 2,
-  },
-  buttonText: {
-    marginLeft: SPACING,
-    color: "#000",
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.medium,
   },
 });

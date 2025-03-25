@@ -26,6 +26,7 @@ export type AppStackParamList = {
       status: string;
       tranxType: string;
       referenceId: string;
+      paymentMethod: string;
     };
   };
   FundWalletScreen: undefined;

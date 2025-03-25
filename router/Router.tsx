@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NetInfo from "@react-native-community/netinfo";
 import AppStack from "./AppStack";
 import AuthRoute from "./AuthRouter";
-import LoadingIndicator from "../components/LoadingIndicator";
+// import LoadingIndicator from "../components/LoadingIndicator";
 import { useAuth } from "../services/AuthContext";
 import OfflineScreen from "@/screens/OfflineScreen";
 import LockScreen from "@/screens/reauth/LockScreen";
@@ -13,6 +13,7 @@ import {
 } from "../types/RootStackParams";
 import { useLock } from "../context/LockContext";
 import PasswordReauthScreen from "@/screens/reauth/PasswordReauthScreen.tsx";
+import { ActivityIndicator } from "react-native";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const LockStack = createNativeStackNavigator<LockStackParamList>();
@@ -62,7 +63,7 @@ const Router = () => {
       "isOnline:",
       isOnline
     );
-    return <LoadingIndicator />;
+    return <ActivityIndicator />;
   }
 
   if (!isOnline) {

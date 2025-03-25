@@ -35,6 +35,7 @@ interface Transaction {
   metadata?: {
     networkType?: string;
     phoneNumber?: string;
+    cableName?: string;
   };
 }
 
@@ -68,11 +69,28 @@ const RecentServiceTransaction: React.FC<{
 
   const renderServiceIcon = (
     provider: string | undefined,
-    tranxType: string
+    tranxType: string,
+    cableName?: string
   ) => {
     if (tranxType === "WALLET_FUNDING") {
       return <WalletAdd1 size={24} color={COLORS.violet400} />;
     }
+
+    if (tranxType === "CABLE_SUBSCRIPTION" && cableName) {
+      const cableLower = cableName.toLowerCase();
+      switch (cableLower) {
+        case "dstv":
+          return <Dstv width={40} height={40} />;
+        case "gotv":
+          return <Gotv width={40} height={40} />;
+        case "startime": // Matches your log data
+          return <Startimes width={40} height={40} />;
+        default:
+          return null;
+      }
+    }
+
+    if (!provider) return null;
 
     if (provider?.toLowerCase() === "airtel") {
       return <Airtel width={40} height={40} />;
@@ -82,12 +100,6 @@ const RecentServiceTransaction: React.FC<{
       return <Eti width={40} height={40} />;
     } else if (provider?.toLowerCase() === "glo") {
       return <Glo width={40} height={40} />;
-    } else if (provider?.toLowerCase() === "dstv") {
-      return <Dstv width={40} height={40} />;
-    } else if (provider?.toLowerCase() === "gotv") {
-      return <Gotv width={40} height={40} />;
-    } else if (provider?.toLowerCase() === "startime") {
-      return <Startimes width={40} height={40} />;
     }
   };
 
@@ -185,6 +197,7 @@ const RecentServiceTransaction: React.FC<{
         ...transaction.metadata,
         networkType: transaction.metadata?.networkType,
         phoneNumber: transaction.metadata?.phoneNumber,
+        cableName: transaction.metadata?.cableName,
       },
     };
   };
@@ -203,98 +216,105 @@ const RecentServiceTransaction: React.FC<{
       </View>
 
       <View>
-        {error ? (
-          renderErrorState()
-        ) : isLoading ? (
-          renderLoadingSkeleton()
-        ) : hasTransaction ? (
-          recentTransactions.map((transaction) => {
-            const formattedTime = new Date(
-              transaction.paidOn
-            ).toLocaleTimeString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-            });
+        {error
+          ? renderErrorState()
+          : isLoading
+          ? renderLoadingSkeleton()
+          : hasTransaction
+          ? recentTransactions.map((transaction) => {
+              const formattedTime = new Date(
+                transaction.paidOn
+              ).toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
 
-            const networkType = transaction.metadata?.networkType;
+              const networkType = transaction.metadata?.networkType;
+              const cableName = transaction.metadata?.cableName;
 
-            return (
-              <TouchableOpacity
-                key={transaction._id}
-                onPress={() =>
-                  navigation.navigate("TransactionSummaryScreen", {
-                    transaction: mapTransactionToSummaryFormat(transaction),
-                  })
-                }
-                style={styles.transactionItem}
-              >
-                <View style={styles.iconContainer}>
-                  {renderServiceIcon(networkType, transaction.transactionType)}
-                </View>
-                <View style={styles.transactionTextContainer}>
-                  <View style={styles.transactionTextRow}>
-                    <Text style={styles.item} allowFontScaling={false}>
-                      {transaction.transactionType}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.valueText,
-                        {
-                          color: transaction.transactionType.includes(
-                            "PURCHASE"
-                          )
-                            ? "black"
-                            : "black",
-                        },
-                      ]}
-                      allowFontScaling={false}
-                    >
-                      {transaction.transactionType.includes("PURCHASE")
-                        ? "-"
-                        : "+"}{" "}
-                      ₦{transaction.amountPaid}
-                    </Text>
+              return (
+                <TouchableOpacity
+                  key={transaction._id}
+                  onPress={() =>
+                    navigation.navigate("TransactionSummaryScreen", {
+                      transaction: mapTransactionToSummaryFormat(transaction),
+                    })
+                  }
+                  style={styles.transactionItem}
+                >
+                  <View style={styles.iconContainer}>
+                    {renderServiceIcon(
+                      networkType,
+                      transaction.transactionType,
+                      cableName
+                    )}
                   </View>
-                  <View style={styles.transactionTextRow}>
-                    <Text style={styles.date} allowFontScaling={false}>
-                      {formattedTime}
-                    </Text>
-                    <View
-                      style={[
-                        styles.statusContainer,
-                        {
-                          backgroundColor:
-                            transaction.paymentStatus === "SUCCESS" ||
-                            transaction.paymentStatus === "SUCCESSFUL"
-                              ? "#E6F9F1"
-                              : "#FFEDE9",
-                        },
-                      ]}
-                    >
+                  <View style={styles.transactionTextContainer}>
+                    <View style={styles.transactionTextRow}>
+                      <Text style={styles.item} allowFontScaling={false}>
+                        {transaction.transactionType}
+                      </Text>
                       <Text
                         style={[
-                          styles.completedText,
+                          styles.valueText,
                           {
                             color:
-                              transaction.paymentStatus === "SUCCESS" ||
-                              transaction.paymentStatus === "SUCCESSFUL"
-                                ? "#06C270"
-                                : "#FF3B30",
+                              transaction.transactionType.includes(
+                                "PURCHASE"
+                              ) ||
+                              transaction.transactionType ===
+                                "CABLE_SUBSCRIPTION"
+                                ? "black"
+                                : "black",
                           },
                         ]}
                         allowFontScaling={false}
                       >
-                        {transaction.paymentStatus}
+                        {transaction.transactionType.includes("PURCHASE") ||
+                        transaction.transactionType === "CABLE_SUBSCRIPTION"
+                          ? "-"
+                          : "+"}{" "}
+                        ₦{transaction.amountPaid}
                       </Text>
                     </View>
+                    <View style={styles.transactionTextRow}>
+                      <Text style={styles.date} allowFontScaling={false}>
+                        {formattedTime}
+                      </Text>
+                      <View
+                        style={[
+                          styles.statusContainer,
+                          {
+                            backgroundColor:
+                              transaction.paymentStatus === "SUCCESS" ||
+                              transaction.paymentStatus === "SUCCESSFUL"
+                                ? "#E6F9F1"
+                                : "#FFEDE9",
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.completedText,
+                            {
+                              color:
+                                transaction.paymentStatus === "SUCCESS" ||
+                                transaction.paymentStatus === "SUCCESSFUL"
+                                  ? "#06C270"
+                                  : "#FF3B30",
+                            },
+                          ]}
+                          allowFontScaling={false}
+                        >
+                          {transaction.paymentStatus}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            );
-          })
-        ) : (
-          renderEmptyState()
-        )}
+                </TouchableOpacity>
+              );
+            })
+          : renderEmptyState()}
       </View>
     </View>
   );
