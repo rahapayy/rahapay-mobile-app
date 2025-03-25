@@ -79,8 +79,8 @@ const ServicesScreen: React.FC<{
             </TouchableOpacity>
 
             <TouchableOpacity
-              // onPress={() => navigation.navigate("TvSubscriptionScreen")}
-              className="w-[48%] mb-4 bg-[#FFEAEA] py-4 px-3 rounded-xl border border-[#FFBEBE] opacity-50"
+              onPress={() => navigation.navigate("TvSubscriptionScreen")}
+              className="w-[48%] mb-4 bg-[#FFEAEA] py-4 px-3 rounded-xl border border-[#FFBEBE]"
             >
               <View className="bg-[#FFBEBE] rounded-full flex-shrink-0 w-10 h-10 items-center justify-center">
                 <TvIcon width={20} height={20} fill="#E62929" />
