@@ -7,6 +7,7 @@ export interface CablePlan {
   planName: string;
   price: number;
   cableName: string;
+  transactionPin: string;
 }
 
 export interface CablePurchasePayload {

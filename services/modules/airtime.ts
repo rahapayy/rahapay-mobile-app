@@ -7,6 +7,7 @@ export interface IAirtimePurchasePayload {
   networkType: string;
   phoneNumber: string;
   saveBeneficiary: boolean;
+  transactionPin: string;
 }
 
 interface AirtimeErrorResponse {

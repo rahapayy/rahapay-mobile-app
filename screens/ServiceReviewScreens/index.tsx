@@ -1,3 +1,4 @@
+// ReviewSummaryScreen.tsx
 import React, { useState } from "react";
 import {
   Platform,
@@ -21,12 +22,12 @@ import Dstv from "../../assets/svg/dstv.svg";
 import Gotv from "../../assets/svg/gotv.svg";
 import Startimes from "../../assets/svg/startimes.svg";
 import { RFValue } from "react-native-responsive-fontsize";
-import SwipeButton from "../../components/SwipeButton";
 import { AppStackParamList } from "../../types/RootStackParams";
 import { services } from "@/services";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { AxiosError } from "axios";
 import { DataPurchasePayload } from "@/services/modules/data";
+import Button from "@/components/common/ui/buttons/Button";
 
 type ReviewSummaryScreenProps = NativeStackScreenProps<
   AppStackParamList,
@@ -44,8 +45,16 @@ const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
   const { title, icon } = getTransactionDetails(transactionType, params);
   const summaryItems = getSummaryItems(transactionType, params);
 
-  const handleSwipeConfirm = async (reset: () => void) => {
+  const handleSwipeConfirm = (reset: () => void) => {
+    navigation.navigate("TransactionPinScreen", {
+      transactionType,
+      params,
+    });
+  };
+
+  const handlePinComplete = async (pin: string) => {
     setIsLoading(true);
+
     try {
       let response;
       switch (transactionType) {
@@ -61,6 +70,7 @@ const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
             networkType: airtimeParams.selectedOperator.toLowerCase(),
             phoneNumber: airtimeParams.phoneNumber,
             saveBeneficiary: airtimeParams.saveBeneficiary || false,
+            transactionPin: pin,
           };
           response = await services.airtimeService.purchaseAirtime(
             airtimePayload
@@ -80,6 +90,7 @@ const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
             planId: cableParams.planId,
             smartCardNo: cableParams.cardNumber,
             customerName: cableParams.customerName || "Unknown",
+            transactionPin: pin,
           };
           response = await services.cableService.purchaseCable(cablePayload);
           break;
@@ -96,17 +107,10 @@ const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
             networkType: dataParams.selectedOperator.toLowerCase(),
             phoneNumber: dataParams.phoneNumber,
             saveBeneficiary: dataParams.saveBeneficiary || false,
+            transactionPin: pin,
           };
           response = await services.dataService.purchaseData(dataPayload);
           break;
-
-        // case "education":
-        //   const educationParams = params as { plan_id: string; quantity: number };
-        //   response = await services.apiClient.post("/exam/", {
-        //     examId: educationParams.plan_id,
-        //     quantity: educationParams.quantity,
-        //   });
-        //   break;
 
         case "electricity":
           const electricityParams = params as {
@@ -120,6 +124,7 @@ const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
             amount: parseFloat(electricityParams.amount),
             discoId: electricityParams.id,
             saveBeneficiary: electricityParams.saveBeneficiary || false,
+            transactionPin: pin,
           };
           response = await services.electricityService.purchaseElectricity(
             electricityPayload
@@ -136,10 +141,37 @@ const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
           : "failed";
       navigation.navigate("TransactionStatusScreen", { status });
     } catch (error: any) {
-      handleError(error, transactionType);
+      // Log the error for debugging
+      console.error(`Error during ${transactionType} transaction:`, {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        headers: error.response?.headers,
+      });
+
+      // Handle and display the error to the user
+      let message = "An unexpected error occurred. Please try again.";
+      if (error instanceof AxiosError && error.response) {
+        const errorData = error.response.data;
+        message = errorData?.message || message;
+        if (Array.isArray(message)) message = message[0];
+        if (error.response.status === 401 || message?.includes("pin")) {
+          message = "Invalid transaction PIN. Please try again.";
+        } else if (error.response.status === 400) {
+          message = "Bad request. Please check the transaction details.";
+        } else if (error.response.status === 503) {
+          message =
+            "The server is currently unavailable. Please try again later.";
+        }
+      } else if (error.message?.includes("Network")) {
+        message = "Network error. Please check your connection and try again.";
+      } else if (error.message?.includes("Timeout")) {
+        message = "Request timed out. Please try again later.";
+      }
+
+      handleShowFlash({ message, type: "danger" });
     } finally {
-      setIsLoading(false);
-      reset();
+      setIsLoading(false); // Ensure loading state is reset
     }
   };
 
@@ -192,7 +224,12 @@ const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
             </View>
           </View>
           <View style={styles.swipeButtonContainer}>
-            <SwipeButton onConfirm={handleSwipeConfirm} />
+            <Button
+              onPress={handleSwipeConfirm}
+              textColor="white"
+              title="Proceed"
+              disabled={isLoading} // Disable swipe button while loading
+            />
           </View>
         </View>
       </ScrollView>
@@ -358,23 +395,6 @@ function getSummaryItems(
   }
 }
 
-function handleError(error: any, type: string) {
-  let message = "An unexpected error occurred. Please try again.";
-  if (error instanceof AxiosError && error.response) {
-    message = error.response.data?.message || message;
-    if (Array.isArray(message)) message = message[0];
-  } else if (error.message?.includes("Network")) {
-    message = "Network error. Please check your connection and try again.";
-  } else if (error.message?.includes("Timeout")) {
-    message = "Request timed out. Please try again later.";
-  } else if (error.response?.status === 503) {
-    message = "The server is currently unavailable. Please try again later.";
-  } else if (error.response?.status === 400) {
-    message = "Bad request. Please check the input values.";
-  }
-  handleShowFlash({ message, type: "danger" });
-}
-
 export default ReviewSummaryScreen;
 
 const styles = StyleSheet.create({
@@ -443,5 +463,11 @@ const styles = StyleSheet.create({
   },
   swipeButtonContainer: {
     marginTop: SPACING * 5,
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

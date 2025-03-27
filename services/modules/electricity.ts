@@ -23,6 +23,7 @@ export interface ElectricityPurchasePayload {
   meterNumber: string;
   amount: number;
   discoId: string;
+  transactionPin: string;
 }
 
 export interface ElectricityPurchaseResponse {

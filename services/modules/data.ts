@@ -7,6 +7,7 @@ export interface DataPurchasePayload {
   networkType: string;
   phoneNumber: string;
   saveBeneficiary: boolean;
+  transactionPin: string;
 }
 
 export interface DataPurchaseResponse {

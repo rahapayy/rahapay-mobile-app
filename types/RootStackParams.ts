@@ -126,6 +126,48 @@ export type AppStackParamList = {
   NotificationDetail: {
     notification: Notifications.Notification;
   };
+  TransactionPinScreen: {
+    transactionType:
+      | "electricity"
+      | "data"
+      | "airtime"
+      | "cableTv"
+      | "education";
+    params:
+      | {
+          selectedOperator: string;
+          phoneNumber: string;
+          amount: number;
+          saveBeneficiary?: boolean;
+        } // Airtime
+      | {
+          service: string;
+          planId: string;
+          price: number;
+          cardNumber: string;
+          planName: string;
+          customerName: string;
+        } // Cable TV
+      | {
+          selectedOperator: string;
+          selectedPlan: { plan_id: string; amount: number };
+          phoneNumber: string;
+          saveBeneficiary?: boolean;
+        } // Data
+      | {
+          meterNumber: string;
+          amount: string;
+          id: string;
+          saveBeneficiary?: boolean;
+        } // Electricity
+      | {
+          exam: string;
+          amount: string;
+          serviceType: string;
+          quantity: number;
+          phoneNumber: string;
+        }; // Education
+  };
 };
 
 // Auth Stack (Authentication-related screens)
