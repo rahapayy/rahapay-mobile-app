@@ -1,6 +1,59 @@
 import { ReactNode } from "react";
 import * as Notifications from "expo-notifications";
 
+// Define a discriminated union for all possible review summary params
+type ReviewSummaryParams =
+  | {
+      transactionType: "airtime";
+      selectedOperator: string;
+      phoneNumber: string;
+      amount: number;
+      saveBeneficiary?: boolean;
+    }
+  | {
+      transactionType: "cableTv";
+      service: string;
+      planId: string;
+      price: number;
+      cardNumber: string;
+      planName: string;
+      customerName: string;
+    }
+  | {
+      transactionType: "data";
+      selectedOperator: string;
+      selectedPlan: {
+        plan: string;
+        days: string;
+        plan_id: string;
+        amount: number;
+      };
+      saveBeneficiary?: boolean;
+      phoneNumber: string;
+    }
+  | {
+      transactionType: "education";
+      exam: string;
+      plan_id: string;
+      amount: string;
+      serviceType: string;
+      phoneNumber: string;
+      quantity: number;
+    }
+  | {
+      transactionType: "electricity";
+      disco: string;
+      id: string;
+      customerName: string;
+      selectedService: string;
+      planName: string;
+      meterType: "PREPAID" | "POSTPAID";
+      meterNumber: string;
+      amount: string;
+      phoneNumber: string;
+      saveBeneficiary?: boolean;
+    };
+
 // App Stack (Main application screens)
 export type AppStackParamList = {
   HomeScreen: undefined;
@@ -43,37 +96,14 @@ export type AppStackParamList = {
   DisputeSubmission: { businessType: string; questionType: string };
   PersonalInformationScreen: undefined;
   ReferralScreen: undefined;
-  ReviewDataSummaryScreen: {
-    selectedOperator: string;
-    selectedPlan: {
-      plan: string;
-      days: string;
-      plan_id: string;
-      amount: number;
-    };
-    saveBeneficiary: boolean;
-    phoneNumber: string;
-  };
-  ReviewAirtimeSummaryScreen: {
-    selectedOperator: string;
-    phoneNumber: string;
-    amount: number;
-    saveBeneficiary: boolean;
-  };
+  // Unified Review Summary Screen
+  ReviewSummaryScreen: ReviewSummaryParams;
   TransactionStatusScreen: {
-    status: "pending" | "failed" | "success";
+    status: "pending" | "failed" | "success" | "successful"; // Added "successful" for education case
   };
   CustomerCareScreen: undefined;
   CableServiceDetailsScreen: undefined;
   CardDetailsScreen: undefined;
-  ReviewCableTvSummaryScreen: {
-    service: string;
-    planId: string;
-    price: number;
-    cardNumber: string;
-    planName: string;
-    customerName: string;
-  };
   EducationServiceType: {
     exam: string;
     plan_id: string;
@@ -84,26 +114,6 @@ export type AppStackParamList = {
     plan_id: string;
     serviceType: string;
     amount: string;
-  };
-  ReviewElectricitySummaryScreen: {
-    disco: string;
-    id: string;
-    customerName: string;
-    selectedService: string;
-    planName: string;
-    meterType: "PREPAID" | "POSTPAID";
-    meterNumber: string;
-    amount: string;
-    phoneNumber: string;
-    saveBeneficiary: boolean;
-  };
-  ReviewEducationSummaryScreen: {
-    exam: string;
-    plan_id: string;
-    amount: string;
-    serviceType: string;
-    phoneNumber: string;
-    quantity: number;
   };
   ServicesScreen: undefined;
   WalletScreen: undefined;

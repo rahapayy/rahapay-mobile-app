@@ -48,7 +48,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
-  const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(true); // Start as true for initial load
+  const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(true);
   const [saveBeneficiary, setSaveBeneficiary] = useState(false);
 
   const isButtonDisabled = !selectedOperator || !phoneNumber || !selectedPlan;
@@ -65,14 +65,11 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
     },
   });
 
-  // Fetch data beneficiaries
   useEffect(() => {
     const fetchBeneficiaries = async () => {
       setIsBeneficiariesLoading(true);
       try {
-        const response = await services.beneficiaryService.getBeneficiaries(
-          "data"
-        );
+        const response = await services.beneficiaryService.getBeneficiaries("data");
         setBeneficiaries(response.data?.beneficiaries || []);
       } catch (error) {
         console.error("Failed to fetch data beneficiaries:", error);
@@ -85,7 +82,6 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
     fetchBeneficiaries();
   }, []);
 
-  // Fetch data plans when operator changes
   useEffect(() => {
     const fetchDataPlans = async () => {
       if (!selectedOperator) return;
@@ -94,8 +90,6 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
       setError(null);
       try {
         const response = await services.dataService.getDataPlans(selectedOperator);
-        // console.log(`Data plans for ${selectedOperator}:`, response); // Debug log
-        // Filter out invalid plans and ensure unique plan_ids
         const validPlans = response
           .filter((plan: DataPlan) => plan.plan_id && plan.plan_name && plan.amount && plan.validity)
           .reduce((unique: DataPlan[], plan: DataPlan) => {
@@ -116,7 +110,6 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
 
   const handleBeneficiarySelect = (beneficiary: Beneficiary) => {
     setPhoneNumber(beneficiary.number);
-    // Auto-select the network provider based on networkType, fallback to detectOperator if needed
     if (beneficiary.networkType) {
       const normalizedNetworkType = beneficiary.networkType.toLowerCase();
       const networkMap: { [key: string]: OperatorType } = {
@@ -129,10 +122,10 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
       if (selectedNetwork) {
         setSelectedOperator(selectedNetwork);
       } else {
-        detectOperator(beneficiary.number); // Fallback if networkType is invalid
+        detectOperator(beneficiary.number);
       }
     } else {
-      detectOperator(beneficiary.number); // Fallback if no networkType
+      detectOperator(beneficiary.number);
     }
   };
 
@@ -149,7 +142,9 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
   const handleProceed = () => {
     if (!selectedPlan) return;
 
-    navigation.navigate("ReviewDataSummaryScreen", {
+    // Updated navigation to use ReviewSummaryScreen with transactionType
+    navigation.navigate("ReviewSummaryScreen", {
+      transactionType: "data",
       selectedOperator,
       selectedPlan,
       phoneNumber,
@@ -231,12 +226,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
               size={18}
               variant="Bold"
               color="#fff"
-              style={{
-                zIndex: 1,
-                position: "absolute",
-                top: 0,
-                right: 0,
-              }}
+              style={{ zIndex: 1, position: "absolute", top: 0, right: 0 }}
             />
           )}
         </View>
@@ -252,12 +242,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
               size={18}
               variant="Bold"
               color="#fff"
-              style={{
-                zIndex: 1,
-                position: "absolute",
-                top: 0,
-                right: 0,
-              }}
+              style={{ zIndex: 1, position: "absolute", top: 0, right: 0 }}
             />
           )}
         </View>
@@ -273,12 +258,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
               size={18}
               variant="Bold"
               color="#fff"
-              style={{
-                zIndex: 1,
-                position: "absolute",
-                top: 0,
-                right: 0,
-              }}
+              style={{ zIndex: 1, position: "absolute", top: 0, right: 0 }}
             />
           )}
         </View>
@@ -294,12 +274,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
               size={18}
               variant="Bold"
               color="#fff"
-              style={{
-                zIndex: 1,
-                position: "absolute",
-                top: 0,
-                right: 0,
-              }}
+              style={{ zIndex: 1, position: "absolute", top: 0, right: 0 }}
             />
           )}
         </View>
@@ -312,10 +287,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.leftIcon}
-            >
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftIcon}>
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
             <Text style={[styles.headerText]} allowFontScaling={false}>
@@ -334,20 +306,14 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                       <Skeleton
                         width={100}
                         height={25}
-                        style={{
-                          backgroundColor: COLORS.grey100,
-                          borderRadius: 10,
-                        }}
+                        style={{ backgroundColor: COLORS.grey100, borderRadius: 10 }}
                         skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                         animation="wave"
                       />
                       <Skeleton
                         width={100}
                         height={25}
-                        style={{
-                          backgroundColor: COLORS.grey100,
-                          borderRadius: 10,
-                        }}
+                        style={{ backgroundColor: COLORS.grey100, borderRadius: 10 }}
                         skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                         animation="wave"
                       />
@@ -366,9 +332,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                         >
                           <RegularText color="black" size="small">
                             {beneficiary.number}{" "}
-                            {beneficiary.networkType
-                              ? `| ${beneficiary.networkType}`
-                              : ""}
+                            {beneficiary.networkType ? `| ${beneficiary.networkType}` : ""}
                           </RegularText>
                         </TouchableOpacity>
                       )}
@@ -381,9 +345,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                 </View>
 
                 <Label text="Select Network Provider" marked={false} />
-                {isBeneficiariesLoading
-                  ? renderNetworkSkeleton()
-                  : renderNetworkProviders()}
+                {isBeneficiariesLoading ? renderNetworkSkeleton() : renderNetworkProviders()}
 
                 <View className="mt-6">
                   <Label text="Phone Number" marked={false} />
@@ -440,13 +402,8 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                     <Switch
                       value={saveBeneficiary}
                       onValueChange={setSaveBeneficiary}
-                      trackColor={{
-                        false: COLORS.grey100,
-                        true: COLORS.violet200,
-                      }}
-                      thumbColor={
-                        saveBeneficiary ? COLORS.violet400 : COLORS.white
-                      }
+                      trackColor={{ false: COLORS.grey100, true: COLORS.violet200 }}
+                      thumbColor={saveBeneficiary ? COLORS.violet400 : COLORS.white}
                       style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
                     />
                   </View>
@@ -457,9 +414,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
               title="Proceed"
               className="mt-10"
               style={{
-                backgroundColor: isButtonDisabled
-                  ? COLORS.violet200
-                  : COLORS.violet400,
+                backgroundColor: isButtonDisabled ? COLORS.violet200 : COLORS.violet400,
               }}
               onPress={handleProceed}
               disabled={isButtonDisabled}
@@ -490,19 +445,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING * 2,
     paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
   },
-  leftIcon: {
-    marginRight: SPACING,
-  },
+  leftIcon: { marginRight: SPACING },
   headerText: {
     color: "#000",
     fontSize: FONT_SIZE.medium,
     fontFamily: "Outfit-Regular",
     flex: 1,
   },
-  tabContent: {
-    marginTop: SPACING,
-    fontFamily: "Outfit-Regular",
-  },
+  tabContent: { marginTop: SPACING, fontFamily: "Outfit-Regular" },
   headText: {
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(12),
@@ -534,7 +484,5 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(12),
   },
-  selectedOperator: {
-    opacity: 0.5,
-  },
+  selectedOperator: { opacity: 0.5 },
 });

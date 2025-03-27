@@ -18,18 +18,13 @@ import HelpAndSupportScreen from "../screens/Profile/help/HelpAndSupportScreen";
 import PersonalInformationScreen from "../screens/Profile/PersonalInformationScreen";
 import ReferralScreen from "../screens/Profile/ReferralScreen";
 import TransactionStatusScreen from "../screens/TransactionStatusScreen";
-import ReviewAirtimeSummaryScreen from "../screens/ServiceReviewScreens/ReviewAirtimeSummaryScreen";
-import ReviewDataSummaryScreen from "../screens/ServiceReviewScreens/ReviewDataSummaryScreen";
 import BettingScreen from "../screens/Services/Betting/BettingScreen";
 import TransferScreen from "../screens/Services/TransferScreen";
 import EducationScreen from "../screens/Services/Education/EducationScreen";
 import CustomerCareScreen from "../screens/CustomerCareScreen";
-import ReviewCableTvSummaryScreen from "../screens/ServiceReviewScreens/ReviewCableTvSummaryScreen";
-import ReviewElectricitySummaryScreen from "../screens/ServiceReviewScreens/ReviewElectricitySummaryScreen";
 import { AppStackParamList } from "../types/RootStackParams";
 import EducationServiceType from "../screens/Services/Education/EducationServiceType";
 import EducationDetailsScreen from "../screens/Services/Education/EducationDetailsScreen";
-import ReviewEducationSummaryScreen from "../screens/ServiceReviewScreens/ReviewEducationSummaryScreem";
 import EditTagScreen from "../screens/Profile/EditTagScreen";
 import SelectPinChangeScreen from "../screens/Profile/SelectPinChangeScreen";
 import BettingSuccess from "../screens/Services/Betting/BettingSuccess";
@@ -40,6 +35,7 @@ import TransferDisputeScreen from "@/screens/Profile/help/TransferDisputeScreen"
 import ReportNewIssueScreen from "@/screens/Profile/help/ReportNewIssueScreen";
 import SelectQuestionTypeScreen from "@/screens/Profile/help/SelectQuestionTypeScreen";
 import DisputeSubmissionScreen from "@/screens/Profile/help/DisputeSubmissionScreen";
+import ReviewSummaryScreen from "@/screens/ServiceReviewScreens";
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
@@ -139,13 +135,8 @@ const AppStack = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="ReviewDataSummaryScreen"
-        component={ReviewDataSummaryScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ReviewAirtimeSummaryScreen"
-        component={ReviewAirtimeSummaryScreen}
+        name="ReviewSummaryScreen"
+        component={ReviewSummaryScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -179,16 +170,6 @@ const AppStack = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="ReviewCableTvSummaryScreen"
-        component={ReviewCableTvSummaryScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ReviewElectricitySummaryScreen"
-        component={ReviewElectricitySummaryScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
         name="EducationServiceType"
         component={EducationServiceType}
         options={{ headerShown: false }}
@@ -196,11 +177,6 @@ const AppStack = () => {
       <Stack.Screen
         name="EducationDetailsScreen"
         component={EducationDetailsScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ReviewEducationSummaryScreen"
-        component={ReviewEducationSummaryScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

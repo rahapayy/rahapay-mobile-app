@@ -59,7 +59,7 @@ const TvSubscriptionScreen: React.FC<{
   const [isValidating, setIsValidating] = useState(false);
   const [isValidated, setIsValidated] = useState(false);
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
-  const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(true); // Start as true for initial load
+  const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(true);
   const [saveBeneficiary, setSaveBeneficiary] = useState(false);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const TvSubscriptionScreen: React.FC<{
         );
         setBeneficiaries(response.data?.beneficiaries || []);
       } catch (error) {
-        console.error("Failed to fetch airtime beneficiaries:", error);
+        console.error("Failed to fetch cable beneficiaries:", error);
         setBeneficiaries([]);
       } finally {
         setIsBeneficiariesLoading(false);
@@ -153,15 +153,16 @@ const TvSubscriptionScreen: React.FC<{
       return;
     }
 
-    // If already validated, proceed to next screen
-    navigation.navigate("ReviewCableTvSummaryScreen", {
+    // Updated navigation to use ReviewSummaryScreen with transactionType
+    navigation.navigate("ReviewSummaryScreen", {
+      transactionType: "cableTv",
       service: selectedService,
       planId: selectedPlan.planId,
       price: selectedPlan.price,
       cardNumber,
       planName: selectedPlan.planName,
       customerName,
-      saveBeneficiary
+      saveBeneficiary,
     });
   };
 
@@ -185,15 +186,26 @@ const TvSubscriptionScreen: React.FC<{
 
   const handleBeneficiarySelect = (beneficiary: Beneficiary) => {
     setCardNumber(beneficiary.number);
-    // Auto-select the network provider based on networkType, fallback to detectOperator if needed
     if (beneficiary.networkType) {
       const normalizedNetworkType = beneficiary.networkType.toLowerCase();
       const networkMap: { [key: string]: string } = {
-        dstv: "Dstv",
-        airtel: "Gotv",
-        startime: "Startime",
+        dstv: "DSTV",
+        gotv: "GOTV",
+        startime: "STARTIMES", // Adjust based on actual service naming
       };
       const selectedNetwork = networkMap[normalizedNetworkType];
+      if (selectedNetwork) {
+        setSelectedService(selectedNetwork);
+        setSelectedServiceIcon(
+          selectedNetwork === "DSTV" ? (
+            <Dstv width={32} height={32} />
+          ) : selectedNetwork === "GOTV" ? (
+            <Gotv width={32} height={32} />
+          ) : (
+            <Startimes width={32} height={32} />
+          )
+        );
+      }
     }
   };
 
@@ -228,20 +240,14 @@ const TvSubscriptionScreen: React.FC<{
                 <Skeleton
                   width={100}
                   height={25}
-                  style={{
-                    backgroundColor: COLORS.grey100,
-                    borderRadius: 10,
-                  }}
+                  style={{ backgroundColor: COLORS.grey100, borderRadius: 10 }}
                   skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                   animation="wave"
                 />
                 <Skeleton
                   width={100}
                   height={25}
-                  style={{
-                    backgroundColor: COLORS.grey100,
-                    borderRadius: 10,
-                  }}
+                  style={{ backgroundColor: COLORS.grey100, borderRadius: 10 }}
                   skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                   animation="wave"
                 />
@@ -369,14 +375,9 @@ const TvSubscriptionScreen: React.FC<{
                 <Switch
                   value={saveBeneficiary}
                   onValueChange={setSaveBeneficiary}
-                  trackColor={{
-                    false: COLORS.grey100,
-                    true: COLORS.violet200,
-                  }}
+                  trackColor={{ false: COLORS.grey100, true: COLORS.violet200 }}
                   thumbColor={saveBeneficiary ? COLORS.violet400 : COLORS.white}
-                  style={{
-                    transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
-                  }}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
                 />
               </View>
             </View>
@@ -419,9 +420,7 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
     paddingBottom: SPACING * 3,
   },
-  leftIcon: {
-    marginRight: SPACING,
-  },
+  leftIcon: { marginRight: SPACING },
   headerText: {
     color: "#000",
     fontSize: FONT_SIZE.medium,
@@ -433,13 +432,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     marginBottom: SPACING * 2,
   },
-  proceedButton: {
-    marginTop: SPACING * 4,
-  },
-  disabledButton: {
-    backgroundColor: COLORS.violet200,
-  },
-  price: {
-    fontFamily: "Outfit-Medium",
-  },
+  proceedButton: { marginTop: SPACING * 4 },
+  disabledButton: { backgroundColor: COLORS.violet200 },
+  price: { fontFamily: "Outfit-Medium" },
 });

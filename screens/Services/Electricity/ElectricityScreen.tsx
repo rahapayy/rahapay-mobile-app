@@ -36,13 +36,12 @@ const ElectricityScreen: React.FC<{
   const [id, setId] = useState<string | null>(null);
   const [meterNumber, setMeterNumber] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
-  const [serviceModalVisible, setServiceModalVisible] =
-    useState<boolean>(false);
+  const [serviceModalVisible, setServiceModalVisible] = useState<boolean>(false);
   const [meterType, setMeterType] = useState<"PREPAID" | "POSTPAID">("PREPAID");
   const [isValidating, setIsValidating] = useState(false);
   const [isValidated, setIsValidated] = useState(false);
   const [customerName, setCustomerName] = useState<string>("");
-  const [validationError, setValidationError] = useState<string | null>(null); // New state for persistent error
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleServiceSelect = (service: string, id: string) => {
     setSelectedService(service);
@@ -74,7 +73,7 @@ const ElectricityScreen: React.FC<{
 
   const handleValidateMeter = async () => {
     setIsValidating(true);
-    setValidationError(null); // Clear previous error before validating
+    setValidationError(null);
     try {
       const response = await services.electricityService.validateMeter({
         meterNumber,
@@ -88,7 +87,7 @@ const ElectricityScreen: React.FC<{
       setIsValidated(false);
       const errorMsg =
         error.response?.data?.msg || "Failed to validate meter number.";
-      setValidationError(errorMsg); // Set persistent error message
+      setValidationError(errorMsg);
       handleShowFlash({
         message: errorMsg,
         type: "danger",
@@ -99,12 +98,13 @@ const ElectricityScreen: React.FC<{
   };
 
   const navigateToReview = () => {
-    navigation.navigate("ReviewElectricitySummaryScreen", {
+    navigation.navigate("ReviewSummaryScreen", {
+      transactionType: "electricity",
       meterNumber,
-      amount: parseFloat(amount),
-      selectedService,
+      amount, // Kept as string to match ReviewSummaryParams
+      selectedService: selectedService!,
       meterType,
-      id,
+      id: id!,
       customerName,
     });
   };

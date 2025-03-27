@@ -30,7 +30,6 @@ import { services } from "@/services";
 import { Beneficiary } from "@/services/modules/beneficiary";
 import { Skeleton } from "@rneui/base";
 import BackButton from "@/components/common/ui/buttons/BackButton";
-// import * as Contacts from 'expo-contacts';
 
 const AirtimeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -41,7 +40,7 @@ const AirtimeScreen: React.FC<{
   const [phoneNumber, setPhoneNumber] = useState("");
   const [amountError, setAmountError] = useState(false);
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
-  const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(true); // Start as true for initial load
+  const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(true);
   const [saveBeneficiary, setSaveBeneficiary] = useState(false);
 
   const amounts = [100, 200, 500, 1000, 2000, 3000, 5000];
@@ -60,14 +59,11 @@ const AirtimeScreen: React.FC<{
     },
   });
 
-  // Fetch airtime beneficiaries
   useEffect(() => {
     const fetchBeneficiaries = async () => {
       setIsBeneficiariesLoading(true);
       try {
-        const response = await services.beneficiaryService.getBeneficiaries(
-          "airtime"
-        );
+        const response = await services.beneficiaryService.getBeneficiaries("airtime");
         setBeneficiaries(response.data?.beneficiaries || []);
       } catch (error) {
         console.error("Failed to fetch airtime beneficiaries:", error);
@@ -95,7 +91,9 @@ const AirtimeScreen: React.FC<{
       setAmountError(false);
     }
 
-    navigation.navigate("ReviewAirtimeSummaryScreen", {
+    // Updated navigation to use the unified ReviewSummaryScreen with transactionType
+    navigation.navigate("ReviewSummaryScreen", {
+      transactionType: "airtime",
       selectedOperator,
       phoneNumber,
       amount: sanitizedAmount,
@@ -141,7 +139,6 @@ const AirtimeScreen: React.FC<{
 
   const handleBeneficiarySelect = (beneficiary: Beneficiary) => {
     setPhoneNumber(beneficiary.number);
-    // Auto-select the network provider based on networkType, fallback to detectOperator if needed
     if (beneficiary.networkType) {
       const normalizedNetworkType = beneficiary.networkType.toLowerCase();
       const networkMap: { [key: string]: OperatorType } = {
@@ -154,10 +151,10 @@ const AirtimeScreen: React.FC<{
       if (selectedNetwork) {
         setSelectedOperator(selectedNetwork);
       } else {
-        detectOperator(beneficiary.number); // Fallback if networkType is invalid
+        detectOperator(beneficiary.number);
       }
     } else {
-      detectOperator(beneficiary.number); // Fallback if no networkType
+      detectOperator(beneficiary.number);
     }
   };
 
@@ -199,12 +196,7 @@ const AirtimeScreen: React.FC<{
               size={18}
               variant="Bold"
               color="#fff"
-              style={{
-                zIndex: 1,
-                position: "absolute",
-                top: 0,
-                right: 0,
-              }}
+              style={{ zIndex: 1, position: "absolute", top: 0, right: 0 }}
             />
           )}
         </View>
@@ -220,12 +212,7 @@ const AirtimeScreen: React.FC<{
               size={18}
               variant="Bold"
               color="#fff"
-              style={{
-                zIndex: 1,
-                position: "absolute",
-                top: 0,
-                right: 0,
-              }}
+              style={{ zIndex: 1, position: "absolute", top: 0, right: 0 }}
             />
           )}
         </View>
@@ -241,12 +228,7 @@ const AirtimeScreen: React.FC<{
               size={18}
               variant="Bold"
               color="#fff"
-              style={{
-                zIndex: 1,
-                position: "absolute",
-                top: 0,
-                right: 0,
-              }}
+              style={{ zIndex: 1, position: "absolute", top: 0, right: 0 }}
             />
           )}
         </View>
@@ -262,12 +244,7 @@ const AirtimeScreen: React.FC<{
               size={18}
               variant="Bold"
               color="#fff"
-              style={{
-                zIndex: 1,
-                position: "absolute",
-                top: 0,
-                right: 0,
-              }}
+              style={{ zIndex: 1, position: "absolute", top: 0, right: 0 }}
             />
           )}
         </View>
@@ -276,7 +253,7 @@ const AirtimeScreen: React.FC<{
   );
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="p-4">
           <View style={styles.header}>
@@ -373,10 +350,7 @@ const AirtimeScreen: React.FC<{
                             onPress={() => handleBeneficiarySelect(beneficiary)}
                           >
                             <RegularText color="black" size="small">
-                              {beneficiary.number}{" "}
-                              {/* {beneficiary.networkType
-                                ? `| ${beneficiary.networkType}`
-                                : ""} */}
+                              {beneficiary.number}
                             </RegularText>
                           </TouchableOpacity>
                         )}
@@ -496,9 +470,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingBottom: SPACING * 3,
   },
-  leftIcon: {
-    marginRight: SPACING,
-  },
+  leftIcon: { marginRight: SPACING },
   headerText: {
     color: "#000",
     fontSize: FONT_SIZE.medium,
@@ -511,31 +483,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     marginVertical: SPACING,
   },
-  tab: {
-    alignItems: "center",
-    flex: 1,
-  },
+  tab: { alignItems: "center", flex: 1 },
   tabText: {
     fontSize: RFValue(14),
     color: "#9BA1A8",
     fontFamily: "Outfit-Regular",
   },
-  activeTab: {
-    alignItems: "center",
-  },
-  activeTabText: {
-    color: COLORS.violet400,
-  },
+  activeTab: { alignItems: "center" },
+  activeTabText: { color: COLORS.violet400 },
   activeTabIndicator: {
     height: 2,
     backgroundColor: COLORS.violet400,
     marginTop: 4,
     width: "100%",
   },
-  tabContent: {
-    marginTop: SPACING,
-    fontFamily: "Outfit-Regular",
-  },
+  tabContent: { marginTop: SPACING, fontFamily: "Outfit-Regular" },
   headText: {
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(12),
@@ -563,26 +525,15 @@ const styles = StyleSheet.create({
     height: Platform.OS === "ios" ? 30 : 33,
     fontFamily: "Outfit-Regular",
   },
-  errorInput: {
-    borderColor: "red",
-  },
-  errorText: {
-    color: "red",
-    marginTop: 8,
-  },
-  topupText: {
-    fontFamily: "Outfit-Regular",
-  },
-  amountText: {
-    fontFamily: "Outfit-Regular",
-  },
+  errorInput: { borderColor: "red" },
+  errorText: { color: "red", marginTop: 8 },
+  topupText: { fontFamily: "Outfit-Regular" },
+  amountText: { fontFamily: "Outfit-Regular" },
   beneficiaryText: {
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(12),
   },
-  selectedOperator: {
-    opacity: 0.5,
-  },
+  selectedOperator: { opacity: 0.5 },
   comingsoonText: {
     fontFamily: "Outfit-Regular",
     fontSize: FONT_SIZE.medium,
