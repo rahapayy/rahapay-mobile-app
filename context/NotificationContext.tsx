@@ -15,10 +15,15 @@ import { Subscription } from "expo-modules-core";
 import { services } from "../services/apiClient";
 import { useAuth } from "../services/AuthContext";
 
+interface NotificationWithTimestamp {
+  notification: Notifications.Notification;
+  receivedAt: string;
+}
+
 interface NotificationContextType {
   expoPushToken: string | null;
   notification: Notifications.Notification | null;
-  notifications: Notifications.Notification[];
+  notifications: NotificationWithTimestamp[];
   notificationsEnabled: boolean;
   setNotificationsEnabled: (enabled: boolean) => void;
   hasAskedForPermission: boolean;
@@ -60,7 +65,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   const [notification, setNotification] =
     useState<Notifications.Notification | null>(null);
   const [notifications, setNotifications] = useState<
-    Notifications.Notification[]
+    NotificationWithTimestamp[]
   >([]);
   const [notificationsEnabled, setNotificationsEnabled] =
     useState<boolean>(false);
@@ -130,38 +135,54 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       Notifications.addNotificationReceivedListener((notification) => {
         setNotification(notification);
         setNotifications((prev) => {
-          // Check for duplicates using request.identifier
+          if (!notification || !notification.request) return prev; // Guard against invalid notification
           if (
             prev.some(
-              (n) => n.request.identifier === notification.request.identifier
+              (n) =>
+                n.notification.request.identifier ===
+                notification.request.identifier
             )
           ) {
-            return prev; // Skip if already exists
+            return prev; // Skip duplicates
           }
-          const updated = [...prev, notification];
+          const newEntry = {
+            notification,
+            receivedAt: new Date().toISOString(),
+          };
+          const updated = [newEntry, ...prev].sort(
+            (a, b) =>
+              new Date(b.receivedAt).getTime() -
+              new Date(a.receivedAt).getTime()
+          );
           persistNotifications(updated);
           console.log("Updated notifications (foreground):", updated);
           return updated;
         });
-        console.log("Notification received in foreground:", notification);
       });
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
         console.log("Notification response received:", response);
-        if (response?.notification) {
+        if (response?.notification && response.notification.request) {
           setNotifications((prev) => {
-            // Check for duplicates using request.identifier
             if (
               prev.some(
                 (n) =>
-                  n.request.identifier ===
+                  n.notification.request.identifier ===
                   response.notification.request.identifier
               )
             ) {
-              return prev; // Skip if already exists
+              return prev; // Skip duplicates
             }
-            const updated = [...prev, response.notification];
+            const newEntry = {
+              notification: response.notification,
+              receivedAt: new Date().toISOString(),
+            };
+            const updated = [newEntry, ...prev].sort(
+              (a, b) =>
+                new Date(b.receivedAt).getTime() -
+                new Date(a.receivedAt).getTime()
+            );
             persistNotifications(updated);
             console.log("Updated notifications (response):", updated);
             return updated;
@@ -186,27 +207,17 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       }
     }
 
-    console.log(
-      "Backend token:",
-      backendDeviceToken,
-      "Current token:",
-      currentToken
-    );
-
     if (
       !backendDeviceToken ||
       (currentToken && backendDeviceToken !== currentToken)
     ) {
-      console.log("Token to send:", currentToken);
       await sendDeviceTokenToBackend(currentToken);
       setExpoPushToken(currentToken);
-    } else {
-      console.log("No update needed; tokens match or backend token exists.");
     }
   };
 
   const persistNotifications = async (
-    notificationsToPersist: Notifications.Notification[]
+    notificationsToPersist: NotificationWithTimestamp[]
   ) => {
     try {
       await AsyncStorage.setItem(
@@ -222,7 +233,23 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     try {
       const saved = await AsyncStorage.getItem("persistedNotifications");
       if (saved) {
-        setNotifications(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        // Filter out invalid entries
+        const validNotifications = parsed
+          .filter(
+            (item: any) =>
+              item &&
+              item.notification &&
+              item.notification.request &&
+              typeof item.receivedAt === "string"
+          )
+          .sort(
+            (a: NotificationWithTimestamp, b: NotificationWithTimestamp) =>
+              new Date(b.receivedAt).getTime() -
+              new Date(a.receivedAt).getTime()
+          );
+        setNotifications(validNotifications);
+        console.log("Loaded notifications:", validNotifications);
       }
     } catch (error) {
       console.error("Error loading notifications:", error);
@@ -266,7 +293,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
 
   const sendDeviceTokenToBackend = async (token: string) => {
     try {
-      console.log("Attempting to send token:", token);
       const response = await services.notificationService.sendDeviceToken(
         token
       );
@@ -303,9 +329,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         finalStatus = status;
       }
       if (finalStatus !== "granted") {
-        throw new Error(
-          "Permission not granted to get push token for push notification!"
-        );
+        throw new Error("Permission not granted to get push token!");
       }
       const projectId =
         Constants?.expoConfig?.extra?.eas?.projectId ??
@@ -313,15 +337,10 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       if (!projectId) {
         throw new Error("Project ID not found");
       }
-      try {
-        const pushTokenString = (
-          await Notifications.getExpoPushTokenAsync({ projectId })
-        ).data;
-        console.log("Push token:", pushTokenString);
-        return pushTokenString;
-      } catch (e: unknown) {
-        throw new Error(`${e}`);
-      }
+      const pushTokenString = (
+        await Notifications.getExpoPushTokenAsync({ projectId })
+      ).data;
+      return pushTokenString;
     } else {
       throw new Error("Must use physical device for push notifications");
     }

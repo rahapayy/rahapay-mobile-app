@@ -25,21 +25,18 @@ const NotificationScreen: React.FC<{
   const { notifications } = useNotification();
 
   const renderNotificationItem = (
-    notification: Notifications.Notification,
+    { notification, receivedAt }: { notification: Notifications.Notification; receivedAt: string },
     index: React.Key | null | undefined
   ) => {
     const { title, body, data } = notification.request.content;
-    // Debug the notification object to check the date/timestamp
-    console.log("Notification Data:", notification);
+    console.log("Notification:", { title, body, data, receivedAt });
 
-    // Use data.timestamp if available, fall back to notification.date, and handle invalid cases
-    let timestamp = data?.timestamp
-      ? new Date(data.timestamp).toISOString() // Convert to ISO string if it's a valid date
-      : notification.date instanceof Date && !isNaN(notification.date.getTime())
-      ? notification.date
-      : new Date(); // Fallback to current date if invalid
-
-    const displayDate = new Date(timestamp).toLocaleDateString("en-US", {
+    const timestamp = receivedAt
+      ? new Date(receivedAt)
+      : data?.timestamp
+      ? new Date(data.timestamp)
+      : new Date();
+    const displayDate = timestamp.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
@@ -96,7 +93,7 @@ const NotificationScreen: React.FC<{
 
           {notifications.length > 0 ? (
             <View style={{ padding: SPACING }}>
-              {notifications.map(renderNotificationItem)}
+              {notifications.map((item, index) => renderNotificationItem(item, index))}
             </View>
           ) : (
             <View style={styles.noTransactionContainer}>
