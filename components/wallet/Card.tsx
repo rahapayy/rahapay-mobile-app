@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   ImageBackground,
   SafeAreaView,
@@ -8,6 +8,7 @@ import {
   View,
   Dimensions,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import {
   AddCircle,
@@ -36,11 +37,17 @@ const Card: React.FC<{
 }> = ({ navigation }) => {
   const [showBalance, setShowBalance] = useState(true);
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const { userInfo } = useAuth();
+  const { refreshAll, balance, isLoading, error } = useWallet();
 
   const handleRefresh = React.useCallback(async () => {
-    await refreshAll();
+    setIsRefreshing(true); // Show the spinner
+    await refreshAll(); // Refresh wallet data
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulated delay
-  }, []);
+    setIsRefreshing(false); // Hide the spinner
+  }, [refreshAll]);
 
   useEffect(() => {
     const getBalanceVisibility = async () => {
@@ -66,9 +73,6 @@ const Card: React.FC<{
     });
   };
 
-  const { userInfo } = useAuth();
-  // console.log(userInfo);
-
   const fullName = userInfo?.fullName || "";
   const firstName = fullName.split(" ")[0];
   const initials = fullName
@@ -76,8 +80,6 @@ const Card: React.FC<{
     .map((n) => n[0])
     .join("")
     .toUpperCase();
-
-  const { refreshAll, balance, isLoading, error } = useWallet(); // Updated to use isLoading
 
   const panResponder = React.useRef(
     PanResponder.create({
@@ -111,6 +113,14 @@ const Card: React.FC<{
     >
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container} {...panResponder.panHandlers}>
+          {isRefreshing && (
+            <View
+              style={[styles.spinnerContainer, shadowStyle]}
+              className="rounded-full"
+            >
+              <ActivityIndicator size="small" color={COLORS.violet400} />
+            </View>
+          )}
           <View style={styles.header}>
             <View style={styles.headerContent}>
               <TouchableOpacity
@@ -205,8 +215,8 @@ const Card: React.FC<{
             onPress={() => navigation.navigate("FundWalletScreen")}
             style={styles.fundWalletButton}
           >
-            <AddCircle variant="Bold" color="#573CC7" className="mr-2" />
-            <RegularText color="primary" size="medium">
+            <AddCircle variant="Bold" color="#573CC7" />
+            <RegularText color="primary" size="medium" marginLeft={5}>
               Fund Wallet
             </RegularText>
           </TouchableOpacity>
@@ -292,5 +302,12 @@ const styles = StyleSheet.create({
     fontSize: RFValue(14),
     color: COLORS.violet400,
     marginTop: 10,
+  },
+  spinnerContainer: {
+    backgroundColor: "white",
+    padding: SPACING,
+    position: "absolute",
+    top: "50%",
+    left: "50%",
   },
 });
