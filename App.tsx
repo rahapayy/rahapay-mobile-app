@@ -11,7 +11,6 @@ import { NotificationProvider } from "./context/NotificationContext";
 import Router from "./router/Router";
 import { AuthProvider } from "./services/AuthContext";
 import { NavigationContainer } from "@react-navigation/native";
-// import { LockProvider } from "./context/LockContext"; // Import LockProvider
 import "./global.css";
 import { LockProvider } from "./context/LockContext";
 

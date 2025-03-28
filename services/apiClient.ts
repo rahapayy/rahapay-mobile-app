@@ -82,7 +82,6 @@ axiosInstance.interceptors.response.use(
 
           const { accessToken, refreshToken } =
             await services.authService.refreshToken({
-              accessToken: accessTokenFromStorage,
               refreshToken: refreshTokenFromStorage,
             });
           console.log("New tokens received:", { accessToken, refreshToken });
@@ -139,12 +138,15 @@ axiosInstance.interceptors.response.use(
     }
 
     if (status === 403 && error.response.data) {
-      console.log("403 Forbidden - Rejecting with response data:", error.response.data);
+      console.log(
+        "403 Forbidden - Rejecting with response data:",
+        error.response.data
+      );
       return Promise.reject(new Error(error.response.data));
     }
 
     console.log("Rejecting error to caller:", error.message);
-    return Promise.reject(new Error(error));
+    return Promise.reject(error);
   }
 );
 

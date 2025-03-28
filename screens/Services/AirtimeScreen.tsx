@@ -30,6 +30,7 @@ import { services } from "@/services";
 import { Beneficiary } from "@/services/modules/beneficiary";
 import { Skeleton } from "@rneui/base";
 import BackButton from "@/components/common/ui/buttons/BackButton";
+import PhoneNumberInput from "@/components/common/ui/forms/PhoneNumberInput";
 
 const AirtimeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -63,7 +64,9 @@ const AirtimeScreen: React.FC<{
     const fetchBeneficiaries = async () => {
       setIsBeneficiariesLoading(true);
       try {
-        const response = await services.beneficiaryService.getBeneficiaries("airtime");
+        const response = await services.beneficiaryService.getBeneficiaries(
+          "airtime"
+        );
         setBeneficiaries(response.data?.beneficiaries || []);
       } catch (error) {
         console.error("Failed to fetch airtime beneficiaries:", error);
@@ -369,17 +372,13 @@ const AirtimeScreen: React.FC<{
                       : renderNetworkProviders()}
 
                     <Label text="Phone Number" marked={false} />
-                    <BasicInput
-                      placeholder="Enter phone number"
+                    <PhoneNumberInput
                       value={phoneNumber}
-                      keyboardType="numeric"
                       onChangeText={(text) => {
                         setPhoneNumber(text);
                         detectOperator(text);
                       }}
-                      autoComplete="off"
-                      autoCapitalize="none"
-                      autoCorrect={false}
+                      countryCode={"+234"}
                     />
                   </View>
 

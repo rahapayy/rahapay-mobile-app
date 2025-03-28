@@ -17,6 +17,7 @@ import { services } from "@/services";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { AxiosError } from "axios";
 import { DataPurchasePayload } from "@/services/modules/data";
+import { handleError } from "@/services/handleError";
 
 type TransactionPinScreenProps = NativeStackScreenProps<
   AppStackParamList,
@@ -136,35 +137,24 @@ const TransactionPinScreen: React.FC<TransactionPinScreenProps> = ({
           : "failed";
       navigation.navigate("TransactionStatusScreen", { status });
     } catch (error: any) {
+      // Log the error for debugging
       console.error(`Error during ${transactionType} transaction:`, {
         message: error.message,
         response: error.response?.data,
         status: error.response?.status,
       });
 
-      let message = "An unexpected error occurred. Please try again.";
-      if (error instanceof AxiosError && error.response) {
-        const errorData = error.response.data;
-        message = errorData?.message || message;
-        if (Array.isArray(message)) message = message[0];
-        if (error.response.status === 401 || message?.includes("pin")) {
-          message = "Invalid transaction PIN. Please try again.";
-          setPin(""); // Reset PIN for retry
-        } else if (error.response.status === 400) {
-          message = "Bad request. Please check the transaction details.";
-        } else if (error.response.status === 503) {
-          message =
-            "The server is currently unavailable. Please try again later.";
-        }
-      } else if (error.message?.includes("Network")) {
-        message = "Network error. Please check your connection and try again.";
-      } else if (error.message?.includes("Timeout")) {
-        message = "Request timed out. Please try again later.";
-      }
+      // Extract the specific server error message
+      const errorMessage =
+        error.response?.data?.message || "An unexpected error occurred";
 
-      handleShowFlash({ message, type: "danger" });
+      // Show flash message with the specific error message
+      handleShowFlash({
+        type: "danger",
+        message: errorMessage,
+      });
     } finally {
-      setIsLoading(false); // Reset loading state
+      setIsLoading(false);
     }
   };
 

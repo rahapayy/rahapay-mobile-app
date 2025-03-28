@@ -29,6 +29,7 @@ import { RegularText } from "@/components/common/Text";
 import { Beneficiary } from "@/services/modules/beneficiary";
 import Label from "@/components/common/ui/forms/Label";
 import BasicInput from "@/components/common/ui/forms/BasicInput";
+import PhoneNumberInput from "@/components/common/ui/forms/PhoneNumberInput";
 
 interface DataScreenProps {
   navigation: NativeStackNavigationProp<any>;
@@ -69,7 +70,9 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
     const fetchBeneficiaries = async () => {
       setIsBeneficiariesLoading(true);
       try {
-        const response = await services.beneficiaryService.getBeneficiaries("data");
+        const response = await services.beneficiaryService.getBeneficiaries(
+          "data"
+        );
         setBeneficiaries(response.data?.beneficiaries || []);
       } catch (error) {
         console.error("Failed to fetch data beneficiaries:", error);
@@ -89,11 +92,18 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await services.dataService.getDataPlans(selectedOperator);
+        const response = await services.dataService.getDataPlans(
+          selectedOperator
+        );
         const validPlans = response
-          .filter((plan: DataPlan) => plan.plan_id && plan.plan_name && plan.amount && plan.validity)
+          .filter(
+            (plan: DataPlan) =>
+              plan.plan_id && plan.plan_name && plan.amount && plan.validity
+          )
           .reduce((unique: DataPlan[], plan: DataPlan) => {
-            return unique.some((p) => p.plan_id === plan.plan_id) ? unique : [...unique, plan];
+            return unique.some((p) => p.plan_id === plan.plan_id)
+              ? unique
+              : [...unique, plan];
           }, []);
         setDataPlans(validPlans);
       } catch (err) {
@@ -287,7 +297,10 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftIcon}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.leftIcon}
+            >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
             <Text style={[styles.headerText]} allowFontScaling={false}>
@@ -306,14 +319,20 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                       <Skeleton
                         width={100}
                         height={25}
-                        style={{ backgroundColor: COLORS.grey100, borderRadius: 10 }}
+                        style={{
+                          backgroundColor: COLORS.grey100,
+                          borderRadius: 10,
+                        }}
                         skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                         animation="wave"
                       />
                       <Skeleton
                         width={100}
                         height={25}
-                        style={{ backgroundColor: COLORS.grey100, borderRadius: 10 }}
+                        style={{
+                          backgroundColor: COLORS.grey100,
+                          borderRadius: 10,
+                        }}
                         skeletonStyle={{ backgroundColor: COLORS.grey50 }}
                         animation="wave"
                       />
@@ -332,7 +351,9 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                         >
                           <RegularText color="black" size="small">
                             {beneficiary.number}{" "}
-                            {beneficiary.networkType ? `| ${beneficiary.networkType}` : ""}
+                            {beneficiary.networkType
+                              ? `| ${beneficiary.networkType}`
+                              : ""}
                           </RegularText>
                         </TouchableOpacity>
                       )}
@@ -345,21 +366,19 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                 </View>
 
                 <Label text="Select Network Provider" marked={false} />
-                {isBeneficiariesLoading ? renderNetworkSkeleton() : renderNetworkProviders()}
+                {isBeneficiariesLoading
+                  ? renderNetworkSkeleton()
+                  : renderNetworkProviders()}
 
                 <View className="mt-6">
                   <Label text="Phone Number" marked={false} />
-                  <BasicInput
-                    placeholder="Enter phone number"
+                  <PhoneNumberInput
                     value={phoneNumber}
-                    keyboardType="numeric"
                     onChangeText={(text) => {
                       setPhoneNumber(text);
                       detectOperator(text);
                     }}
-                    autoComplete="off"
-                    autoCapitalize="none"
-                    autoCorrect={false}
+                    countryCode={"+234"}
                   />
                 </View>
 
@@ -402,8 +421,13 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                     <Switch
                       value={saveBeneficiary}
                       onValueChange={setSaveBeneficiary}
-                      trackColor={{ false: COLORS.grey100, true: COLORS.violet200 }}
-                      thumbColor={saveBeneficiary ? COLORS.violet400 : COLORS.white}
+                      trackColor={{
+                        false: COLORS.grey100,
+                        true: COLORS.violet200,
+                      }}
+                      thumbColor={
+                        saveBeneficiary ? COLORS.violet400 : COLORS.white
+                      }
                       style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
                     />
                   </View>
@@ -414,7 +438,9 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
               title="Proceed"
               className="mt-10"
               style={{
-                backgroundColor: isButtonDisabled ? COLORS.violet200 : COLORS.violet400,
+                backgroundColor: isButtonDisabled
+                  ? COLORS.violet200
+                  : COLORS.violet400,
               }}
               onPress={handleProceed}
               disabled={isButtonDisabled}

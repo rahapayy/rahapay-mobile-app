@@ -1,14 +1,13 @@
 import {
   View,
   FlatList,
-  Share,
   Image,
   StyleSheet,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { SemiBoldText } from "../common/Text";
-import Button from "../common/ui/buttons/Button";
 import { SPACING } from "../../constants/ui";
 import { useAuth } from "../../services/AuthContext";
 import { Skeleton } from "@rneui/themed";
@@ -24,24 +23,22 @@ const banners = [
     id: "1",
     text: "Create a tag to personalize your account to invite others and earn rewards!",
     backgroundColor: "#5136C1",
-    showButton: true,
-    buttonText: "Create tag",
     showIcon: true,
+    icon: require("@/assets/animation/at.gif"), // Assuming you have this
+    iconWidth: 130, // Custom width for this banner
+    iconHeight: 130, // Custom height for this banner
+    onPress: (navigation: NativeStackNavigationProp<any, "">) =>
+      navigation.navigate("CreateTagScreen"),
   },
   {
     id: "2",
-    text: "Invite your friends and earn exclusive bonuses!",
-    backgroundColor: "#5136C1",
-    showButton: true,
-    buttonText: "Invite now",
-    showIcon: false,
-  },
-  {
-    id: "3",
     text: "Card Coming Soon! Get ready for seamless payments.",
     backgroundColor: "#5136C1",
-    showButton: false,
-    showIcon: false,
+    showIcon: true,
+    icon: require("@/assets/images/Card.png"), // Assuming you have this
+    iconWidth: 90, // Smaller width for this banner
+    iconHeight: 90, // Smaller height for this banner
+    onPress: () => {},
   },
 ];
 
@@ -58,15 +55,9 @@ const Banner = ({
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const handleInviteFriends = async () => {
-    await Share.share({
-      message: "https://example.com/invite-link",
-    });
-  };
-
   // Auto-scroll logic
   useEffect(() => {
-    if (filteredBanners.length <= 1) return; // No need to scroll if 1 or fewer items
+    if (filteredBanners.length <= 1) return;
 
     const interval = setInterval(() => {
       const nextIndex = (currentIndex + 1) % filteredBanners.length;
@@ -75,91 +66,77 @@ const Banner = ({
         index: nextIndex,
         animated: true,
       });
-    }, 3000); // Scroll every 3 seconds
+    }, 3000);
 
-    return () => clearInterval(interval); // Cleanup on unmount
+    return () => clearInterval(interval);
   }, [currentIndex, filteredBanners.length]);
 
-  // Handle manual scrolling to update currentIndex
+  // Handle manual scrolling
   const onScroll = (event: any) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
-    const newIndex = Math.round(contentOffsetX / (width / 1.3));
+    const itemWidth = width * 0.7 + 8;
+    const newIndex = Math.round(contentOffsetX / itemWidth);
     setCurrentIndex(newIndex);
   };
 
   const renderItem = ({ item }: { item: (typeof banners)[0] }) => (
-    <View
+    <TouchableOpacity
+      onPress={() => item.onPress(navigation)}
+      activeOpacity={0.8}
       className="rounded-xl overflow-hidden mx-2"
       style={{
         backgroundColor: item.backgroundColor,
-        width: width / 1.2,
-        height: RFValue(100),
+        width: width * 0.7,
+        height: RFValue(80),
       }}
     >
-      <View className="p-4">
+      <View className="p-3">
         <Overlay style={styles.overlay} />
         <View style={styles.content}>
-          <SemiBoldText color="white" size="base">
+          <SemiBoldText color="white" size="base" numberOfLines={3}>
             {item.text}
           </SemiBoldText>
-
-          {item.showButton && (
-            <Button
-              textColor="black"
-              title={item.buttonText}
-              style={{
-                backgroundColor: "white",
-                width: 150,
-                height: 32,
-                marginTop: SPACING * 2,
-              }}
-              onPress={() => {
-                if (item.id === "1") {
-                  navigation.navigate("CreateTagScreen");
-                } else if (item.id === "2") {
-                  handleInviteFriends();
-                }
-              }}
-            />
-          )}
-
           {item.showIcon && (
             <Image
-              source={require("@/assets/animation/at.gif")}
-              style={styles.animation}
+              source={item.icon}
+              style={{
+                ...styles.animation,
+                width: item.iconWidth, // Override with custom width
+                height: item.iconHeight, // Override with custom height
+              }}
             />
           )}
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
-    <View className="py-6">
+    <View className="py-4">
       {isLoading ? (
         <Skeleton
           animation="wave"
-          width={RFValue(250)}
-          height={RFValue(102)}
+          width={RFValue(220)}
+          height={RFValue(92)}
           style={{ backgroundColor: COLORS.grey100, borderRadius: 8 }}
           skeletonStyle={{ backgroundColor: COLORS.grey50 }}
         >
-          <View className="p-4">
+          <View className="p-3">
             <Skeleton
               animation="wave"
-              width={RFValue(180)}
-              height={RFValue(16)}
+              width={RFValue(160)}
+              height={RFValue(14)}
               style={{ backgroundColor: COLORS.grey100, borderRadius: 8 }}
               skeletonStyle={{ backgroundColor: COLORS.grey50 }}
             />
             <Skeleton
               animation="wave"
-              width={RFValue(120)}
-              height={RFValue(24)}
+              width={RFValue(100)}
+              height={RFValue(20)}
               style={{
                 backgroundColor: COLORS.grey100,
                 borderRadius: 8,
-                marginTop: SPACING * 2,
+                marginTop: SPACING,
               }}
               skeletonStyle={{ backgroundColor: COLORS.grey50 }}
             />
@@ -174,11 +151,11 @@ const Banner = ({
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           onScroll={onScroll}
-          snapToInterval={width / 1.3 + 8} // Item width + margin (mx-2 = 8px total)
+          snapToInterval={width * 0.7 + 8}
           snapToAlignment="start"
           decelerationRate="fast"
           initialNumToRender={filteredBanners.length}
-          contentContainerStyle={{ paddingHorizontal: 4 }} // Half of mx-2 for alignment
+          contentContainerStyle={{ paddingHorizontal: 4 }}
         />
       )}
     </View>
@@ -199,10 +176,10 @@ const styles = StyleSheet.create({
   },
   animation: {
     position: "absolute",
-    right: -40,
-    bottom: -50,
-    width: 150,
-    height: 150,
+    right: -45,
+    top: 0,
+    width: 130, // Default width (overridden by iconWidth)
+    height: 130, // Default height (overridden by iconHeight)
   },
 });
 

@@ -17,7 +17,7 @@ import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { services } from "@/services";
 import { BasicPasswordInput } from "@/components/common/ui/forms/BasicPasswordInput";
 import BackButton from "@/components/common/ui/buttons/BackButton";
-import { BoldText, RegularText } from "@/components/common/Text";
+import { RegularText } from "@/components/common/Text";
 import Label from "@/components/common/ui/forms/Label";
 
 const ChangePasswordScreen: React.FC<{
