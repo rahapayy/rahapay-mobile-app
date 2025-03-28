@@ -1,22 +1,20 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import COLORS from "../../constants/colors";
 import FONT_SIZE from "../../constants/font-size";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../constants/SPACING";
-import { AuthContext } from "../../services/AuthContext";
-// import { AuthContext } from "../../context/AuthContext";
+import { RegularText } from "../common/Text";
 
 const LogOutModal: React.FC<{
   visible: boolean;
   onClose: () => void;
-  onToggle: () => void;
-}> = ({ visible, onClose, onToggle }) => {
-  const { logout } = useContext(AuthContext);
-
+  onConfirm: () => void; // Changed from onToggle to onConfirm
+}> = ({ visible, onClose, onConfirm }) => {
   const handleLogout = () => {
-    logout();
+    onConfirm(); // Trigger logout and navigation in ProfileScreen
   };
+
   return (
     <Modal
       transparent={true}
@@ -27,9 +25,9 @@ const LogOutModal: React.FC<{
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
           <View className="px-10 justify-center items-center">
-            <Text style={styles.subModalText} allowFontScaling={false}>
-              Are you sure you want to Log out of RahaPay?
-            </Text>
+            <RegularText color="black" size="medium" center marginBottom={14}>
+              Are you sure you want to log out of RahaPay?
+            </RegularText>
             <View className="flex-row gap-4">
               <TouchableOpacity
                 style={styles.modalButton}
@@ -76,15 +74,10 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING,
-    paddingVertical: SPACING,
+    paddingHorizontal: SPACING * 2,
+    paddingVertical: SPACING * 1.5,
     borderRadius: 10,
     alignItems: "center",
-  },
-  modalText: {
-    fontFamily: "Outfit-Medium",
-    fontSize: FONT_SIZE.medium,
-    marginBottom: SPACING,
   },
   subModalText: {
     fontFamily: "Outfit-Regular",

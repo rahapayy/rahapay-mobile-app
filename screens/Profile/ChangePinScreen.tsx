@@ -1,31 +1,28 @@
 import {
-  Image,
-  Platform,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
-  TouchableOpacity,
   View,
+  Keyboard,
+  TouchableWithoutFeedback,
+  ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RouteProp, useRoute } from "@react-navigation/native";
 import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../../constants/SPACING";
-import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
-import { RFValue } from "react-native-responsive-fontsize";
 import Button from "../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
+import { RegularText } from "../../components/common/Text";
+import OtpInput from "../../components/common/ui/forms/OtpInput";
+import Label from "../../components/common/ui/forms/Label";
 import { services } from "@/services";
-import { RouteProp, useRoute } from "@react-navigation/native";
-import { RegularText } from "@/components/common/Text";
-import Label from "@/components/common/ui/forms/Label";
-import { BasicPasswordInput } from "@/components/common/ui/forms/BasicPasswordInput";
-import BasicInput from "@/components/common/ui/forms/BasicInput";
-// import OtpInput from "../../components/common/ui/forms/OtpInput";
+import { Platform } from "react-native";
 
 const ChangePinScreen: React.FC<{
-  navigation: NativeStackNavigationProp<any, "">;
+  navigation: NativeStackNavigationProp<any, "ChangePin">;
 }> = ({ navigation }) => {
   const route =
     useRoute<
@@ -35,129 +32,155 @@ const ChangePinScreen: React.FC<{
       >
     >();
   const pinType = route.params.type;
+  const pinLength = pinType === "transactionPin" ? 4 : 6;
 
-  const [showPin, setShowPin] = useState(true);
-  const togglePinVisibility = () => setShowPin((prev) => !prev);
   const [formValues, setFormValues] = useState({
-    currPin: "",
-    newPin: "",
-    confirmPin: "",
+    currPin: Array(pinLength).fill(""),
+    newPin: Array(pinLength).fill(""),
+    confirmPin: Array(pinLength).fill(""),
   });
-  const [isLoading, setIsLoading] = useState(false); // State to manage loading state
+  const [isLoading, setIsLoading] = useState(false);
 
-  function handleInputChange(value: string, fieldKey: keyof typeof formValues) {
+  function handleInputChange(
+    value: string[],
+    fieldKey: keyof typeof formValues
+  ) {
     setFormValues({ ...formValues, [fieldKey]: value });
   }
 
   async function handleButtonClick() {
-    if (formValues.newPin !== formValues.confirmPin) {
+    const currPinStr = formValues.currPin.join("");
+    const newPinStr = formValues.newPin.join("");
+    const confirmPinStr = formValues.confirmPin.join("");
+
+    if (newPinStr !== confirmPinStr) {
       handleShowFlash({
-        message: "New pin must match confirmation pin",
+        message: "New PIN must match confirmation PIN",
         type: "danger",
       });
-    } else {
-      setIsLoading(true); // Start loading
-      try {
-        const response = await services.userService
-          .updateCredentials({
-            type: pinType,
-            current: formValues.currPin,
-            new: formValues.newPin,
-          })
-          .then(() => {
-            handleShowFlash({
-              message: "Transaction pin changed successfully!",
-              type: "success",
-            });
-            navigation.goBack();
-          })
-          .catch((error) => {
-            const err = error as {
-              response?: { data?: { message?: string } };
-              message: string;
-            };
-            const errorMessage =
-              err.response?.data?.message || err.message || "An error occurred";
+      return;
+    }
 
-            console.error("Failed to update pin:", errorMessage); // Log the error message
-            handleShowFlash({
-              message: errorMessage,
-              type: "danger",
-            });
-          });
-      } catch (error: any) {
-        console.error("Failed to update pin:", error.message); // Log the error message
-        handleShowFlash({
-          message: "Failed to update pin. Please try again.",
-          type: "danger",
-        });
-      } finally {
-        setIsLoading(false); // Stop loading
-      }
+    if (
+      currPinStr.length !== pinLength ||
+      newPinStr.length !== pinLength ||
+      confirmPinStr.length !== pinLength
+    ) {
+      handleShowFlash({
+        message: `Please enter a ${pinLength}-digit PIN for all fields`,
+        type: "danger",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await services.userService.updateCredentials({
+        type: pinType,
+        current: currPinStr,
+        new: newPinStr,
+      });
+      handleShowFlash({
+        message: `${
+          pinType === "transactionPin" ? "Transaction" : "Security"
+        } PIN changed successfully!`,
+        type: "success",
+      });
+      navigation.goBack();
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message instanceof Array
+          ? error.response.data.message[0]
+          : error.response?.data?.message || "An unexpected error occurred";
+      console.error("Failed to update PIN:", errorMessage);
+      handleShowFlash({
+        message: errorMessage,
+        type: "danger",
+      });
+    } finally {
+      setIsLoading(false);
     }
   }
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView>
-        <View className="p-4">
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.leftIcon}
-            >
-              <ArrowLeft color={"#000"} size={24} />
-            </TouchableOpacity>
-            <RegularText color="black" size="large">
-              Change {pinType === "transactionPin" ? "Transaction" : "Security"}{" "}
-              Pin
-            </RegularText>
-          </View>
 
-          <View className="">
-            <View>
-              <Label text="Current Pin" marked={false} />
-              <BasicPasswordInput
-                style={styles.input}
-                placeholder="Enter current pin"
-                value={formValues.currPin}
-                onChangeText={(value) => handleInputChange(value, "currPin")}
-              />
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
+  return (
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <ScrollView>
+          <View style={{ padding: 16, flex: 1 }}>
+            <View style={styles.header}>
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={styles.leftIcon}
+              >
+                <ArrowLeft color={"#000"} size={24} />
+              </TouchableOpacity>
+              <RegularText color="black" size="large">
+                Change{" "}
+                {pinType === "transactionPin" ? "Transaction" : "Security"} PIN
+              </RegularText>
             </View>
-            <View className="mt-4">
-              <Label text="New Pin" marked={false} />
-              <BasicPasswordInput
-                style={styles.input}
-                placeholder="Enter new pin"
-                value={formValues.newPin}
-                onChangeText={(value) => handleInputChange(value, "newPin")}
-              />
-            </View>
-            <View className="mt-4">
-              <Label text="Confirm Pin" marked={false} />
-              <BasicPasswordInput
-                style={styles.input}
-                placeholder="Enter confirmation pin"
-                value={formValues.confirmPin}
-                onChangeText={(value) => handleInputChange(value, "confirmPin")}
-              />
+            <View className="flex-1">
+              <View style={styles.inputContainer}>
+                <Label text="Current PIN" marked={false} />
+                <View className="justify-start items-start">
+                  <OtpInput
+                    length={pinLength}
+                    value={formValues.currPin}
+                    onChange={(value) => handleInputChange(value, "currPin")}
+                    secureTextEntry
+                    autoFocus={true}
+                    disabled={isLoading}
+                  />
+                </View>
+              </View>
+              <View style={styles.inputContainer}>
+                <Label text="New PIN" marked={false} />
+                <View className="justify-start items-start">
+                  <OtpInput
+                    length={pinLength}
+                    value={formValues.newPin}
+                    onChange={(value) => handleInputChange(value, "newPin")}
+                    secureTextEntry
+                    autoFocus={false}
+                    disabled={isLoading}
+                  />
+                </View>
+              </View>
+              <View style={styles.inputContainer}>
+                <Label text="Confirm New PIN" marked={false} />
+                <View className="justify-start items-start">
+                  <OtpInput
+                    length={pinLength}
+                    value={formValues.confirmPin}
+                    onChange={(value) => handleInputChange(value, "confirmPin")}
+                    secureTextEntry
+                    autoFocus={false}
+                    disabled={isLoading}
+                  />
+                </View>
+              </View>
             </View>
             <Button
-              title={"Save Changes"}
-              isLoading={isLoading} // Pass isLoading state to Button component
-              disabled={
-                !formValues.confirmPin ||
-                !formValues.newPin ||
-                !formValues.currPin ||
-                isLoading // Disable button while loading
-              }
+              title="Confirm"
               onPress={handleButtonClick}
-              style={styles.proceedButton}
+              isLoading={isLoading}
+              disabled={
+                formValues.currPin.some((digit) => !digit) ||
+                formValues.newPin.some((digit) => !digit) ||
+                formValues.confirmPin.some((digit) => !digit) ||
+                isLoading
+              }
+              style={{ marginTop: SPACING * 4 }}
               textColor="#fff"
             />
           </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -173,90 +196,12 @@ const styles = StyleSheet.create({
   leftIcon: {
     marginRight: SPACING,
   },
-  headerText: {
-    color: "#000",
-    fontSize: FONT_SIZE.medium,
-    fontFamily: "Outfit-Regular",
-    flex: 1,
-  },
-  headerTextDark: {
-    color: COLORS.white,
-  },
-  headTextContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  itemText: {
-    fontSize: FONT_SIZE.medium,
-    fontFamily: "Outfit-Medium",
-    paddingVertical: SPACING * 2,
-  },
-  container: {
-    backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING,
-    paddingVertical: SPACING,
-    borderRadius: SPACING,
-    marginTop: SPACING * 4,
-  },
-  headText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(18),
-    marginBottom: SPACING,
-  },
-  titleText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(16),
-    paddingVertical: SPACING,
-  },
-  descriptionText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
-    color: "#9BA1A8",
-  },
-  completedText: {
-    fontFamily: "Outfit-Regular",
-    color: "#06C270",
-  },
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderStyle: "dotted",
-    borderColor: "#000",
-    paddingVertical: SPACING,
-    paddingHorizontal: SPACING * 3,
-    borderRadius: 8,
-    marginTop: SPACING * 2,
-  },
-  buttonText: {
-    marginLeft: SPACING,
-    color: "#000",
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.medium,
-  },
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    fontSize: RFValue(12),
+    flexDirection: "column",
+    paddingVertical: SPACING * 1.5,
+    paddingHorizontal: SPACING * 2,
     borderRadius: 10,
-    padding: 18,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#DFDFDF",
-  },
-  input: {
-    flex: 1,
-    height: "100%",
-    fontSize: RFValue(12),
-  },
-  label: {
-    fontFamily: "Outfit-Regular",
-    marginBottom: 10,
-    fontSize: RFValue(12),
-  },
-  proceedButton: {
-    marginTop: SPACING * 4,
+    backgroundColor: COLORS.white,
+    marginTop: SPACING * 2,
   },
 });

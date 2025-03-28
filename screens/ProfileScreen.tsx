@@ -26,15 +26,22 @@ import SPACING from "../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import BiometricModal from "../components/modals/BiometricModal";
 import CloseAccountModal from "../components/modals/CloseAccountModal";
-import LogOutModal from "../components/modals/LogoutModal";
 import {
   BoldText,
   LightText,
   MediumText,
   SemiBoldText,
 } from "../components/common/Text";
-import { AuthContext, useAuth } from "../services/AuthContext";
+import { useAuth } from "../services/AuthContext";
 import { getItem, setItem } from "@/utils/storage";
+import LogOutModal from "@/components/modals/LogoutModal";
+
+const options = [
+  {
+    title: "Change transaction pin",
+    type: "transactionPin",
+  },
+];
 
 const ProfileScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -49,14 +56,9 @@ const ProfileScreen: React.FC<{
     .join("")
     .toUpperCase();
 
-
   const [isCloseAccountModalVisible, setIsCloseAccountModalVisible] =
     useState(false);
-
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
-
-
-
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [biometricModalVisible, setBiometricModalVisible] = useState(false);
 
@@ -104,8 +106,13 @@ const ProfileScreen: React.FC<{
     setIsCloseAccountModalVisible(false);
   };
 
-  const handleLogout = () => {
-    logOut();
+  const handleConfirmLogout = () => {
+    logOut(); // Perform logout
+    setIsLogoutModalVisible(false); // Close modal
+    // navigation.reset({
+    //   index: 0,
+    //   routes: [{ name: "LoginScreen" }], // Replace with your login screen name
+    // }); // Reset navigation stack to login screen
   };
 
   return (
@@ -133,18 +140,6 @@ const ProfileScreen: React.FC<{
             </View>
           </View>
 
-          {/* <TouchableOpacity
-              onPress={() =>
-                navigation.navigate("AgentAccountVerificationScreen")
-              }
-              style={styles.verifyButton}
-            >
-              <Verify variant="Bold" color="#fff" />
-              <Text style={styles.verifyText} allowFontScaling={false}>
-                Become an agent
-              </Text>
-            </TouchableOpacity> */}
-
           {/* Settings Section */}
           <View className="mt-4">
             <MediumText color="light">Account</MediumText>
@@ -164,7 +159,6 @@ const ProfileScreen: React.FC<{
                     Personal Information
                   </LightText>
                 </View>
-                {/* <ArrowRight color="black" size={20} /> */}
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -215,20 +209,27 @@ const ProfileScreen: React.FC<{
                     Change Password
                   </LightText>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("SelectPinChangeScreen")}
-                  style={styles.settingsItem}
-                >
-                  <Lock
-                    variant="Bold"
-                    color={COLORS.violet400}
-                    size={24}
-                    style={{ marginRight: SPACING }}
-                  />
-                  <LightText color="black" size="base">
-                    Change Pin
-                  </LightText>
-                </TouchableOpacity>
+                {options.map((item, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() =>
+                      navigation.navigate("ChangePinScreen", {
+                        type: item.type,
+                      })
+                    }
+                    style={styles.settingsItem}
+                  >
+                    <Lock
+                      variant="Bold"
+                      color={COLORS.violet400}
+                      size={24}
+                      style={{ marginRight: SPACING }}
+                    />
+                    <LightText color="black" size="base">
+                      Change Pin
+                    </LightText>
+                  </TouchableOpacity>
+                ))}
                 <View style={styles.switchContainer}>
                   <View style={styles.switchLabel}>
                     <FingerScan
@@ -307,7 +308,7 @@ const ProfileScreen: React.FC<{
 
             {/* Logout */}
             <TouchableOpacity
-              onPress={handleLogout}
+              onPress={handleToggleLogout}
               style={styles.logoutContainer}
             >
               <MediumText color="error" size="large">
@@ -331,8 +332,8 @@ const ProfileScreen: React.FC<{
       />
       <LogOutModal
         visible={isLogoutModalVisible}
-        onToggle={handleToggleLogout}
         onClose={handleCloseLogout}
+        onConfirm={handleConfirmLogout}
       />
     </SafeAreaView>
   );
@@ -347,7 +348,6 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     paddingBottom: SPACING * 6,
   },
-
   profileContainer: {
     flexDirection: "row",
     backgroundColor: COLORS.white,
@@ -366,15 +366,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: SPACING * 1.5,
   },
-  verifyButton: {
-    backgroundColor: COLORS.violet400,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderRadius: 10,
-    flexDirection: "row",
-    marginTop: SPACING,
-  },
   settingsContainer: {
     backgroundColor: COLORS.white,
     padding: SPACING,
@@ -384,14 +375,8 @@ const styles = StyleSheet.create({
   },
   settingsItem: {
     flexDirection: "row",
-    // justifyContent: "space-between",
     alignItems: "center",
     marginBottom: SPACING,
-  },
-  titleText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(12),
-    marginLeft: SPACING,
   },
   switchContainer: {
     flexDirection: "row",
@@ -407,11 +392,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-  },
-  logoutButton: {
-    color: "#FF2E2E",
-    fontFamily: "Outfit-Medium",
-    fontSize: FONT_SIZE.small,
-    marginRight: SPACING,
   },
 });
