@@ -11,7 +11,6 @@ export interface IOnboardingDto {
 
 export interface IRefreshTokenDto {
   refreshToken: string;
-  accessToken: string;
 }
 
 export interface IRefreshTokenResponseDto {
