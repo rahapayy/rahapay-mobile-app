@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: RFValue(10),
+    fontSize: RFValue(11),
     fontFamily: "Outfit-Regular",
     color: "#1E1E1E",
   },
