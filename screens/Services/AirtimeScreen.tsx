@@ -302,13 +302,13 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <BackButton navigation={navigation} />
+          <RegularText color="black" size="large" marginLeft={10}>
+            Airtime Top-up
+          </RegularText>
+        </View>
         <View className="p-4">
-          <View style={styles.header}>
-            <BackButton navigation={navigation} />
-            <RegularText color="black" size="large">
-              Airtime Top-up
-            </RegularText>
-          </View>
           <View className="">
             <View style={styles.tabsContainer}>
               <TouchableOpacity
@@ -512,7 +512,8 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingBottom: SPACING * 3,
+    paddingHorizontal: SPACING,
+    paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
   },
   leftIcon: { marginRight: SPACING },
   headerText: {

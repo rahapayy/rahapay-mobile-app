@@ -9,6 +9,7 @@ import {
   Platform,
   Switch,
   FlatList,
+  Alert,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowDown2, ArrowLeft, TickCircle } from "iconsax-react-native";
@@ -28,7 +29,7 @@ import { services } from "@/services";
 import { RegularText } from "@/components/common/Text";
 import { Beneficiary } from "@/services/modules/beneficiary";
 import Label from "@/components/common/ui/forms/Label";
-import BasicInput from "@/components/common/ui/forms/BasicInput";
+import * as Contacts from "expo-contacts";
 import PhoneNumberInput from "@/components/common/ui/forms/PhoneNumberInput";
 import BackButton from "@/components/common/ui/buttons/BackButton";
 
@@ -199,6 +200,35 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
     setSelectedOperator("");
   };
 
+  const handleContactPress = async () => {
+    const { status } = await Contacts.requestPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Denied",
+        "Please allow access to contacts to use this feature."
+      );
+      return;
+    }
+
+    const contact = await Contacts.presentContactPickerAsync();
+    if (contact) {
+      const selectedContact = contact;
+      const phoneNumber = selectedContact?.phoneNumbers?.[0]?.number;
+      if (phoneNumber) {
+        const cleanedNumber = phoneNumber
+          .replace(/[^0-9+]/g, "")
+          .replace(/^[+]?/, "");
+        setPhoneNumber(cleanedNumber);
+        detectOperator(cleanedNumber);
+      } else {
+        Alert.alert(
+          "No Phone Number",
+          "The selected contact has no phone number."
+        );
+      }
+    }
+  };
+
   const renderNetworkSkeleton = () => (
     <View
       className="flex-row p-2 bg-white rounded-xl items-center justify-between"
@@ -299,9 +329,9 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
         <View>
           <View style={styles.header}>
             <BackButton navigation={navigation} />
-            <Text style={[styles.headerText]} allowFontScaling={false}>
+            <RegularText color="black" size="large" marginLeft={10}>
               Buy Data Bundle
-            </Text>
+            </RegularText>
           </View>
           <View className="p-4">
             <View style={styles.tabContent}>
@@ -375,6 +405,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                       detectOperator(text);
                     }}
                     countryCode={"+234"}
+                    onContactPress={handleContactPress}
                   />
                 </View>
 
@@ -464,7 +495,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: SPACING * 2,
+    paddingHorizontal: SPACING,
     paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
   },
   leftIcon: { marginRight: SPACING },
