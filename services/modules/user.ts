@@ -1,6 +1,7 @@
 import { AxiosInstance } from "axios";
 import { IResponse } from "@/types/general";
 import { IUpdateUserCredentials, IUpdateProfilePayload } from "../dtos/user";
+import { IResetTransactionPinVerifyDto } from "../dtos";
 
 class UserServices {
   constructor(private readonly baseService: AxiosInstance) {}
@@ -36,6 +37,23 @@ class UserServices {
   ): Promise<IResponse<void>> {
     const response = await this.baseService.patch(
       "/user/update/credentials",
+      payload
+    );
+    return response.data;
+  }
+
+  async requestTransactionPinReset(): Promise<IResponse<{ success: boolean }>> {
+    const response = await this.baseService.post(
+      "/auth/reset-transaction-pin/request"
+    );
+    return response.data;
+  }
+
+  async verifyTransactionPinReset(
+    payload: IResetTransactionPinVerifyDto
+  ): Promise<IResponse<{ success: boolean }>> {
+    const response = await this.baseService.post(
+      "/auth/reset-transaction-pin/verify",
       payload
     );
     return response.data;

@@ -10,6 +10,7 @@ import {
   IRefreshTokenDto,
   IRefreshTokenResponseDto,
   IVerifyResetDto,
+  IResetTransactionPinVerifyDto,
 } from "@/services/dtos";
 import { UserInfoType } from "@/services/dtos/user";
 import { IResponse } from "@/types/general";

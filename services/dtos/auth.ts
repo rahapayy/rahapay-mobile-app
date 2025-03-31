@@ -49,3 +49,12 @@ export interface ICreatePinDto {
 export interface IReAuthenticateDto {
   pin: string;
 }
+
+export interface IResetTransactionPinRequestDto {
+  // No payload needed based on your description
+}
+
+export interface IResetTransactionPinVerifyDto {
+  otp: string;
+  transactionPin: string;
+}

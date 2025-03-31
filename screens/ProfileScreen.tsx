@@ -7,7 +7,6 @@ import {
   Switch,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import FONT_SIZE from "../constants/font-size";
 import {
   Document,
   FingerScan,
@@ -21,20 +20,16 @@ import {
   Profile,
 } from "iconsax-react-native";
 import COLORS from "../constants/colors";
-import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import BiometricModal from "../components/modals/BiometricModal";
 import CloseAccountModal from "../components/modals/CloseAccountModal";
-import {
-  BoldText,
-  LightText,
-  MediumText,
-  SemiBoldText,
-} from "../components/common/Text";
+import { BoldText, LightText, MediumText } from "../components/common/Text";
 import { useAuth } from "../services/AuthContext";
 import { getItem, setItem } from "@/utils/storage";
 import LogOutModal from "@/components/modals/LogoutModal";
+import { handleShowFlash } from "@/components/FlashMessageComponent";
+import { services } from "@/services";
 
 const options = [
   {
@@ -61,6 +56,7 @@ const ProfileScreen: React.FC<{
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [biometricModalVisible, setBiometricModalVisible] = useState(false);
+  const [isRequestingPinReset, setIsRequestingPinReset] = useState(false);
 
   // Load biometric preference on mount
   useEffect(() => {
@@ -113,6 +109,27 @@ const ProfileScreen: React.FC<{
     //   index: 0,
     //   routes: [{ name: "LoginScreen" }], // Replace with your login screen name
     // }); // Reset navigation stack to login screen
+  };
+
+  const handleChangePin = async (type: string) => {
+    if (type === "transactionPin") {
+      setIsRequestingPinReset(true);
+      try {
+        await services.userService.requestTransactionPinReset();
+        handleShowFlash({ message: "OTP sent successfully!", type: "success" });
+        navigation.navigate("ChangePinScreen");
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message instanceof Array
+            ? error.response.data.message[0]
+            : error.response?.data?.message || "Failed to send OTP";
+        handleShowFlash({ message: errorMessage, type: "danger" });
+      } finally {
+        setIsRequestingPinReset(false);
+      }
+    } else {
+      navigation.navigate("ChangePinScreen");
+    }
   };
 
   return (
@@ -212,11 +229,7 @@ const ProfileScreen: React.FC<{
                 {options.map((item, index) => (
                   <TouchableOpacity
                     key={index}
-                    onPress={() =>
-                      navigation.navigate("ChangePinScreen", {
-                        type: item.type,
-                      })
-                    }
+                    onPress={() => handleChangePin(item.type)}
                     style={styles.settingsItem}
                   >
                     <Lock

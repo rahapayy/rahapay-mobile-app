@@ -20,54 +20,53 @@ import OtpInput from "../../components/common/ui/forms/OtpInput";
 import Label from "../../components/common/ui/forms/Label";
 import { services } from "@/services";
 import { Platform } from "react-native";
+import { AxiosError } from "axios";
 
-const ChangePinScreen: React.FC<{
-  navigation: NativeStackNavigationProp<any, "ChangePin">;
-}> = ({ navigation }) => {
-  const route =
-    useRoute<
-      RouteProp<
-        { params: { type: "transactionPin" | "securityPin" } },
-        "params"
-      >
-    >();
-  const pinType = route.params.type;
-  const pinLength = pinType === "transactionPin" ? 4 : 6;
+// Define the expected error response structure from the API
+interface ErrorResponse {
+  message: string | string[];
+}
 
-  const [formValues, setFormValues] = useState({
-    currPin: Array(pinLength).fill(""),
+// Define props type for the component
+interface ChangePinScreenProps {
+  navigation: NativeStackNavigationProp<{ ChangePin: { type: "transactionPin" } }, "ChangePin">;
+}
+
+// Define the form values type
+interface FormValues {
+  otp: string[];
+  newPin: string[];
+}
+
+const ChangePinScreen: React.FC<ChangePinScreenProps> = ({ navigation }) => {
+  const pinLength = 4; // Fixed for transactionPin
+  const otpLength = 6; // Assuming OTP is 6 digits, adjust if different
+
+  const [formValues, setFormValues] = useState<FormValues>({
+    otp: Array(otpLength).fill(""),
     newPin: Array(pinLength).fill(""),
-    confirmPin: Array(pinLength).fill(""),
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  function handleInputChange(
-    value: string[],
-    fieldKey: keyof typeof formValues
-  ) {
-    setFormValues({ ...formValues, [fieldKey]: value });
+  function handleInputChange(value: string[], fieldKey: keyof FormValues) {
+    setFormValues((prev) => ({ ...prev, [fieldKey]: value }));
   }
 
   async function handleButtonClick() {
-    const currPinStr = formValues.currPin.join("");
+    const otpStr = formValues.otp.join("");
     const newPinStr = formValues.newPin.join("");
-    const confirmPinStr = formValues.confirmPin.join("");
 
-    if (newPinStr !== confirmPinStr) {
+    if (otpStr.length !== otpLength) {
       handleShowFlash({
-        message: "New PIN must match confirmation PIN",
+        message: `Please enter a ${otpLength}-digit OTP`,
         type: "danger",
       });
       return;
     }
 
-    if (
-      currPinStr.length !== pinLength ||
-      newPinStr.length !== pinLength ||
-      confirmPinStr.length !== pinLength
-    ) {
+    if (newPinStr.length !== pinLength) {
       handleShowFlash({
-        message: `Please enter a ${pinLength}-digit PIN for all fields`,
+        message: `Please enter a ${pinLength}-digit PIN`,
         type: "danger",
       });
       return;
@@ -75,24 +74,22 @@ const ChangePinScreen: React.FC<{
 
     setIsLoading(true);
     try {
-      await services.userService.updateCredentials({
-        type: pinType,
-        current: currPinStr,
-        new: newPinStr,
+      await services.userService.verifyTransactionPinReset({
+        otp: otpStr,
+        transactionPin: newPinStr,
       });
       handleShowFlash({
-        message: `${
-          pinType === "transactionPin" ? "Transaction" : "Security"
-        } PIN changed successfully!`,
+        message: "Transaction PIN changed successfully!",
         type: "success",
       });
       navigation.goBack();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ErrorResponse>;
       const errorMessage =
-        error.response?.data?.message instanceof Array
-          ? error.response.data.message[0]
-          : error.response?.data?.message || "An unexpected error occurred";
-      console.error("Failed to update PIN:", errorMessage);
+        axiosError.response?.data?.message instanceof Array
+          ? axiosError.response.data.message[0]
+          : axiosError.response?.data?.message || "An unexpected error occurred";
+      console.error("Failed to update transaction PIN:", errorMessage);
       handleShowFlash({
         message: errorMessage,
         type: "danger",
@@ -116,47 +113,33 @@ const ChangePinScreen: React.FC<{
                 onPress={() => navigation.goBack()}
                 style={styles.leftIcon}
               >
-                <ArrowLeft color={"#000"} size={24} />
+                <ArrowLeft color="#000" size={24} />
               </TouchableOpacity>
               <RegularText color="black" size="large">
-                Change{" "}
-                {pinType === "transactionPin" ? "Transaction" : "Security"} PIN
+                Change Transaction PIN
               </RegularText>
             </View>
             <View className="flex-1">
               <View style={styles.inputContainer}>
-                <Label text="Current PIN" marked={false} />
+                <Label text="OTP" marked={false} />
                 <View className="justify-start items-start">
                   <OtpInput
-                    length={pinLength}
-                    value={formValues.currPin}
-                    onChange={(value) => handleInputChange(value, "currPin")}
-                    secureTextEntry
+                    length={otpLength}
+                    value={formValues.otp}
+                    onChange={(value) => handleInputChange(value, "otp")}
+                    secureTextEntry={false}
                     autoFocus={true}
                     disabled={isLoading}
                   />
                 </View>
               </View>
               <View style={styles.inputContainer}>
-                <Label text="New PIN" marked={false} />
+                <Label text="New Transaction PIN" marked={false} />
                 <View className="justify-start items-start">
                   <OtpInput
                     length={pinLength}
                     value={formValues.newPin}
                     onChange={(value) => handleInputChange(value, "newPin")}
-                    secureTextEntry
-                    autoFocus={false}
-                    disabled={isLoading}
-                  />
-                </View>
-              </View>
-              <View style={styles.inputContainer}>
-                <Label text="Confirm New PIN" marked={false} />
-                <View className="justify-start items-start">
-                  <OtpInput
-                    length={pinLength}
-                    value={formValues.confirmPin}
-                    onChange={(value) => handleInputChange(value, "confirmPin")}
                     secureTextEntry
                     autoFocus={false}
                     disabled={isLoading}
@@ -169,9 +152,8 @@ const ChangePinScreen: React.FC<{
               onPress={handleButtonClick}
               isLoading={isLoading}
               disabled={
-                formValues.currPin.some((digit) => !digit) ||
+                formValues.otp.some((digit) => !digit) ||
                 formValues.newPin.some((digit) => !digit) ||
-                formValues.confirmPin.some((digit) => !digit) ||
                 isLoading
               }
               style={{ marginTop: SPACING * 4 }}
