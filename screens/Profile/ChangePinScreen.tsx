@@ -21,6 +21,7 @@ import Label from "../../components/common/ui/forms/Label";
 import { services } from "@/services";
 import { Platform } from "react-native";
 import { AxiosError } from "axios";
+import BackButton from "@/components/common/ui/buttons/BackButton";
 
 // Define the expected error response structure from the API
 interface ErrorResponse {
@@ -29,7 +30,10 @@ interface ErrorResponse {
 
 // Define props type for the component
 interface ChangePinScreenProps {
-  navigation: NativeStackNavigationProp<{ ChangePin: { type: "transactionPin" } }, "ChangePin">;
+  navigation: NativeStackNavigationProp<
+    { ChangePin: { type: "transactionPin" } },
+    "ChangePin"
+  >;
 }
 
 // Define the form values type
@@ -88,7 +92,8 @@ const ChangePinScreen: React.FC<ChangePinScreenProps> = ({ navigation }) => {
       const errorMessage =
         axiosError.response?.data?.message instanceof Array
           ? axiosError.response.data.message[0]
-          : axiosError.response?.data?.message || "An unexpected error occurred";
+          : axiosError.response?.data?.message ||
+            "An unexpected error occurred";
       console.error("Failed to update transaction PIN:", errorMessage);
       handleShowFlash({
         message: errorMessage,
@@ -107,18 +112,13 @@ const ChangePinScreen: React.FC<ChangePinScreenProps> = ({ navigation }) => {
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={{ flex: 1 }}>
         <ScrollView>
+          <View style={styles.header}>
+            <BackButton navigation={navigation} />
+            <RegularText color="black" size="large" marginLeft={10}>
+              Change Transaction PIN
+            </RegularText>
+          </View>
           <View style={{ padding: 16, flex: 1 }}>
-            <View style={styles.header}>
-              <TouchableOpacity
-                onPress={() => navigation.goBack()}
-                style={styles.leftIcon}
-              >
-                <ArrowLeft color="#000" size={24} />
-              </TouchableOpacity>
-              <RegularText color="black" size="large">
-                Change Transaction PIN
-              </RegularText>
-            </View>
             <View className="flex-1">
               <View style={styles.inputContainer}>
                 <Label text="OTP" marked={false} />
@@ -172,8 +172,8 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
+    paddingHorizontal: SPACING,
     paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
-    paddingBottom: SPACING * 3,
   },
   leftIcon: {
     marginRight: SPACING,
