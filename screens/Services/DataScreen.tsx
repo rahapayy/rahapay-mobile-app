@@ -30,6 +30,7 @@ import { Beneficiary } from "@/services/modules/beneficiary";
 import Label from "@/components/common/ui/forms/Label";
 import BasicInput from "@/components/common/ui/forms/BasicInput";
 import PhoneNumberInput from "@/components/common/ui/forms/PhoneNumberInput";
+import BackButton from "@/components/common/ui/buttons/BackButton";
 
 interface DataScreenProps {
   navigation: NativeStackNavigationProp<any>;
@@ -297,12 +298,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.leftIcon}
-            >
-              <ArrowLeft color={"#000"} size={24} />
-            </TouchableOpacity>
+            <BackButton navigation={navigation} />
             <Text style={[styles.headerText]} allowFontScaling={false}>
               Buy Data Bundle
             </Text>
