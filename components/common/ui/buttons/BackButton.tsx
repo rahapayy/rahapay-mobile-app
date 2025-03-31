@@ -1,32 +1,29 @@
-import { TouchableOpacity, Text, View } from "react-native";
 import React from "react";
+import { TouchableOpacity, StyleSheet } from "react-native";
 import { ArrowLeft } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { COLORS } from "../../../../constants/ui";
 
-export default function BackButton({
-  color,
-  navigation,
-}: {
+// Define a generic type for the navigation prop
+interface BackButtonProps<StackParamList extends Record<string, object | undefined>> {
+  navigation: NativeStackNavigationProp<StackParamList>;
   color?: string;
-  navigation: NativeStackNavigationProp<any, "">;
-}) {
+}
+
+const BackButton = <StackParamList extends Record<string, object | undefined>>({
+  navigation,
+  color = "#000",
+}: BackButtonProps<StackParamList>) => {
   return (
-    <TouchableOpacity onPress={() => navigation.goBack()}>
-      <View
-        style={{
-          // padding: 4,
-          // backgroundColor: "#FFD9C7",
-          // width: 35,
-          // height: 35,
-          // justifyContent: "center",
-          // alignItems: "center",
-          // borderRadius: 10,
-        }}
-        // className="bg-violet-200"
-      >
-        <ArrowLeft color={color ?? COLORS.elementary.black} size={24} />
-      </View>
+    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.container}>
+      <ArrowLeft color={color} size={24} />
     </TouchableOpacity>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 8,
+  },
+});
+
+export default BackButton;

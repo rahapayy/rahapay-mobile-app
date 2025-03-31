@@ -9,9 +9,10 @@ import {
   Platform,
   Switch,
   FlatList,
+  Alert,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, TickCircle } from "iconsax-react-native";
+import { TickCircle } from "iconsax-react-native";
 import SPACING from "../../constants/SPACING";
 import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
@@ -21,21 +22,36 @@ import Mtn from "../../assets/svg/mtn.svg";
 import Eti from "../../assets/svg/eti.svg";
 import Glo from "../../assets/svg/glo.svg";
 import Button from "../../components/common/ui/buttons/Button";
+import BackButton from "@/components/common/ui/buttons/BackButton";
 import ComingSoon from "../../assets/svg/Coming Soon.svg";
 import { RegularText } from "@/components/common/Text";
-import CurrencyInput from "@/components/common/ui/forms/CurrencyInput";
-import BasicInput from "@/components/common/ui/forms/BasicInput";
 import Label from "@/components/common/ui/forms/Label";
+import CurrencyInput from "@/components/common/ui/forms/CurrencyInput";
+import PhoneNumberInput from "@/components/common/ui/forms/PhoneNumberInput";
 import { services } from "@/services";
 import { Beneficiary } from "@/services/modules/beneficiary";
 import { Skeleton } from "@rneui/base";
-import BackButton from "@/components/common/ui/buttons/BackButton";
-import PhoneNumberInput from "@/components/common/ui/forms/PhoneNumberInput";
+import * as Contacts from "expo-contacts";
 
-const AirtimeScreen: React.FC<{
-  navigation: NativeStackNavigationProp<any, "">;
-}> = ({ navigation }) => {
-  const [activeTab, setActiveTab] = useState("Local");
+interface AirtimeScreenProps {
+  navigation: NativeStackNavigationProp<
+    {
+      ReviewSummaryScreen: {
+        transactionType: string;
+        selectedOperator: string;
+        phoneNumber: string;
+        amount: number;
+        saveBeneficiary: boolean;
+      };
+    },
+    "ReviewSummaryScreen"
+  >;
+}
+
+const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
+  const [activeTab, setActiveTab] = useState<"Local" | "International">(
+    "Local"
+  );
   const [amount, setAmount] = useState("");
   const [selectedOperator, setSelectedOperator] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -83,7 +99,7 @@ const AirtimeScreen: React.FC<{
     const sanitizedAmount = parseFloat(amount);
 
     if (isNaN(sanitizedAmount) || sanitizedAmount <= 0) {
-      alert("Please enter a valid positive amount.");
+      Alert.alert("Invalid Amount", "Please enter a valid positive amount.");
       return;
     }
 
@@ -94,7 +110,6 @@ const AirtimeScreen: React.FC<{
       setAmountError(false);
     }
 
-    // Updated navigation to use the unified ReviewSummaryScreen with transactionType
     navigation.navigate("ReviewSummaryScreen", {
       transactionType: "airtime",
       selectedOperator,
@@ -158,6 +173,35 @@ const AirtimeScreen: React.FC<{
       }
     } else {
       detectOperator(beneficiary.number);
+    }
+  };
+
+  const handleContactPress = async () => {
+    const { status } = await Contacts.requestPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Denied",
+        "Please allow access to contacts to use this feature."
+      );
+      return;
+    }
+
+    const contact = await Contacts.presentContactPickerAsync();
+    if (contact) {
+      const selectedContact = contact;
+      const phoneNumber = selectedContact?.phoneNumbers?.[0]?.number;
+      if (phoneNumber) {
+        const cleanedNumber = phoneNumber
+          .replace(/[^0-9+]/g, "")
+          .replace(/^[+]?/, "");
+        setPhoneNumber(cleanedNumber);
+        detectOperator(cleanedNumber);
+      } else {
+        Alert.alert(
+          "No Phone Number",
+          "The selected contact has no phone number."
+        );
+      }
     }
   };
 
@@ -261,9 +305,9 @@ const AirtimeScreen: React.FC<{
         <View className="p-4">
           <View style={styles.header}>
             <BackButton navigation={navigation} />
-            <Text style={[styles.headerText]} allowFontScaling={false}>
+            <RegularText color="black" size="large">
               Airtime Top-up
-            </Text>
+            </RegularText>
           </View>
           <View className="">
             <View style={styles.tabsContainer}>
@@ -379,6 +423,7 @@ const AirtimeScreen: React.FC<{
                         detectOperator(text);
                       }}
                       countryCode={"+234"}
+                      onContactPress={handleContactPress}
                     />
                   </View>
 

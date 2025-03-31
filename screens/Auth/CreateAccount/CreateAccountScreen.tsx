@@ -233,6 +233,7 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                     formikProps.setFieldValue("phoneNumber", value)
                   }
                   countryCode={countryCode}
+                  contactIcon={false}
                 />
                 {formikProps.touched.phoneNumber &&
                   formikProps.errors.phoneNumber && (
