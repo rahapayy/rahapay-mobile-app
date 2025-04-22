@@ -1,37 +1,14 @@
-// services/modules/electricity.ts
 import { AxiosInstance } from "axios";
 import { IResponse } from "@/types/general";
-
-export interface Disco {
-  id: string;
-  name: string;
-}
-
-export interface ValidateElectricityPayload {
-  meterNumber: string;
-  meterId: string;
-  meterType: "PREPAID" | "POSTPAID";
-}
-
-export interface ValidateElectricityResponse {
-  name: string;
-  status: "success" | "failed";
-  msg: string;
-}
-
-export interface ElectricityPurchasePayload {
-  meterNumber: string;
-  amount: number;
-  discoId: string;
-  transactionPin: string;
-}
-
-export interface ElectricityPurchaseResponse {
-  status: "success" | "failed";
-  msg: string;
-  amount: number;
-  [key: string]: any; // Allow for additional fields
-}
+import {
+  Disco,
+  ValidateElectricityPayload,
+  ValidateElectricityResponse,
+  ElectricityPurchasePayload,
+  ElectricityPurchaseResponse,
+  ElectricityRequeryPayload,
+  ElectricityRequeryResponse,
+} from "../dtos/electricity";
 
 class ElectricityService {
   constructor(private readonly baseService: AxiosInstance) {}
@@ -55,6 +32,16 @@ class ElectricityService {
     payload: ElectricityPurchasePayload
   ): Promise<IResponse<ElectricityPurchaseResponse>> {
     const response = await this.baseService.post("/electricity", payload);
+    return response.data;
+  }
+
+  async requeryElectricity(
+    payload: ElectricityRequeryPayload
+  ): Promise<IResponse<ElectricityRequeryResponse>> {
+    const response = await this.baseService.post(
+      "/electricity/requery",
+      payload
+    );
     return response.data;
   }
 }

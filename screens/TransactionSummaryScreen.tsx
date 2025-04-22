@@ -6,10 +6,17 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Image,
 } from "react-native";
+import * as Clipboard from 'expo-clipboard';
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
-import { ArrowLeft, DocumentDownload, WalletAdd1 } from "iconsax-react-native";
+import {
+  ArrowLeft,
+  DocumentDownload,
+  WalletAdd1,
+  Copy,
+} from "iconsax-react-native";
 import SPACING from "../constants/SPACING";
 import FONT_SIZE from "../constants/font-size";
 import COLORS from "../constants/colors";
@@ -23,12 +30,14 @@ import { DownloadReceiptButton } from "@/components/DownloadReceipt";
 import Dstv from "../assets/svg/dstv.svg";
 import Gotv from "../assets/svg/gotv.svg";
 import Startimes from "../assets/svg/startimes.svg";
+import { handleShowFlash } from "@/components/FlashMessageComponent";
+import { MediumText } from "@/components/common/Text";
 
 type TransactionSummaryRouteParams = {
   transaction: {
     purpose: string;
     amount: number;
-    created_at: number;
+    created_at: number | string;
     status: string;
     tranxType: string;
     referenceId: string;
@@ -38,6 +47,15 @@ type TransactionSummaryRouteParams = {
       cableName?: string;
       smartCardNo?: string;
       planName?: string;
+      discoId?: string;
+      discoName?: string;
+      electricity?: string;
+      meterNumber?: string;
+      meterType?: "Prepaid" | "Postpaid";
+      electricity_token?: string;
+      electricity_units?: string;
+      customerName?: string;
+      customerAddress?: string;
     };
   };
 };
@@ -56,10 +74,60 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
 }) => {
   const { transaction } = route.params;
 
+  // Debug logging to inspect metadata
+  console.log("Transaction metadata:", transaction.metadata);
+
   const networkType = transaction.metadata?.networkType;
   const cableName = transaction.metadata?.cableName;
+  const discoId = transaction.metadata?.discoId;
 
-  const renderServiceIcon = (provider: string | undefined) => {
+ // Helper function to extract token numbers
+ const getDisplayToken = (token: string | undefined): string => {
+  if (!token || token === "Processing, check notifications later") {
+    return token || "N/A";
+  }
+  // Split on " : " and take the second part
+  const parts = token.split(" : ");
+  return parts[1] || token; // Return numbers or original token if no " : "
+};
+
+
+  const getDiscoIcon = (discoId: string | undefined) => {
+    if (!discoId) return null;
+    switch (discoId) {
+      case "abuja-electric":
+        return require("@/assets/images/electricity/abuja.jpeg");
+      case "aba-electric":
+        return require("@/assets/images/electricity/aba.png");
+      case "benin-electric":
+        return require("@/assets/images/electricity/benin.jpeg");
+      case "eko-electric":
+        return require("@/assets/images/electricity/eko.png");
+      case "enugu-electric":
+        return require("@/assets/images/electricity/enugu.png");
+      case "ibadan-electric":
+        return require("@/assets/images/electricity/ibadan.jpeg");
+      case "ikeja-electric":
+        return require("@/assets/images/electricity/ikeja.png");
+      case "jos-electric":
+        return require("@/assets/images/electricity/jos.jpeg");
+      case "kaduna-electric":
+        return require("@/assets/images/electricity/kaduna.png");
+      case "kano-electric":
+        return require("@/assets/images/electricity/kano.jpeg");
+      case "yola-electric":
+        return require("@/assets/images/electricity/yola.png");
+      case "portharcourt-electric":
+        return null;
+      default:
+        return null;
+    }
+  };
+
+  const renderServiceIcon = (
+    provider: string | undefined,
+    discoId: string | undefined
+  ) => {
     if (transaction.tranxType === "CABLE_SUBSCRIPTION" && cableName) {
       const cableLower = cableName.toLowerCase();
       switch (cableLower) {
@@ -67,15 +135,28 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
           return <Dstv width={70} height={70} />;
         case "gotv":
           return <Gotv width={70} height={70} />;
-        case "startime": // Assuming "STARTIME" from log should match "startimes"
+        case "startime":
           return <Startimes width={70} height={70} />;
         default:
           return null;
       }
     }
 
+    if (transaction.tranxType === "ELECTRICITY_PURCHASE" && discoId) {
+      const iconSource = getDiscoIcon(discoId);
+      return iconSource ? (
+        <Image
+          source={iconSource}
+          style={styles.discoIcon}
+          resizeMode="contain"
+        />
+      ) : (
+        <View style={styles.placeholderIcon} />
+      );
+    }
+
     if (!provider) return null;
-    
+
     const providerLower = provider.toLowerCase();
     switch (providerLower) {
       case "airtel":
@@ -91,6 +172,14 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
     }
   };
 
+  const copyToken = (token: string) => {
+    Clipboard.setStringAsync(token);
+    handleShowFlash({
+      message: "Token copied to clipboard",
+      type: "success",
+    });
+  };
+
   const renderTransactionDetails = () => {
     switch (transaction.tranxType) {
       case "WALLET_TRANSFER":
@@ -99,13 +188,13 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
             <View style={styles.row}>
               <Text style={styles.titleText}>Sender</Text>
               <Text style={styles.descriptionText}>
-                {transaction.metadata?.sender}
+                {transaction.metadata?.sender || "N/A"}
               </Text>
             </View>
             <View style={styles.row}>
               <Text style={styles.titleText}>Recipient</Text>
               <Text style={styles.descriptionText}>
-                {transaction.metadata?.recipient}
+                {transaction.metadata?.recipient || "N/A"}
               </Text>
             </View>
           </>
@@ -196,6 +285,43 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
             </View>
           </>
         );
+      case "ELECTRICITY_PURCHASE":
+        return (
+          <>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Provider</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.metadata?.electricity ||
+                  transaction.metadata?.discoName ||
+                  "N/A"}
+              </Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Meter Number</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.metadata?.meterNumber || "N/A"}
+              </Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Meter Type</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.metadata?.meterType || "N/A"}
+              </Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Customer Name</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.metadata?.customerName || "N/A"}
+              </Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.titleText}>Customer Address</Text>
+              <Text style={styles.descriptionText}>
+                {transaction.metadata?.customerAddress || "N/A"}
+              </Text>
+            </View>
+          </>
+        );
       default:
         return null;
     }
@@ -223,12 +349,49 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
                 <WalletAdd1 color={COLORS.violet400} size={40} />
               </View>
             ) : (
-              renderServiceIcon(networkType || cableName)
+              renderServiceIcon(networkType || cableName, discoId)
             )}
             <Text style={styles.itemText} allowFontScaling={false}>
               {transaction.tranxType.replace("_", " ")}
             </Text>
           </View>
+
+          {transaction.tranxType === "ELECTRICITY_PURCHASE" &&
+            transaction.metadata?.meterType === "Prepaid" && (
+              <View style={styles.tokenSection}>
+                <View style={styles.row}>
+                  <Text style={styles.titleText}>Token</Text>
+                  <View style={styles.tokenContainer}>
+                    <MediumText color="black">
+                      {transaction.metadata?.electricity_token ===
+                      "Processing, check notifications later"
+                        ? "Token processing, check notifications"
+                        : getDisplayToken(
+                            transaction.metadata?.electricity_token
+                          )}
+                    </MediumText>
+                    {transaction.metadata?.electricity_token &&
+                      transaction.metadata?.electricity_token !==
+                        "Processing, check notifications later" && (
+                        <TouchableOpacity
+                          onPress={() =>
+                            copyToken(transaction.metadata!.electricity_token!)
+                          }
+                          style={styles.copyButton}
+                        >
+                          <Copy size={16} color={COLORS.violet400} />
+                        </TouchableOpacity>
+                      )}
+                  </View>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.titleText}>Units</Text>
+                  <Text style={styles.descriptionText}>
+                    {transaction.metadata?.electricity_units || "N/A"}
+                  </Text>
+                </View>
+              </View>
+            )}
 
           <View className="p-4">
             <View style={styles.container}>
@@ -302,11 +465,21 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 70,
     height: 70,
-    borderRadius: 50,
+    borderRadius: 35,
     marginRight: 10,
     backgroundColor: COLORS.violet100,
     justifyContent: "center",
     alignItems: "center",
+  },
+  discoIcon: {
+    width: 70,
+    height: 70,
+  },
+  placeholderIcon: {
+    width: 70,
+    height: 70,
+    backgroundColor: COLORS.grey200,
+    borderRadius: 35,
   },
   itemText: {
     fontSize: FONT_SIZE.medium,
@@ -318,7 +491,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING,
     paddingVertical: SPACING,
     borderRadius: SPACING,
-    marginTop: SPACING * 4,
+    marginTop: SPACING,
   },
   titleText: {
     fontFamily: "Outfit-Regular",
@@ -344,5 +517,21 @@ const styles = StyleSheet.create({
   completedText: {
     fontFamily: "Outfit-Regular",
     color: "#06C270",
+  },
+  tokenContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  copyButton: {
+    marginLeft: SPACING,
+    padding: SPACING / 2,
+  },
+  tokenSection: {
+    paddingHorizontal: SPACING * 2,
+    paddingVertical: SPACING,
+    backgroundColor: COLORS.white,
+    borderRadius: SPACING,
+    marginHorizontal: SPACING * 1.5,
+    marginTop: SPACING,
   },
 });

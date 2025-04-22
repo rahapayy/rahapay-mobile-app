@@ -69,17 +69,30 @@ export type AppStackParamList = {
   TransactionHistoryScreen: undefined;
   TransactionSummaryScreen: {
     transaction: {
-      network: string;
-      phone_number: string;
-      transid: ReactNode;
-      metadata: any;
       purpose: string;
       amount: number;
-      created_at: number;
+      created_at: number | string;
       status: string;
       tranxType: string;
       referenceId: string;
-      paymentMethod: string;
+      metadata?: {
+        networkType?: string; // For AIRTIME_PURCHASE, DATA_PURCHASE (e.g., "MTN", "Airtel")
+        phoneNumber?: string; // For AIRTIME_PURCHASE, DATA_PURCHASE, ELECTRICITY_PURCHASE
+        cableName?: string; // For CABLE_SUBSCRIPTION (e.g., "DSTV", "GOTV")
+        smartCardNo?: string; // For CABLE_SUBSCRIPTION
+        planName?: string; // For DATA_PURCHASE, CABLE_SUBSCRIPTION
+        sender?: string; // For WALLET_TRANSFER
+        recipient?: string; // For WALLET_TRANSFER
+        discoId?: string; // For ELECTRICITY_PURCHASE (e.g., "eko-electric")
+        discoName?: string; // For ELECTRICITY_PURCHASE (e.g., "Eko (EKEDC)")
+        electricity?: string; // Temporary fallback for discoName (e.g., "Jos (JED)")
+        meterNumber?: string; // For ELECTRICITY_PURCHASE
+        meterType?: "Prepaid" | "Postpaid"; // For ELECTRICITY_PURCHASE
+        electricity_token?: string; // For ELECTRICITY_PURCHASE (Prepaid only)
+        electricity_units?: string; // For ELECTRICITY_PURCHASE (Prepaid only)
+        customerName?: string; // For ELECTRICITY_PURCHASE
+        customerAddress?: string; // For ELECTRICITY_PURCHASE
+      };
     };
   };
   FundWalletScreen: undefined;
@@ -100,6 +113,12 @@ export type AppStackParamList = {
   ReviewSummaryScreen: ReviewSummaryParams;
   TransactionStatusScreen: {
     status: "pending" | "failed" | "success" | "successful"; // Added "successful" for education case
+    transactionType?: string;
+    transactionDetails?: {
+      electricity_token?: string;
+      electricity_units?: string;
+    };
+    errorMessage?: string;
   };
   CustomerCareScreen: undefined;
   CableServiceDetailsScreen: undefined;

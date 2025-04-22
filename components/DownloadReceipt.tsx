@@ -91,6 +91,15 @@ const generateReceiptHTML = (transaction: Transaction): string => {
   `;
 };
 
+// Helper function to extract token numbers
+const getDisplayToken = (token: string | undefined): string => {
+  if (!token || token === "Processing, check notifications later") {
+    return token || "N/A";
+  }
+  const parts = token.split(" : ");
+  return parts[1] || token; // Return numbers or original token if no " : "
+};
+
 // Helper function to generate transaction-specific details in HTML
 const generateTransactionSpecificDetailsHTML = (
   transaction: Transaction
@@ -134,6 +143,78 @@ const generateTransactionSpecificDetailsHTML = (
           <span class="value">${transaction.purpose || "Unknown Source"}</span>
         </div>
       `;
+    case "CABLE_SUBSCRIPTION":
+      return `
+        <div class="details-row">
+          <span class="label">Provider</span>
+          <span class="value">${transaction.metadata?.cableName || "N/A"}</span>
+        </div>
+        <div class="details-row">
+          <span class="label">Smart Card Number</span>
+          <span class="value">${transaction.metadata?.smartCardNo || "N/A"}</span>
+        </div>
+        <div class="details-row">
+          <span class="label">Plan</span>
+          <span class="value">${transaction.metadata?.planName || "N/A"}</span>
+        </div>
+        <div class="details-row">
+          <span class="label">Paid with</span>
+          <span class="value">${transaction.purpose || "N/A"}</span>
+        </div>
+      `;
+    case "ELECTRICITY_PURCHASE":
+      return `
+        <div class="details-row">
+          <span class="label">Provider</span>
+          <span class="value">${
+            transaction.metadata?.electricity ||
+            transaction.metadata?.discoName ||
+            "N/A"
+          }</span>
+        </div>
+        <div class="details-row">
+          <span class="label">Meter Number</span>
+          <span class="value">${
+            transaction.metadata?.meterNumber || "N/A"
+          }</span>
+        </div>
+        <div class="details-row">
+          <span class="label">Meter Type</span>
+          <span class="value">${
+            transaction.metadata?.meterType || "N/A"
+          }</span>
+        </div>
+        <div class="details-row">
+          <span class="label">Customer Name</span>
+          <span class="value">${
+            transaction.metadata?.customerName || "N/A"
+          }</span>
+        </div>
+        <div class="details-row">
+          <span class="label">Customer Address</span>
+          <span class="value">${
+            transaction.metadata?.customerAddress || "N/A"
+          }</span>
+        </div>
+        ${
+          transaction.metadata?.meterType === "Prepaid"
+            ? `
+              <div class="details-row">
+                <span class="label">Token</span>
+                <span class="value">${getDisplayToken(
+                  transaction.metadata?.electricity_token
+                )}</span>
+              </div>
+              <div class="details-row">
+                <span class="label">Units</span>
+                <span class="value">${
+                  transaction.metadata?.electricity_units || "N/A"
+                }</span>
+              </div>
+            `
+            : ""
+        }
+      `;
     default:
       return `
         <div class="details-row">
@@ -148,13 +229,12 @@ const generateTransactionSpecificDetailsHTML = (
 const getStatusColors = (status: string) => {
   switch (status.toLowerCase()) {
     case "success":
-    case "successful": // Combine both cases since they represent the same state
+    case "successful":
       return {
         titleColor: "#222",
-        amountColor: "#0A5C3E", // Very dark green for the amount
-        statusColor: "#0A3D1F", // Even darker green for the status text
+        amountColor: "#0A5C3E",
+        statusColor: "#0A3D1F",
       };
-
     case "failed":
       return {
         titleColor: "#333",
@@ -240,8 +320,6 @@ const saveAsPDF = async (transaction: Transaction): Promise<void> => {
 // Function to save the receipt as an image (placeholder for now)
 const saveAsImage = async (transaction: Transaction): Promise<void> => {
   try {
-    // Since Expo doesn't natively support HTML-to-image conversion,
-    // this is a placeholder. In a real app, you might use a WebView with react-native-view-shot.
     Alert.alert(
       "Image Saving Not Supported",
       "Saving as an image is not directly supported in this app yet. Please save as PDF instead.",

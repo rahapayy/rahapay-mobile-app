@@ -9,8 +9,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#5136C1",
-      "preventAutoHide": true
+      "backgroundColor": "#5136C1"
     },
     "updates": {
       "enabled": true,
@@ -74,6 +73,14 @@
         "expo-contacts",
         {
           "contactsPermission": "Allow $(PRODUCT_NAME) to access your contacts."
+        }
+      ],
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "rahapay",
+          "organization": "voltcore-technologies"
         }
       ]
     ],

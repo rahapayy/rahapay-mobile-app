@@ -12,6 +12,7 @@ import {
   GLOBAL_PADDING_HORIZONTAL,
 } from "../constants/ui";
 import SPACING from "@/constants/SPACING";
+import Button from "@/components/common/ui/buttons/Button";
 
 const HomeScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;

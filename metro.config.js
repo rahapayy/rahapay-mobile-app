@@ -1,8 +1,10 @@
-const { getDefaultConfig } = require("expo/metro-config");
 const { withNativeWind } = require('nativewind/metro');
+const {
+  getSentryExpoConfig
+} = require("@sentry/react-native/metro");
 
 module.exports = (() => {
-  const config = getDefaultConfig(__dirname, { isCSSEnabled: true });
+  const config = getSentryExpoConfig(__dirname, { isCSSEnabled: true });
 
   const { transformer, resolver } = config;
 

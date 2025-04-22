@@ -1,4 +1,11 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Clipboard,
+} from "react-native";
 import React from "react";
 import COLORS from "../constants/colors";
 import SPACING from "../constants/SPACING";
@@ -7,9 +14,10 @@ import * as Animatable from "react-native-animatable";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import Button from "../components/common/ui/buttons/Button";
-import { ReceiptText, Timer, Warning2 } from "iconsax-react-native";
+import { ReceiptText, Timer, Warning2, Copy } from "iconsax-react-native";
 import { AppStackParamList } from "../types/RootStackParams";
 import useWallet from "@/hooks/use-wallet";
+import { handleShowFlash } from "@/components/FlashMessageComponent";
 
 type TransactionStatusScreenNavigationProp = NativeStackNavigationProp<
   AppStackParamList,
@@ -18,7 +26,20 @@ type TransactionStatusScreenNavigationProp = NativeStackNavigationProp<
 type TransactionStatusScreenRouteProp = RouteProp<
   AppStackParamList,
   "TransactionStatusScreen"
->;
+> & {
+  params: {
+    status: "success" | "failed" | "pending" | "successful";
+    tranxType?: string;
+    token?: string;
+    meterType?: string;
+    transactionType?: string;
+    transactionDetails?: {
+      electricity_token?: string;
+      electricity_units?: string;
+    };
+    errorMessage?: string;
+  };
+};
 
 type Props = {
   navigation: TransactionStatusScreenNavigationProp;
@@ -26,15 +47,24 @@ type Props = {
 };
 
 const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { status } = route.params;
-
-  const { refreshAll } = useWallet(); // Access the refresh function
+  const { status, tranxType, token, meterType } = route.params;
+  const { refreshAll } = useWallet();
 
   const handleDone = () => {
     if (status === "success") {
-      refreshAll(); // Refresh user balance after successful transaction
+      refreshAll();
     }
     navigation.navigate("HomeScreen");
+  };
+
+  const copyToken = () => {
+    if (token) {
+      Clipboard.setString(token);
+      handleShowFlash({
+        message: "Token copied to clipboard",
+        type: "success",
+      });
+    }
   };
 
   const getStatusProps = () => {
@@ -94,6 +124,25 @@ const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
             <Text style={styles.subText} allowFontScaling={false}>
               {subText}
             </Text>
+            {status === "success" &&
+              tranxType === "ELECTRICITY_PURCHASE" &&
+              meterType === "Prepaid" &&
+              token && (
+                <View style={styles.tokenContainer}>
+                  <Text style={styles.tokenText} allowFontScaling={false}>
+                    Token: {token}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={copyToken}
+                    style={styles.copyButton}
+                  >
+                    <Copy size={20} color={COLORS.violet400} />
+                    <Text style={styles.copyText} allowFontScaling={false}>
+                      Copy
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
           </View>
         </View>
 
@@ -148,19 +197,39 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: "#ADADAD",
     fontSize: RFValue(14),
+    marginTop: SPACING,
+  },
+  tokenContainer: {
+    marginTop: SPACING * 2,
+    alignItems: "center",
+    backgroundColor: COLORS.violet100,
+    padding: SPACING,
+    borderRadius: 10,
+  },
+  tokenText: {
+    fontFamily: "Outfit-Medium",
+    fontSize: RFValue(14),
+    color: COLORS.black400,
+    marginBottom: SPACING,
+  },
+  copyButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.violet400,
+    paddingVertical: SPACING / 2,
+    paddingHorizontal: SPACING,
+    borderRadius: 5,
+  },
+  copyText: {
+    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(12),
+    color: COLORS.white,
+    marginLeft: SPACING / 2,
   },
   buttonContainer: {
     width: "100%",
     justifyContent: "flex-end",
     gap: 10,
-  },
-  inactiveButton: {
-    backgroundColor: COLORS.violet200,
-    marginTop: SPACING,
-  },
-  viewReciptText: {
-    fontFamily: "Outfit-Medium",
-    color: COLORS.violet300,
   },
 });
 

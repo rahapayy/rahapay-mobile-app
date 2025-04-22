@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { StatusBar } from "react-native";
 import { createTheme, ThemeProvider } from "@rneui/themed";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -13,6 +13,22 @@ import { AuthProvider } from "./services/AuthContext";
 import { NavigationContainer } from "@react-navigation/native";
 import "./global.css";
 import { LockProvider } from "./context/LockContext";
+import * as Sentry from "@sentry/react-native";
+
+// Prevent auto hiding of splash screen
+SplashScreen.preventAutoHideAsync();
+
+Sentry.init({
+  dsn: "https://b6d56a13d87e9557b6e7b3c7b14ee515@o4508189082648576.ingest.de.sentry.io/4509181912678480",
+
+  // Configure Session Replay
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [Sentry.mobileReplayIntegration()],
+
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // spotlight: __DEV__,
+});
 
 const queryClient = new QueryClient();
 
@@ -21,7 +37,7 @@ const theme = createTheme({
   darkColors: {},
 });
 
-export default function App() {
+export default Sentry.wrap(function App() {
   const [fontsLoaded, fontError] = useFonts({
     "Outfit-Black": require("./assets/fonts/Outfit-Black.ttf"),
     "Outfit-Bold": require("./assets/fonts/Outfit-Bold.ttf"),
@@ -34,9 +50,9 @@ export default function App() {
     "Outfit-Thin": require("./assets/fonts/Outfit-Thin.ttf"),
   });
 
-  const onLayoutRootView = useCallback(async () => {
+  useEffect(() => {
     if (fontsLoaded || fontError) {
-      await SplashScreen.hideAsync();
+      SplashScreen.hideAsync();
     }
   }, [fontsLoaded, fontError]);
 
@@ -47,7 +63,7 @@ export default function App() {
   return (
     <AuthProvider>
       <ThemeProvider theme={theme}>
-        <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
           <QueryClientProvider client={queryClient}>
             <NotificationProvider>
               <LockProvider>
@@ -67,4 +83,4 @@ export default function App() {
       </ThemeProvider>
     </AuthProvider>
   );
-}
+});

@@ -1,4 +1,3 @@
-// ReviewSummaryScreen.tsx
 import React, { useState } from "react";
 import {
   Platform,
@@ -8,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Image,
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ArrowLeft } from "iconsax-react-native";
@@ -41,7 +41,8 @@ const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
   const { title, icon } = getTransactionDetails(transactionType, params);
   const summaryItems = getSummaryItems(transactionType, params);
 
-  const handleSwipeConfirm = (reset: () => void) => {
+  const handleSwipeConfirm = () => {
+    setIsLoading(true);
     navigation.navigate("TransactionPinScreen", {
       transactionType,
       params,
@@ -101,7 +102,7 @@ const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
               onPress={handleSwipeConfirm}
               textColor="white"
               title="Proceed"
-              disabled={isLoading} // Disable swipe button while loading
+              disabled={isLoading}
             />
           </View>
         </View>
@@ -182,10 +183,89 @@ function getTransactionDetails(
       const electricityParams = params as {
         selectedService: string;
         meterType: string;
+        discoId: string;
+      };
+      const getDiscoIcon = () => {
+        switch (electricityParams.discoId) {
+          case "abuja-electric":
+            return (
+              <Image
+                source={require("@/assets/images/electricity/abuja.jpeg")}
+                style={styles.discoIcon}
+                resizeMode="contain"
+              />
+            );
+          case "benin-electric":
+            return (
+              <Image
+                source={require("@/assets/images/electricity/benin.jpeg")}
+                style={styles.discoIcon}
+                resizeMode="contain"
+              />
+            );
+          case "eko-electric":
+            return (
+              <Image
+                source={require("@/assets/images/electricity/eko.png")}
+                style={styles.discoIcon}
+                resizeMode="contain"
+              />
+            );
+          case "enugu-electric":
+            return (
+              <Image
+                source={require("@/assets/images/electricity/enugu.png")}
+                style={styles.discoIcon}
+                resizeMode="contain"
+              />
+            );
+          case "ibadan-electric":
+            return (
+              <Image
+                source={require("@/assets/images/electricity/ibadan.jpeg")}
+                style={styles.discoIcon}
+                resizeMode="contain"
+              />
+            );
+          case "ikeja-electric":
+            return (
+              <Image
+                source={require("@/assets/images/electricity/ikeja.png")}
+                style={styles.discoIcon}
+                resizeMode="contain"
+              />
+            );
+          case "jos-electric":
+            return (
+              <Image
+                source={require("@/assets/images/electricity/jos.jpeg")}
+                style={styles.discoIcon}
+                resizeMode="contain"
+              />
+            );
+          case "kaduna-electric":
+            return (
+              <Image
+                source={require("@/assets/images/electricity/kaduna.png")}
+                style={styles.discoIcon}
+                resizeMode="contain"
+              />
+            );
+          case "yola-electric":
+            return (
+              <Image
+                source={require("@/assets/images/electricity/yola.png")}
+                style={styles.discoIcon}
+                resizeMode="contain"
+              />
+            );
+          default:
+            return null;
+        }
       };
       return {
         title: `${electricityParams.selectedService} Bill (${electricityParams.meterType})`,
-        icon: null,
+        icon: getDiscoIcon(),
       };
     default:
       return { title: "UNKNOWN TRANSACTION", icon: null };
@@ -201,7 +281,7 @@ function getSummaryItems(
     case "airtime":
       const airtimeParams = params as { amount: number; phoneNumber: string };
       return [
-        { label: "Amount", value: `₦ ${airtimeParams.amount}` },
+        { label: "Amount", value: `₦${airtimeParams.amount}` },
         { label: "Recipient", value: airtimeParams.phoneNumber },
         { label: "Date", value: date },
       ];
@@ -225,7 +305,7 @@ function getSummaryItems(
         phoneNumber: string;
       };
       return [
-        { label: "Amount", value: `₦ ${dataParams.selectedPlan.amount}` },
+        { label: "Amount", value: `₦${dataParams.selectedPlan.amount}` },
         {
           label: "Package",
           value: `${dataParams.selectedPlan.plan} - ${dataParams.selectedPlan.days}`,
@@ -251,17 +331,21 @@ function getSummaryItems(
       const electricityParams = params as {
         amount: string;
         meterNumber: string;
+        phoneNumber: string;
         customerName: string;
+        customerAddress: string;
         selectedService: string;
         meterType: string;
       };
       return [
         { label: "Amount", value: `₦${electricityParams.amount}` },
         { label: "Meter Number", value: electricityParams.meterNumber },
+        // { label: "Phone Number", value: electricityParams.phoneNumber },
         { label: "Account Name", value: electricityParams.customerName },
+        { label: "Address", value: electricityParams.customerAddress },
         { label: "Disco", value: electricityParams.selectedService },
-        { label: "Meter Type", value: electricityParams.meterType },
-        { label: "Date", value: date },
+        // { label: "Meter Type", value: electricityParams.meterType },
+        // { label: "Date", value: date },
       ];
     default:
       return [{ label: "Error", value: "Unknown transaction type" }];
@@ -337,10 +421,8 @@ const styles = StyleSheet.create({
   swipeButtonContainer: {
     marginTop: SPACING * 5,
   },
-  loaderOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
-    justifyContent: "center",
-    alignItems: "center",
+  discoIcon: {
+    width: 100,
+    height: 100,
   },
 });

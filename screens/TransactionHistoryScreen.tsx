@@ -8,6 +8,7 @@ import {
   View,
   SectionList,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { ArrowLeft, WalletAdd1 } from "iconsax-react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -107,7 +108,8 @@ const AllTransactionsScreen: React.FC<{
   const renderServiceIcon = (
     provider: string | undefined,
     tranxType: string,
-    cableName?: string
+    cableName?: string,
+    discoId?: string
   ) => {
     if (tranxType === "WALLET_FUNDING") {
       return <WalletAdd1 size={24} color={COLORS.violet400} />;
@@ -120,23 +122,72 @@ const AllTransactionsScreen: React.FC<{
           return <Dstv width={40} height={40} />;
         case "gotv":
           return <Gotv width={40} height={40} />;
-        case "startime": // Matches your log data
+        case "startime":
           return <Startimes width={40} height={40} />;
         default:
           return null;
       }
     }
 
+    if (tranxType === "ELECTRICITY_PURCHASE" && discoId) {
+      const iconSource = getDiscoIcon(discoId);
+      return iconSource ? (
+        <Image
+          source={iconSource}
+          style={styles.discoIcon}
+          resizeMode="contain"
+        />
+      ) : (
+        <View style={styles.placeholderIcon} />
+      );
+    }
+
     if (!provider) return null;
 
-    if (provider?.toLowerCase() === "airtel") {
-      return <Airtel width={40} height={40} />;
-    } else if (provider?.toLowerCase() === "mtn") {
-      return <Mtn width={40} height={40} />;
-    } else if (provider?.toLowerCase() === "9mobile") {
-      return <Eti width={40} height={40} />;
-    } else if (provider?.toLowerCase() === "glo") {
-      return <Glo width={40} height={40} />;
+    const providerLower = provider.toLowerCase();
+    switch (providerLower) {
+      case "airtel":
+        return <Airtel width={40} height={40} />;
+      case "mtn":
+        return <Mtn width={40} height={40} />;
+      case "9mobile":
+        return <Eti width={40} height={40} />;
+      case "glo":
+        return <Glo width={40} height={40} />;
+      default:
+        return null;
+    }
+  };
+
+  const getDiscoIcon = (discoId: string | undefined) => {
+    if (!discoId) return null;
+    switch (discoId) {
+      case "abuja-electric":
+        return require("@/assets/images/electricity/abuja.jpeg");
+      case "aba-electric":
+        return require("@/assets/images/electricity/aba.png");
+      case "benin-electric":
+        return require("@/assets/images/electricity/benin.jpeg");
+      case "eko-electric":
+        return require("@/assets/images/electricity/eko.png");
+      case "enugu-electric":
+        return require("@/assets/images/electricity/enugu.png");
+      case "ibadan-electric":
+        return require("@/assets/images/electricity/ibadan.jpeg");
+      case "ikeja-electric":
+        return require("@/assets/images/electricity/ikeja.png");
+      case "jos-electric":
+        return require("@/assets/images/electricity/jos.jpeg");
+      case "kaduna-electric":
+        return require("@/assets/images/electricity/kaduna.png");
+      case "kano-electric":
+        return require("@/assets/images/electricity/kano.jpeg");
+      case "yola-electric":
+        return require("@/assets/images/electricity/yola.png");
+      case "portharcourt-electric":
+        return null;
+      default:
+        return null;
     }
   };
 
@@ -192,7 +243,12 @@ const AllTransactionsScreen: React.FC<{
         style={styles.transactionItem}
       >
         <View style={styles.iconContainer}>
-          {renderServiceIcon(networkType, item.transactionType, cableName)}
+          {renderServiceIcon(
+            networkType,
+            item.transactionType,
+            cableName,
+            item.metadata?.discoId
+          )}
         </View>
         <View style={styles.transactionTextContainer}>
           <View style={styles.transactionTextRow}>
@@ -479,6 +535,17 @@ const styles = StyleSheet.create({
   notransactionText: {
     fontFamily: "Outfit-Regular",
     fontSize: RFValue(14),
+  },
+  discoIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  placeholderIcon: {
+    width: 40,
+    height: 40,
+    backgroundColor: COLORS.grey200,
+    borderRadius: 20,
   },
 });
 

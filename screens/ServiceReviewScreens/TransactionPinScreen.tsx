@@ -17,7 +17,6 @@ import { services } from "@/services";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { AxiosError } from "axios";
 import { DataPurchasePayload } from "@/services/modules/data";
-import { handleError } from "@/services/handleError";
 
 type TransactionPinScreenProps = NativeStackScreenProps<
   AppStackParamList,
@@ -97,16 +96,27 @@ const TransactionPinScreen: React.FC<TransactionPinScreenProps> = ({
           break;
 
         case "electricity":
-          const electricityParams = params as {
+          const electricityParams = params as unknown as {
             meterNumber: string;
+            phoneNumber: string;
             amount: string;
-            id: string;
+            selectedService: string;
+            meterType: "Prepaid" | "Postpaid";
+            discoId: string;
+            customerName: string;
+            customerAddress: string;
+            userId: string;
             saveBeneficiary?: boolean;
           };
           const electricityPayload = {
             meterNumber: electricityParams.meterNumber,
+            phoneNumber: electricityParams.phoneNumber,
             amount: parseFloat(electricityParams.amount),
-            discoId: electricityParams.id,
+            discoId: electricityParams.discoId,
+            meterType: electricityParams.meterType,
+            customerName: electricityParams.customerName,
+            customerAddress: electricityParams.customerAddress,
+            userId: electricityParams.userId,
             saveBeneficiary: electricityParams.saveBeneficiary || false,
             transactionPin: pin,
           };
@@ -123,36 +133,50 @@ const TransactionPinScreen: React.FC<TransactionPinScreenProps> = ({
             quantity: number;
             phoneNumber: string;
           };
-          // Add education-specific logic here if applicable
-          throw new Error("Education transaction not implemented"); // Placeholder
+          throw new Error("Education transaction not implemented");
           break;
 
         default:
           throw new Error("Unknown transaction type");
       }
 
-      const status =
-        response.status === "success" || response.data?.success
-          ? "success"
-          : "failed";
-      navigation.navigate("TransactionStatusScreen", { status });
+      const status = response.status === "success" ? "success" : "failed";
+      navigation.navigate("TransactionStatusScreen", {
+        status,
+        transactionType,
+        transactionDetails:
+          transactionType === "electricity" &&
+          response.data &&
+          "token" in response.data
+            ? {
+                token: (
+                  response.data as unknown as { token: string; units: string }
+                ).token,
+                units: (
+                  response.data as unknown as { token: string; units: string }
+                ).units,
+              }
+            : undefined,
+      });
     } catch (error: any) {
-      // Log the error for debugging
       console.error(`Error during ${transactionType} transaction:`, {
         message: error.message,
         response: error.response?.data,
         status: error.response?.status,
       });
 
-      // Extract the specific server error message
       const errorMessage =
         error.response?.data?.message || "An unexpected error occurred";
-
-      // Show flash message with the specific error message
       handleShowFlash({
         type: "danger",
         message: errorMessage,
       });
+
+      // Navigate to TransactionStatusScreen with failed status for user feedback
+      // navigation.navigate("TransactionStatusScreen", {
+      //   status: "failed",
+      //   errorMessage,
+      // });
     } finally {
       setIsLoading(false);
     }

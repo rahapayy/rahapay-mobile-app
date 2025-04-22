@@ -5,6 +5,7 @@ import {
   View,
   StyleSheet,
   Platform,
+  Image,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import LottieView from "lottie-react-native";
@@ -23,7 +24,6 @@ import Dstv from "../assets/svg/dstv.svg";
 import Gotv from "../assets/svg/gotv.svg";
 import Startimes from "../assets/svg/startimes.svg";
 
-// Define the Transaction interface
 interface Transaction {
   _id: string;
   paidOn: string | number | Date;
@@ -36,6 +36,7 @@ interface Transaction {
     networkType?: string;
     phoneNumber?: string;
     cableName?: string;
+    discoId?: string;
   };
 }
 
@@ -67,10 +68,43 @@ const RecentServiceTransaction: React.FC<{
     setHasTransaction(transactions.length > 0);
   }, [transactions]);
 
+  const getDiscoIcon = (discoId: string | undefined) => {
+    if (!discoId) return null;
+    switch (discoId) {
+      case "abuja-electric":
+        return require("@/assets/images/electricity/abuja.jpeg");
+      case "aba-electric":
+        return require("@/assets/images/electricity/aba.png");
+      case "benin-electric":
+        return require("@/assets/images/electricity/benin.jpeg");
+      case "eko-electric":
+        return require("@/assets/images/electricity/eko.png");
+      case "enugu-electric":
+        return require("@/assets/images/electricity/enugu.png");
+      case "ibadan-electric":
+        return require("@/assets/images/electricity/ibadan.jpeg");
+      case "ikeja-electric":
+        return require("@/assets/images/electricity/ikeja.png");
+      case "jos-electric":
+        return require("@/assets/images/electricity/jos.jpeg");
+      case "kaduna-electric":
+        return require("@/assets/images/electricity/kaduna.png");
+      case "kano-electric":
+        return require("@/assets/images/electricity/kano.jpeg");
+      case "yola-electric":
+        return require("@/assets/images/electricity/yola.png");
+      case "portharcourt-electric":
+        return null;
+      default:
+        return null;
+    }
+  };
+
   const renderServiceIcon = (
     provider: string | undefined,
     tranxType: string,
-    cableName?: string
+    cableName?: string,
+    discoId?: string
   ) => {
     if (tranxType === "WALLET_FUNDING") {
       return <WalletAdd1 size={24} color={COLORS.violet400} />;
@@ -83,23 +117,40 @@ const RecentServiceTransaction: React.FC<{
           return <Dstv width={40} height={40} />;
         case "gotv":
           return <Gotv width={40} height={40} />;
-        case "startime": // Matches your log data
+        case "startime":
           return <Startimes width={40} height={40} />;
         default:
           return null;
       }
     }
 
+    if (tranxType === "ELECTRICITY_PURCHASE" && discoId) {
+      const iconSource = getDiscoIcon(discoId);
+      return iconSource ? (
+        <Image
+          source={iconSource}
+          style={styles.discoIcon}
+          resizeMode="contain"
+        />
+      ) : (
+        <View style={styles.placeholderIcon} />
+      );
+    }
+
     if (!provider) return null;
 
-    if (provider?.toLowerCase() === "airtel") {
-      return <Airtel width={40} height={40} />;
-    } else if (provider?.toLowerCase() === "mtn") {
-      return <Mtn width={40} height={40} />;
-    } else if (provider?.toLowerCase() === "9mobile") {
-      return <Eti width={40} height={40} />;
-    } else if (provider?.toLowerCase() === "glo") {
-      return <Glo width={40} height={40} />;
+    const providerLower = provider.toLowerCase();
+    switch (providerLower) {
+      case "airtel":
+        return <Airtel width={40} height={40} />;
+      case "mtn":
+        return <Mtn width={40} height={40} />;
+      case "9mobile":
+        return <Eti width={40} height={40} />;
+      case "glo":
+        return <Glo width={40} height={40} />;
+      default:
+        return null;
     }
   };
 
@@ -198,6 +249,7 @@ const RecentServiceTransaction: React.FC<{
         networkType: transaction.metadata?.networkType,
         phoneNumber: transaction.metadata?.phoneNumber,
         cableName: transaction.metadata?.cableName,
+        discoId: transaction.metadata?.discoId,
       },
     };
   };
@@ -221,7 +273,7 @@ const RecentServiceTransaction: React.FC<{
           : isLoading
           ? renderLoadingSkeleton()
           : hasTransaction
-          ? recentTransactions.map((transaction) => {
+          ? recentTransactions.map((transaction: Transaction) => {
               const formattedTime = new Date(
                 transaction.paidOn
               ).toLocaleTimeString("en-US", {
@@ -231,6 +283,7 @@ const RecentServiceTransaction: React.FC<{
 
               const networkType = transaction.metadata?.networkType;
               const cableName = transaction.metadata?.cableName;
+              const discoId = transaction.metadata?.discoId;
 
               return (
                 <TouchableOpacity
@@ -246,7 +299,8 @@ const RecentServiceTransaction: React.FC<{
                     {renderServiceIcon(
                       networkType,
                       transaction.transactionType,
-                      cableName
+                      cableName,
+                      discoId
                     )}
                   </View>
                   <View style={styles.transactionTextContainer}>
@@ -339,6 +393,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 10,
     backgroundColor: "#F7F9FC",
+  },
+  discoIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  placeholderIcon: {
+    width: 40,
+    height: 40,
+    backgroundColor: COLORS.grey200,
+    borderRadius: 20,
   },
   transactionItem: {
     flexDirection: "row",

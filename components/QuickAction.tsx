@@ -40,7 +40,7 @@ const QuickAction: React.FC<{
     {
       icon: ElectricityIcon,
       title: "Electricity",
-      isComingSoon: true,
+      navigateTo: "ElectricityScreen"
     },
   ];
   // const actionItems = [
