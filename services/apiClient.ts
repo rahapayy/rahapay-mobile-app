@@ -9,6 +9,10 @@ import BeneficiaryService from "./modules/beneficiary";
 import CableService from "./modules/cable";
 import ElectricityService from "./modules/electricity";
 
+interface CustomAxiosRequestConfig extends AxiosRequestConfig {
+  _retry?: boolean;
+}
+
 export const axiosInstance = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
   withCredentials: true,
@@ -47,7 +51,52 @@ axiosInstance.interceptors.response.use(
   },
   async (error) => {
     const status = error.response ? error.response.status : null;
-    const originalRequest: AxiosRequestConfig = error.config;
+    const originalRequest = error.config as CustomAxiosRequestConfig;
+
+    // Don't retry if the request has already been retried
+    if (originalRequest._retry) {
+      return Promise.reject(error);
+    }
+
+    // Handle 401 errors without automatically logging out
+    if (status === 401) {
+      if (!isRefreshing) {
+        isRefreshing = true;
+        try {
+          const refreshTokenFromStorage =
+            (await getItem("REFRESH_TOKEN", true)) ?? "";
+          const accessTokenFromStorage =
+            (await getItem("ACCESS_TOKEN", true)) ?? "";
+
+          const { accessToken, refreshToken } =
+            await services.authService.refreshToken({
+              refreshToken: refreshTokenFromStorage,
+            });
+            
+
+          setItem("ACCESS_TOKEN", accessToken, true);
+          setItem("REFRESH_TOKEN", refreshToken, true);
+
+          axiosInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+
+          refreshAndRetryQueue.forEach(({ config, resolve, reject }) => {
+            axiosInstance.request(config).then(resolve).catch(reject);
+          });
+
+          refreshAndRetryQueue.length = 0;
+          return await axiosInstance(originalRequest);
+        } catch (refreshError) {
+          // Don't automatically log out, just reject the request
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
+        }
+      }
+
+      return new Promise((resolve, reject) => {
+        refreshAndRetryQueue.push({ config: originalRequest, resolve, reject });
+      });
+    }
 
     // console.log("Response Interceptor - Error:", {
     //   status,
@@ -56,86 +105,6 @@ axiosInstance.interceptors.response.use(
     //   url: originalRequest.url,
     //   method: originalRequest.method,
     // });
-
-    if (status === 401) {
-      // console.log("401 Detected - Handling unauthorized request");
-      const errorMessage = error.response?.data?.message?.toLowerCase() || "";
-
-      // Check if the 401 is due to an invalid PIN
-      if (errorMessage.includes("pin")) {
-        // console.log("Invalid PIN detected - Rejecting error immediately");
-        return Promise.reject(error); // Skip token refresh and propagate error
-      }
-
-      if (!isRefreshing) {
-        isRefreshing = true;
-        // console.log("Starting token refresh process");
-        try {
-          const refreshTokenFromStorage =
-            (await getItem("REFRESH_TOKEN", true)) ?? "";
-          const accessTokenFromStorage =
-            (await getItem("ACCESS_TOKEN", true)) ?? "";
-          // console.log("Tokens from storage:", {
-          //   accessToken: accessTokenFromStorage,
-          //   refreshToken: refreshTokenFromStorage,
-          // });
-
-          const { accessToken, refreshToken } =
-            await services.authService.refreshToken({
-              refreshToken: refreshTokenFromStorage,
-            });
-          // console.log("New tokens received:", { accessToken, refreshToken });
-
-          setItem("ACCESS_TOKEN", accessToken, true);
-          setItem("REFRESH_TOKEN", refreshToken, true);
-          // console.log("Tokens saved to storage");
-
-          axiosInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-          // console.log("Updated Authorization header with new token");
-
-          // console.log("Retrying queued requests:", refreshAndRetryQueue.length);
-          refreshAndRetryQueue.forEach(({ config, resolve, reject }) => {
-            // console.log("Retrying request:", config.url);
-            axiosInstance
-              .request(config)
-              .then((response) => {
-                // console.log("Retry success:", config.url);
-                resolve(response);
-              })
-              .catch((err) => {
-                // console.log("Retry failed:", config.url, err.message);
-                reject(err);
-              });
-          });
-
-          refreshAndRetryQueue.length = 0;
-          // console.log("Retry queue cleared");
-
-          // console.log("Retrying original request:", originalRequest.url);
-          return await axiosInstance(originalRequest);
-        } catch (refreshError: any) {
-          // console.error("Token refresh failed:", {
-          //   message: refreshError.message,
-          //   response: refreshError.response?.data,
-          //   status: refreshError.response?.status,
-          // });
-          removeItem("ACCESS_TOKEN", true);
-          removeItem("REFRESH_TOKEN", true);
-          // console.log("Tokens removed from storage due to refresh failure");
-
-          return Promise.reject(new Error(refreshError) as AxiosError);
-        } finally {
-          isRefreshing = false;
-          // console.log("Refresh process completed, isRefreshing set to false");
-        }
-      }
-
-      // console.log("Adding request to retry queue:", originalRequest.url);
-      return new Promise<void>((resolve, reject) => {
-        refreshAndRetryQueue.push({ config: originalRequest, resolve, reject });
-        // console.log("Current queue length:", refreshAndRetryQueue.length);
-      });
-    }
 
     if (status === 403 && error.response.data) {
       // console.log(

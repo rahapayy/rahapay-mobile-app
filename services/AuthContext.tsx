@@ -52,8 +52,8 @@ const SWR: React.FC<SWRProps> = ({ children, logOut }) => {
         return response.data;
       } catch (error: any) {
         if (error.response?.status === 401) {
-          await logOut(); // Log out on 401
-          throw new Error("Unauthorized"); // Re-throw to let SWR handle the error
+          // Instead of automatically logging out, we'll just throw the error
+          throw new Error("Unauthorized");
         }
         throw error;
       }
@@ -65,7 +65,7 @@ const SWR: React.FC<SWRProps> = ({ children, logOut }) => {
     <SWRConfig
       value={{
         fetcher,
-        provider: () => new Map(), // Creates a new cache instance per render
+        provider: () => new Map(),
         revalidateOnFocus: false,
         revalidateOnReconnect: false,
       }}

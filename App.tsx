@@ -79,12 +79,12 @@ export default Sentry.wrap(function App() {
               <NavigationContainer
                 ref={navigationRef}
                 initialState={initialState}
-                onStateChange={(state) =>
-                  AsyncStorage.setItem(
-                    "NAVIGATION_STATE",
-                    JSON.stringify(state)
-                  )
-                }
+                // onStateChange={(state) =>
+                //   AsyncStorage.setItem(
+                //     "NAVIGATION_STATE",
+                //     JSON.stringify(state)
+                //   )
+                // }
               >
                 <StatusBar barStyle={"default"} />
                 <Router />

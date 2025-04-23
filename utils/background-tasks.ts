@@ -1,15 +1,10 @@
 import * as BackgroundFetch from "expo-background-fetch";
 import * as TaskManager from "expo-task-manager";
-import { removeItem } from "./storage";
 
-const BACKGROUND_FETCH_TASK = "background-logout";
+const BACKGROUND_FETCH_TASK = "background-sync";
 
 TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
-  await Promise.all([
-    removeItem("userInfo"),
-    removeItem("access_token"),
-    removeItem("userDetails"),
-  ]);
+  // Perform background sync tasks here
   return BackgroundFetch.BackgroundFetchResult.NewData;
 });
 

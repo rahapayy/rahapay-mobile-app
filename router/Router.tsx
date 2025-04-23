@@ -23,7 +23,7 @@ const LockStackNavigator = () => {
       <LockStack.Screen
         name="LockScreen"
         component={LockScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, presentation: "containedModal" }}
       />
       <LockStack.Screen
         name="PasswordReauthScreen"

@@ -134,7 +134,7 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
         { paddingTop: insets.top, paddingBottom: insets.bottom },
       ]}
     >
-      <View style={styles.semiCircle} />
+      {/* <View style={styles.semiCircle} /> */}
       <View style={styles.profileSection}>
         <View style={styles.welcomeWrapper}>
           <MediumText color="black" size="xxlarge" style={styles.welcomeText}>
