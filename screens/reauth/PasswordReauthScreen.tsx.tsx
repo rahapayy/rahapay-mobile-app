@@ -16,7 +16,7 @@ import { LockStackParamList } from "../../types/RootStackParams";
 import { useLock } from "../../context/LockContext";
 import { BoldText, RegularText } from "@/components/common/Text";
 import { BasicPasswordInput } from "@/components/common/ui/forms/BasicPasswordInput";
-import { COLORS } from "@/constants/ui";
+import { COLORS, SPACING } from "@/constants/ui";
 import Button from "@/components/common/ui/buttons/Button";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 // Using the app's existing icon components instead of iconsax
@@ -134,20 +134,6 @@ const PasswordReauthScreen: React.FC<PasswordReauthScreenProps> = ({
             </RegularText>
           </View>
 
-          <View style={styles.profileSection}>
-            <View style={styles.avatar}>
-              <BoldText color="white" size="xlarge">
-                {initials}
-              </BoldText>
-            </View>
-            <BoldText color="black" size="medium" style={styles.userName}>
-              {userInfo?.fullName || "User"}
-            </BoldText>
-            <RegularText color="mediumGrey" size="base">
-              {maskedId}
-            </RegularText>
-          </View>
-
           <View style={styles.formContainer}>
             <View style={styles.inputContainer}>
               <MaterialIcons
@@ -210,7 +196,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     width: "100%",
-    marginBottom: 32,
+    marginBottom: SPACING * 5,
   },
   title: {
     marginBottom: 8,

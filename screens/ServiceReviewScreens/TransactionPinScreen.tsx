@@ -149,10 +149,10 @@ const TransactionPinScreen: React.FC<TransactionPinScreenProps> = ({
           response.data &&
           "token" in response.data
             ? {
-                token: (
+                electricity_token: (
                   response.data as unknown as { token: string; units: string }
                 ).token,
-                units: (
+                electricity_units: (
                   response.data as unknown as { token: string; units: string }
                 ).units,
               }

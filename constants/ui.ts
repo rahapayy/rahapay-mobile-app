@@ -15,6 +15,7 @@ export const COLORS = {
     border: "#FF5100",
     medium: "#5185A2",
     light: "#9BB9CA",
+    primaryLight: "#E5E1F6",
   },
   error: {
     primary: "#E94242",
