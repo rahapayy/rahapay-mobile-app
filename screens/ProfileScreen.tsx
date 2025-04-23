@@ -30,6 +30,7 @@ import { getItem, setItem } from "@/utils/storage";
 import LogOutModal from "@/components/modals/LogoutModal";
 import { handleShowFlash } from "@/components/FlashMessageComponent";
 import { services } from "@/services";
+import Loading from "@/components/common/ui/loading/loader";
 
 const options = [
   {
@@ -131,6 +132,10 @@ const ProfileScreen: React.FC<{
       navigation.navigate("VerifyOtp", { type });
     }
   };
+
+  if (isRequestingPinReset) {
+    return <Loading size="large" color={COLORS.violet400} />;
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

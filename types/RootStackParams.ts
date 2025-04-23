@@ -100,7 +100,7 @@ export type AppStackParamList = {
   NotificationScreen: undefined;
   AgentAccountVerificationScreen: undefined;
   ChangePasswordScreen: undefined;
-  ChangePinScreen: undefined;
+  ChangePinScreen: { type: "transactionPin"; otp: string };
   SelectPinChangeScreen: undefined;
   EnableNotificationScreen: undefined;
   HelpAndSupportScreen: undefined;
@@ -110,10 +110,9 @@ export type AppStackParamList = {
   DisputeSubmission: { businessType: string; questionType: string };
   PersonalInformationScreen: undefined;
   ReferralScreen: undefined;
-  // Unified Review Summary Screen
   ReviewSummaryScreen: ReviewSummaryParams;
   TransactionStatusScreen: {
-    status: "pending" | "failed" | "success" | "successful"; // Added "successful" for education case
+    status: "pending" | "failed" | "success" | "successful";
     transactionType?: string;
     transactionDetails?: {
       electricity_token?: string;

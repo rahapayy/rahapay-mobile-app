@@ -20,24 +20,16 @@ import { services } from "@/services";
 import { Platform } from "react-native";
 import { AxiosError } from "axios";
 import BackButton from "@/components/common/ui/buttons/BackButton";
+import { AppStackParamList } from "../../types/RootStackParams";
 
 // Define the expected error response structure from the API
 interface ErrorResponse {
   message: string | string[];
 }
 
-// Define navigation params for ChangePinScreen
-type ChangePinParams = {
-  type: "transactionPin";
-  otp: string;
-};
-
 // Define props type for the component
 interface ChangePinScreenProps {
-  navigation: NativeStackNavigationProp<
-    { ChangePin: ChangePinParams },
-    "ChangePin"
-  >;
+  navigation: NativeStackNavigationProp<AppStackParamList, "ChangePinScreen">;
 }
 
 // Define the form values type
@@ -46,7 +38,7 @@ interface FormValues {
 }
 
 const ChangePinScreen: React.FC<ChangePinScreenProps> = ({ navigation }) => {
-  const route = useRoute<RouteProp<{ ChangePin: ChangePinParams }, "ChangePin">>();
+  const route = useRoute<RouteProp<AppStackParamList, "ChangePinScreen">>();
   const { otp } = route.params;
   const pinLength = 4; // Fixed for transactionPin
 
@@ -80,7 +72,7 @@ const ChangePinScreen: React.FC<ChangePinScreenProps> = ({ navigation }) => {
         message: "Transaction PIN changed successfully!",
         type: "success",
       });
-      navigation.goBack();
+      navigation.navigate("ProfileScreen");
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ErrorResponse>;
       const errorMessage =
@@ -132,9 +124,7 @@ const ChangePinScreen: React.FC<ChangePinScreenProps> = ({ navigation }) => {
               title="Confirm"
               onPress={handleButtonClick}
               isLoading={isLoading}
-              disabled={
-                formValues.newPin.some((digit) => !digit) || isLoading
-              }
+              disabled={formValues.newPin.some((digit) => !digit) || isLoading}
               style={{ marginTop: SPACING * 4 }}
               textColor="#fff"
             />
