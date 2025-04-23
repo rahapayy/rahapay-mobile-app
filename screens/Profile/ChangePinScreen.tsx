@@ -5,12 +5,10 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   ScrollView,
-  TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../../constants/SPACING";
 import COLORS from "../../constants/colors";
 import Button from "../../components/common/ui/buttons/Button";
@@ -28,26 +26,31 @@ interface ErrorResponse {
   message: string | string[];
 }
 
+// Define navigation params for ChangePinScreen
+type ChangePinParams = {
+  type: "transactionPin";
+  otp: string;
+};
+
 // Define props type for the component
 interface ChangePinScreenProps {
   navigation: NativeStackNavigationProp<
-    { ChangePin: { type: "transactionPin" } },
+    { ChangePin: ChangePinParams },
     "ChangePin"
   >;
 }
 
 // Define the form values type
 interface FormValues {
-  otp: string[];
   newPin: string[];
 }
 
 const ChangePinScreen: React.FC<ChangePinScreenProps> = ({ navigation }) => {
+  const route = useRoute<RouteProp<{ ChangePin: ChangePinParams }, "ChangePin">>();
+  const { otp } = route.params;
   const pinLength = 4; // Fixed for transactionPin
-  const otpLength = 6; // Assuming OTP is 6 digits, adjust if different
 
   const [formValues, setFormValues] = useState<FormValues>({
-    otp: Array(otpLength).fill(""),
     newPin: Array(pinLength).fill(""),
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -57,16 +60,7 @@ const ChangePinScreen: React.FC<ChangePinScreenProps> = ({ navigation }) => {
   }
 
   async function handleButtonClick() {
-    const otpStr = formValues.otp.join("");
     const newPinStr = formValues.newPin.join("");
-
-    if (otpStr.length !== otpLength) {
-      handleShowFlash({
-        message: `Please enter a ${otpLength}-digit OTP`,
-        type: "danger",
-      });
-      return;
-    }
 
     if (newPinStr.length !== pinLength) {
       handleShowFlash({
@@ -79,8 +73,8 @@ const ChangePinScreen: React.FC<ChangePinScreenProps> = ({ navigation }) => {
     setIsLoading(true);
     try {
       await services.userService.verifyTransactionPinReset({
-        otp: otpStr,
-        transactionPin: newPinStr,
+        otp,
+        newPin: newPinStr,
       });
       handleShowFlash({
         message: "Transaction PIN changed successfully!",
@@ -121,19 +115,6 @@ const ChangePinScreen: React.FC<ChangePinScreenProps> = ({ navigation }) => {
           <View style={{ padding: 16, flex: 1 }}>
             <View className="flex-1">
               <View style={styles.inputContainer}>
-                <Label text="OTP" marked={false} />
-                <View className="justify-start items-start">
-                  <OtpInput
-                    length={otpLength}
-                    value={formValues.otp}
-                    onChange={(value) => handleInputChange(value, "otp")}
-                    secureTextEntry={false}
-                    autoFocus={true}
-                    disabled={isLoading}
-                  />
-                </View>
-              </View>
-              <View style={styles.inputContainer}>
                 <Label text="New Transaction PIN" marked={false} />
                 <View className="justify-start items-start">
                   <OtpInput
@@ -141,7 +122,7 @@ const ChangePinScreen: React.FC<ChangePinScreenProps> = ({ navigation }) => {
                     value={formValues.newPin}
                     onChange={(value) => handleInputChange(value, "newPin")}
                     secureTextEntry
-                    autoFocus={false}
+                    autoFocus={true}
                     disabled={isLoading}
                   />
                 </View>
@@ -152,9 +133,7 @@ const ChangePinScreen: React.FC<ChangePinScreenProps> = ({ navigation }) => {
               onPress={handleButtonClick}
               isLoading={isLoading}
               disabled={
-                formValues.otp.some((digit) => !digit) ||
-                formValues.newPin.some((digit) => !digit) ||
-                isLoading
+                formValues.newPin.some((digit) => !digit) || isLoading
               }
               style={{ marginTop: SPACING * 4 }}
               textColor="#fff"
@@ -174,9 +153,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: SPACING,
     paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
-  },
-  leftIcon: {
-    marginRight: SPACING,
   },
   inputContainer: {
     flexDirection: "column",

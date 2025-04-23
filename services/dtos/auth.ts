@@ -56,5 +56,5 @@ export interface IResetTransactionPinRequestDto {
 
 export interface IResetTransactionPinVerifyDto {
   otp: string;
-  transactionPin: string;
+  newPin: string;
 }

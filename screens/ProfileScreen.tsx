@@ -117,7 +117,7 @@ const ProfileScreen: React.FC<{
       try {
         await services.userService.requestTransactionPinReset();
         handleShowFlash({ message: "OTP sent successfully!", type: "success" });
-        navigation.navigate("ChangePinScreen");
+        navigation.navigate("VerifyOtp", { type: "transactionPin" });
       } catch (error: any) {
         const errorMessage =
           error.response?.data?.message instanceof Array
@@ -128,7 +128,7 @@ const ProfileScreen: React.FC<{
         setIsRequestingPinReset(false);
       }
     } else {
-      navigation.navigate("ChangePinScreen");
+      navigation.navigate("VerifyOtp", { type });
     }
   };
 

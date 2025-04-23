@@ -37,6 +37,7 @@ import SelectQuestionTypeScreen from "@/screens/Profile/help/SelectQuestionTypeS
 import DisputeSubmissionScreen from "@/screens/Profile/help/DisputeSubmissionScreen";
 import ReviewSummaryScreen from "@/screens/ServiceReviewScreens";
 import TransactionPinScreen from "@/screens/ServiceReviewScreens/TransactionPinScreen";
+import VerifyOtpScreen from "@/screens/Profile/VerifyOtpScreen";
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
@@ -223,6 +224,11 @@ const AppStack = () => {
       <Stack.Screen
         name="TransactionPinScreen"
         component={TransactionPinScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="VerifyOtp"
+        component={VerifyOtpScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
