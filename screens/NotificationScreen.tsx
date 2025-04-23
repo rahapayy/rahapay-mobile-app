@@ -29,7 +29,7 @@ const NotificationScreen: React.FC<{
     index: React.Key | null | undefined
   ) => {
     const { title, body, data } = notification.request.content;
-    console.log("Notification:", { title, body, data, receivedAt });
+    // console.log("Notification:", { title, body, data, receivedAt });
 
     const timestamp = receivedAt
       ? new Date(receivedAt)

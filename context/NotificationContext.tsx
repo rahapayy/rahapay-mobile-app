@@ -249,7 +249,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
               new Date(a.receivedAt).getTime()
           );
         setNotifications(validNotifications);
-        console.log("Loaded notifications:", validNotifications);
+        // console.log("Loaded notifications:", validNotifications);
       }
     } catch (error) {
       console.error("Error loading notifications:", error);

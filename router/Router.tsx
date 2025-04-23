@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NetInfo from "@react-native-community/netinfo";
+import * as SplashScreen from "expo-splash-screen";
 import AppStack from "./AppStack";
 import AuthRoute from "./AuthRouter";
-// import LoadingIndicator from "../components/LoadingIndicator";
 import { useAuth } from "../services/AuthContext";
 import OfflineScreen from "@/screens/OfflineScreen";
 import LockScreen from "@/screens/reauth/LockScreen";
@@ -13,7 +13,6 @@ import {
 } from "../types/RootStackParams";
 import { useLock } from "../context/LockContext";
 import PasswordReauthScreen from "@/screens/reauth/PasswordReauthScreen.tsx";
-import { ActivityIndicator } from "react-native";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const LockStack = createNativeStackNavigator<LockStackParamList>();
@@ -48,12 +47,20 @@ const Router = () => {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    // Hide splash screen only when all states are ready
+    if (isAppReady && isLockStateReady && isOnline !== null) {
+      SplashScreen.hideAsync();
+    }
+  }, [isAppReady, isLockStateReady, isOnline]);
+
   const handleRetry = () => {
     NetInfo.fetch().then((state) => {
       setIsOnline(state.isConnected ?? false);
     });
   };
 
+  // Return null to keep splash screen visible during initialization
   if (!isAppReady || !isLockStateReady || isOnline === null) {
     console.log(
       "Waiting for readiness - isAppReady:",
@@ -63,7 +70,7 @@ const Router = () => {
       "isOnline:",
       isOnline
     );
-    return <ActivityIndicator />;
+    return null;
   }
 
   if (!isOnline) {

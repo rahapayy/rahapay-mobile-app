@@ -15,19 +15,11 @@ import "./global.css";
 import { LockProvider } from "./context/LockContext";
 import * as Sentry from "@sentry/react-native";
 
-// Prevent auto hiding of splash screen
-SplashScreen.preventAutoHideAsync();
-
 Sentry.init({
   dsn: "https://b6d56a13d87e9557b6e7b3c7b14ee515@o4508189082648576.ingest.de.sentry.io/4509181912678480",
-
-  // Configure Session Replay
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
   integrations: [Sentry.mobileReplayIntegration()],
-
-  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
-  // spotlight: __DEV__,
 });
 
 const queryClient = new QueryClient();
@@ -51,10 +43,15 @@ export default Sentry.wrap(function App() {
   });
 
   useEffect(() => {
-    if (fontsLoaded || fontError) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded, fontError]);
+    const prepare = async () => {
+      try {
+        await SplashScreen.preventAutoHideAsync();
+      } catch (error) {
+        console.warn("Error in preventAutoHideAsync:", error);
+      }
+    };
+    prepare();
+  }, []);
 
   if (!fontsLoaded && !fontError) {
     return null;
