@@ -18,14 +18,22 @@ const fontColors = {
 };
 
 const fontSize = {
-  large: RFValue(16),
-  xlarge: RFValue(20),
-  xxlarge: RFValue(24),
-  base: RFValue(12),
-  medium: RFValue(14),
-  small: RFValue(10),
-  xsmall: RFValue(8),
-  xxsmall: RFValue(6),
+  // large: RFValue(16),
+  // xlarge: RFValue(20),
+  // xxlarge: RFValue(24),
+  // base: RFValue(12),
+  // medium: RFValue(14),
+  // small: RFValue(10),
+  // xsmall: RFValue(8),
+  // xxsmall: RFValue(6),
+  large: RFValue(17),
+  xlarge: RFValue(21),
+  xxlarge: RFValue(25),
+  base: RFValue(13),
+  medium: RFValue(15),
+  small: RFValue(11),
+  xsmall: RFValue(9),
+  xxsmall: RFValue(7),
 };
 
 interface CustomTextProps extends TextProps {

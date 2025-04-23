@@ -72,7 +72,7 @@ const ChangePinScreen: React.FC<ChangePinScreenProps> = ({ navigation }) => {
         message: "Transaction PIN changed successfully!",
         type: "success",
       });
-      navigation.navigate("ProfileScreen");
+      navigation.navigate("HomeScreen");
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ErrorResponse>;
       const errorMessage =
