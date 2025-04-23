@@ -30,7 +30,7 @@ import { getItem, setItem } from "@/utils/storage";
 import LogOutModal from "@/components/modals/LogoutModal";
 import { handleShowFlash } from "@/components/FlashMessageComponent";
 import { services } from "@/services";
-import Loading from "@/components/common/ui/loading/loader";
+import { Loading } from "@/components/common/ui/loading";
 
 const options = [
   {
