@@ -24,51 +24,39 @@ export const LockProvider = ({ children }: { children: ReactNode }) => {
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [isLockStateReady, setIsLockStateReady] = useState(false);
   const [appState, setAppState] = useState(AppState.currentState);
-  const INACTIVITY_LIMIT = 1 * 60 * 1000; // 1 minute
+  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
+  const INACTIVITY_LIMIT = 30 * 1000; // 30 seconds
 
-  // Initialize lock state on mount
+  // Initialize lock state
   useEffect(() => {
     const initializeLockState = async () => {
       try {
         const isLockedState = await getItem("IS_LOCKED");
-        const backgroundTimestamp = await getItem("BACKGROUND_TIMESTAMP");
-        const currentTime = Date.now();
+        const wasTerminated = await getItem("WAS_TERMINATED");
+        const biometricEnabled =
+          (await getItem("BIOMETRIC_ENABLED")) === "true";
+        setIsBiometricEnabled(biometricEnabled);
 
         console.log("Initializing lock state:");
         console.log("  isAuthenticated:", isAuthenticated);
         console.log("  isLockedState:", isLockedState);
-        console.log("  backgroundTimestamp:", backgroundTimestamp);
+        console.log("  wasTerminated:", wasTerminated);
+        console.log("  biometricEnabled:", biometricEnabled);
 
-        if (!isAuthenticated) {
-          setIsLocked(false);
-          await setItem("IS_LOCKED", "false");
-          await removeItem("BACKGROUND_TIMESTAMP");
-          await removeItem("LOCK_TIMESTAMP");
-          console.log("  Not authenticated, set isLocked to false");
-        } else if (backgroundTimestamp) {
-          const backgroundDuration =
-            currentTime - parseInt(backgroundTimestamp);
-          console.log(
-            "  Background duration:",
-            backgroundDuration / 1000,
-            "seconds"
-          );
-          if (backgroundDuration >= INACTIVITY_LIMIT) {
+        // Only set initial lock state if not already locked
+        if (isLockedState !== "true") {
+          if (!isAuthenticated) {
+            setIsLocked(false);
+            await setItem("IS_LOCKED", "false");
+            await removeItem("WAS_TERMINATED");
+          } else if (wasTerminated === "true") {
             setIsLocked(true);
             await setItem("IS_LOCKED", "true");
-            await setItem("LOCK_TIMESTAMP", currentTime.toString());
-            console.log("  Background > 1 min, set isLocked to true");
+            await removeItem("WAS_TERMINATED");
           } else {
             setIsLocked(false);
             await setItem("IS_LOCKED", "false");
-            console.log("  Background < 1 min, set isLocked to false");
           }
-        } else {
-          setIsLocked(isLockedState === "true");
-          console.log(
-            "  No background timestamp, isLocked:",
-            isLockedState === "true"
-          );
         }
       } catch (error) {
         console.log("Error initializing lock state: ", error);
@@ -80,7 +68,7 @@ export const LockProvider = ({ children }: { children: ReactNode }) => {
     };
 
     initializeLockState();
-  }, []); // Run only on mount
+  }, [isAuthenticated]);
 
   // Handle app state changes
   useEffect(() => {
@@ -92,18 +80,54 @@ export const LockProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       subscription.remove();
     };
-  }, [isAuthenticated, appState]); // Depend on appState to ensure updates
+  }, [isAuthenticated, appState, isBiometricEnabled]);
 
   const handleAppStateChange = async (nextAppState: AppStateStatus) => {
     console.log("AppState change detected:", nextAppState);
     console.log("Previous appState:", appState);
+    console.log("isAuthenticated:", isAuthenticated);
+    console.log("isBiometricEnabled:", isBiometricEnabled);
 
+    // When app is going to background or being terminated
+    if (nextAppState === "background" || nextAppState === "inactive") {
+      console.log("App is going to background/inactive state");
+      if (isAuthenticated) {
+        const currentTime = Date.now();
+        console.log("Setting BACKGROUND_TIMESTAMP:", currentTime);
+        await setItem("BACKGROUND_TIMESTAMP", currentTime.toString());
+
+        // If app is being terminated (inactive state)
+        if (nextAppState === "inactive") {
+          console.log("App is being terminated, setting WAS_TERMINATED flag");
+          await setItem("WAS_TERMINATED", "true");
+        }
+      }
+    }
+
+    // When app is coming to foreground
     if (appState.match(/inactive|background/) && nextAppState === "active") {
       console.log("App has come to the foreground!");
-      const backgroundTimestamp = await getItem("BACKGROUND_TIMESTAMP");
-      console.log("Retrieved BACKGROUND_TIMESTAMP:", backgroundTimestamp);
 
-      if (backgroundTimestamp && isAuthenticated) {
+      // Check if app was terminated
+      const wasTerminated = await getItem("WAS_TERMINATED");
+      console.log("WAS_TERMINATED flag:", wasTerminated);
+
+      if (wasTerminated === "true") {
+        console.log("App was terminated, showing lock screen");
+        setIsLocked(true);
+        await setItem("IS_LOCKED", "true");
+        await removeItem("WAS_TERMINATED");
+        return;
+      }
+
+      const backgroundTimestamp = await getItem("BACKGROUND_TIMESTAMP");
+      const biometricEnabled = (await getItem("BIOMETRIC_ENABLED")) === "true";
+      setIsBiometricEnabled(biometricEnabled);
+
+      console.log("Background timestamp:", backgroundTimestamp);
+      console.log("Biometric enabled:", biometricEnabled);
+
+      if (backgroundTimestamp && isAuthenticated && biometricEnabled) {
         const currentTime = Date.now();
         const backgroundDuration = currentTime - parseInt(backgroundTimestamp);
         console.log(
@@ -113,54 +137,44 @@ export const LockProvider = ({ children }: { children: ReactNode }) => {
         );
 
         if (backgroundDuration >= INACTIVITY_LIMIT) {
-          console.log("Background duration exceeded 1 minute, locking app");
+          console.log("Background duration exceeded limit, locking app");
           setIsLocked(true);
           await setItem("IS_LOCKED", "true");
           await setItem("LOCK_TIMESTAMP", currentTime.toString());
         } else {
-          console.log("Background duration < 1 minute, keeping unlocked");
+          console.log("Background duration within limit, keeping unlocked");
           setIsLocked(false);
           await setItem("IS_LOCKED", "false");
         }
       } else {
         console.log(
-          "No background timestamp or not authenticated, isLocked remains:",
-          isLocked
+          "No background timestamp, not authenticated, or biometrics disabled"
         );
+        setIsLocked(false);
+        await setItem("IS_LOCKED", "false");
       }
       await removeItem("BACKGROUND_TIMESTAMP");
-    } else if (nextAppState === "background" && isAuthenticated) {
-      const currentTime = Date.now();
-      console.log(
-        "App going to background, setting BACKGROUND_TIMESTAMP:",
-        currentTime
-      );
-      await setItem("BACKGROUND_TIMESTAMP", currentTime.toString());
-    } else {
-      console.log("Unhandled AppState transition:", nextAppState);
     }
+
     setAppState(nextAppState);
   };
 
   const handleUnlock = async () => {
-    const isBiometricEnabled = (await getItem("BIOMETRIC_ENABLED")) === "true";
-    if (isBiometricEnabled) {
-      const hasHardware = await LocalAuthentication.hasHardwareAsync();
-      if (!hasHardware) throw new Error("Biometric hardware not available");
+    try {
+      // Clear all lock-related flags
+      await Promise.all([
+        setItem("IS_LOCKED", "false"),
+        removeItem("LOCK_TIMESTAMP"),
+        removeItem("BACKGROUND_TIMESTAMP"),
+        removeItem("WAS_TERMINATED"),
+      ]);
 
-      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-      if (!isEnrolled) throw new Error("No biometric credentials enrolled");
-
-      const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: "Unlock the app",
-        fallbackLabel: "Use PIN",
-      });
-      if (!result.success) throw new Error("Biometric authentication failed");
+      setIsLocked(false);
+      console.log("App unlocked successfully");
+    } catch (error) {
+      console.error("Error during unlock:", error);
+      throw error;
     }
-    setIsLocked(false);
-    await setItem("IS_LOCKED", "false");
-    await removeItem("LOCK_TIMESTAMP");
-    console.log("App unlocked, isLocked:", false);
   };
 
   // Reset lock state when authentication changes
@@ -168,10 +182,13 @@ export const LockProvider = ({ children }: { children: ReactNode }) => {
     const resetLockState = async () => {
       if (isAuthenticated) {
         console.log("User authenticated, resetting lock state");
-        setIsLocked(false);
-        await setItem("IS_LOCKED", "false");
-        await removeItem("LOCK_TIMESTAMP");
-        await removeItem("BACKGROUND_TIMESTAMP");
+        const biometricEnabled =
+          (await getItem("BIOMETRIC_ENABLED")) === "true";
+        setIsBiometricEnabled(biometricEnabled);
+        if (!biometricEnabled) {
+          setIsLocked(false);
+          await setItem("IS_LOCKED", "false");
+        }
       } else {
         console.log("User logged out, clearing lock state");
         setIsLocked(false);

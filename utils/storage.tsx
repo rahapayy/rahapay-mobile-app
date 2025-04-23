@@ -60,4 +60,5 @@ export const StorageKeys = {
   LAST_ACTIVE_TIMESTAMP: "lastActiveTimestamp",
   BACKGROUND_TIMESTAMP: "backgroundTimestamp",
   LOCK_TIMESTAMP: "lockTimestamp",
+  WAS_TERMINATED: "wasTerminated",
 };

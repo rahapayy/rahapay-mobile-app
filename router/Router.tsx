@@ -48,9 +48,10 @@ const Router = () => {
   }, []);
 
   useEffect(() => {
-    // Hide splash screen only when all states are ready
     if (isAppReady && isLockStateReady && isOnline !== null) {
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync().catch((error) => {
+        console.warn("Error in hideAsync:", error);
+      });
     }
   }, [isAppReady, isLockStateReady, isOnline]);
 
@@ -60,7 +61,6 @@ const Router = () => {
     });
   };
 
-  // Return null to keep splash screen visible during initialization
   if (!isAppReady || !isLockStateReady || isOnline === null) {
     console.log(
       "Waiting for readiness - isAppReady:",

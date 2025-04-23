@@ -3,7 +3,6 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
-  Image,
   Dimensions,
   Platform,
 } from "react-native";
@@ -23,7 +22,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { FaceIdIcon } from "@/components/common/ui/icons";
 
 type LockScreenProps = NativeStackScreenProps<LockStackParamList, "LockScreen">;
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
   const { setIsAuthenticated, setUserInfo, userInfo, logOut } = useAuth();
@@ -40,7 +39,7 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
     .toUpperCase();
 
   useEffect(() => {
-    // Check biometric type
+    // Check biometric type and trigger authentication
     (async () => {
       const supportedTypes =
         await LocalAuthentication.supportedAuthenticationTypesAsync();
@@ -57,6 +56,15 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
       ) {
         setBiometricType("Fingerprint");
       }
+
+      // Check if biometrics are available and enrolled
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+      if (hasHardware && isEnrolled) {
+        // Only trigger biometric authentication if both conditions are met
+        handleBiometricLogin();
+      }
     })();
   }, []);
 
@@ -65,7 +73,7 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
       const hasHardware = await LocalAuthentication.hasHardwareAsync();
       if (!hasHardware) {
         handleShowFlash({
-          message: "This device doesn’t support biometric authentication.",
+          message: "This device doesn't support biometric authentication.",
           type: "info",
         });
         return;
@@ -97,7 +105,7 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
             message: `Logged in successfully with ${biometricType}`,
             type: "success",
           });
-          handleUnlock();
+          await handleUnlock();
         } else {
           handleShowFlash({
             message: "No access token found. Please log in with password.",
@@ -128,7 +136,7 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
     >
       <View style={styles.semiCircle} />
       <View style={styles.profileSection}>
-        <View style={{ marginTop: 370 }}>
+        <View style={styles.welcomeWrapper}>
           <MediumText color="black" size="xxlarge" style={styles.welcomeText}>
             Welcome back 🎉
           </MediumText>
@@ -191,13 +199,13 @@ const styles = StyleSheet.create({
   },
   semiCircle: {
     position: "absolute",
-    top: -320, // Shifted up to push the top edge off-screen
-    right: -320, // Shifted to the right to push the right edge off-screen
-    width: 600, // Large size to ensure edges are off-screen
-    height: 600,
+    top: -width * 0.4, // Adjusted for smaller size (previously -width * 0.533)
+    right: -width * 0.4,
+    width: width * 1.2, // Reduced from width * 1.6 (600px to ~450px on a 375px-wide screen)
+    height: width * 1.2,
     backgroundColor: COLORS.brand.primaryLight,
-    borderBottomLeftRadius: 320, // Creates the downward curve
-    borderBottomRightRadius: 320,
+    borderBottomLeftRadius: width * 0.6, // Half the new width/height for semi-circle curve
+    borderBottomRightRadius: width * 0.6,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
     zIndex: -1,
@@ -208,19 +216,17 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   profileSection: {
-    marginTop: 30,
+    marginTop: height * 0.5,
     alignItems: "flex-start",
   },
-  logo: {
-    width: 80,
-    height: 80,
-    marginBottom: 16,
+  welcomeWrapper: {
+    // No changes needed here
   },
   welcomeText: {
     marginBottom: 8,
   },
   authSection: {
-    marginTop: 40,
+    marginTop: height * 0.05,
     alignItems: "flex-start",
   },
   biometricButton: {
@@ -242,7 +248,7 @@ const styles = StyleSheet.create({
   footerSection: {
     marginTop: "auto",
     alignItems: "center",
-    marginBottom: SPACING * 4,
+    marginBottom: SPACING * 2,
   },
   passwordButton: {
     shadowColor: "#000",
