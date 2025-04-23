@@ -30,7 +30,7 @@ import Label from "../../../components/common/ui/forms/Label";
 import BasicInput from "../../../components/common/ui/forms/BasicInput";
 import { ILoginDto } from "../../../services/dtos";
 import { useAuth } from "@/services/AuthContext";
-import { getItem, setItem } from "@/utils/storage";
+import { getItem, setItem, removeItem } from "@/utils/storage";
 import Divider from "@/components/Divider";
 import { BasicPasswordInput } from "@/components/common/ui/forms/BasicPasswordInput";
 import * as LocalAuthentication from "expo-local-authentication";
@@ -128,11 +128,21 @@ const LoginScreen: React.FC<{
       const response = await services.authService.login(payload);
       console.log(response);
       if (response) {
-        await setItem("ACCESS_TOKEN", response.data.accessToken, true);
-        await setItem("REFRESH_TOKEN", response.data.refreshToken, true);
+        // Clear all lock-related state before setting new tokens
+        await Promise.all([
+          removeItem("IS_LOCKED"),
+          removeItem("BACKGROUND_TIMESTAMP"),
+          removeItem("WAS_TERMINATED"),
+          removeItem("LOCK_TIMESTAMP"),
+        ]);
+
+        // Set new tokens after clearing lock state
+        await Promise.all([
+          setItem("ACCESS_TOKEN", response.data.accessToken, true),
+          setItem("REFRESH_TOKEN", response.data.refreshToken, true),
+        ]);
 
         const userResponse = await services.authServiceToken.getUserDetails();
-
         setIsAuthenticated(true);
         setUserInfo(userResponse.data);
 

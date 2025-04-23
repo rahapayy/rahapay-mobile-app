@@ -36,7 +36,7 @@ const LockStackNavigator = () => {
 
 const Router = () => {
   const { isAuthenticated, isAppReady } = useAuth();
-  const { isLocked, isLockStateReady } = useLock();
+  const { isLocked, isLockStateReady, setIsLocked } = useLock();
   const [isOnline, setIsOnline] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -54,6 +54,13 @@ const Router = () => {
       });
     }
   }, [isAppReady, isLockStateReady, isOnline]);
+
+  // Reset lock state when authentication state changes
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setIsLocked(false);
+    }
+  }, [isAuthenticated, setIsLocked]);
 
   const handleRetry = () => {
     NetInfo.fetch().then((state) => {

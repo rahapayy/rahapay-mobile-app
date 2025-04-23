@@ -10,7 +10,8 @@ import { useAuth } from "../services/AuthContext";
 import { getItem, setItem, removeItem } from "@/utils/storage";
 
 // Constants
-const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+const INACTIVITY_TIMEOUT = 30 * 1000; // 30 seconds
+// const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
 interface LockContextType {
   isLocked: boolean;
@@ -34,33 +35,48 @@ export const LockProvider = ({ children }: { children: ReactNode }) => {
     const initialize = async () => {
       let shouldBeLocked = false;
       try {
-        // Determine initial lock state
-        const wasTerminated = await getItem("WAS_TERMINATED");
-        if (wasTerminated === "true") {
-          shouldBeLocked = true;
-          await removeItem("WAS_TERMINATED");
-        } else if (isAuthenticated) {
-          // If not terminated but authenticated, check background time
-          const backgroundTimestamp = await getItem("BACKGROUND_TIMESTAMP");
-          if (backgroundTimestamp) {
-            const lastBackgroundTime = parseInt(backgroundTimestamp, 10);
-            const currentTime = Date.now();
-            const backgroundDuration = currentTime - lastBackgroundTime;
-            if (backgroundDuration >= INACTIVITY_TIMEOUT) {
-              shouldBeLocked = true;
-            }
-            await removeItem("BACKGROUND_TIMESTAMP");
+        // If not authenticated, ensure we're not locked
+        if (!isAuthenticated) {
+          shouldBeLocked = false;
+          await Promise.all([
+            removeItem("IS_LOCKED"),
+            removeItem("BACKGROUND_TIMESTAMP"),
+            removeItem("WAS_TERMINATED"),
+            removeItem("LOCK_TIMESTAMP"),
+          ]);
+        } else {
+          // Determine initial lock state
+          const wasTerminated = await getItem("WAS_TERMINATED");
+          if (wasTerminated === "true") {
+            shouldBeLocked = true;
+            await removeItem("WAS_TERMINATED");
           } else {
-            const isLockedState = await getItem("IS_LOCKED");
-            shouldBeLocked = isLockedState === "true";
+            // If not terminated but authenticated, check background time
+            const backgroundTimestamp = await getItem("BACKGROUND_TIMESTAMP");
+            if (backgroundTimestamp) {
+              const lastBackgroundTime = parseInt(backgroundTimestamp, 10);
+              const currentTime = Date.now();
+              const backgroundDuration = currentTime - lastBackgroundTime;
+              if (backgroundDuration >= INACTIVITY_TIMEOUT) {
+                shouldBeLocked = true;
+              }
+              await removeItem("BACKGROUND_TIMESTAMP");
+            } else {
+              // Default to unlocked for fresh authentication
+              shouldBeLocked = false;
+              await removeItem("IS_LOCKED");
+            }
           }
         }
       } catch (error) {
         console.error("Error initializing lock state:", error);
+        shouldBeLocked = false;
       } finally {
         setIsLocked(shouldBeLocked);
         setIsLockStateReady(true);
-        await setItem("IS_LOCKED", shouldBeLocked ? "true" : "false");
+        if (shouldBeLocked) {
+          await setItem("IS_LOCKED", "true");
+        }
       }
     };
 
@@ -70,14 +86,17 @@ export const LockProvider = ({ children }: { children: ReactNode }) => {
   // Handle app state changes
   useEffect(() => {
     const handleAppStateChange = async (nextAppState: AppStateStatus) => {
+      if (!isAuthenticated) {
+        setAppState(nextAppState);
+        return;
+      }
+
       if (
         appState === "active" &&
         (nextAppState === "background" || nextAppState === "inactive")
       ) {
-        if (isAuthenticated) {
-          const currentTime = Date.now();
-          await setItem("BACKGROUND_TIMESTAMP", currentTime.toString());
-        }
+        const currentTime = Date.now();
+        await setItem("BACKGROUND_TIMESTAMP", currentTime.toString());
       }
 
       if (
@@ -85,7 +104,7 @@ export const LockProvider = ({ children }: { children: ReactNode }) => {
         nextAppState === "active"
       ) {
         const backgroundTimestamp = await getItem("BACKGROUND_TIMESTAMP");
-        if (backgroundTimestamp && isAuthenticated) {
+        if (backgroundTimestamp) {
           const currentTime = Date.now();
           const backgroundDuration =
             currentTime - parseInt(backgroundTimestamp, 10);
