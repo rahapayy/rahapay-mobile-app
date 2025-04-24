@@ -37,6 +37,10 @@
         "appleId": "shedrachjonah22@gmail.com",
         "ascAppId": "367d0cfa-1475-4062-8ce2-436d9f7b7508",
         "appleTeamId": "D84VV5F569"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./ServiceAccountRahapay.json",
+        "track": "production"
       }
     }
   }

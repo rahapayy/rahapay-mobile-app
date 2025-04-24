@@ -20,9 +20,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 Sentry.init({
   dsn: "https://b6d56a13d87e9557b6e7b3c7b14ee515@o4508189082648576.ingest.de.sentry.io/4509181912678480",
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1,
-  integrations: [Sentry.mobileReplayIntegration()],
+  tracesSampleRate: 1.0,
+  sendDefaultPii: true,
 });
 
 const queryClient = new QueryClient();

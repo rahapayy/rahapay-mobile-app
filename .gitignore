@@ -21,3 +21,5 @@ config.ts
 google-services.json
 
 .env.local
+
+ServiceAccountRahapay.json
