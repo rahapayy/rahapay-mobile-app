@@ -10,22 +10,16 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ArrowLeft } from "iconsax-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import COLORS from "@/constants/colors";
 import SPACING from "@/constants/SPACING";
 import { AppStackParamList } from "@/types/RootStackParams";
 
-type DisputeSubmissionScreenNavigationProp = NativeStackNavigationProp<
-  AppStackParamList,
-  "DisputeSubmission"
->;
+type Props = NativeStackScreenProps<AppStackParamList, "DisputeSubmission">;
 
-const DisputeSubmissionScreen: React.FC<{
-  navigation: DisputeSubmissionScreenNavigationProp;
-  route: { params: { businessType: string; questionType: string } };
-}> = ({ navigation, route }) => {
+const DisputeSubmissionScreen: React.FC<Props> = ({ navigation, route }) => {
   const { businessType, questionType } = route.params;
   const [transactionNumber, setTransactionNumber] = useState("");
   const [description, setDescription] = useState("");

@@ -29,10 +29,11 @@ const Loading: React.FC<LoadingProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: ""
+    zIndex: 0,
   },
   text: {
     marginTop: 10,

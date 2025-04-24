@@ -61,4 +61,5 @@ export const StorageKeys = {
   BACKGROUND_TIMESTAMP: "backgroundTimestamp",
   LOCK_TIMESTAMP: "lockTimestamp",
   WAS_TERMINATED: "wasTerminated",
+  NAVIGATION_STATE: "navigationState",
 };

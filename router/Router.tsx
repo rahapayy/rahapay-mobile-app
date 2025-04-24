@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NetInfo from "@react-native-community/netinfo";
-import * as SplashScreen from "expo-splash-screen";
 import AppStack from "./AppStack";
 import AuthRoute from "./AuthRouter";
 import { useAuth } from "../services/AuthContext";
@@ -19,7 +18,7 @@ const LockStack = createNativeStackNavigator<LockStackParamList>();
 
 const LockStackNavigator = () => {
   return (
-    <LockStack.Navigator>
+    <LockStack.Navigator screenOptions={{ gestureEnabled: false }}>
       <LockStack.Screen
         name="LockScreen"
         component={LockScreen}
@@ -37,25 +36,18 @@ const LockStackNavigator = () => {
 const Router = () => {
   const { isAuthenticated, isAppReady } = useAuth();
   const { isLocked, isLockStateReady, setIsLocked } = useLock();
-  const [isOnline, setIsOnline] = useState<boolean | null>(null);
+  const [isOnline, setIsOnline] = useState<boolean>(true);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
-      setIsOnline(state.isConnected ?? false);
+      setIsOnline(state.isConnected ?? true);
     });
-
+    NetInfo.fetch().then((state) => {
+      setIsOnline(state.isConnected ?? true);
+    });
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (isAppReady && isLockStateReady && isOnline !== null) {
-      SplashScreen.hideAsync().catch((error) => {
-        console.warn("Error in hideAsync:", error);
-      });
-    }
-  }, [isAppReady, isLockStateReady, isOnline]);
-
-  // Reset lock state when authentication state changes
   useEffect(() => {
     if (!isAuthenticated) {
       setIsLocked(false);
@@ -64,44 +56,20 @@ const Router = () => {
 
   const handleRetry = () => {
     NetInfo.fetch().then((state) => {
-      setIsOnline(state.isConnected ?? false);
+      setIsOnline(state.isConnected ?? true);
     });
   };
 
-  if (!isAppReady || !isLockStateReady || isOnline === null) {
-    console.log(
-      "Waiting for readiness - isAppReady:",
-      isAppReady,
-      "isLockStateReady:",
-      isLockStateReady,
-      "isOnline:",
-      isOnline
-    );
+  if (!isAppReady || !isLockStateReady) {
     return null;
   }
 
   if (!isOnline) {
-    console.log("Offline detected");
     return <OfflineScreen onRetry={handleRetry} />;
   }
 
-  console.log(
-    "Rendering Router - isAuthenticated:",
-    isAuthenticated,
-    "isLocked:",
-    isLocked
-  );
-  console.log(
-    "Navigation decision:",
-    isLocked && isAuthenticated
-      ? "LockStack"
-      : isAuthenticated
-      ? "AppStack"
-      : "AuthRoute"
-  );
-
   return (
-    <RootStack.Navigator>
+    <RootStack.Navigator screenOptions={{ gestureEnabled: false }}>
       {isLocked && isAuthenticated ? (
         <RootStack.Screen
           name="LockStack"

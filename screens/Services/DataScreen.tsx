@@ -89,11 +89,11 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
 
   useEffect(() => {
     const fetchDataPlans = async () => {
-      console.log("Fetching data plans for operator:", selectedOperator);
-      if (!selectedOperator) {
-        console.log("No selected operator. Fetching data plans aborted.");
-        return;
-      }
+      // console.log("Fetching data plans for operator:", selectedOperator);
+      // if (!selectedOperator) {
+      //   console.log("No selected operator. Fetching data plans aborted.");
+      //   return;
+      // }
 
       setLoading(true);
       setError(null);
@@ -101,7 +101,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
         const response = await services.dataService.getDataPlans(
           selectedOperator
         );
-        console.log("Data plans fetched successfully:", response);
+        // console.log("Data plans fetched successfully:", response);
         const validPlans = response
           .filter(
             (plan: DataPlan) =>
@@ -113,7 +113,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
               : [...unique, plan];
           }, []);
         setDataPlans(validPlans);
-        console.log("Valid data plans set:", validPlans);
+        // console.log("Valid data plans set:", validPlans);
       } catch (err) {
         setError("Failed to load data plans. Please try again.");
         console.error("Error fetching data plans:", err);

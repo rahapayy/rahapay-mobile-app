@@ -7,17 +7,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ArrowLeft } from "iconsax-react-native";
 import COLORS from "@/constants/colors";
 import SPACING from "@/constants/SPACING";
 import { RFValue } from "react-native-responsive-fontsize";
 import { AppStackParamList } from "@/types/RootStackParams";
 
-type SelectQuestionTypeScreenNavigationProp = NativeStackNavigationProp<
-  AppStackParamList,
-  "SelectQuestionType"
->;
+type Props = NativeStackScreenProps<AppStackParamList, "SelectQuestionType">;
 
 const questionTypes = [
   { label: "Successful but no drop", value: "Successful but no drop" },
@@ -25,10 +22,7 @@ const questionTypes = [
   { label: "Long time pending", value: "Long time pending" },
 ];
 
-const SelectQuestionTypeScreen: React.FC<{
-  navigation: SelectQuestionTypeScreenNavigationProp;
-  route: { params: { businessType: string } };
-}> = ({ navigation, route }) => {
+const SelectQuestionTypeScreen: React.FC<Props> = ({ navigation, route }) => {
   const { businessType } = route.params;
 
   return (

@@ -173,12 +173,12 @@ const LoginScreen: React.FC<{
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className="flex-1 p-4">
           {/* <BackButton navigation={navigation} /> */}
-          <View className="mt-4">
+          <View className="mt-20">
             <SemiBoldText color="black" size="xlarge" marginBottom={5}>
               Welcome Back
             </SemiBoldText>
             <LightText color="mediumGrey" size="base">
-              Let's sign in to your account!
+              Let's sign in to your account! 🚀
             </LightText>
           </View>
 
