@@ -9,27 +9,53 @@ import { MediumText, LightText } from "../../../components/common/Text";
 import { useAuth } from "@/services/AuthContext";
 import { services } from "@/services";
 import { handleShowFlash } from "@/components/FlashMessageComponent";
+import { removeItem, getItem } from "@/utils/storage";
+import * as Sentry from "@sentry/react-native";
 
 const SuccessfulScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { setIsAuthenticated, setUserInfo, isLoading, setIsLoading } =
-    useAuth();
+  const { setIsAuthenticated, setUserInfo, isLoading, setIsLoading, setIsFreshLogin } = useAuth();
 
   const handleCompletion = async () => {
     try {
       setIsLoading(true);
+
+      // Clear lock-related storage to prevent lock screen
+      await Promise.all([
+        removeItem("IS_LOCKED"),
+        removeItem("BACKGROUND_TIMESTAMP"),
+        removeItem("WAS_TERMINATED"),
+        removeItem("LOCK_TIMESTAMP"),
+      ]);
+      console.log("Cleared lock-related storage in SuccessfulScreen");
+
+      // Verify tokens exist
+      const accessToken = await getItem("ACCESS_TOKEN", true);
+      if (!accessToken) {
+        throw new Error("No access token found after signup");
+      }
+
+      // Fetch user details and update auth state
       const userResponse = await services.authServiceToken.getUserDetails();
       setUserInfo(userResponse.data);
       setIsAuthenticated(true);
-      setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
+      setIsFreshLogin(true);
+      console.log("Signup completion successful, set isFreshLogin: true, isAuthenticated: true");
+
+      handleShowFlash({
+        message: "Account setup complete! Welcome to RahaPay!",
+        type: "success",
+      });
+    } catch (error: any) {
+      Sentry.captureException(error);
       console.error("Failed to fetch user details:", error);
       handleShowFlash({
         message: "Failed to complete setup. Please try again.",
         type: "danger",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 

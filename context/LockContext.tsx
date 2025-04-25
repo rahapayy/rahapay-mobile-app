@@ -1,44 +1,40 @@
-import React, { createContext, useContext, useEffect, ReactNode } from "react";
+import React, { useEffect, ReactNode, useContext } from "react";
 import { AppState, AppStateStatus } from "react-native";
 import { useAuth } from "../services/AuthContext";
-import { setItem, removeItem } from "@/utils/storage";
+import { setItem } from "@/utils/storage";
 import * as Sentry from "@sentry/react-native";
 
-interface LockContextType {
-  // Empty for now, can add utilities if needed
-}
+interface LockContextType {}
 
-const LockContext = createContext<LockContextType | undefined>(undefined);
+const LockContext = React.createContext<LockContextType | undefined>(undefined);
 
 export const LockProvider = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    const setTerminationFlag = async () => {
-      if (isAuthenticated) {
-        console.log("Setting WAS_TERMINATED flag");
-        await setItem("WAS_TERMINATED", "true");
+    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
+      if (
+        isAuthenticated &&
+        (nextAppState === "background" || nextAppState === "inactive")
+      ) {
+        console.log("App going to background/inactive, setting WAS_TERMINATED");
+        try {
+          await setItem("WAS_TERMINATED", "true");
+        } catch (error) {
+          console.error("Error setting WAS_TERMINATED:", error);
+          Sentry.captureException(error);
+        }
       }
     };
 
-    setTerminationFlag().catch((error) => {
-      console.error("Error setting termination flag:", error);
-      Sentry.captureException(error);
-    });
-
-    return () => {
-      setTerminationFlag().catch((error) => {
-        console.error("Error in cleanup termination flag:", error);
-        Sentry.captureException(error);
-      });
-    };
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
+    return () => subscription.remove();
   }, [isAuthenticated]);
 
-  return (
-    <LockContext.Provider value={{}}>
-      {children}
-    </LockContext.Provider>
-  );
+  return <LockContext.Provider value={{}}>{children}</LockContext.Provider>;
 };
 
 export const useLock = () => {

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -33,7 +33,7 @@ import { useAuth } from "@/services/AuthContext";
 import { getItem, setItem, removeItem } from "@/utils/storage";
 import Divider from "@/components/Divider";
 import { BasicPasswordInput } from "@/components/common/ui/forms/BasicPasswordInput";
-import * as LocalAuthentication from "expo-local-authentication";
+import * as Sentry from "@sentry/react-native";
 
 const validationSchema = Yup.object().shape({
   id: Yup.string()
@@ -50,69 +50,8 @@ const validationSchema = Yup.object().shape({
 const LoginScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { setIsAuthenticated, setUserInfo } = useAuth();
+  const { setIsAuthenticated, setUserInfo, setIsFreshLogin } = useAuth();
   const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
-
-  const handleBiometricLogin = async (accessToken?: string) => {
-    try {
-      const hasHardware = await LocalAuthentication.hasHardwareAsync();
-      if (!hasHardware) {
-        handleShowFlash({
-          message: "Biometric authentication is not available on this device",
-          type: "info",
-        });
-        setShowBiometricPrompt(false);
-        return;
-      }
-
-      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-      if (!isEnrolled) {
-        handleShowFlash({
-          message: "No biometric data enrolled on this device",
-          type: "info",
-        });
-        setShowBiometricPrompt(false);
-        return;
-      }
-
-      const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: "Log in with Face ID",
-        fallbackLabel: "Use Password",
-        disableDeviceFallback: false,
-      });
-
-      if (result.success) {
-        if (accessToken) {
-          const userResponse = await services.authServiceToken.getUserDetails();
-          setIsAuthenticated(true);
-          setUserInfo(userResponse.data);
-          handleShowFlash({
-            message: "Logged in successfully with Face ID",
-            type: "success",
-          });
-        } else {
-          handleShowFlash({
-            message:
-              "Biometric verified. Please enter your credentials to proceed.",
-            type: "danger",
-          });
-        }
-      } else {
-        handleShowFlash({
-          message: "Face ID authentication failed",
-          type: "danger",
-        });
-      }
-      setShowBiometricPrompt(false);
-    } catch (error) {
-      console.error("Biometric login error:", error);
-      handleShowFlash({
-        message: "An error occurred during Face ID login",
-        type: "danger",
-      });
-      setShowBiometricPrompt(false);
-    }
-  };
 
   const handleLogin = async (
     values: { id: string; password: string },
@@ -126,39 +65,41 @@ const LoginScreen: React.FC<{
       };
 
       const response = await services.authService.login(payload);
-      console.log(response);
-      if (response) {
-        // Clear all lock-related state before setting new tokens
-        await Promise.all([
-          removeItem("IS_LOCKED"),
-          removeItem("BACKGROUND_TIMESTAMP"),
-          removeItem("WAS_TERMINATED"),
-          removeItem("LOCK_TIMESTAMP"),
-        ]);
+      console.log("Login response:", response);
 
-        // Set new tokens after clearing lock state
-        await Promise.all([
-          setItem("ACCESS_TOKEN", response.data.accessToken, true),
-          setItem("REFRESH_TOKEN", response.data.refreshToken, true),
-        ]);
+      // Clear all lock-related state before setting new tokens
+      await Promise.all([
+        removeItem("IS_LOCKED"),
+        removeItem("BACKGROUND_TIMESTAMP"),
+        removeItem("WAS_TERMINATED"),
+        removeItem("LOCK_TIMESTAMP"),
+      ]);
+      console.log("Cleared lock-related storage");
 
-        const userResponse = await services.authServiceToken.getUserDetails();
-        setIsAuthenticated(true);
-        setUserInfo(userResponse.data);
+      // Set new tokens after clearing lock state
+      await Promise.all([
+        setItem("ACCESS_TOKEN", response.data.accessToken, true),
+        setItem("REFRESH_TOKEN", response.data.refreshToken, true),
+      ]);
+      console.log("Set ACCESS_TOKEN and REFRESH_TOKEN");
 
-        // Add success flash message
-        handleShowFlash({
-          message: "Login successful! Welcome back!",
-          type: "success",
-        });
-      }
+      const userResponse = await services.authServiceToken.getUserDetails();
+      setIsAuthenticated(true);
+      setUserInfo(userResponse.data);
+      setIsFreshLogin(true);
+      console.log("Login successful, set isFreshLogin: true");
+
+      handleShowFlash({
+        message: "Login successful! Welcome back!",
+        type: "success",
+      });
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message instanceof Array
           ? error.response.data.message[0]
           : error.response?.data?.message || "An unexpected error occurred";
       console.error("Login error:", errorMessage);
-
+      Sentry.captureException(error);
       handleShowFlash({
         message: errorMessage,
         type: "danger",
@@ -172,7 +113,6 @@ const LoginScreen: React.FC<{
     <SafeAreaView className="flex-1">
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className="flex-1 p-4">
-          {/* <BackButton navigation={navigation} /> */}
           <View className="mt-20">
             <SemiBoldText color="black" size="xlarge" marginBottom={5}>
               Welcome Back
@@ -197,87 +137,68 @@ const LoginScreen: React.FC<{
                 touched,
                 isSubmitting,
               }) => (
-                <>
-                  <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : undefined}
-                    style={{ flex: 1 }}
-                  >
-                    <View className="flex-1">
-                      <View className="mt-10">
-                        <Label text="Email or Phone Number" marked={false} />
-                        <BasicInput
-                          value={values.id}
-                          onChangeText={handleChange("id")}
-                          placeholder="Email or Phone Number"
-                          autoCapitalize="none"
-                          autoComplete="off"
-                          autoCorrect={false}
-                        />
-                        {touched.id && errors.id && (
-                          <Text style={styles.errorText}>{errors.id}</Text>
-                        )}
-                      </View>
-
-                      <View className="mt-4">
-                        <Label text="Password" marked={false} />
-                        <BasicPasswordInput
-                          value={values.password}
-                          onChangeText={handleChange("password")}
-                          placeholder="Password"
-                        />
-                        {touched.password && errors.password && (
-                          <Text style={styles.errorText}>
-                            {errors.password}
-                          </Text>
-                        )}
-                      </View>
-                      <TouchableOpacity
-                        onPress={() =>
-                          navigation.navigate("ResetPasswordScreen")
-                        }
-                        className="mt-4 justify-center items-end"
-                      >
-                        <RegularText color="black" size="base">
-                          Forgot Password?
-                        </RegularText>
-                      </TouchableOpacity>
-                      <Divider length={3} />
-                      <Button
-                        title="Login"
-                        onPress={handleSubmit}
-                        isLoading={isSubmitting}
-                        style={styles.proceedButton}
-                        textColor="#fff"
-                        disabled={isSubmitting}
+                <KeyboardAvoidingView
+                  behavior={Platform.OS === "ios" ? "padding" : undefined}
+                  style={{ flex: 1 }}
+                >
+                  <View className="flex-1">
+                    <View className="mt-10">
+                      <Label text="Email or Phone Number" marked={false} />
+                      <BasicInput
+                        value={values.id}
+                        onChangeText={handleChange("id")}
+                        placeholder="Email or Phone Number"
+                        autoCapitalize="none"
+                        autoComplete="off"
+                        autoCorrect={false}
                       />
-                      {/* Add "Log in with Face ID" button */}
-                      {/* <Button
-                        title="Log in with Face ID"
-                        onPress={() => {
-                          setShowBiometricPrompt(true);
-                          handleBiometricLogin();
-                        }}
-                        style={[styles.proceedButton, styles.faceIdButton]}
-                        textColor="#5136C1"
-                        disabled={isSubmitting}
-                      /> */}
-                      <View className="flex-row justify-center items-center mt-6">
-                        <LightText color="mediumGrey" size="base">
-                          Don't have an account?{" "}
-                        </LightText>
-                        <TouchableOpacity
-                          onPress={() =>
-                            navigation.navigate("CreateAccountScreen")
-                          }
-                        >
-                          <BoldText color="primary" size="base">
-                            Create Account
-                          </BoldText>
-                        </TouchableOpacity>
-                      </View>
+                      {touched.id && errors.id && (
+                        <Text style={styles.errorText}>{errors.id}</Text>
+                      )}
                     </View>
-                  </KeyboardAvoidingView>
-                </>
+
+                    <View className="mt-4">
+                      <Label text="Password" marked={false} />
+                      <BasicPasswordInput
+                        value={values.password}
+                        onChangeText={handleChange("password")}
+                        placeholder="Password"
+                      />
+                      {touched.password && errors.password && (
+                        <Text style={styles.errorText}>{errors.password}</Text>
+                      )}
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate("ResetPasswordScreen")}
+                      className="mt-4 justify-center items-end"
+                    >
+                      <RegularText color="black" size="base">
+                        Forgot Password?
+                      </RegularText>
+                    </TouchableOpacity>
+                    <Divider length={3} />
+                    <Button
+                      title="Login"
+                      onPress={handleSubmit}
+                      isLoading={isSubmitting}
+                      style={styles.proceedButton}
+                      textColor="#fff"
+                      disabled={isSubmitting}
+                    />
+                    <View className="flex-row justify-center items-center mt-6">
+                      <LightText color="mediumGrey" size="base">
+                        Don't have an account?{" "}
+                      </LightText>
+                      <TouchableOpacity
+                        onPress={() => navigation.navigate("CreateAccountScreen")}
+                      >
+                        <BoldText color="primary" size="base">
+                          Create Account
+                        </BoldText>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </KeyboardAvoidingView>
               )}
             </Formik>
           ) : (

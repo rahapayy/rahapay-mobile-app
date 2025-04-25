@@ -84,10 +84,7 @@ export default Sentry.wrap(function App() {
         <QueryClientProvider client={queryClient}>
           <NotificationProvider>
             <LockProvider>
-              <NavigationContainer
-                ref={navigationRef}
-                initialState={initialState}
-              >
+              <NavigationContainer ref={navigationRef} initialState={initialState}>
                 <StatusBar barStyle={"default"} />
                 <Router />
                 <FlashMessage

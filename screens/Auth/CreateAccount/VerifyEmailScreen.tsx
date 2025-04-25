@@ -23,9 +23,10 @@ import {
 import ProgressIndicator from "../../../components/ProgressIndicator";
 import { IVerifyEmailDto } from "@/services/dtos";
 import { services } from "@/services";
-import { setItem } from "@/utils/storage";
+import { setItem, removeItem } from "@/utils/storage";
 import { useAuth } from "@/services/AuthContext";
 import OtpInput from "@/components/common/ui/forms/OtpInput";
+import * as Sentry from "@sentry/react-native";
 
 type VerifyEmailScreenRouteParams = { email: string; id: string };
 
@@ -41,13 +42,13 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
   const email = route.params.email;
   const id = route.params.id;
 
+  const { setUserInfo, setIsFreshLogin } = useAuth();
   const [boxes, setBoxes] = useState(["", "", "", "", "", ""]);
   const boxRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isInputFilled, setIsInputFilled] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(60);
   const [isLoading, setIsLoading] = useState(false);
-  const { setUserInfo } = useAuth();
 
   useEffect(() => {
     setIsInputFilled(boxes.every((box) => box !== ""));
@@ -75,11 +76,27 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
         const response = await services.authService.verifyEmail(payload);
 
         if (response?.data?.accessToken) {
-          await setItem("ACCESS_TOKEN", response.data.accessToken, true);
-          await setItem("REFRESH_TOKEN", response.data.refreshToken, true);
+          // Clear lock-related storage to prevent lock screen
+          await Promise.all([
+            removeItem("IS_LOCKED"),
+            removeItem("BACKGROUND_TIMESTAMP"),
+            removeItem("WAS_TERMINATED"),
+            removeItem("LOCK_TIMESTAMP"),
+          ]);
+          console.log("Cleared lock-related storage in VerifyEmailScreen");
 
+          // Set tokens
+          await Promise.all([
+            setItem("ACCESS_TOKEN", response.data.accessToken, true),
+            setItem("REFRESH_TOKEN", response.data.refreshToken, true),
+          ]);
+          console.log("Set ACCESS_TOKEN and REFRESH_TOKEN");
+
+          // Fetch user details and update auth state
           const userResponse = await services.authServiceToken.getUserDetails();
           setUserInfo(userResponse.data);
+          setIsFreshLogin(true);
+          console.log("Email verification successful, set isFreshLogin: true");
 
           await AsyncStorage.setItem(
             "ONBOARDING_STATE",
@@ -92,15 +109,12 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
             type: "success",
           });
         }
-      } catch (error) {
-        const err = error as {
-          response?: { data?: { message?: string; code?: string } };
-          message: string;
-        };
+      } catch (error: any) {
+        Sentry.captureException(error);
         const errorMessage =
-          err.response?.data?.message || err.message || "An error occurred";
+          error.response?.data?.message || error.message || "An error occurred";
 
-        if (err.response?.data?.code === "INVALID_OTP") {
+        if (error.response?.data?.code === "INVALID_OTP") {
           handleShowFlash({
             message: "The OTP you entered is incorrect. Please try again.",
             type: "danger",
@@ -126,13 +140,10 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
       await services.authService.resendOtp(id);
       handleShowFlash({ message: "OTP resent successfully!", type: "success" });
       setResendCountdown(60);
-    } catch (error) {
-      const err = error as {
-        response?: { data?: { message?: string } };
-        message: string;
-      };
+    } catch (error: any) {
+      Sentry.captureException(error);
       const errorMessage =
-        err.response?.data?.message || err.message || "An error occurred";
+        error.response?.data?.message || error.message || "An error occurred";
       handleShowFlash({ message: errorMessage, type: "danger" });
     }
   };

@@ -23,6 +23,8 @@ interface AuthContextType {
   setUserInfo: (userInfo: UserInfoType | null) => void;
   isAppReady: boolean;
   logOut: () => Promise<void>;
+  isFreshLogin: boolean;
+  setIsFreshLogin: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface SWRProps {
@@ -43,6 +45,8 @@ export const AuthContext = createContext<AuthContextType>({
   logOut: async () => {},
   setUserInfo: () => {},
   isAppReady: false,
+  isFreshLogin: false,
+  setIsFreshLogin: () => {},
 });
 
 const SWR: React.FC<SWRProps> = ({ children, logOut }) => {
@@ -85,15 +89,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAppReady, setIsAppReady] = useState(false);
+  const [isFreshLogin, setIsFreshLogin] = useState(false);
 
   const checkAuth = async () => {
     try {
+      console.log("checkAuth start, isFreshLogin:", isFreshLogin);
       const accessToken = await getItem("ACCESS_TOKEN", true);
       const refreshToken = await getItem("REFRESH_TOKEN", true);
 
       console.log("Checking auth state:", {
         accessToken: accessToken ? "Present" : "Not present",
         refreshToken: refreshToken ? "Present" : "Not present",
+        isFreshLogin,
       });
 
       if (accessToken) {
@@ -102,18 +109,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
+        setIsFreshLogin(false);
       }
     } catch (error) {
       console.error("Auth check failed:", error);
       Sentry.captureException(error);
       setIsAuthenticated(false);
+      setIsFreshLogin(false);
     } finally {
       setIsAppReady(true);
       setIsLoading(false);
+      console.log("checkAuth complete, isAppReady:", true, "isFreshLogin:", isFreshLogin);
     }
   };
 
-  // Check authentication state on mount
   useEffect(() => {
     checkAuth();
   }, []);
@@ -124,41 +133,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         removeItem("ACCESS_TOKEN", true),
         removeItem("REFRESH_TOKEN", true),
         removeItem("IS_LOCKED", true),
+        removeItem("WAS_TERMINATED"),
+        removeItem("BACKGROUND_TIMESTAMP"),
       ]);
-
-      // Clear SWR cache
       mutate(() => true, undefined, false);
       console.log("SWR cache cleared on logout");
-
-      // Reset authentication state
       setIsAuthenticated(false);
       setUserInfo(null);
+      setIsFreshLogin(false);
     } catch (error) {
       console.error("Logout error:", error);
       Sentry.captureException(error);
     }
   }, []);
 
-  // Pass logout callback to apiClient
   useEffect(() => {
     setLogoutCallback(logOut);
     return () => {
-      setLogoutCallback(() => Promise.resolve()); // Cleanup on unmount
+      setLogoutCallback(() => Promise.resolve());
     };
   }, [logOut]);
 
   const value = useMemo(
     () => ({
       isLoading,
+      setIsLoading,
       isAuthenticated,
+      setIsAuthenticated,
       userInfo,
+      setUserInfo,
       isAppReady,
       logOut,
-      setIsAuthenticated,
-      setUserInfo,
-      setIsLoading,
+      isFreshLogin,
+      setIsFreshLogin,
     }),
-    [isLoading, isAuthenticated, userInfo, isAppReady, logOut]
+    [isLoading, isAuthenticated, userInfo, isAppReady, logOut, isFreshLogin]
   );
 
   return (
@@ -168,4 +177,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
