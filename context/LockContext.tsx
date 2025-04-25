@@ -10,8 +10,8 @@ import { useAuth } from "../services/AuthContext";
 import { getItem, setItem, removeItem } from "@/utils/storage";
 
 // Constants
-// const INACTIVITY_TIMEOUT = 30 * 1000; // 30 seconds
-const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+const INACTIVITY_TIMEOUT = 30 * 1000; // 30 seconds
+// const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
 interface LockContextType {
   isLocked: boolean;

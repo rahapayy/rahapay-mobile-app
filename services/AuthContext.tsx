@@ -8,10 +8,11 @@ import React, {
   useCallback,
 } from "react";
 import { SWRConfig } from "swr";
-import { axiosInstance, services } from "./apiClient";
+import { axiosInstance, services, setLogoutCallback } from "./apiClient";
 import { UserInfoType } from "./dtos";
 import { getItem, removeItem } from "@/utils/storage";
-import { mutate } from "swr"; // Import mutate to clear cache
+import { mutate } from "swr";
+import * as Sentry from "@sentry/react-native";
 
 interface AuthContextType {
   isLoading: boolean;
@@ -51,10 +52,14 @@ const SWR: React.FC<SWRProps> = ({ children, logOut }) => {
         const response = await axiosInstance.get(url);
         return response.data;
       } catch (error: any) {
+        if (error.message === "Session expired. Please log in again.") {
+          await logOut();
+          throw new Error("Session expired. Please log in again.");
+        }
         if (error.response?.status === 401) {
-          // Instead of automatically logging out, we'll just throw the error
           throw new Error("Unauthorized");
         }
+        Sentry.captureException(error);
         throw error;
       }
     },
@@ -84,15 +89,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const checkAuth = async () => {
     try {
       const accessToken = await getItem("ACCESS_TOKEN", true);
-      console.log("Access token: " + accessToken);
+      const refreshToken = await getItem("REFRESH_TOKEN", true);
+
+      console.log("Checking auth state:", {
+        accessToken: accessToken ? "Present" : "Not present",
+        refreshToken: refreshToken ? "Present" : "Not present",
+      });
 
       if (accessToken) {
         const userResponse = await services.authServiceToken.getUserDetails();
         setUserInfo(userResponse.data);
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
       }
-
-      setIsAuthenticated(!!accessToken);
     } catch (error) {
+      console.error("Auth check failed:", error);
+      Sentry.captureException(error);
       setIsAuthenticated(false);
     } finally {
       setIsAppReady(true);
@@ -107,13 +120,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logOut = useCallback(async () => {
     try {
-      // Clear tokens from storage
-      await removeItem("ACCESS_TOKEN", true);
-      await removeItem("REFRESH_TOKEN", true);
-      await removeItem("IS_LOCKED", true);
+      await Promise.all([
+        removeItem("ACCESS_TOKEN", true),
+        removeItem("REFRESH_TOKEN", true),
+        removeItem("IS_LOCKED", true),
+      ]);
 
       // Clear SWR cache
-      mutate(() => true, undefined, false); // Clears all SWR cache
+      mutate(() => true, undefined, false);
       console.log("SWR cache cleared on logout");
 
       // Reset authentication state
@@ -121,8 +135,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUserInfo(null);
     } catch (error) {
       console.error("Logout error:", error);
+      Sentry.captureException(error);
     }
   }, []);
+
+  // Pass logout callback to apiClient
+  useEffect(() => {
+    setLogoutCallback(logOut);
+    return () => {
+      setLogoutCallback(() => Promise.resolve()); // Cleanup on unmount
+    };
+  }, [logOut]);
 
   const value = useMemo(
     () => ({
