@@ -23,3 +23,7 @@ google-services.json
 .env.local
 
 ServiceAccountRahapay.json
+
+.env.development
+.env.preview
+.env.production
