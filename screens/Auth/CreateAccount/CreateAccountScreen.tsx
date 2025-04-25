@@ -300,13 +300,27 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                   </View>
                 )}
               </View>
-              {renderInputField(
-                "Re-type Password",
-                "confirmPassword",
-                "Confirm Password",
-                formikProps,
-                true
-              )}
+              <View className="mt-4">
+                <Label text="Re-type Password" marked={false} />
+                <BasicInput
+                  value={formikProps.values.confirmPassword}
+                  onChangeText={(value) => {
+                    formikProps.handleChange("confirmPassword")(value);
+                    formikProps.validateField("confirmPassword");
+                  }}
+                  onBlur={formikProps.handleBlur("confirmPassword")}
+                  placeholder="Confirm Password"
+                  secureTextEntry
+                  autoCapitalize="none"
+                  autoComplete="off"
+                  autoCorrect={false}
+                />
+                {formikProps.errors.confirmPassword && (
+                  <Text style={styles.errorText}>
+                    {formikProps.errors.confirmPassword}
+                  </Text>
+                )}
+              </View>
               {renderInputField(
                 "Referral",
                 "referral",
