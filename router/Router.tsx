@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NetInfo from "@react-native-community/netinfo";
-import { AppState, AppStateStatus } from "react-native"; // Correct import
+import { AppState, AppStateStatus } from "react-native";
 import AppStack from "./AppStack";
 import AuthRoute from "./AuthRouter";
 import { useAuth } from "../services/AuthContext";
@@ -62,14 +62,15 @@ const Router = () => {
   const [isLockScreenRequired, setIsLockScreenRequired] = useState<boolean>(false);
   const [isLockStateReady, setIsLockStateReady] = useState<boolean>(false);
   const [appState, setAppState] = useState<AppStateStatus>(AppState.currentState);
+  const [biometricFailed, setBiometricFailed] = useState<boolean>(false);
 
   useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      setIsOnline(state.isConnected ?? true);
-    });
-    NetInfo.fetch().then((state) => {
-      setIsOnline(state.isConnected ?? true);
-    });
+    console.log("State Update:", { isLockScreenRequired, biometricFailed, isAuthenticated });
+  }, [isLockScreenRequired, biometricFailed, isAuthenticated]);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => setIsOnline(state.isConnected ?? true));
+    NetInfo.fetch().then((state) => setIsOnline(state.isConnected ?? true));
     return () => unsubscribe();
   }, []);
 
@@ -77,8 +78,8 @@ const Router = () => {
     const initialize = async () => {
       try {
         if (!isAuthenticated) {
-          console.log("Not authenticated, no lock screen required");
           setIsLockScreenRequired(false);
+          setBiometricFailed(false);
           await Promise.all([
             removeItem("WAS_TERMINATED"),
             removeItem("BACKGROUND_TIMESTAMP"),
@@ -87,42 +88,26 @@ const Router = () => {
         } else {
           const wasTerminated = await getItem("WAS_TERMINATED");
           const backgroundTimestamp = await getItem("BACKGROUND_TIMESTAMP");
-          const INACTIVITY_TIMEOUT = 30 * 1000; // 30 seconds
-          let shouldLock = false;
-
-          console.log("Initialization checks:", { wasTerminated, backgroundTimestamp });
+          const INACTIVITY_TIMEOUT = 30 * 1000;
+          let shouldLock = true;
 
           if (wasTerminated === "true") {
-            console.log("App was terminated, requiring lock screen");
             shouldLock = true;
             await removeItem("WAS_TERMINATED");
           } else if (backgroundTimestamp) {
-            const lastBackgroundTime = parseInt(backgroundTimestamp, 10);
-            const currentTime = Date.now();
-            const backgroundDuration = currentTime - lastBackgroundTime;
-            console.log("Background duration:", backgroundDuration);
-            if (backgroundDuration >= INACTIVITY_TIMEOUT) {
-              console.log("Inactivity timeout exceeded, requiring lock screen");
-              shouldLock = true;
-            }
+            const backgroundDuration = Date.now() - parseInt(backgroundTimestamp, 10);
+            shouldLock = backgroundDuration >= INACTIVITY_TIMEOUT;
             await removeItem("BACKGROUND_TIMESTAMP");
-          } else {
-            // If no termination or background timestamp, check if app was recently active
-            console.log("No termination or timeout, but checking authentication state");
-            shouldLock = true; // Default to locked for authenticated users until unlocked
           }
-
           setIsLockScreenRequired(shouldLock);
         }
       } catch (error) {
-        console.error("Error initializing lock state:", error);
-        Sentry.captureException(error);
-        setIsLockScreenRequired(true); // Default to locked on error
+        console.error("Initialize error:", error);
+        setIsLockScreenRequired(true);
       } finally {
         setIsLockStateReady(true);
       }
     };
-
     initialize();
   }, [isAuthenticated]);
 
@@ -132,46 +117,24 @@ const Router = () => {
         setAppState(nextAppState);
         return;
       }
-
-      if (
-        appState === "active" &&
-        (nextAppState === "background" || nextAppState === "inactive")
-      ) {
-        const currentTime = Date.now();
-        console.log("App going to background, setting timestamp:", currentTime);
-        await setItem("BACKGROUND_TIMESTAMP", currentTime.toString());
+      if (appState === "active" && (nextAppState === "background" || nextAppState === "inactive")) {
+        await setItem("BACKGROUND_TIMESTAMP", Date.now().toString());
       }
-
-      if (
-        (appState.match(/inactive|background/) || appState === "inactive") &&
-        nextAppState === "active"
-      ) {
+      if ((appState.match(/inactive|background/) || appState === "inactive") && nextAppState === "active") {
         const backgroundTimestamp = await getItem("BACKGROUND_TIMESTAMP");
-        console.log("App returning to foreground, timestamp:", backgroundTimestamp);
         if (backgroundTimestamp) {
-          const currentTime = Date.now();
-          const backgroundDuration = currentTime - parseInt(backgroundTimestamp, 10);
+          const backgroundDuration = Date.now() - parseInt(backgroundTimestamp, 10);
           const INACTIVITY_TIMEOUT = 30 * 1000;
-          console.log("Background duration on return:", backgroundDuration);
           if (backgroundDuration >= INACTIVITY_TIMEOUT) {
-            console.log("Inactivity timeout exceeded, requiring lock screen");
             setIsLockScreenRequired(true);
-          } else {
-            console.log("No timeout, no lock screen required");
-            setIsLockScreenRequired(false);
           }
           await removeItem("BACKGROUND_TIMESTAMP");
         }
       }
-
       setAppState(nextAppState);
     };
-
     const subscription = AppState.addEventListener("change", handleAppStateChange);
-
-    return () => {
-      subscription.remove();
-    };
+    return () => subscription.remove();
   }, [appState, isAuthenticated]);
 
   const handleBiometricSuccess = async () => {
@@ -181,8 +144,8 @@ const Router = () => {
         const userResponse = await services.authServiceToken.getUserDetails();
         setIsAuthenticated(true);
         setUserInfo(userResponse.data);
-        console.log("Biometric success, unlocking app");
         setIsLockScreenRequired(false);
+        setBiometricFailed(false);
         await Promise.all([
           setItem("IS_LOCKED", "false"),
           removeItem("BACKGROUND_TIMESTAMP"),
@@ -190,92 +153,86 @@ const Router = () => {
           removeItem("WAS_TERMINATED"),
         ]);
       } else {
-        handleShowFlash({
-          message: "No access token found. Please log in with password.",
-          type: "danger",
-        });
+        handleShowFlash({ message: "No access token. Use password.", type: "danger" });
         setIsLockScreenRequired(true);
+        setBiometricFailed(true);
       }
     } catch (error) {
-      console.error("Error verifying user after biometric success:", error);
-      Sentry.captureException(error);
-      handleShowFlash({
-        message: "Failed to verify user. Please try again.",
-        type: "danger",
-      });
-      setIsLockScreenRequired(true); // Keep locked on error
+      console.error("Biometric success error:", error);
+      handleShowFlash({ message: "Verification failed.", type: "danger" });
+      setIsLockScreenRequired(true);
+      setBiometricFailed(true);
     }
   };
 
   const handleBiometricFailure = () => {
-    console.log("Biometric failure, keeping lock screen");
+    console.log("Biometric failed");
     setIsLockScreenRequired(true);
+    setBiometricFailed(true);
+    handleShowFlash({ message: "Biometric authentication failed.", type: "danger" });
   };
 
   const handlePasswordLogin = () => {
-    // Navigation to PasswordReauthScreen is handled by LockStack
+    console.log("Navigating to PasswordReauthScreen");
   };
 
   const handleSwitchAccount = async () => {
     await logOut();
     setIsLockScreenRequired(false);
+    setBiometricFailed(false);
   };
 
   const handleRetry = () => {
-    NetInfo.fetch().then((state) => {
-      setIsOnline(state.isConnected ?? true);
-    });
+    NetInfo.fetch().then((state) => setIsOnline(state.isConnected ?? true));
   };
 
-  console.log("Router state:", {
-    isAppReady,
-    isLockStateReady,
-    isAuthenticated,
-    isLockScreenRequired,
-    isOnline,
-  });
+  // Ensure LockScreen after biometric failure
+  useEffect(() => {
+    if (biometricFailed) {
+      console.log("Biometric failed effect: Enforcing LockScreen");
+      setIsLockScreenRequired(true); // Reinforce lock screen
+    }
+  }, [biometricFailed]);
 
-  if (!isAppReady || !isLockStateReady) {
-    return null;
-  }
+  const navigationStack = useMemo(() => {
+    const shouldRenderLockScreen = isAuthenticated && (isLockScreenRequired || biometricFailed);
+    console.log("Navigation decision:", { shouldRenderLockScreen, isAuthenticated, isLockScreenRequired, biometricFailed });
 
-  if (!isOnline) {
-    return <OfflineScreen onRetry={handleRetry} />;
-  }
+    if (!isAuthenticated) {
+      return (
+        <RootStack.Navigator screenOptions={{ gestureEnabled: false }}>
+          <RootStack.Screen name="AuthRoute" component={AuthRoute} options={{ headerShown: false }} />
+        </RootStack.Navigator>
+      );
+    }
+    if (shouldRenderLockScreen) {
+      return (
+        <RootStack.Navigator screenOptions={{ gestureEnabled: false }}>
+          <RootStack.Screen name="LockStack" options={{ headerShown: false }}>
+            {(props) => (
+              <LockStackNavigator
+                {...props}
+                onBiometricSuccess={handleBiometricSuccess}
+                onBiometricFailure={handleBiometricFailure}
+                onPasswordLogin={handlePasswordLogin}
+                onSwitchAccount={handleSwitchAccount}
+                userInfo={userInfo}
+              />
+            )}
+          </RootStack.Screen>
+        </RootStack.Navigator>
+      );
+    }
+    return (
+      <RootStack.Navigator screenOptions={{ gestureEnabled: false }}>
+        <RootStack.Screen name="AppStack" component={AppStack} options={{ headerShown: false }} />
+      </RootStack.Navigator>
+    );
+  }, [isAuthenticated, isLockScreenRequired, biometricFailed, userInfo]);
 
-  return (
-    <RootStack.Navigator screenOptions={{ gestureEnabled: false }}>
-      {isLockScreenRequired && isAuthenticated ? (
-        <RootStack.Screen
-          name="LockStack"
-          options={{ headerShown: false }}
-        >
-          {(props) => (
-            <LockStackNavigator
-              {...props}
-              onBiometricSuccess={handleBiometricSuccess}
-              onBiometricFailure={handleBiometricFailure}
-              onPasswordLogin={handlePasswordLogin}
-              onSwitchAccount={handleSwitchAccount}
-              userInfo={userInfo}
-            />
-          )}
-        </RootStack.Screen>
-      ) : isAuthenticated ? (
-        <RootStack.Screen
-          name="AppStack"
-          component={AppStack}
-          options={{ headerShown: false }}
-        />
-      ) : (
-        <RootStack.Screen
-          name="AuthRoute"
-          component={AuthRoute}
-          options={{ headerShown: false }}
-        />
-      )}
-    </RootStack.Navigator>
-  );
+  if (!isAppReady || !isLockStateReady) return null;
+  if (!isOnline) return <OfflineScreen onRetry={handleRetry} />;
+  return navigationStack;
 };
 
 export default Router;
