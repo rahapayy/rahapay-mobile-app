@@ -4,66 +4,78 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  Platform,
 } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
-import { services } from "../../services";
-import { useAuth } from "../../services/AuthContext";
-import { getItem } from "../../utils/storage";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { LockStackParamList } from "../../types/RootStackParams";
-import { useLock } from "../../context/LockContext";
 import { COLORS, SPACING } from "@/constants/ui";
 import Button from "@/components/common/ui/buttons/Button";
 import { BoldText, MediumText, RegularText } from "@/components/common/Text";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { FaceIdIcon } from "@/components/common/ui/icons";
+import * as Sentry from "@sentry/react-native";
 
-type LockScreenProps = NativeStackScreenProps<LockStackParamList, "LockScreen">;
 const { width, height } = Dimensions.get("window");
 
-const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
-  const { setIsAuthenticated, setUserInfo, userInfo, logOut } = useAuth();
-  const { handleUnlock } = useLock();
+type LockScreenProps = {
+  onBiometricSuccess: () => void;
+  onBiometricFailure: () => void;
+  onPasswordLogin: () => void;
+  onSwitchAccount: () => void;
+  userInfo: { fullName?: string } | null;
+};
+
+const LockScreen: React.FC<LockScreenProps> = ({
+  onBiometricSuccess,
+  onBiometricFailure,
+  onPasswordLogin,
+  onSwitchAccount,
+  userInfo,
+}) => {
   const [biometricType, setBiometricType] = useState<string>("biometric");
   const insets = useSafeAreaInsets();
 
   const fullName = userInfo?.fullName || "";
   const firstName = fullName.split(" ")[0] || "";
-  const initials = fullName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase();
 
   useEffect(() => {
-    // Check biometric type and trigger authentication
     (async () => {
-      const supportedTypes =
-        await LocalAuthentication.supportedAuthenticationTypesAsync();
-      if (
-        supportedTypes.includes(
-          LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION
-        )
-      ) {
-        setBiometricType("Face ID");
-      } else if (
-        supportedTypes.includes(
-          LocalAuthentication.AuthenticationType.FINGERPRINT
-        )
-      ) {
-        setBiometricType("Fingerprint");
-      }
+      try {
+        const supportedTypes =
+          await LocalAuthentication.supportedAuthenticationTypesAsync();
+        if (
+          supportedTypes.includes(
+            LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION
+          )
+        ) {
+          setBiometricType("Face ID");
+        } else if (
+          supportedTypes.includes(
+            LocalAuthentication.AuthenticationType.FINGERPRINT
+          )
+        ) {
+          setBiometricType("Fingerprint");
+        }
 
-      // Check if biometrics are available and enrolled
-      const hasHardware = await LocalAuthentication.hasHardwareAsync();
-      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+        const hasHardware = await LocalAuthentication.hasHardwareAsync();
+        const isEnrolled = await LocalAuthentication.isEnrolledAsync();
 
-      if (hasHardware && isEnrolled) {
-        // Only trigger biometric authentication if both conditions are met
-        handleBiometricLogin();
+        if (hasHardware && isEnrolled) {
+          handleBiometricLogin();
+        } else {
+          handleShowFlash({
+            message:
+              "Biometric authentication not available. Please use password login.",
+            type: "info",
+          });
+        }
+      } catch (error) {
+        console.error("Error checking biometric support:", error);
+        Sentry.captureException(error);
+        handleShowFlash({
+          message: "Error checking biometric support",
+          type: "danger",
+        });
       }
     })();
   }, []);
@@ -76,6 +88,7 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
           message: "This device doesn't support biometric authentication.",
           type: "info",
         });
+        onBiometricFailure();
         return;
       }
 
@@ -86,6 +99,7 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
             "No biometric data enrolled. Please set it up in your device settings.",
           type: "info",
         });
+        onBiometricFailure();
         return;
       }
 
@@ -96,34 +110,28 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
       });
 
       if (result.success) {
-        const accessToken = await getItem("ACCESS_TOKEN", true);
-        if (accessToken) {
-          const userResponse = await services.authServiceToken.getUserDetails();
-          setIsAuthenticated(true);
-          setUserInfo(userResponse.data);
-          handleShowFlash({
-            message: `Logged in successfully with ${biometricType}`,
-            type: "success",
-          });
-          await handleUnlock();
-        } else {
-          handleShowFlash({
-            message: "No access token found. Please log in with password.",
-            type: "danger",
-          });
-        }
+        console.log("Biometric authentication successful");
+        onBiometricSuccess();
+        handleShowFlash({
+          message: `Logged in successfully with ${biometricType}`,
+          type: "success",
+        });
       } else {
+        console.log("Biometric authentication failed");
         handleShowFlash({
           message: `${biometricType} authentication failed`,
           type: "danger",
         });
+        onBiometricFailure();
       }
     } catch (error) {
       console.error("Biometric login error:", error);
+      Sentry.captureException(error);
       handleShowFlash({
         message: "An error occurred during biometric login",
         type: "danger",
       });
+      onBiometricFailure();
     }
   };
 
@@ -134,7 +142,6 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
         { paddingTop: insets.top, paddingBottom: insets.bottom },
       ]}
     >
-      {/* <View style={styles.semiCircle} /> */}
       <View style={styles.profileSection}>
         <View style={styles.welcomeWrapper}>
           <MediumText color="black" size="xxlarge" style={styles.welcomeText}>
@@ -171,12 +178,12 @@ const LockScreen: React.FC<LockScreenProps> = ({ navigation }) => {
 
       <View style={styles.footerSection}>
         <Button
-          onPress={() => navigation.navigate("PasswordReauthScreen")}
+          onPress={onPasswordLogin}
           title="Login with Password"
           textColor="#5136C1"
           style={styles.passwordButton}
         />
-        <TouchableOpacity style={styles.optionButton} onPress={logOut}>
+        <TouchableOpacity style={styles.optionButton} onPress={onSwitchAccount}>
           <MaterialIcons
             name="people-alt"
             size={18}
@@ -197,31 +204,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     paddingHorizontal: 20,
   },
-  semiCircle: {
-    position: "absolute",
-    top: -width * 0.4, // Adjusted for smaller size (previously -width * 0.533)
-    right: -width * 0.4,
-    width: width * 1.2, // Reduced from width * 1.6 (600px to ~450px on a 375px-wide screen)
-    height: width * 1.2,
-    backgroundColor: COLORS.brand.primaryLight,
-    borderBottomLeftRadius: width * 0.6, // Half the new width/height for semi-circle curve
-    borderBottomRightRadius: width * 0.6,
-    borderTopLeftRadius: 0,
-    borderTopRightRadius: 0,
-    zIndex: -1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-  },
   profileSection: {
     marginTop: height * 0.5,
     alignItems: "flex-start",
   },
-  welcomeWrapper: {
-    // No changes needed here
-  },
+  welcomeWrapper: {},
   welcomeText: {
     marginBottom: 8,
   },

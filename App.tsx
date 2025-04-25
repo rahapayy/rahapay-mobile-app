@@ -18,7 +18,6 @@ import { LockProvider } from "./context/LockContext";
 import * as Sentry from "@sentry/react-native";
 import { getItem } from "./utils/storage";
 
-// Initialize Sentry
 Sentry.init({
   dsn: "https://b6d56a13d87e9557b6e7b3c7b14ee515@o4508189082648576.ingest.de.sentry.io/4509181912678480",
   tracesSampleRate: 1.0,
@@ -27,7 +26,6 @@ Sentry.init({
 
 const queryClient = new QueryClient();
 
-// Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
 export default Sentry.wrap(function App() {
@@ -50,7 +48,6 @@ export default Sentry.wrap(function App() {
   useEffect(() => {
     async function prepare() {
       try {
-        // Load navigation state
         const savedStateString = await getItem("NAVIGATION_STATE", false);
         const state = savedStateString ? JSON.parse(savedStateString) : undefined;
         if (state !== undefined) {
@@ -78,7 +75,7 @@ export default Sentry.wrap(function App() {
   }, [appIsReady, fontsLoaded, fontError]);
 
   if (!appIsReady || (!fontsLoaded && !fontError)) {
-    return null; // Keep native splash screen visible
+    return null;
   }
 
   return (
