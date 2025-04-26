@@ -1,6 +1,6 @@
 {
   "cli": {
-    "version": ">= 7.8.2",
+    "version": ">= 7.3.2",
     "appVersionSource": "remote"
   },
   "build": {
@@ -11,7 +11,13 @@
         "APP_VARIANT": "development",
         "APP_ENV": "development"
       },
-      "channel": "development"
+      "channel": "development",
+      "ios": {
+        "buildConfiguration": "Debug"
+      },
+      "android": {
+        "buildType": "apk"
+      }
     },
     "development-simulator": {
       "extends": "development",
@@ -26,7 +32,13 @@
         "APP_VARIANT": "preview",
         "APP_ENV": "preview"
       },
-      "channel": "preview"
+      "channel": "preview",
+      "ios": {
+        "buildConfiguration": "Release"
+      },
+      "android": {
+        "buildType": "apk"
+      }
     },
     "production": {
       "autoIncrement": true,
@@ -34,7 +46,13 @@
         "APP_VARIANT": "production",
         "APP_ENV": "production"
       },
-      "channel": "production"
+      "channel": "production",
+      "ios": {
+        "buildConfiguration": "Release"
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
     }
   },
   "submit": {

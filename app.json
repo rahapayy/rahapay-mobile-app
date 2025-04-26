@@ -17,9 +17,7 @@
       "fallbackToCacheTimeout": 0,
       "checkAutomatically": "ON_LOAD"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.app.rahapay",
@@ -90,75 +88,6 @@
         "projectId": "6c9dcd70-fdd4-4f28-a0d5-e1d1a6680543"
       }
     },
-    "description": "RahaPay Mobile App - Secure payments made simple",
-    "cli": {
-      "version": ">= 7.8.2",
-      "appVersionSource": "remote"
-    },
-    "build": {
-      "development": {
-        "developmentClient": true,
-        "distribution": "internal",
-        "env": {
-          "APP_VARIANT": "development",
-          "APP_ENV": "development"
-        },
-        "channel": "development",
-        "ios": {
-          "buildConfiguration": "Debug"
-        },
-        "android": {
-          "buildType": "apk"
-        }
-      },
-      "development-simulator": {
-        "extends": "development",
-        "ios": {
-          "simulator": true
-        },
-        "channel": "development-simulator"
-      },
-      "preview": {
-        "distribution": "internal",
-        "env": {
-          "APP_VARIANT": "preview",
-          "APP_ENV": "preview"
-        },
-        "channel": "preview",
-        "ios": {
-          "buildConfiguration": "Release"
-        },
-        "android": {
-          "buildType": "apk"
-        }
-      },
-      "production": {
-        "autoIncrement": true,
-        "env": {
-          "APP_VARIANT": "production",
-          "APP_ENV": "production"
-        },
-        "channel": "production",
-        "ios": {
-          "buildConfiguration": "Release"
-        },
-        "android": {
-          "buildType": "app-bundle"
-        }
-      }
-    },
-    "submit": {
-      "production": {
-        "ios": {
-          "appleId": "shedrachjonah22@gmail.com",
-          "ascAppId": "367d0cfa-1475-4062-8ce2-436d9f7b7508",
-          "appleTeamId": "D84VV5F569"
-        },
-        "android": {
-          "serviceAccountKeyPath": "./ServiceAccountRahapay.json",
-          "track": "production"
-        }
-      }
-    }
+    "description": "RahaPay Mobile App - Secure payments made simple"
   }
 }
