@@ -12,7 +12,7 @@ import {
   Alert,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowDown2, ArrowLeft, TickCircle } from "iconsax-react-native";
+import { ArrowDown2, TickCircle } from "iconsax-react-native";
 import SPACING from "../../constants/SPACING";
 import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
@@ -393,9 +393,11 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                       )}
                     />
                   ) : (
-                    <RegularText color="mediumGrey" className="mb-4">
-                      No saved beneficiaries found.
-                    </RegularText>
+                    <View className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 w-44 justify-center items-center">
+                      <RegularText color="mediumGrey" className="mb-4" size="small">
+                        No beneficiaries found.
+                      </RegularText>
+                    </View>
                   )}
                 </View>
 

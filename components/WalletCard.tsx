@@ -5,7 +5,7 @@ import {
   View,
   ImageBackground,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { AddCircle, Eye, EyeSlash, WalletAdd1 } from "iconsax-react-native";
@@ -19,11 +19,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const WalletCard: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { balance } = useWallet();
-
+  const { balance, refreshBalance } = useWallet();
   const [showBalance, setShowBalance] = useState(true);
 
-  React.useEffect(() => {
+  // Load balance visibility from AsyncStorage
+  useEffect(() => {
     const getBalanceVisibility = async () => {
       const balanceVisibility = await AsyncStorage.getItem("showBalance");
       if (balanceVisibility !== null) {
@@ -33,15 +33,22 @@ const WalletCard: React.FC<{
     getBalanceVisibility();
   }, []);
 
+  // Revalidate balance when screen is focused
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      refreshBalance(); // Trigger balance refresh
+    });
+    return unsubscribe;
+  }, [navigation, refreshBalance]);
+
   const toggleBalanceVisibility = async () => {
-    // Toggle the state
     setShowBalance((prev) => {
       const newVisibility = !prev;
-      // Store the new state in AsyncStorage
       AsyncStorage.setItem("showBalance", String(newVisibility));
       return newVisibility;
     });
   };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground
@@ -122,7 +129,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
   },
-
   fundWalletButton: {
     backgroundColor: "#fff",
     justifyContent: "center",
@@ -135,6 +141,6 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     color: COLORS.violet400,
     marginLeft: 4,
-    fontSize: RFValue(14), // Adjusted font size
+    fontSize: RFValue(14),
   },
 });

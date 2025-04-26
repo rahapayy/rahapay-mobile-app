@@ -15,6 +15,8 @@ export interface CablePurchasePayload {
   planId: string;
   customerName?: string; // Optional as per your payload example
   smartCardNo: string;
+  transactionPin?: string;
+  saveBeneficiary: boolean;
 }
 
 export interface CablePurchaseResponse {

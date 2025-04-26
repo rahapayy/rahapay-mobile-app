@@ -67,12 +67,14 @@ const TransactionPinScreen: React.FC<TransactionPinScreenProps> = ({
             price: number;
             cardNumber: string;
             customerName: string;
+            saveBeneficiary: boolean;
           };
           const cablePayload = {
             cableName: cableParams.service.toUpperCase(),
             planId: cableParams.planId,
             smartCardNo: cableParams.cardNumber,
             customerName: cableParams.customerName || "Unknown",
+            saveBeneficiary: cableParams.saveBeneficiary,
             transactionPin: pin,
           };
           response = await services.cableService.purchaseCable(cablePayload);

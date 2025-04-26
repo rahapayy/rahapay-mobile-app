@@ -32,6 +32,7 @@ import { services } from "@/services";
 import { Beneficiary } from "@/services/modules/beneficiary";
 import { Skeleton } from "@rneui/base";
 import * as Contacts from "expo-contacts";
+import useWallet from "@/hooks/use-wallet"; // Adjust path as needed
 
 interface AirtimeScreenProps {
   navigation: NativeStackNavigationProp<
@@ -49,6 +50,7 @@ interface AirtimeScreenProps {
 }
 
 const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
+  const { balance, refreshBalance } = useWallet();
   const [activeTab, setActiveTab] = useState<"Local" | "International">(
     "Local"
   );
@@ -94,6 +96,14 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
 
     fetchBeneficiaries();
   }, []);
+
+  // Refresh balance when screen is focused
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      refreshBalance(); // Ensure latest balance is displayed
+    });
+    return unsubscribe;
+  }, [navigation, refreshBalance]);
 
   const handleProceed = () => {
     const sanitizedAmount = parseFloat(amount);
@@ -403,9 +413,11 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
                         )}
                       />
                     ) : (
-                      <RegularText color="mediumGrey" className="mb-4">
-                        No saved beneficiaries found.
-                      </RegularText>
+                      <View className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 w-52">
+                        <RegularText color="mediumGrey" className="mb-4">
+                          No beneficiaries found.
+                        </RegularText>
+                      </View>
                     )}
                   </View>
 
@@ -428,6 +440,15 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
                   </View>
 
                   <View className="mt-4">
+                    <View className="flex-row justify-between items-center">
+                      <Label text="Amount" marked={false} />
+                      <RegularText color="black" marginBottom={10}>
+                        Balance: ₦
+                        {balance.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                        })}
+                      </RegularText>
+                    </View>
                     <CurrencyInput
                       value={amount}
                       error={amountError}

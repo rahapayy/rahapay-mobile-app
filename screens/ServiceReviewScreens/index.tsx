@@ -291,6 +291,7 @@ function getSummaryItems(
         customerName: string;
         planName: string;
         cardNumber: string;
+        saveBeneficiary: boolean;
       };
       return [
         { label: "Amount", value: `₦${cableParams.price}` },

@@ -92,6 +92,7 @@ export type AppStackParamList = {
         electricity_units?: string; // For ELECTRICITY_PURCHASE (Prepaid only)
         customerName?: string; // For ELECTRICITY_PURCHASE
         customerAddress?: string; // For ELECTRICITY_PURCHASE
+        saveBeneficiary?: boolean;
       };
     };
   };
@@ -166,6 +167,7 @@ export type AppStackParamList = {
           cardNumber: string;
           planName: string;
           customerName: string;
+          saveBeneficiary?: boolean;
         } // Cable TV
       | {
           selectedOperator: string;

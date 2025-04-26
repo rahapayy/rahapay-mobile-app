@@ -19,15 +19,26 @@ const CurrencyInput: React.FC<CurrencyInputProps> = ({
   errorMessage,
 }) => {
   const handleChangeText = (text: string) => {
+    // Remove any non-numeric characters
     const sanitizedText = text.replace(/[^0-9]/g, "");
+
+    // Store the raw value (without commas) in the state
     onChange(sanitizedText);
+  };
+
+  // Format the displayed value with commas
+  const formatWithCommas = (value: string): string => {
+    if (!value) return "";
+
+    // Convert to number and format with commas
+    const number = parseInt(value, 10);
+    return number.toLocaleString("en-US");
   };
 
   return (
     <View style={styles.container}>
-      <Label text="Amount" marked={false} />
       <View style={[styles.inputContainer, error && styles.errorInput]}>
-        <SemiBoldText color="black" marginRight={8}>
+        <SemiBoldText color="black" marginRight={8} size="large">
           ₦
         </SemiBoldText>
         <TextInput
@@ -35,7 +46,7 @@ const CurrencyInput: React.FC<CurrencyInputProps> = ({
           placeholder="100 - 500,000"
           placeholderTextColor="#BABFC3"
           keyboardType="numeric"
-          value={value}
+          value={formatWithCommas(value)}
           onChangeText={handleChangeText}
           autoComplete="off"
           autoCapitalize="none"
@@ -66,7 +77,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: RFValue(12),
+    fontSize: RFValue(20),
     fontFamily: "Outfit-Regular",
   },
   errorInput: {

@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
     width: 1,
     height: "70%",
     backgroundColor: "#DFDFDF",
+    borderWidth: 1,
   },
   input: {
     flex: 1,

@@ -148,7 +148,7 @@ const Router = () => {
         } else {
           const wasTerminated = await getItem("WAS_TERMINATED");
           const backgroundTimestamp = await getItem("BACKGROUND_TIMESTAMP");
-          const INACTIVITY_TIMEOUT = 180 * 1000; // 3 minutes
+          const INACTIVITY_TIMEOUT = 180 * 1000; //3 min
           // const INACTIVITY_TIMEOUT = 30 * 1000; // For test
           let shouldLock = false; // Default to NOT locked to avoid premature lock screen
 
@@ -241,7 +241,7 @@ const Router = () => {
           const currentTime = Date.now();
           const backgroundDuration =
             currentTime - parseInt(backgroundTimestamp, 10);
-          const INACTIVITY_TIMEOUT = 30 * 1000;
+          const INACTIVITY_TIMEOUT = 180 * 1000;
           console.log("Background duration on return:", backgroundDuration);
           if (backgroundDuration >= INACTIVITY_TIMEOUT) {
             console.log("Inactivity timeout exceeded, requiring lock screen");

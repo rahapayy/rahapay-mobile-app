@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useContext } from "react";
+import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, Copy } from "iconsax-react-native";
 import SPACING from "../constants/SPACING";
@@ -27,7 +27,6 @@ const FundWalletScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const { account, isLoading } = useWallet();
-
   const { userInfo } = useAuth();
 
   const copyToClipboard = async (textToCopy: string) => {
@@ -38,10 +37,17 @@ const FundWalletScreen: React.FC<{
     });
   };
 
+  // Transform bank name to remove "(Amucha)"
+  const formatBankName = (bankName?: string) => {
+    if (!bankName) return "";
+    return bankName.replace(/\(Amucha\)/, "").trim();
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
         <View>
+          {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
@@ -57,59 +63,101 @@ const FundWalletScreen: React.FC<{
           {/* Cards */}
           <View style={styles.cardsContainer}>
             <View style={styles.cardWrapper}>
-              {/* {isLoading ? (
-                // Display Skeleton components while loading
+              {isLoading ? (
+                // Skeleton Loading UI with Background Image
+                <ImageBackground
+                  source={require("../assets/images/layer.png")}
+                  resizeMode="cover"
+                  style={styles.walletContain}
+                >
+                  <View style={styles.cardHeader}>
+                    <Skeleton
+                      style={styles.skeletonVirtualText}
+                      animation="wave"
+                    />
+                    <Skeleton
+                      circle
+                      style={styles.skeletonCircle}
+                      animation="wave"
+                      skeletonStyle={{ backgroundColor: COLORS.violet300 }}
+                    />
+                  </View>
+                  <Skeleton style={styles.skeletonBankName} animation="wave" />
+                  <View style={styles.copyContainer}>
+                    <Skeleton
+                      style={styles.skeletonCopyText}
+                      animation="wave"
+                      skeletonStyle={{ backgroundColor: COLORS.violet200 }}
+                    />
+                    <View style={styles.accountNumberContainer}>
+                      <Skeleton
+                        style={styles.skeletonAccountNumber}
+                        animation="wave"
+                      />
+                      <Skeleton
+                        circle
+                        style={styles.skeletonCopyIcon}
+                        animation="wave"
+                      />
+                    </View>
+                  </View>
+                  <Skeleton
+                    style={styles.skeletonAccountName}
+                    animation="wave"
+                  />
+                </ImageBackground>
+              ) : !account || !account.accountNumber ? (
+                // No Account Notification
                 <View style={styles.walletContain}>
-                  <View style={styles.skeletonHeader}>
-                    <Skeleton style={styles.skeletonCircle} />
-                    <Skeleton style={styles.skeletonTitle} />
-                  </View>
-                  <Skeleton style={styles.skeletonBankName} />
-                  <View style={styles.skeletonCopyContainer}>
-                    <Skeleton style={styles.skeletonCopyText} />
-                    <Skeleton style={styles.skeletonAccountNumber} />
-                  </View>
-                  <Skeleton style={styles.skeletonName} />
-                </View>
-              ) : ( */}
-              <ImageBackground
-                source={require("../assets/images/layer.png")}
-                resizeMode="cover"
-                style={styles.walletContain}
-              >
-                {/* Card Details */}
-                <View style={styles.cardHeader}>
-                  <Text style={styles.virtualText} allowFontScaling={false}>
-                    Virtual Account
+                  <Text style={styles.noAccountText} allowFontScaling={false}>
+                    Please exercise patience, your account is on the way.
                   </Text>
-                  <Circle />
                 </View>
-
-                <Text style={styles.bankName} allowFontScaling={false}>
-                  {account.bankName}
-                </Text>
-                <View style={styles.copyContainer}>
-                  <Text style={styles.copyText} allowFontScaling={false}>
-                    Copy your account number
-                  </Text>
-                  <View style={styles.accountNumberContainer}>
-                    <Text style={styles.accountNumber} allowFontScaling={false}>
-                      {account.accountNumber}
+              ) : (
+                // Actual Account Information
+                <ImageBackground
+                  source={require("../assets/images/layer.png")}
+                  resizeMode="cover"
+                  style={styles.walletContain}
+                >
+                  {/* Card Details */}
+                  <View style={styles.cardHeader}>
+                    <Text style={styles.virtualText} allowFontScaling={false}>
+                      Virtual Account
                     </Text>
-                    <TouchableOpacity
-                      onPress={() =>
-                        copyToClipboard(account?.accountNumber.toString() || "")
-                      }
-                    >
-                      <Copy color="#fff" />
-                    </TouchableOpacity>
+                    <Circle />
                   </View>
-                </View>
-                <Text style={styles.accountName} allowFontScaling={false}>
-                  {userInfo?.fullName}
-                </Text>
-              </ImageBackground>
-              {/* )} */}
+
+                  <Text style={styles.bankName} allowFontScaling={false}>
+                    {formatBankName(account.bankName)}
+                  </Text>
+                  <View style={styles.copyContainer}>
+                    <Text style={styles.copyText} allowFontScaling={false}>
+                      Copy your account number
+                    </Text>
+                    <View style={styles.accountNumberContainer}>
+                      <Text
+                        style={styles.accountNumber}
+                        allowFontScaling={false}
+                      >
+                        {account.accountNumber}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          copyToClipboard(
+                            account?.accountNumber.toString() || ""
+                          )
+                        }
+                      >
+                        <Copy color="#fff" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <Text style={styles.accountName} allowFontScaling={false}>
+                    {account.accountName?.toUpperCase()}
+                  </Text>
+                </ImageBackground>
+              )}
             </View>
           </View>
         </View>
@@ -137,63 +185,6 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Regular",
     flex: 1,
   },
-  headerTextDark: {
-    color: COLORS.white,
-  },
-  headTextContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  itemText: {
-    fontSize: FONT_SIZE.medium,
-    fontFamily: "Outfit-Medium",
-    paddingVertical: SPACING * 2,
-  },
-  container: {
-    backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING,
-    paddingVertical: SPACING,
-    borderRadius: SPACING,
-    marginTop: SPACING * 4,
-  },
-  headText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(18),
-    marginBottom: SPACING,
-  },
-  titleText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(16),
-    paddingVertical: SPACING,
-  },
-  descriptionText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: RFValue(14),
-    color: "#9BA1A8",
-  },
-  completedText: {
-    fontFamily: "Outfit-Regular",
-    color: "#06C270",
-  },
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderStyle: "dotted",
-    borderColor: "#000",
-    paddingVertical: SPACING,
-    paddingHorizontal: SPACING * 3,
-    borderRadius: 8,
-    marginTop: SPACING * 2,
-  },
-  buttonText: {
-    marginLeft: SPACING,
-    color: "#000",
-    fontFamily: "Outfit-Regular",
-    fontSize: FONT_SIZE.medium,
-  },
   cardsContainer: {
     paddingHorizontal: SPACING * 2,
   },
@@ -203,18 +194,19 @@ const styles = StyleSheet.create({
   walletContain: {
     paddingHorizontal: SPACING * 2,
     paddingVertical: SPACING,
-    backgroundColor: COLORS.violet300,
+    backgroundColor: "#5136C1", // COLORS.violet300
     borderRadius: 10,
   },
   cardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: SPACING,
   },
   virtualText: {
     fontFamily: "Outfit-Regular",
     color: "#fff",
     fontSize: RFValue(13),
-    marginBottom: SPACING,
   },
   bankName: {
     fontFamily: "Outfit-Medium",
@@ -252,43 +244,64 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.small,
     color: "#fff",
   },
-  skeletonHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: SPACING,
+  noAccountText: {
+    fontFamily: "Outfit-Regular",
+    fontSize: RFValue(14),
+    color: "#fff",
+    textAlign: "center",
+    paddingVertical: SPACING * 2,
+  },
+  skeletonVirtualText: {
+    width: RFValue(100), // Matches "Virtual Account" text
+    height: RFValue(13), // Matches fontSize
+    borderRadius: 4,
+    backgroundColor: "#6B4ED1", // Lighter shade of #5136C1
+    opacity: 0.7,
   },
   skeletonCircle: {
-    width: RFValue(40),
-    height: RFValue(40),
+    width: RFValue(25), // Matches Circle SVG
+    height: RFValue(25),
     borderRadius: RFValue(20),
-  },
-  skeletonTitle: {
-    width: "60%", // Approximate width of the title text
-    height: RFValue(20),
+    backgroundColor: "#6B4ED1",
+    opacity: 0.7,
   },
   skeletonBankName: {
-    width: "100%", // Full width of the card
-    height: RFValue(18),
-    marginBottom: SPACING,
-  },
-  skeletonCopyContainer: {
-    backgroundColor: COLORS.violet700, // Matches the button background color
-    borderRadius: 5,
-    paddingVertical: 2,
-    paddingHorizontal: SPACING,
-    width: "100%",
+    width: RFValue(120), // Matches typical bank name length
+    height: RFValue(12), // Matches fontSize
+    borderRadius: 4,
+    backgroundColor: "#6B4ED1",
+    opacity: 0.7,
     marginBottom: SPACING,
   },
   skeletonCopyText: {
-    width: "100%",
-    height: RFValue(14),
+    width: RFValue(160), // Matches "Copy your account number" text
+    height: RFValue(12), // Matches fontSize
+    borderRadius: 4,
+    backgroundColor: "#8B6EF1", // Matches violet700 context
+    opacity: 0.7,
+    marginBottom: 5,
   },
   skeletonAccountNumber: {
-    width: "70%", // Approximate width of the account number
-    height: RFValue(30),
+    width: RFValue(140), // Matches typical account number length
+    height: RFValue(18), // Matches fontSize
+    borderRadius: 4,
+    backgroundColor: "#8B6EF1",
+    opacity: 0.7,
+    marginRight: 5,
+    marginBottom: 5,
   },
-  skeletonName: {
-    width: "50%", // Approximate width of the account name
-    height: RFValue(20),
+  skeletonCopyIcon: {
+    width: RFValue(24), // Matches Copy icon
+    height: RFValue(24),
+    borderRadius: RFValue(12),
+    backgroundColor: "#8B6EF1",
+    opacity: 0.7,
+  },
+  skeletonAccountName: {
+    width: RFValue(100), // Matches typical account name length
+    height: RFValue(12), // Matches FONT_SIZE.small
+    borderRadius: 4,
+    backgroundColor: "#6B4ED1",
+    opacity: 0.7,
   },
 });

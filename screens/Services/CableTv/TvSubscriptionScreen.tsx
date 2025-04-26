@@ -16,7 +16,6 @@ import { TickCircle } from "iconsax-react-native";
 import SPACING from "../../../constants/SPACING";
 import FONT_SIZE from "../../../constants/font-size";
 import COLORS from "../../../constants/colors";
-import { RFValue } from "react-native-responsive-fontsize";
 import Dstv from "../../../assets/svg/dstv.svg";
 import Gotv from "../../../assets/svg/gotv.svg";
 import Startimes from "../../../assets/svg/startimes.svg";
@@ -47,10 +46,15 @@ type RootStackParamList = {
 };
 
 interface TvSubscriptionScreenProps {
-  navigation: NativeStackNavigationProp<RootStackParamList, "TvSubscriptionScreen">;
+  navigation: NativeStackNavigationProp<
+    RootStackParamList,
+    "TvSubscriptionScreen"
+  >;
 }
 
-const TvSubscriptionScreen: React.FC<TvSubscriptionScreenProps> = ({ navigation }) => {
+const TvSubscriptionScreen: React.FC<TvSubscriptionScreenProps> = ({
+  navigation,
+}) => {
   const [selectedService, setSelectedService] = useState<string>("DSTV");
   const [cardNumber, setCardNumber] = useState<string>("");
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -84,7 +88,9 @@ const TvSubscriptionScreen: React.FC<TvSubscriptionScreenProps> = ({ navigation 
     const fetchBeneficiaries = async () => {
       setIsBeneficiariesLoading(true);
       try {
-        const response = await services.beneficiaryService.getBeneficiaries("cable");
+        const response = await services.beneficiaryService.getBeneficiaries(
+          "cable"
+        );
         setBeneficiaries(response.data?.beneficiaries || []);
       } catch (error) {
         console.error("Failed to fetch cable beneficiaries:", error);
@@ -101,7 +107,9 @@ const TvSubscriptionScreen: React.FC<TvSubscriptionScreenProps> = ({ navigation 
     const fetchPlans = async () => {
       setIsPlansLoading(true);
       try {
-        const response = await services.cableService.getCablePlans(selectedService);
+        const response = await services.cableService.getCablePlans(
+          selectedService
+        );
         setPlans(response.data || []);
       } catch (error) {
         console.error("Error fetching cable plans:", error);
@@ -125,7 +133,11 @@ const TvSubscriptionScreen: React.FC<TvSubscriptionScreenProps> = ({ navigation 
     setIsValidated(false);
   };
 
-  const handlePlanSelect = (plan: { planId: string; price: number; planName: string }) => {
+  const handlePlanSelect = (plan: {
+    planId: string;
+    price: number;
+    planName: string;
+  }) => {
     setSelectedPlan(plan);
     setModalVisible(false);
   };
@@ -144,7 +156,8 @@ const TvSubscriptionScreen: React.FC<TvSubscriptionScreenProps> = ({ navigation 
       setCustomerName("");
       setIsValidated(false);
       handleShowFlash({
-        message: error.response?.data?.msg || "Failed to validate smartcard number.",
+        message:
+          error.response?.data?.msg || "Failed to validate smartcard number.",
         type: "danger",
       });
       return false;
@@ -190,7 +203,10 @@ const TvSubscriptionScreen: React.FC<TvSubscriptionScreenProps> = ({ navigation 
   };
 
   const renderServiceSkeleton = () => (
-    <View className="flex-row p-2 bg-white rounded-xl items-center justify-between mb-4" style={[shadowStyle]}>
+    <View
+      className="flex-row p-2 bg-white rounded-xl items-center justify-between mb-4"
+      style={[shadowStyle]}
+    >
       {[1, 2, 3].map((_, index) => (
         <Skeleton
           key={index}
@@ -209,7 +225,10 @@ const TvSubscriptionScreen: React.FC<TvSubscriptionScreenProps> = ({ navigation 
   );
 
   const renderServiceProviders = () => (
-    <View className="flex-row p-2 bg-white rounded-xl items-center justify-between mb-4" style={[shadowStyle]}>
+    <View
+      className="flex-row p-2 bg-white rounded-xl items-center justify-between mb-4"
+      style={[shadowStyle]}
+    >
       <TouchableOpacity
         onPress={() => handleServiceSelect("DSTV")}
         style={[
@@ -271,7 +290,8 @@ const TvSubscriptionScreen: React.FC<TvSubscriptionScreenProps> = ({ navigation 
   );
 
   // Enable the button as soon as all required fields are filled, before validation
-  const canProceed = selectedService !== null && cardNumber !== "" && selectedPlan !== null;
+  const canProceed =
+    selectedService !== null && cardNumber !== "" && selectedPlan !== null;
 
   return (
     <SafeAreaView className="flex-1">
@@ -285,7 +305,11 @@ const TvSubscriptionScreen: React.FC<TvSubscriptionScreenProps> = ({ navigation 
           </View>
 
           <View>
-            <RegularText color="black" marginBottom={8} allowFontScaling={false}>
+            <RegularText
+              color="black"
+              marginBottom={8}
+              allowFontScaling={false}
+            >
               Saved Beneficiaries
             </RegularText>
             {isBeneficiariesLoading ? (
@@ -319,21 +343,27 @@ const TvSubscriptionScreen: React.FC<TvSubscriptionScreenProps> = ({ navigation 
                   >
                     <RegularText color="black" size="small">
                       {beneficiary.number}{" "}
-                      {beneficiary.networkType ? `| ${beneficiary.networkType}` : ""}
+                      {beneficiary.networkType
+                        ? `| ${beneficiary.networkType}`
+                        : ""}
                     </RegularText>
                   </TouchableOpacity>
                 )}
               />
             ) : (
-              <RegularText color="mediumGrey" className="mb-4">
-                No saved beneficiaries found.
-              </RegularText>
+              <View className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 w-44 justify-center items-center">
+                <RegularText color="mediumGrey" className="mb-4" size="small">
+                  No beneficiaries found.
+                </RegularText>
+              </View>
             )}
           </View>
 
           <View className="mt-3">
             <Label text="Select Service Provider" marked={false} />
-            {isPlansLoading ? renderServiceSkeleton() : renderServiceProviders()}
+            {isPlansLoading
+              ? renderServiceSkeleton()
+              : renderServiceProviders()}
 
             <Label text="Smartcard Number" marked={false} />
             <BasicInput
@@ -369,7 +399,10 @@ const TvSubscriptionScreen: React.FC<TvSubscriptionScreenProps> = ({ navigation 
                 style={styles.inputContainer}
                 onPress={() => setModalVisible(true)}
               >
-                <RegularText color={selectedPlan ? "black" : "mediumGrey"} size="small">
+                <RegularText
+                  color={selectedPlan ? "black" : "mediumGrey"}
+                  size="small"
+                >
                   {selectedPlan ? selectedPlan.planName : "Select a plan"}
                 </RegularText>
               </TouchableOpacity>

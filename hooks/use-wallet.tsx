@@ -54,7 +54,6 @@ const useWallet = () => {
 
   // Use userInfo._id to track user changes
   const userId = userInfo?._id || "anonymous";
-  // console.log("User ID:", userId);
 
   // Adjust API endpoints (remove userId from URL, rely on token-based auth)
   const {
@@ -89,7 +88,6 @@ const useWallet = () => {
 
   // Revalidate when userInfo._id changes
   useEffect(() => {
-    // console.log("User ID changed, revalidating:", userId);
     if (userId !== "anonymous") {
       mutateDashboard();
       mutateReservedAccounts();
@@ -97,10 +95,16 @@ const useWallet = () => {
     }
   }, [userId, mutateDashboard, mutateReservedAccounts, mutateAllTransactions]);
 
+  // Refresh all data
   const refreshAll = () => {
     mutateDashboard();
     mutateReservedAccounts();
     mutateAllTransactions();
+  };
+
+  // Refresh only the balance (dashboard data)
+  const refreshBalance = () => {
+    mutateDashboard();
   };
 
   const isLoading = isDashboardLoading || isReservedAccountsLoading;
@@ -113,12 +117,20 @@ const useWallet = () => {
     // console.log("Reserved Accounts Error:", reservedAccountsError);
     // console.log("All Transactions Pages:", allTransactionsPages);
     // console.log("Transactions Error:", transactionsError);
-  }, [dashboardData, dashboardError, reservedAccountsData, reservedAccountsError, allTransactionsPages, transactionsError]);
+  }, [
+    dashboardData,
+    dashboardError,
+    reservedAccountsData,
+    reservedAccountsError,
+    allTransactionsPages,
+    transactionsError,
+  ]);
 
   // Handle errors
-  const errorMessage = dashboardError || reservedAccountsError || transactionsError
-    ? "Failed to load wallet data. Please try again later."
-    : null;
+  const errorMessage =
+    dashboardError || reservedAccountsError || transactionsError
+      ? "Failed to load wallet data. Please try again later."
+      : null;
 
   // Remove filtering from dashboard transactions
   const dashboardTransactions = dashboardData?.transactions || [];
@@ -165,10 +177,11 @@ const useWallet = () => {
     balance,
     account,
     refreshAll,
+    refreshBalance, // Expose new function
     transactions: formattedTransactions,
     isLoading,
     getAllTransactions,
-    error: errorMessage, // Add error message for the UI to display
+    error: errorMessage,
   };
 };
 

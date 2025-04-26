@@ -10,8 +10,10 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   Image,
+  FlatList,
+  Switch,
 } from "react-native";
-import React, { useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useRef, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowLeft, ArrowRight2, TickCircle } from "iconsax-react-native";
 import SPACING from "../../../constants/SPACING";
@@ -32,11 +34,15 @@ import { services } from "@/services";
 import { handleShowFlash } from "@/components/FlashMessageComponent";
 import PhoneNumberInput from "@/components/common/ui/forms/PhoneNumberInput";
 import { useAuth } from "@/services/AuthContext";
+import { Beneficiary } from "@/services/modules/beneficiary";
+import { Skeleton } from "@rneui/base";
+import useWallet from "../../../hooks/use-wallet"; // Added for balance
 
 const ElectricityScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const { userInfo } = useAuth();
+  const { balance, refreshBalance } = useWallet(); // Added
   const {
     discos,
     loading: discosLoading,
@@ -50,21 +56,38 @@ const ElectricityScreen: React.FC<{
     validateMeter,
   } = useValidateMeter(services.electricityService);
 
-  const [selectedService, setSelectedService] = React.useState<string | null>(
-    null
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [discoId, setDiscoId] = useState<string | null>(null);
+  const [meterNumber, setMeterNumber] = useState<string>("");
+  const [phoneNumber, setPhoneNumber] = useState<string>(
+    userInfo?.phoneNumber?.replace(/^\+234/, "") || ""
   );
-  const [discoId, setDiscoId] = React.useState<string | null>(null);
-  const [meterNumber, setMeterNumber] = React.useState<string>("");
-  const [phoneNumber, setPhoneNumber] = React.useState<string>(
-    userInfo?.phoneNumber || ""
-  );
-  const [amount, setAmount] = React.useState<string>("");
-  const [meterType, setMeterType] = React.useState<"Prepaid" | "Postpaid">(
-    "Prepaid"
-  );
+  const [amount, setAmount] = useState<string>("");
+  const [meterType, setMeterType] = useState<"Prepaid" | "Postpaid">("Prepaid");
   const [serviceModalVisible, setServiceModalVisible] =
-    React.useState<boolean>(false);
+    useState<boolean>(false);
+  const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(true);
+  const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
+  const [saveBeneficiary, setSaveBeneficiary] = useState(true); // Added
   const prevMeterNumberRef = useRef<string>("");
+
+  useEffect(() => {
+    const fetchBeneficiaries = async () => {
+      setIsBeneficiariesLoading(true);
+      try {
+        const response = await services.beneficiaryService.getBeneficiaries(
+          "electricity"
+        );
+        setBeneficiaries(response.data?.beneficiaries || []);
+      } catch (error) {
+        console.error("Failed to fetch electricity beneficiaries:", error);
+        setBeneficiaries([]);
+      } finally {
+        setIsBeneficiariesLoading(false);
+      }
+    };
+    fetchBeneficiaries();
+  }, []);
 
   useEffect(() => {
     fetchDiscos();
@@ -72,10 +95,7 @@ const ElectricityScreen: React.FC<{
 
   useEffect(() => {
     if (discosError) {
-      handleShowFlash({
-        message: discosError,
-        type: "danger",
-      });
+      handleShowFlash({ message: discosError, type: "danger" });
     }
   }, [discosError]);
 
@@ -85,7 +105,6 @@ const ElectricityScreen: React.FC<{
     }
   }, [userInfo]);
 
-  // Set default Disco (jos) when discos are loaded
   useEffect(() => {
     if (discos && discos.length > 0 && !selectedService && !discoId) {
       const defaultDisco =
@@ -97,6 +116,13 @@ const ElectricityScreen: React.FC<{
     }
   }, [discos, selectedService, discoId]);
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      refreshBalance(); // Refresh balance on screen focus
+    });
+    return unsubscribe;
+  }, [navigation, refreshBalance]);
+
   const debouncedValidateMeter = useCallback(() => {
     if (
       meterNumber &&
@@ -105,11 +131,7 @@ const ElectricityScreen: React.FC<{
       meterNumber.length >= 11 &&
       meterNumber !== prevMeterNumberRef.current
     ) {
-      validateMeter({
-        meterNumber,
-        meterId: discoId,
-        meterType,
-      });
+      validateMeter({ meterNumber, meterId: discoId, meterType });
       prevMeterNumberRef.current = meterNumber;
     }
   }, [meterNumber, discoId, meterType, validating, validateMeter]);
@@ -130,6 +152,20 @@ const ElectricityScreen: React.FC<{
     setServiceModalVisible(false);
   };
 
+  const handleBeneficiarySelect = (beneficiary: Beneficiary) => {
+    setMeterNumber(beneficiary.number);
+    if (beneficiary.networkType) {
+      const selectedDisco = discos.find(
+        (disco) => disco.id === beneficiary.networkType.toLowerCase()
+      );
+      if (selectedDisco) {
+        setSelectedService(selectedDisco.name);
+        setDiscoId(selectedDisco.id);
+      }
+    }
+    setPhoneNumber(userInfo?.phoneNumber?.replace(/^\+234/, "") || "");
+  };
+
   const validateAmountInput = (text: string) => {
     if (/^\d*\.?\d*$/.test(text)) {
       setAmount(text);
@@ -147,6 +183,14 @@ const ElectricityScreen: React.FC<{
   };
 
   const navigateToReview = () => {
+    const parsedAmount = parseFloat(amount);
+    if (parsedAmount > balance) {
+      handleShowFlash({
+        message: "Insufficient balance. Please fund your wallet.",
+        type: "danger",
+      });
+      return;
+    }
     navigation.navigate("ReviewSummaryScreen", {
       transactionType: "electricity",
       meterNumber,
@@ -158,6 +202,7 @@ const ElectricityScreen: React.FC<{
       customerName: validation?.name || "",
       customerAddress: validation?.address || "",
       userId: userInfo?._id || "",
+      saveBeneficiary, // Added
     });
   };
 
@@ -216,11 +261,30 @@ const ElectricityScreen: React.FC<{
       case "yola-electric":
         return require("@/assets/images/electricity/yola.png");
       case "portharcourt-electric":
-        return null; // No logo provided for PHED
+        return null;
       default:
-        return null; // Fallback for unexpected discoId
+        return null;
     }
   };
+
+  const renderBeneficiarySkeleton = () => (
+    <View className="flex-row mb-2 gap-1">
+      <Skeleton
+        width={100}
+        height={25}
+        style={{ backgroundColor: COLORS.grey100, borderRadius: 10 }}
+        skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+        animation="wave"
+      />
+      <Skeleton
+        width={100}
+        height={25}
+        style={{ backgroundColor: COLORS.grey100, borderRadius: 10 }}
+        skeletonStyle={{ backgroundColor: COLORS.grey50 }}
+        animation="wave"
+      />
+    </View>
+  );
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
@@ -241,14 +305,58 @@ const ElectricityScreen: React.FC<{
           </View>
 
           <View className="justify-center px-4">
+            <View className="">
+              <RegularText
+                color="black"
+                marginBottom={8}
+                allowFontScaling={false}
+              >
+                Saved Beneficiaries
+              </RegularText>
+              {isBeneficiariesLoading ? (
+                renderBeneficiarySkeleton()
+              ) : beneficiaries.length > 0 ? (
+                <FlatList
+                  data={beneficiaries}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={({ item: beneficiary, index }) => (
+                    <TouchableOpacity
+                      key={index}
+                      className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2"
+                      onPress={() => handleBeneficiarySelect(beneficiary)}
+                    >
+                      <RegularText color="black" size="small">
+                        {beneficiary.number}{" "}
+                        {beneficiary.networkType
+                          ? `| ${beneficiary.networkType}`
+                          : ""}
+                      </RegularText>
+                    </TouchableOpacity>
+                  )}
+                />
+              ) : (
+                <View className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 w-44 justify-center items-center">
+                  <RegularText
+                    color="mediumGrey"
+                    style={{ flexShrink: 1, fontSize: RFValue(12) }}
+                    size="small"
+                    allowFontScaling={false}
+                  >
+                    No beneficiaries found
+                  </RegularText>
+                </View>
+              )}
+            </View>
+
             <View
-              className="bg-white shadow-md rounded-lg py-4 px-4"
+              className="bg-white shadow-md rounded-lg py-4 px-4 mt-4"
               style={shadowStyle}
             >
               <RegularText color="black">
                 Select an electricity provider
               </RegularText>
-
               <TouchableOpacity onPress={() => setServiceModalVisible(true)}>
                 <View
                   style={{
@@ -290,7 +398,6 @@ const ElectricityScreen: React.FC<{
                 Prepaid
               </MediumText>
             </TouchableOpacity>
-
             <TouchableOpacity
               style={[
                 styles.meterTypeButton,
@@ -355,7 +462,15 @@ const ElectricityScreen: React.FC<{
                 />
               </View>
               <View className="mb-4">
-                <Label text="Amount" marked={false} />
+                <View className="flex-row justify-between items-center">
+                  <Label text="Amount" marked={false} />
+                  <RegularText color="black" marginBottom={10}>
+                    Balance: ₦
+                    {balance.toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                    })}
+                  </RegularText>
+                </View>
                 <BasicInput
                   placeholder="Enter amount"
                   value={amount}
@@ -367,6 +482,21 @@ const ElectricityScreen: React.FC<{
                     Min: ₦{validation.minAmount} | Max: ₦{validation.maxAmount}
                   </RegularText>
                 )}
+              </View>
+            </View>
+
+            <View className="mb-4">
+              <View className="flex-row items-center mt-2">
+                <RegularText color="black" marginRight={6}>
+                  Save as beneficiary
+                </RegularText>
+                <Switch
+                  value={saveBeneficiary}
+                  onValueChange={setSaveBeneficiary}
+                  trackColor={{ false: COLORS.grey100, true: COLORS.violet200 }}
+                  thumbColor={saveBeneficiary ? COLORS.violet400 : COLORS.white}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+                />
               </View>
             </View>
 
@@ -396,15 +526,13 @@ const ElectricityScreen: React.FC<{
   );
 };
 
-export default ElectricityScreen;
-
 const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: SPACING * 2,
     paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
-    paddingBottom: SPACING * 3,
+    paddingBottom: SPACING * 2,
   },
   leftIcon: {
     marginRight: SPACING,
@@ -459,3 +587,5 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
 });
+
+export default ElectricityScreen;
