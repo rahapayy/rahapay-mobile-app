@@ -6,10 +6,13 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Platform,
+  AppState,
+  Alert,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../../constants/SPACING";
 import COLORS from "../../../../constants/colors";
+import * as Clipboard from "expo-clipboard"; // Import expo-clipboard
 
 interface OtpInputProps {
   length: number;
@@ -27,22 +30,21 @@ const OtpInput: React.FC<OtpInputProps> = ({
   value,
   onChange,
   secureTextEntry = false,
-  autoFocus = true, // Changed default to true for auto keyboard
+  autoFocus = true,
   disabled = false,
   error = false,
   onComplete,
 }) => {
   const inputRefs = useRef<Array<TextInput | null>>(Array(length).fill(null));
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+  const [clipboardContent, setClipboardContent] = useState<string | null>(null);
 
   // Auto-focus first input and show keyboard on mount
   useEffect(() => {
     if (autoFocus && !disabled) {
-      // Focus the first input
       inputRefs.current[0]?.focus();
-      // Ensure keyboard is shown (redundant on most platforms, but safe)
-      Keyboard.dismiss(); // Reset any existing keyboard state
-      setTimeout(() => inputRefs.current[0]?.focus(), 100); // Small delay to ensure focus
+      Keyboard.dismiss();
+      setTimeout(() => inputRefs.current[0]?.focus(), 100);
     }
   }, [autoFocus, disabled]);
 
@@ -52,6 +54,55 @@ const OtpInput: React.FC<OtpInputProps> = ({
       onComplete(value.join(""));
     }
   }, [value, onComplete]);
+
+  // Detect app state changes to check clipboard when app becomes active
+  useEffect(() => {
+    const handleAppStateChange = async (nextAppState: string) => {
+      if (nextAppState === "active" && !disabled) {
+        // Read clipboard content using expo-clipboard
+        const content = await Clipboard.getStringAsync();
+        // Check if clipboard content matches the expected OTP format (e.g., 6 digits)
+        if (content && /^\d+$/.test(content) && content.length === length) {
+          setClipboardContent(content);
+        } else {
+          setClipboardContent(null);
+        }
+      }
+    };
+
+    // Add event listener for app state changes
+    const subscription = AppState.addEventListener("change", handleAppStateChange);
+
+    // Cleanup on unmount
+    return () => {
+      subscription.remove();
+    };
+  }, [disabled, length]);
+
+  // Show paste prompt when clipboard content is detected
+  useEffect(() => {
+    if (clipboardContent) {
+      Alert.alert(
+        "Paste OTP",
+        `Would you like to paste "${clipboardContent}"?`,
+        [
+          {
+            text: "Don't Allow",
+            style: "cancel",
+            onPress: () => setClipboardContent(null),
+          },
+          {
+            text: "Allow Paste",
+            onPress: () => {
+              handlePaste(clipboardContent);
+              setClipboardContent(null); // Clear after pasting
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  }, [clipboardContent]);
 
   const handleInput = (text: string, index: number) => {
     if (!/^\d?$/.test(text) || disabled) return;
@@ -79,10 +130,9 @@ const OtpInput: React.FC<OtpInputProps> = ({
     }
   };
 
-  const handlePaste = (event: any) => {
+  const handlePaste = (text: string) => {
     if (disabled) return;
 
-    const text = Platform.OS === "web" ? event.nativeEvent.text : event;
     if (text.length >= length && /^\d+$/.test(text)) {
       const newValue = text.slice(0, length).split("");
       onChange(newValue);

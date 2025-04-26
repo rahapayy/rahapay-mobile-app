@@ -17,7 +17,6 @@ import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   LightText,
-  MediumText,
   SemiBoldText,
 } from "../../../components/common/Text";
 import ProgressIndicator from "../../../components/ProgressIndicator";
