@@ -18,6 +18,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import LottieView from "lottie-react-native";
 import { useNotification } from "../context/NotificationContext";
 import * as Notifications from "expo-notifications";
+import { LightText, MediumText, RegularText } from "@/components/common/Text";
 
 const NotificationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "Notifications">;
@@ -25,7 +26,10 @@ const NotificationScreen: React.FC<{
   const { notifications } = useNotification();
 
   const renderNotificationItem = (
-    { notification, receivedAt }: { notification: Notifications.Notification; receivedAt: string },
+    {
+      notification,
+      receivedAt,
+    }: { notification: Notifications.Notification; receivedAt: string },
     index: React.Key | null | undefined
   ) => {
     const { title, body, data } = notification.request.content;
@@ -58,17 +62,17 @@ const NotificationScreen: React.FC<{
         />
         <View style={styles.transactionTextContainer}>
           <View style={styles.transactionTextRow}>
-            <Text style={styles.item} allowFontScaling={false} numberOfLines={1}>
+            <RegularText color="black" size="small">
               {title || "New Notification"}
-            </Text>
-            <Text style={styles.valueText} allowFontScaling={false}>
+            </RegularText>
+            <LightText color="black" size="xsmall">
               {displayDate}
-            </Text>
+            </LightText>
           </View>
           <View style={styles.transactionTextRow}>
-            <Text style={styles.date} allowFontScaling={false} numberOfLines={1}>
+            <RegularText color="light" size="small">
               {body || "Notification content"}
-            </Text>
+            </RegularText>
           </View>
         </View>
       </TouchableOpacity>
@@ -86,14 +90,16 @@ const NotificationScreen: React.FC<{
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={styles.headerText} allowFontScaling={false}>
+            <RegularText size="large" color="black">
               Notifications
-            </Text>
+            </RegularText>
           </View>
 
           {notifications.length > 0 ? (
             <View style={{ padding: SPACING }}>
-              {notifications.map((item, index) => renderNotificationItem(item, index))}
+              {notifications.map((item, index) =>
+                renderNotificationItem(item, index)
+              )}
             </View>
           ) : (
             <View style={styles.noTransactionContainer}>
@@ -103,9 +109,9 @@ const NotificationScreen: React.FC<{
                 loop
                 style={styles.loadingAnimation}
               />
-              <Text style={styles.notransactionText}>
+              <RegularText color="black">
                 You don't have any notifications
-              </Text>
+              </RegularText>
             </View>
           )}
         </View>
@@ -170,22 +176,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 5,
-  },
-  valueText: {
-    fontFamily: "Outfit-Medium",
-    fontSize: RFValue(8),
-  },
-  item: {
-    fontFamily: "Outfit-Medium",
-    fontSize: RFValue(12),
-    maxWidth: "70%",
-  },
-  date: {
-    fontFamily: "Outfit-Regular",
-    color: "#9BA1A8",
-    fontSize: RFValue(10),
-    maxWidth: "90%",
     marginTop: 5,
   },
 });

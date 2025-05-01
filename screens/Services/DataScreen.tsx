@@ -52,7 +52,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
   const [error, setError] = useState<string | null>(null);
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
   const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(true);
-  const [saveBeneficiary, setSaveBeneficiary] = useState(false);
+  const [saveBeneficiary, setSaveBeneficiary] = useState(true);
 
   const isButtonDisabled = !selectedOperator || !phoneNumber || !selectedPlan;
 
@@ -345,7 +345,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
             <View style={styles.tabContent}>
               <View>
                 <View className="mb-4">
-                  <RegularText color="black" marginBottom={5}>
+                  <RegularText color="black" marginBottom={5} size="small">
                     Saved Beneficiaries
                   </RegularText>
                   {isBeneficiariesLoading ? (
@@ -393,8 +393,12 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                       )}
                     />
                   ) : (
-                    <View className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 w-44 justify-center items-center">
-                      <RegularText color="mediumGrey" className="mb-4" size="small">
+                    <View className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 w-48 justify-center items-center">
+                      <RegularText
+                        color="mediumGrey"
+                        className="mb-4"
+                        size="small"
+                      >
                         No beneficiaries found.
                       </RegularText>
                     </View>
@@ -439,7 +443,6 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                           color: selectedPlan ? "#000" : "#9BA1A8",
                           fontSize: RFValue(12),
                         }}
-                        allowFontScaling={false}
                       >
                         {selectedPlan
                           ? `${selectedPlan.plan} - ${selectedPlan.days} - ${selectedPlan.amount}`
@@ -452,7 +455,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
 
                 <View className="mb-4">
                   <View className="flex-row items-center mt-2">
-                    <RegularText color="black" marginRight={6}>
+                    <RegularText color="black" marginRight={6} size="small">
                       Save as beneficiary
                     </RegularText>
                     <Switch

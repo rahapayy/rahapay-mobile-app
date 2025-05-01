@@ -18,7 +18,6 @@ import HelpAndSupportScreen from "../screens/Profile/help/HelpAndSupportScreen";
 import PersonalInformationScreen from "../screens/Profile/PersonalInformationScreen";
 import ReferralScreen from "../screens/Profile/ReferralScreen";
 import TransactionStatusScreen from "../screens/TransactionStatusScreen";
-import BettingScreen from "../screens/Services/Betting/BettingScreen";
 import TransferScreen from "../screens/Services/TransferScreen";
 import EducationScreen from "../screens/Services/Education/EducationScreen";
 import CustomerCareScreen from "../screens/CustomerCareScreen";
@@ -26,8 +25,6 @@ import { AppStackParamList } from "../types/RootStackParams";
 import EducationServiceType from "../screens/Services/Education/EducationServiceType";
 import EducationDetailsScreen from "../screens/Services/Education/EducationDetailsScreen";
 import EditTagScreen from "../screens/Profile/EditTagScreen";
-import SelectPinChangeScreen from "../screens/Profile/SelectPinChangeScreen";
-import BettingSuccess from "../screens/Services/Betting/BettingSuccess";
 import CreateTagScreen from "../screens/Profile/CreateTagScreen";
 import TicketScreen from "../screens/Services/TicketScreen";
 import NotificationDetailScreen from "@/screens/notification/NotificationDetailScreen";
@@ -112,11 +109,6 @@ const AppStack = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="SelectPinChangeScreen"
-        component={SelectPinChangeScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
         name="EnableNotificationScreen"
         component={EnableNotificationScreen}
         options={{ headerShown: false }}
@@ -145,16 +137,6 @@ const AppStack = () => {
         name="TransactionStatusScreen"
         component={TransactionStatusScreen}
         options={{ headerShown: false, presentation: "containedModal" }}
-      />
-      <Stack.Screen
-        name="BettingScreen"
-        component={BettingScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="BettingSuccessScreen"
-        component={BettingSuccess}
-        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="TransferScreen"

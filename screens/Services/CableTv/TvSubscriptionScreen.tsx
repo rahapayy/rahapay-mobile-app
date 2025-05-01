@@ -305,11 +305,7 @@ const TvSubscriptionScreen: React.FC<TvSubscriptionScreenProps> = ({
           </View>
 
           <View>
-            <RegularText
-              color="black"
-              marginBottom={8}
-              allowFontScaling={false}
-            >
+            <RegularText color="black" marginBottom={8} size="small">
               Saved Beneficiaries
             </RegularText>
             {isBeneficiariesLoading ? (
@@ -351,7 +347,7 @@ const TvSubscriptionScreen: React.FC<TvSubscriptionScreenProps> = ({
                 )}
               />
             ) : (
-              <View className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 w-44 justify-center items-center">
+              <View className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 w-48 justify-center items-center">
                 <RegularText color="mediumGrey" className="mb-4" size="small">
                   No beneficiaries found.
                 </RegularText>
@@ -420,7 +416,7 @@ const TvSubscriptionScreen: React.FC<TvSubscriptionScreenProps> = ({
 
           <View className="mb-4">
             <View className="flex-row items-center mt-2">
-              <RegularText color="black" marginRight={6}>
+              <RegularText color="black" marginRight={6} size="small">
                 Save as beneficiary
               </RegularText>
               <Switch

@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useFonts } from "expo-font";
@@ -16,7 +16,7 @@ import {
 import "./global.css";
 import { LockProvider } from "./context/LockContext";
 import * as Sentry from "@sentry/react-native";
-import { getItem } from "./utils/storage";
+import { getItem, setItem } from "./utils/storage";
 
 Sentry.init({
   dsn: "https://b6d56a13d87e9557b6e7b3c7b14ee515@o4508189082648576.ingest.de.sentry.io/4509181912678480",
@@ -44,18 +44,33 @@ export default Sentry.wrap(function App() {
   const navigationRef = useNavigationContainerRef();
   const [initialState, setInitialState] = React.useState();
   const [appIsReady, setAppIsReady] = React.useState(false);
+  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null); // New state for onboarding
 
   useEffect(() => {
     async function prepare() {
       try {
+        // Check navigation state
         const savedStateString = await getItem("NAVIGATION_STATE", false);
-        const state = savedStateString ? JSON.parse(savedStateString) : undefined;
+        const state = savedStateString
+          ? JSON.parse(savedStateString)
+          : undefined;
         if (state !== undefined) {
           setInitialState(state);
+        }
+
+        // Check onboarding status
+        let onboarded = await getItem("ONBOARDED");
+        if (onboarded === "1") {
+          setShowOnboarding(false);
+        } else {
+          setShowOnboarding(true);
+          await setItem("ONBOARDED", "1");
         }
       } catch (error) {
         console.warn("Error during app preparation:", error);
         Sentry.captureException(error);
+        // Default to skipping onboarding on error
+        setShowOnboarding(false);
       } finally {
         setAppIsReady(true);
       }
@@ -64,7 +79,7 @@ export default Sentry.wrap(function App() {
   }, []);
 
   const onLayoutRootView = useCallback(async () => {
-    if (appIsReady && (fontsLoaded || fontError)) {
+    if (appIsReady && (fontsLoaded || fontError) && showOnboarding !== null) {
       try {
         await SplashScreen.hideAsync();
       } catch (error) {
@@ -72,10 +87,10 @@ export default Sentry.wrap(function App() {
         Sentry.captureException(error);
       }
     }
-  }, [appIsReady, fontsLoaded, fontError]);
+  }, [appIsReady, fontsLoaded, fontError, showOnboarding]);
 
-  if (!appIsReady || (!fontsLoaded && !fontError)) {
-    return null;
+  if (!appIsReady || (!fontsLoaded && !fontError) || showOnboarding === null) {
+    return null; // Keep splash screen visible
   }
 
   return (
@@ -84,9 +99,12 @@ export default Sentry.wrap(function App() {
         <QueryClientProvider client={queryClient}>
           <NotificationProvider>
             <LockProvider>
-              <NavigationContainer ref={navigationRef} initialState={initialState}>
+              <NavigationContainer
+                ref={navigationRef}
+                initialState={initialState}
+              >
                 <StatusBar barStyle={"default"} />
-                <Router />
+                <Router showOnboarding={showOnboarding} />
                 <FlashMessage
                   statusBarHeight={StatusBar.currentHeight || 0}
                   position="top"

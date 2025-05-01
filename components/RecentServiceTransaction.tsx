@@ -305,7 +305,7 @@ const RecentServiceTransaction: React.FC<{
                   </View>
                   <View style={styles.transactionTextContainer}>
                     <View style={styles.transactionTextRow}>
-                      <Text style={styles.item} allowFontScaling={false}>
+                      <Text style={styles.item}>
                         {transaction.transactionType}
                       </Text>
                       <Text
@@ -322,7 +322,6 @@ const RecentServiceTransaction: React.FC<{
                                 : "black",
                           },
                         ]}
-                        allowFontScaling={false}
                       >
                         {transaction.transactionType.includes("PURCHASE") ||
                         transaction.transactionType === "CABLE_SUBSCRIPTION"
@@ -332,9 +331,7 @@ const RecentServiceTransaction: React.FC<{
                       </Text>
                     </View>
                     <View style={styles.transactionTextRow}>
-                      <Text style={styles.date} allowFontScaling={false}>
-                        {formattedTime}
-                      </Text>
+                      <Text style={styles.date}>{formattedTime}</Text>
                       <View
                         style={[
                           styles.statusContainer,
@@ -358,7 +355,6 @@ const RecentServiceTransaction: React.FC<{
                                   : "#FF3B30",
                             },
                           ]}
-                          allowFontScaling={false}
                         >
                           {transaction.paymentStatus}
                         </Text>
@@ -422,16 +418,16 @@ const styles = StyleSheet.create({
   },
   item: {
     fontFamily: "Outfit-Medium",
-    fontSize: RFValue(12),
+    fontSize: RFValue(14),
   },
   valueText: {
     fontFamily: "Outfit-Medium",
-    fontSize: RFValue(14),
+    fontSize: RFValue(16),
   },
   date: {
     fontFamily: "Outfit-Regular",
     color: "#9BA1A8",
-    fontSize: RFValue(10),
+    fontSize: RFValue(12),
   },
   statusContainer: {
     paddingHorizontal: 8,
@@ -442,7 +438,7 @@ const styles = StyleSheet.create({
   completedText: {
     fontFamily: "Outfit-Regular",
     color: "#06C270",
-    fontSize: RFValue(10),
+    fontSize: RFValue(12),
   },
   noTransactionContainer: {
     flex: 1,

@@ -11,6 +11,7 @@ import {
 import React from "react";
 import COLORS from "../../../../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
+import { MediumText } from "../../Text";
 
 const { height: windowHeight, width: windowWidth } = Dimensions.get("window");
 
@@ -58,12 +59,12 @@ const Button: React.FC<ButtonProps> = ({
         {isLoading ? (
           <ActivityIndicator size="small" color="#fff" style={styles.spinner} />
         ) : (
-          <Text
+          <MediumText
+            color="white"
             style={[styles.buttonText, { color: textColor }]}
-            allowFontScaling={false}
           >
             {title}
-          </Text>
+          </MediumText>
         )}
         {icon && iconPosition === "right" && (
           <View style={styles.icon}>{icon}</View>
@@ -94,6 +95,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: RFValue(12),
+
     fontFamily: "Outfit-Medium",
   },
   contentContainer: {

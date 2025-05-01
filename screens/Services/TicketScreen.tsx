@@ -29,7 +29,7 @@ const TicketScreen: React.FunctionComponent<Props> = ({navigation}) => {
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={[styles.headerText]} allowFontScaling={false}>
+            <Text style={[styles.headerText]} >
               Transfer to User
             </Text>
           </View>

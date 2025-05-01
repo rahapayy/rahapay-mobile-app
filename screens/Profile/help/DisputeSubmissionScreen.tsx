@@ -81,7 +81,7 @@ const DisputeSubmissionScreen: React.FC<Props> = ({ navigation, route }) => {
           >
             <ArrowLeft color="#000" size={24} />
           </TouchableOpacity>
-          <Text style={styles.headerText} allowFontScaling={false}>
+          <Text style={styles.headerText}>
             {questionType}
           </Text>
         </View>
@@ -105,7 +105,7 @@ const DisputeSubmissionScreen: React.FC<Props> = ({ navigation, route }) => {
           </View>
         </View>
         <View style={styles.form}>
-          <Text style={styles.label} allowFontScaling={false}>
+          <Text style={styles.label}>
             Transaction Number
           </Text>
           <TextInput
@@ -114,15 +114,15 @@ const DisputeSubmissionScreen: React.FC<Props> = ({ navigation, route }) => {
             value={transactionNumber}
             onChangeText={setTransactionNumber}
           />
-          <Text style={styles.label} allowFontScaling={false}>
+          <Text style={styles.label}>
             Upload Photo
           </Text>
           <View style={styles.uploadArea}>
-            <Text style={styles.uploadText} allowFontScaling={false}>
+            <Text style={styles.uploadText}>
               Not more than one
             </Text>
           </View>
-          <Text style={styles.label} allowFontScaling={false}>
+          <Text style={styles.label}>
             Description
           </Text>
           <TextInput
@@ -140,7 +140,7 @@ const DisputeSubmissionScreen: React.FC<Props> = ({ navigation, route }) => {
             onPress={handleSubmit}
             disabled={isSubmitting}
           >
-            <Text style={styles.submitButtonText} allowFontScaling={false}>
+            <Text style={styles.submitButtonText}>
               Submit
             </Text>
           </TouchableOpacity>
@@ -151,7 +151,7 @@ const DisputeSubmissionScreen: React.FC<Props> = ({ navigation, route }) => {
       {showPinModal && (
         <View style={styles.modalOverlay}>
           <View style={styles.modal}>
-            <Text style={styles.modalTitle} allowFontScaling={false}>
+            <Text style={styles.modalTitle}>
               Enter Transaction PIN
             </Text>
             <TextInput
@@ -168,7 +168,7 @@ const DisputeSubmissionScreen: React.FC<Props> = ({ navigation, route }) => {
                 style={styles.modalButton}
                 onPress={() => setShowPinModal(false)}
               >
-                <Text style={styles.modalButtonText} allowFontScaling={false}>
+                <Text style={styles.modalButtonText}>
                   Cancel
                 </Text>
               </TouchableOpacity>
@@ -182,7 +182,6 @@ const DisputeSubmissionScreen: React.FC<Props> = ({ navigation, route }) => {
                 ) : (
                   <Text
                     style={styles.modalSubmitButtonText}
-                    allowFontScaling={false}
                   >
                     Submit
                   </Text>

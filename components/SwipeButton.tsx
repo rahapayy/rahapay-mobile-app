@@ -12,7 +12,7 @@ import LottieView from "lottie-react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const windowWidth = Dimensions.get("window").width;
-const sliderWidth = windowWidth/1.1;
+const sliderWidth = windowWidth / 1.1;
 const knobWidth = 50;
 const maxTranslateX = sliderWidth - knobWidth - 20;
 
@@ -106,7 +106,7 @@ const SwipeButton: React.FC<SwipeButtonProps> = ({ onConfirm, buttonText }) => {
                 },
               ]}
             >
-              <Text style={styles.slideText} allowFontScaling={false}>
+              <Text style={styles.slideText}>
                 {buttonText || "Slide to Confirm"}
               </Text>
             </Animated.View>

@@ -1,7 +1,13 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NetInfo from "@react-native-community/netinfo";
-import { AppState, AppStateStatus } from "react-native";
+import {
+  AppState,
+  AppStateStatus,
+  View,
+  ActivityIndicator,
+  Image,
+} from "react-native";
 import AppStack from "./AppStack";
 import AuthRoute from "./AuthRouter";
 import { useAuth } from "../services/AuthContext";
@@ -19,6 +25,25 @@ import { handleShowFlash } from "../components/FlashMessageComponent";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const LockStack = createNativeStackNavigator<LockStackParamList>();
+
+const LoadingScreen = () => {
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "#5136C1",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Image
+        source={require("../assets/animation/logo.gif")}
+        style={{ width: 250, height: 250 }}
+        resizeMode="contain"
+      />
+    </View>
+  );
+};
 
 const LockStackNavigator = ({
   onBiometricSuccess,
@@ -59,7 +84,7 @@ const LockStackNavigator = ({
   );
 };
 
-const Router = () => {
+const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
   const {
     isAuthenticated,
     isAppReady,
@@ -78,6 +103,7 @@ const Router = () => {
     AppState.currentState
   );
   const [biometricFailed, setBiometricFailed] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Debug state changes
   useEffect(() => {
@@ -148,9 +174,8 @@ const Router = () => {
         } else {
           const wasTerminated = await getItem("WAS_TERMINATED");
           const backgroundTimestamp = await getItem("BACKGROUND_TIMESTAMP");
-          const INACTIVITY_TIMEOUT = 180 * 1000; //3 min
-          // const INACTIVITY_TIMEOUT = 30 * 1000; // For test
-          let shouldLock = false; // Default to NOT locked to avoid premature lock screen
+          const INACTIVITY_TIMEOUT = 180 * 1000; // 3 min
+          let shouldLock = false;
 
           console.log("Initialization checks:", {
             wasTerminated,
@@ -351,15 +376,27 @@ const Router = () => {
       isAppReady,
       isLockStateReady,
       isFreshLogin,
+      isLoading,
     });
-    if (!isAppReady || !isLockStateReady) {
-      console.log("App not ready, rendering null");
-      return null;
+
+    if (isLoading || !isAppReady || !isLockStateReady) {
+      console.log("App not ready, showing loading screen");
+      return (
+        <RootStack.Navigator screenOptions={{ gestureEnabled: false }}>
+          <RootStack.Screen
+            name="LoadingScreen"
+            component={LoadingScreen}
+            options={{ headerShown: false }}
+          />
+        </RootStack.Navigator>
+      );
     }
+
     if (!isOnline) {
       console.log("Offline, rendering OfflineScreen");
       return <OfflineScreen onRetry={handleRetry} />;
     }
+
     if (isAuthenticated && (isLockScreenRequired || biometricFailed)) {
       console.log("Rendering LockStack");
       return (
@@ -393,11 +430,11 @@ const Router = () => {
       console.log("Rendering AuthRoute");
       return (
         <RootStack.Navigator screenOptions={{ gestureEnabled: false }}>
-          <RootStack.Screen
-            name="AuthRoute"
-            component={AuthRoute}
-            options={{ headerShown: false }}
-          />
+          <RootStack.Screen name="AuthRoute" options={{ headerShown: false }}>
+            {(props) => (
+              <AuthRoute {...props} showOnboarding={showOnboarding} />
+            )}
+          </RootStack.Screen>
         </RootStack.Navigator>
       );
     }
@@ -409,7 +446,16 @@ const Router = () => {
     isLockStateReady,
     isOnline,
     userInfo,
+    showOnboarding,
+    isLoading,
   ]);
+
+  // Set loading state based on app readiness
+  useEffect(() => {
+    if (isAppReady && isLockStateReady) {
+      setIsLoading(false);
+    }
+  }, [isAppReady, isLockStateReady]);
 
   return navigationStack;
 };

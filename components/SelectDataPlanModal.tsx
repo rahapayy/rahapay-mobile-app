@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { DataPlan } from "@/services/modules/data";
 import COLORS from "@/constants/colors";
+import { RFValue } from "react-native-responsive-fontsize";
 
 // Constants
 const SPACING = 16;
@@ -38,7 +39,8 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
   error,
 }) => {
   // Default to "Daily" category
-  const [selectedCategory, setSelectedCategory] = useState<ValidityCategory>("Daily");
+  const [selectedCategory, setSelectedCategory] =
+    useState<ValidityCategory>("Daily");
 
   // Function to determine the validity category (Daily, Weekly, Monthly)
   const getValidityCategory = (validity: string): ValidityCategory => {
@@ -93,21 +95,11 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
       onPress={() => onSelectPackage(item)}
       accessibilityLabel={`Select ${item.plan_name} plan for ${item.validity} at ₦${item.amount}`}
     >
-      <Text style={styles.planText} allowFontScaling={false}>
-        {item.plan_name || "Unknown Plan"}
-      </Text>
-      <Text style={styles.separator} allowFontScaling={false}>
-        |
-      </Text>
-      <Text style={styles.planText} allowFontScaling={false}>
-        {item.validity || "N/A"}
-      </Text>
-      <Text style={styles.separator} allowFontScaling={false}>
-        |
-      </Text>
-      <Text style={styles.planText} allowFontScaling={false}>
-        ₦{item.amount || "0"}
-      </Text>
+      <Text style={styles.planText}>{item.plan_name || "Unknown Plan"}</Text>
+      <Text style={styles.separator}>|</Text>
+      <Text style={styles.planText}>{item.validity || "N/A"}</Text>
+      <Text style={styles.separator}>|</Text>
+      <Text style={styles.planText}>₦{item.amount || "0"}</Text>
     </TouchableOpacity>
   );
 
@@ -126,9 +118,7 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
         />
         <View style={styles.modalView}>
           <View style={styles.header}>
-            <Text style={styles.modalText} allowFontScaling={false}>
-              Select Data Plan
-            </Text>
+            <Text style={styles.modalText}>Select Data Plan</Text>
             <TouchableOpacity onPress={onClose} accessibilityLabel="Close">
               <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
@@ -147,9 +137,9 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
               <Text
                 style={[
                   styles.categoryButtonText,
-                  selectedCategory === "Daily" && styles.selectedCategoryButtonText,
+                  selectedCategory === "Daily" &&
+                    styles.selectedCategoryButtonText,
                 ]}
-                allowFontScaling={false}
               >
                 Daily
               </Text>
@@ -165,9 +155,9 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
               <Text
                 style={[
                   styles.categoryButtonText,
-                  selectedCategory === "Weekly" && styles.selectedCategoryButtonText,
+                  selectedCategory === "Weekly" &&
+                    styles.selectedCategoryButtonText,
                 ]}
-                allowFontScaling={false}
               >
                 Weekly
               </Text>
@@ -183,9 +173,9 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
               <Text
                 style={[
                   styles.categoryButtonText,
-                  selectedCategory === "Monthly" && styles.selectedCategoryButtonText,
+                  selectedCategory === "Monthly" &&
+                    styles.selectedCategoryButtonText,
                 ]}
-                allowFontScaling={false}
               >
                 Monthly
               </Text>
@@ -196,11 +186,7 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
             <ActivityIndicator size="large" color={COLORS.violet200} />
           )}
 
-          {error && (
-            <Text style={styles.errorText} allowFontScaling={false}>
-              {error}
-            </Text>
-          )}
+          {error && <Text style={styles.errorText}>{error}</Text>}
 
           {!isLoading && !error && filteredDataPlans.length > 0 && (
             <FlatList
@@ -212,7 +198,7 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
           )}
 
           {!isLoading && !error && filteredDataPlans.length === 0 && (
-            <Text style={styles.noPlansText} allowFontScaling={false}>
+            <Text style={styles.noPlansText}>
               No plans available for this category
             </Text>
           )}
@@ -286,7 +272,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   planText: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     fontWeight: "bold",
     fontFamily: "Outfit-Regular",
     color: COLORS.grey900, // Darker text for readability (assumes grey900 exists)

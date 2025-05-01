@@ -42,8 +42,10 @@ const validationSchema = Yup.object().shape({
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
     .required("Password is required"),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password")], "Passwords must match"),
+  confirmPassword: Yup.string().oneOf(
+    [Yup.ref("password")],
+    "Passwords must match"
+  ),
   referral: Yup.string(),
 });
 
@@ -279,7 +281,6 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                               ? styles.requirementMetIcon
                               : styles.requirementNotMetIcon,
                           ]}
-                          allowFontScaling={false}
                         >
                           {metRequirements.has(index) ? "✓" : "✗"}
                         </Text>
@@ -290,7 +291,6 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                               ? styles.requirementMetText
                               : styles.requirementNotMetText,
                           ]}
-                          allowFontScaling={false}
                         >
                           {requirement.text}
                         </Text>
@@ -328,25 +328,27 @@ const CreateAccountScreen: React.FC<CreateAccountScreenProps> = ({
                 false,
                 true
               )}
-              <Button
-                title="Proceed"
-                onPress={() => formikProps.handleSubmit()}
-                isLoading={formikProps.isSubmitting}
-                style={[
-                  styles.proceedButton,
-                  !formikProps.isValid && styles.proceedButtonDisabled,
-                ]}
-                textColor="#fff"
-                disabled={!formikProps.isValid || formikProps.isSubmitting}
-              />
+              <View className="justify-center items-center">
+                <Button
+                  title="Proceed"
+                  onPress={() => formikProps.handleSubmit()}
+                  isLoading={formikProps.isSubmitting}
+                  style={[
+                    styles.proceedButton,
+                    !formikProps.isValid && styles.proceedButtonDisabled,
+                  ]}
+                  textColor="#fff"
+                  disabled={!formikProps.isValid || formikProps.isSubmitting}
+                />
+              </View>
               <View style={styles.alreadyHaveAccountContainer}>
-                <MediumText color="mediumGrey" size="base">
+                <MediumText color="mediumGrey" size="small">
                   Already have an account?{" "}
                 </MediumText>
                 <TouchableOpacity
                   onPress={() => navigation.navigate("LoginScreen")}
                 >
-                  <BoldText color="primary" size="base">
+                  <BoldText color="primary" size="small">
                     Login
                   </BoldText>
                 </TouchableOpacity>

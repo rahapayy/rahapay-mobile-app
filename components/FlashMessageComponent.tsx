@@ -121,9 +121,8 @@ const FlashMessageComponent = ({ message }: MessageComponentProps) => {
 
         {/* Message Text */}
         <Text
-          allowFontScaling={false}
           style={{
-            fontSize: RFValue(14),
+            fontSize: RFValue(16),
             color: textIconColor,
             fontFamily: "Outfit-Regular",
             flex: 1,

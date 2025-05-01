@@ -217,9 +217,10 @@ export type LockStackParamList = {
 
 // Root Stack (Top-level navigation)
 export type RootStackParamList = {
-  AuthRoute: undefined;
   AppStack: undefined;
+  AuthRoute: { showOnboarding: boolean };
   LockStack: undefined;
+  LoadingScreen: undefined;
 };
 
 // Combined Route Stack (for convenience, if needed)

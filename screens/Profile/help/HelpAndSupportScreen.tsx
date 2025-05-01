@@ -76,9 +76,7 @@ const HelpAndSupportScreen: React.FC<{
           >
             <ArrowLeft color="#000" size={24} />
           </TouchableOpacity>
-          <Text style={styles.headerText} allowFontScaling={false}>
-            Help and Support
-          </Text>
+          <Text style={styles.headerText}>Help and Support</Text>
         </View>
         <View style={styles.greetingContainer}>
           <Image
@@ -86,31 +84,21 @@ const HelpAndSupportScreen: React.FC<{
             style={styles.avatar}
           />
           <View>
-            <Text style={styles.greetingText} allowFontScaling={false}>
-              Hello, {firstName} 👋
-            </Text>
-            <Text style={styles.subGreetingText} allowFontScaling={false}>
-              How can we help you?
-            </Text>
+            <Text style={styles.greetingText}>Hello, {firstName} 👋</Text>
+            <Text style={styles.subGreetingText}>How can we help you?</Text>
           </View>
         </View>
-        <Text style={styles.sectionTitle} allowFontScaling={false}>
-          Self-service
-        </Text>
+        <Text style={styles.sectionTitle}>Self-service</Text>
         <TouchableOpacity
           style={styles.option}
           onPress={() => navigation.navigate("ReportNewIssue")}
         >
-          <Text style={styles.optionText} allowFontScaling={false}>
-            Report an issue
-          </Text>
+          <Text style={styles.optionText}>Report an issue</Text>
           <ArrowLeft color="#000" size={24} style={styles.optionIcon} />
         </TouchableOpacity>
 
         {/* Social Links Section */}
-        <Text style={styles.sectionTitle} allowFontScaling={false}>
-          Contact Us
-        </Text>
+        <Text style={styles.sectionTitle}>Contact Us</Text>
         {socialLinks.map((link, index) => (
           <TouchableOpacity
             key={index}
@@ -118,9 +106,7 @@ const HelpAndSupportScreen: React.FC<{
             onPress={() => handleSocialLinkPress(link.url)}
           >
             <link.icon size={24} color={link.color} style={styles.socialIcon} />
-            <Text style={styles.optionText} allowFontScaling={false}>
-              {link.name}
-            </Text>
+            <Text style={styles.optionText}>{link.name}</Text>
             <ArrowLeft color="#000" size={24} style={styles.optionIcon} />
           </TouchableOpacity>
         ))}

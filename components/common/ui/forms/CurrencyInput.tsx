@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: RFValue(20),
+    fontSize: RFValue(18),
     fontFamily: "Outfit-Regular",
   },
   errorInput: {

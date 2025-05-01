@@ -2,7 +2,6 @@ import React from "react";
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import COLORS from "../../constants/colors";
 import FONT_SIZE from "../../constants/font-size";
-import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../constants/SPACING";
 import * as LocalAuthentication from "expo-local-authentication";
 import { handleShowFlash } from "../FlashMessageComponent";
@@ -71,17 +70,17 @@ const BiometricModal: React.FC<{
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
           <View className="px-10 justify-center items-center">
-            <Text style={styles.modalText} allowFontScaling={false}>
+            <Text style={styles.modalText}>
               {isEnabled ? "Disable Biometrics?" : "Biometric Authentication"}
             </Text>
-            <Text style={styles.subModalText} allowFontScaling={false}>
+            <Text style={styles.subModalText}>
               {isEnabled
                 ? "Disable fingerprint authentication for both Login and Transactions?"
                 : "Enable fingerprint authentication for both Login and Transactions?"}
             </Text>
             <View className="flex-row gap-4">
               <TouchableOpacity style={styles.modalButton} onPress={handleBiometricToggle}>
-                <Text style={styles.modalButtonText} allowFontScaling={false}>
+                <Text style={styles.modalButtonText}>
                   {isEnabled ? "Disable" : "Yes, Enable"}
                 </Text>
               </TouchableOpacity>
@@ -98,7 +97,6 @@ const BiometricModal: React.FC<{
               >
                 <Text
                   style={[styles.modalButtonText, { color: "#FF2E2E" }]}
-                  allowFontScaling={false}
                 >
                   Cancel
                 </Text>
@@ -134,7 +132,7 @@ const styles = StyleSheet.create({
   subModalText: {
     fontFamily: "Outfit-Regular",
     textAlign: "center",
-    fontSize: RFValue(12),
+    fontSize: 12,
     marginBottom: SPACING * 2,
   },
   modalButton: {

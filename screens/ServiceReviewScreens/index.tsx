@@ -59,39 +59,39 @@ const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
           >
             <ArrowLeft color="#000" size={24} />
           </TouchableOpacity>
-          <Text style={styles.headerText} allowFontScaling={false}>
+          <Text style={styles.headerText} >
             Review Summary
           </Text>
         </View>
 
         <View style={styles.imageContainer}>
           {icon}
-          <Text style={styles.itemText} allowFontScaling={false}>
+          <Text style={styles.itemText} >
             {title}
           </Text>
         </View>
 
         <View style={styles.content}>
           <View style={styles.container}>
-            <Text style={styles.headText} allowFontScaling={false}>
+            <Text style={styles.headText}>
               Transaction Summary
             </Text>
             {summaryItems.map((item, index) => (
               <View key={index} style={styles.row}>
-                <Text style={styles.titleText} allowFontScaling={false}>
+                <Text style={styles.titleText} >
                   {item.label}
                 </Text>
-                <Text style={styles.descriptionText} allowFontScaling={false}>
+                <Text style={styles.descriptionText}>
                   {item.value}
                 </Text>
               </View>
             ))}
             <View style={styles.row}>
-              <Text style={styles.titleText} allowFontScaling={false}>
+              <Text style={styles.titleText}>
                 Status
               </Text>
               <View style={styles.statusContainer}>
-                <Text style={styles.completedText} allowFontScaling={false}>
+                <Text style={styles.completedText} >
                   Pending
                 </Text>
               </View>

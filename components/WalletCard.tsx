@@ -4,6 +4,8 @@ import {
   Text,
   View,
   ImageBackground,
+  useWindowDimensions,
+  Platform,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -19,6 +21,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const WalletCard: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
+  const { width: screenWidth } = useWindowDimensions();
+  const isTablet = Platform.OS === "ios" && screenWidth >= 768;
   const { balance, refreshBalance } = useWallet();
   const [showBalance, setShowBalance] = useState(true);
 
@@ -54,44 +58,78 @@ const WalletCard: React.FC<{
       <ImageBackground
         source={require("../assets/images/layer.png")}
         resizeMode="cover"
-        style={styles.walletContain}
+        style={[
+          styles.walletContain,
+          isTablet && {
+            paddingHorizontal: SPACING * 3,
+            paddingVertical: SPACING * 3,
+          },
+        ]}
       >
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             marginBottom: SPACING,
+            width: "100%",
+            justifyContent: "center",
           }}
         >
-          <WalletAdd1 color="#fff" size={20} className="mr-2" />
-          <Text style={styles.walletText}>Available Balance</Text>
+          <WalletAdd1 color="#fff" size={isTablet ? 24 : 20} className="mr-2" />
+          <Text
+            style={[styles.walletText, isTablet && { fontSize: RFValue(18) }]}
+          >
+            Available Balance
+          </Text>
           {showBalance ? (
             <TouchableOpacity onPress={toggleBalanceVisibility}>
-              <Eye color="#fff" size={20} style={{ marginLeft: 10 }} />
+              <Eye
+                color="#fff"
+                size={isTablet ? 24 : 20}
+                style={{ marginLeft: 10 }}
+              />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity onPress={toggleBalanceVisibility}>
-              <EyeSlash color="#fff" size={20} style={{ marginLeft: 10 }} />
+              <EyeSlash
+                color="#fff"
+                size={isTablet ? 24 : 20}
+                style={{ marginLeft: 10 }}
+              />
             </TouchableOpacity>
           )}
         </View>
         {showBalance ? (
-          <Text style={styles.balance}>
+          <Text style={[styles.balance, isTablet && { fontSize: RFValue(36) }]}>
             ₦{" "}
             {balance.toLocaleString("en-US", {
               minimumFractionDigits: 2,
             })}
           </Text>
         ) : (
-          <Text style={styles.balance}>********</Text>
+          <Text style={[styles.balance, isTablet && { fontSize: RFValue(36) }]}>
+            ********
+          </Text>
         )}
         <View className="w-full">
           <TouchableOpacity
             onPress={() => navigation.navigate("FundWalletScreen")}
-            style={styles.fundWalletButton}
+            style={[
+              styles.fundWalletButton,
+              isTablet && { paddingVertical: 16 },
+            ]}
           >
-            <AddCircle variant="Bold" color="#573CC7" />
-            <Text style={styles.fundWalletText} allowFontScaling={false}>
+            <AddCircle
+              variant="Bold"
+              color="#573CC7"
+              size={isTablet ? 24 : 20}
+            />
+            <Text
+              style={[
+                styles.fundWalletText,
+                isTablet && { fontSize: RFValue(16) },
+              ]}
+            >
               Fund Wallet
             </Text>
           </TouchableOpacity>

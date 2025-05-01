@@ -15,10 +15,7 @@ import COLORS from "../../../constants/colors";
 import Button from "../../../components/common/ui/buttons/Button";
 import { handleShowFlash } from "../../../components/FlashMessageComponent";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  LightText,
-  SemiBoldText,
-} from "../../../components/common/Text";
+import { LightText, SemiBoldText } from "../../../components/common/Text";
 import ProgressIndicator from "../../../components/ProgressIndicator";
 import { IVerifyEmailDto } from "@/services/dtos";
 import { services } from "@/services";
@@ -182,15 +179,13 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
           style={isSubmitting || !isInputFilled ? styles.disabledButton : null}
         />
         <View className="justify-center items-center mt-6">
-          <Text style={styles.otpText} allowFontScaling={false}>
-            Didn't receive an OTP?
-          </Text>
+          <Text style={styles.otpText}>Didn't receive an OTP?</Text>
           <TouchableOpacity
             onPress={handleResendOTP}
             disabled={resendCountdown > 0}
           >
             <View style={styles.countdownContainer}>
-              <Text style={styles.countdownText} allowFontScaling={false}>
+              <Text style={styles.countdownText}>
                 {resendCountdown > 0
                   ? `Resend OTP (${resendCountdown}s)`
                   : "Resend OTP"}
@@ -231,7 +226,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   inputBoxFocused: { borderColor: COLORS.violet400, borderWidth: 1 },
-  otpText: { fontSize: RFValue(13), fontFamily: "Outfit-Regular" },
+  otpText: { fontSize: RFValue(14), fontFamily: "Outfit-Regular" },
   countdownContainer: {
     marginTop: SPACING * 2,
     backgroundColor: COLORS.violet200,

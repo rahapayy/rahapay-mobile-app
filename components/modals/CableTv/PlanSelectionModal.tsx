@@ -60,7 +60,7 @@ const PlanSelectionModal: React.FC<PlanSelectionModalProps> = ({
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle} allowFontScaling={false}>
+            <Text style={styles.modalTitle}>
               Select a Plan
             </Text>
             <TouchableOpacity
@@ -82,7 +82,6 @@ const PlanSelectionModal: React.FC<PlanSelectionModalProps> = ({
               placeholder="Search plans..."
               value={searchQuery}
               onChangeText={setSearchQuery}
-              allowFontScaling={false}
               accessibilityLabel="Search Plans Input"
             />
           </View>
@@ -102,16 +101,16 @@ const PlanSelectionModal: React.FC<PlanSelectionModalProps> = ({
                     }}
                     accessibilityLabel={`Select ${plan.planName} for ₦${plan.price}`}
                   >
-                    <Text style={styles.planName} allowFontScaling={false}>
+                    <Text style={styles.planName}>
                       {plan.planName}
                     </Text>
-                    <Text style={styles.planPrice} allowFontScaling={false}>
+                    <Text style={styles.planPrice}>
                       ₦{plan.price}
                     </Text>
                   </TouchableOpacity>
                 ))
               ) : (
-                <Text style={styles.noPlansText} allowFontScaling={false}>
+                <Text style={styles.noPlansText}>
                   No plans match your search.
                 </Text>
               )}

@@ -63,13 +63,13 @@ const EducationScreen: React.FC<{
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={[styles.headerText]} allowFontScaling={false}>
+            <Text style={[styles.headerText]} >
               Education
             </Text>
           </View>
 
           <View style={{ paddingHorizontal: 16 }}>
-            <Text style={styles.titleText} allowFontScaling={false}>
+            <Text style={styles.titleText}>
               Select an electricity provider
             </Text>
 
@@ -95,7 +95,7 @@ const EducationScreen: React.FC<{
                         )
                       }
                     >
-                      <Text style={styles.examText} allowFontScaling={false}>
+                      <Text style={styles.examText} >
                         {item.exam_name}
                       </Text>
                     </TouchableOpacity>

@@ -4,7 +4,6 @@ import React from "react";
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import COLORS from "../../constants/colors";
 import FONT_SIZE from "../../constants/font-size";
-import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../constants/SPACING";
 
 const CloseAccountModal: React.FC<{
@@ -27,16 +26,16 @@ const CloseAccountModal: React.FC<{
               alignItems: "center",
             }}
           >
-            <Text style={styles.modalText} allowFontScaling={false}>
+            <Text style={styles.modalText}>
               Close My Account
             </Text>
-            <Text style={styles.subModalText} allowFontScaling={false}>
+            <Text style={styles.subModalText}>
               This action cannot be reversed. Are you sure you want to
               permanently close your account?
             </Text>
             <View style={{ flexDirection: "row", gap: SPACING }}>
               <TouchableOpacity style={styles.modalButton} onPress={onConfirm}>
-                <Text style={styles.modalButtonText} allowFontScaling={false}>
+                <Text style={styles.modalButtonText}>
                   Yes, Close Account
                 </Text>
               </TouchableOpacity>
@@ -53,7 +52,6 @@ const CloseAccountModal: React.FC<{
               >
                 <Text
                   style={[styles.modalButtonText, { color: "#FF2E2E" }]}
-                  allowFontScaling={false}
                 >
                   Cancel
                 </Text>
@@ -89,7 +87,7 @@ const styles = StyleSheet.create({
   subModalText: {
     fontFamily: "Outfit-Regular",
     textAlign: "center",
-    fontSize: RFValue(12),
+    fontSize: 12,
     marginBottom: SPACING * 2,
   },
   modalButton: {

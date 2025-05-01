@@ -45,7 +45,7 @@ const NextButton: FC<NextButtonProps> = ({
           },
         ]}
       >
-        <Text style={styles.buttonText}>Create an Account</Text>
+        <RegularText color="white">Create an Account</RegularText>
       </TouchableOpacity>
 
       <TouchableOpacity

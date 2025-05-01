@@ -43,7 +43,7 @@ const ServiceSelectionModal: React.FC<ServiceSelectionModalProps> = ({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle} allowFontScaling={false}>
+            <Text style={styles.modalTitle}>
               Select a Service
             </Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -65,7 +65,7 @@ const ServiceSelectionModal: React.FC<ServiceSelectionModalProps> = ({
                   }}
                 >
                   {service.icon}
-                  <Text style={styles.serviceName} allowFontScaling={false}>
+                  <Text style={styles.serviceName}>
                     {service.name}
                   </Text>
                 </TouchableOpacity>
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     padding: SPACING * 2,
   },
   modalTitle: {
-    fontSize: RFValue(16),
+    fontSize: 16,
     fontFamily: "Outfit-Medium",
     color: COLORS.black400,
   },
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   serviceName: {
-    fontSize: RFValue(14),
+    fontSize: 14,
     fontFamily: "Outfit-Regular",
     color: COLORS.black400,
     marginLeft: SPACING,

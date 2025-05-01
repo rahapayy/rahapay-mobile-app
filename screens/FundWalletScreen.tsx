@@ -22,6 +22,7 @@ import { handleShowFlash } from "../components/FlashMessageComponent";
 import * as Clipboard from "expo-clipboard";
 import { useAuth } from "../services/AuthContext";
 import { Skeleton } from "@rneui/themed";
+import { RegularText } from "@/components/common/Text";
 
 const FundWalletScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -55,9 +56,9 @@ const FundWalletScreen: React.FC<{
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={[styles.headerText]} allowFontScaling={false}>
+            <RegularText color="black" size="large">
               Virtual Funding Accounts
-            </Text>
+            </RegularText>
           </View>
 
           {/* Cards */}
@@ -109,9 +110,9 @@ const FundWalletScreen: React.FC<{
               ) : !account || !account.accountNumber ? (
                 // No Account Notification
                 <View style={styles.walletContain}>
-                  <Text style={styles.noAccountText} allowFontScaling={false}>
+                  <RegularText color="black">
                     Please exercise patience, your account is on the way.
-                  </Text>
+                  </RegularText>
                 </View>
               ) : (
                 // Actual Account Information
@@ -122,26 +123,21 @@ const FundWalletScreen: React.FC<{
                 >
                   {/* Card Details */}
                   <View style={styles.cardHeader}>
-                    <Text style={styles.virtualText} allowFontScaling={false}>
-                      Virtual Account
-                    </Text>
+                    <RegularText color="white">Virtual Account</RegularText>
                     <Circle />
                   </View>
 
-                  <Text style={styles.bankName} allowFontScaling={false}>
+                  <RegularText color="white" marginBottom={10}>
                     {formatBankName(account.bankName)}
-                  </Text>
+                  </RegularText>
                   <View style={styles.copyContainer}>
-                    <Text style={styles.copyText} allowFontScaling={false}>
+                    <RegularText color="white">
                       Copy your account number
-                    </Text>
+                    </RegularText>
                     <View style={styles.accountNumberContainer}>
-                      <Text
-                        style={styles.accountNumber}
-                        allowFontScaling={false}
-                      >
+                      <RegularText color="white">
                         {account.accountNumber}
-                      </Text>
+                      </RegularText>
                       <TouchableOpacity
                         onPress={() =>
                           copyToClipboard(
@@ -153,9 +149,9 @@ const FundWalletScreen: React.FC<{
                       </TouchableOpacity>
                     </View>
                   </View>
-                  <Text style={styles.accountName} allowFontScaling={false}>
+                  <RegularText color="white" marginTop={2}>
                     {account.accountName?.toUpperCase()}
-                  </Text>
+                  </RegularText>
                 </ImageBackground>
               )}
             </View>
@@ -231,6 +227,7 @@ const styles = StyleSheet.create({
   accountNumberContainer: {
     flexDirection: "row",
     alignItems: "center",
+    marginTop: 2,
   },
   accountNumber: {
     fontFamily: "Outfit-Medium",

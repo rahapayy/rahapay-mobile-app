@@ -71,7 +71,10 @@ const OtpInput: React.FC<OtpInputProps> = ({
     };
 
     // Add event listener for app state changes
-    const subscription = AppState.addEventListener("change", handleAppStateChange);
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
 
     // Cleanup on unmount
     return () => {
@@ -167,7 +170,6 @@ const OtpInput: React.FC<OtpInputProps> = ({
             maxLength={1}
             value={value[index] || ""}
             secureTextEntry={secureTextEntry}
-            allowFontScaling={false}
             editable={!disabled}
             onChangeText={(text) => handleInput(text, index)}
             onKeyPress={(e) => handleKeyPress(e, index)}

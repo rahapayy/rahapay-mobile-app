@@ -25,8 +25,8 @@ const banners = [
     backgroundColor: "#5136C1",
     showIcon: true,
     icon: require("@/assets/animation/at.gif"), // Assuming you have this
-    iconWidth: 130, // Custom width for this banner
-    iconHeight: 130, // Custom height for this banner
+    iconWidth: 100, // Custom width for this banner
+    iconHeight: 100, // Custom height for this banner
     onPress: (navigation: NativeStackNavigationProp<any, "">) =>
       navigation.navigate("CreateTagScreen"),
   },
@@ -36,8 +36,8 @@ const banners = [
     backgroundColor: "#5136C1",
     showIcon: true,
     icon: require("@/assets/images/Card.png"), // Assuming you have this
-    iconWidth: 90, // Smaller width for this banner
-    iconHeight: 90, // Smaller height for this banner
+    iconWidth: 80, // Smaller width for this banner
+    iconHeight: 80, // Smaller height for this banner
     onPress: () => {},
   },
 ];
@@ -87,13 +87,13 @@ const Banner = ({
       style={{
         backgroundColor: item.backgroundColor,
         width: width * 0.7,
-        height: RFValue(80),
+        height: RFValue(75),
       }}
     >
       <View className="p-3">
         <Overlay style={styles.overlay} />
         <View style={styles.content}>
-          <SemiBoldText color="white" size="base" numberOfLines={3}>
+          <SemiBoldText color="white" size="small" numberOfLines={3}>
             {item.text}
           </SemiBoldText>
           {item.showIcon && (
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   animation: {
     position: "absolute",
     right: -45,
-    top: 0,
+    top: 10,
     width: 130, // Default width (overridden by iconWidth)
     height: 130, // Default height (overridden by iconHeight)
   },

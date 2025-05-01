@@ -23,6 +23,7 @@ import BackButton from "../../../components/common/ui/buttons/BackButton";
 import {
   BoldText,
   LightText,
+  MediumText,
   RegularText,
   SemiBoldText,
 } from "../../../components/common/Text";
@@ -172,27 +173,31 @@ const LoginScreen: React.FC<{
                       onPress={() => navigation.navigate("ResetPasswordScreen")}
                       className="mt-4 justify-center items-end"
                     >
-                      <RegularText color="black" size="base">
+                      <MediumText color="primary" size="small">
                         Forgot Password?
-                      </RegularText>
+                      </MediumText>
                     </TouchableOpacity>
                     <Divider length={3} />
-                    <Button
-                      title="Login"
-                      onPress={handleSubmit}
-                      isLoading={isSubmitting}
-                      style={styles.proceedButton}
-                      textColor="#fff"
-                      disabled={isSubmitting}
-                    />
+                    <View className="justify-center items-center">
+                      <Button
+                        title="Login"
+                        onPress={handleSubmit}
+                        isLoading={isSubmitting}
+                        style={styles.proceedButton}
+                        textColor="#fff"
+                        disabled={isSubmitting}
+                      />
+                    </View>
                     <View className="flex-row justify-center items-center mt-6">
-                      <LightText color="mediumGrey" size="base">
+                      <LightText color="mediumGrey" size="small">
                         Don't have an account?{" "}
                       </LightText>
                       <TouchableOpacity
-                        onPress={() => navigation.navigate("CreateAccountScreen")}
+                        onPress={() =>
+                          navigation.navigate("CreateAccountScreen")
+                        }
                       >
-                        <BoldText color="primary" size="base">
+                        <BoldText color="primary" size="small">
                           Create Account
                         </BoldText>
                       </TouchableOpacity>

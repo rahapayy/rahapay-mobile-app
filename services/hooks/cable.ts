@@ -2,10 +2,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { services } from "@/services";
 import { handleError } from "../handleError";
-import {
-  CablePurchasePayload,
-  ValidateCablePayload,
-} from "../modules/cable";
+import { CablePurchasePayload, ValidateCablePayload } from "../modules/cable";
 
 export const useCablePlans = (cableName: string) => {
   return useQuery({

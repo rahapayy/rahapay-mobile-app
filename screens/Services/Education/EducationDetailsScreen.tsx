@@ -52,14 +52,14 @@ const EducationDetailsScreen: React.FC<EducationDetailsScreenProps> = ({
           >
             <ArrowLeft color={"#000"} size={24} />
           </TouchableOpacity>
-          <Text style={[styles.headerText]} allowFontScaling={false}>
+          <Text style={[styles.headerText]}>
             Enter Details
           </Text>
         </View>
 
         <View>
           <View className="bg-white shadow-md rounded-lg py-4 px-4">
-            <Text style={styles.label} allowFontScaling={false}>
+            <Text style={styles.label}>
               Quantity
             </Text>
             <TextInput
@@ -69,9 +69,9 @@ const EducationDetailsScreen: React.FC<EducationDetailsScreenProps> = ({
               value={quantity.toString()}
               onChangeText={(text) => setQuantity(parseInt(text) || 1)}
               keyboardType="numeric"
-              allowFontScaling={false}
+         
             />
-            <Text style={styles.label} allowFontScaling={false}>
+            <Text style={styles.label} >
               Phone Number
             </Text>
             <TextInput
@@ -81,16 +81,16 @@ const EducationDetailsScreen: React.FC<EducationDetailsScreenProps> = ({
               value={phoneNumber}
               onChangeText={setPhoneNumber}
               keyboardType="phone-pad"
-              allowFontScaling={false}
+
             />
 
-            <Text style={styles.label} allowFontScaling={false}>
+            <Text style={styles.label} >
               Service
             </Text>
             <View style={styles.input}>
               <Text
                 style={{ fontFamily: "Outfit-Regular", color: COLORS.black300 }}
-                allowFontScaling={false}
+       
               >
                 {serviceType} - {amount}
               </Text>

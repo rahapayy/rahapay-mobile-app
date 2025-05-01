@@ -15,7 +15,13 @@ import * as Sentry from "@sentry/react-native";
 const SuccessfulScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { setIsAuthenticated, setUserInfo, isLoading, setIsLoading, setIsFreshLogin } = useAuth();
+  const {
+    setIsAuthenticated,
+    setUserInfo,
+    isLoading,
+    setIsLoading,
+    setIsFreshLogin,
+  } = useAuth();
 
   const handleCompletion = async () => {
     try {
@@ -41,7 +47,9 @@ const SuccessfulScreen: React.FC<{
       setUserInfo(userResponse.data);
       setIsAuthenticated(true);
       setIsFreshLogin(true);
-      console.log("Signup completion successful, set isFreshLogin: true, isAuthenticated: true");
+      console.log(
+        "Signup completion successful, set isFreshLogin: true, isAuthenticated: true"
+      );
 
       handleShowFlash({
         message: "Account setup complete! Welcome to RahaPay!",
@@ -112,7 +120,12 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: "center",
   },
-  buttonContainer: { paddingHorizontal: 24, paddingBottom: SPACING * 4 },
+  buttonContainer: {
+    paddingHorizontal: 24,
+    paddingBottom: SPACING * 4,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   button: { width: "100%" },
 });
 

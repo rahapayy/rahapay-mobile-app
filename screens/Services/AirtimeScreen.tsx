@@ -60,7 +60,7 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
   const [amountError, setAmountError] = useState(false);
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
   const [isBeneficiariesLoading, setIsBeneficiariesLoading] = useState(true);
-  const [saveBeneficiary, setSaveBeneficiary] = useState(false);
+  const [saveBeneficiary, setSaveBeneficiary] = useState(true);
 
   const amounts = [100, 200, 500, 1000, 2000, 3000, 5000];
 
@@ -330,7 +330,6 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
                     styles.tabText,
                     activeTab === "Local" && styles.activeTabText,
                   ]}
-                  allowFontScaling={false}
                 >
                   Local
                 </Text>
@@ -350,7 +349,6 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
                     styles.tabText,
                     activeTab === "International" && styles.activeTabText,
                   ]}
-                  allowFontScaling={false}
                 >
                   International
                 </Text>
@@ -364,11 +362,7 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
               {activeTab === "Local" ? (
                 <View>
                   <View>
-                    <RegularText
-                      color="black"
-                      marginBottom={8}
-                      allowFontScaling={false}
-                    >
+                    <RegularText color="black" marginBottom={8} size="small">
                       Saved Beneficiaries
                     </RegularText>
                     {isBeneficiariesLoading ? (
@@ -413,8 +407,12 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
                         )}
                       />
                     ) : (
-                      <View className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 w-52">
-                        <RegularText color="mediumGrey" className="mb-4">
+                      <View className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 w-48 justify-center items-center">
+                        <RegularText
+                          color="mediumGrey"
+                          className="mb-4"
+                          size="small"
+                        >
                           No beneficiaries found.
                         </RegularText>
                       </View>
@@ -442,7 +440,7 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
                   <View className="mt-4">
                     <View className="flex-row justify-between items-center">
                       <Label text="Amount" marked={false} />
-                      <RegularText color="black" marginBottom={10}>
+                      <RegularText color="black" marginBottom={10} size="small">
                         Balance: ₦
                         {balance.toLocaleString("en-US", {
                           minimumFractionDigits: 2,
@@ -470,7 +468,9 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
                             onPress={() => setAmount(amount.toString())}
                             className="bg-white rounded p-2 m-2"
                           >
-                            <RegularText color="black">₦{amount}</RegularText>
+                            <RegularText color="black" size="small">
+                              ₦{amount}
+                            </RegularText>
                           </TouchableOpacity>
                         ))}
                       </View>
@@ -479,7 +479,7 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
 
                   <View className="mb-4">
                     <View className="flex-row items-center mt-2">
-                      <RegularText color="black" marginRight={6}>
+                      <RegularText color="black" marginRight={6} size="small">
                         Save as beneficiary
                       </RegularText>
                       <Switch

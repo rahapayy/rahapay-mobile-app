@@ -3,6 +3,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   View,
+  Platform,
 } from "react-native";
 import React from "react";
 import COLORS from "../constants/colors";
@@ -26,11 +27,16 @@ interface ActionItem {
 const QuickAction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { width: screenWidth } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const { isLoading } = useAuth();
 
-  // Set a fixed card size to maintain consistency across screens
-  const cardSize = Math.min((screenWidth - 64) / 4, 100);
+  // Calculate card size based on screen dimensions and device type
+  const isTablet = Platform.OS === "ios" && screenWidth >= 768;
+  const baseCardSize = isTablet ? 120 : 100;
+  const cardSize = Math.min(
+    (screenWidth - (isTablet ? 96 : 64)) / (isTablet ? 6 : 4),
+    baseCardSize
+  );
   const fill = COLORS.violet300;
 
   const actionItems = [
@@ -40,7 +46,7 @@ const QuickAction: React.FC<{
     {
       icon: ElectricityIcon,
       title: "Electricity",
-      navigateTo: "ElectricityScreen"
+      navigateTo: "ElectricityScreen",
     },
   ];
   // const actionItems = [
@@ -56,28 +62,46 @@ const QuickAction: React.FC<{
 
   return (
     <View className="mt-4">
-      <BoldText color="black" size="medium">
+      <BoldText color="black" size={isTablet ? "large" : "medium"}>
         Quick Action
       </BoldText>
-      <View className="flex-row items-center justify-between mt-4 mb-2">
+      <View
+        className={`flex-row flex-wrap items-center ${
+          isTablet ? "justify-start" : "justify-between"
+        } mt-4 mb-2`}
+      >
         {actionItems.map((item, index) => (
           <TouchableOpacity
             key={index}
             onPress={() =>
               item.navigateTo && navigation.navigate(item.navigateTo)
             }
-            className={`bg-white justify-center items-center rounded-2xl`}
-            style={{ width: cardSize, height: cardSize * 1.1 }}
+            className={`bg-white justify-center items-center rounded-2xl ${
+              isTablet ? "mr-4 mb-4" : ""
+            }`}
+            style={{
+              width: cardSize,
+              height: cardSize * 1.1,
+              ...(isTablet && { marginRight: 16, marginBottom: 16 }),
+            }}
           >
-            <item.icon fill={fill} width={24} height={24} />
-            {item.isComingSoon && (
+            <item.icon
+              fill={fill}
+              width={isTablet ? 32 : 24}
+              height={isTablet ? 32 : 24}
+            />
+            {/* {item.isComingSoon && (
               <View style={styles.badgeContainer}>
                 <RegularText color="black" size="xsmall" center>
                   Coming Soon!
                 </RegularText>
               </View>
-            )}
-            <RegularText color="black" marginTop={8} size="base">
+            )} */}
+            <RegularText
+              color="black"
+              marginTop={8}
+              size={isTablet ? "medium" : "small"}
+            >
               {item.title}
             </RegularText>
           </TouchableOpacity>

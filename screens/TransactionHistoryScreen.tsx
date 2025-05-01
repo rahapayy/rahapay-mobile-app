@@ -252,9 +252,7 @@ const AllTransactionsScreen: React.FC<{
         </View>
         <View style={styles.transactionTextContainer}>
           <View style={styles.transactionTextRow}>
-            <Text style={styles.item} allowFontScaling={false}>
-              {item.transactionType}
-            </Text>
+            <Text style={styles.item}>{item.transactionType}</Text>
             <Text
               style={[
                 styles.valueText,
@@ -266,7 +264,6 @@ const AllTransactionsScreen: React.FC<{
                       : "black",
                 },
               ]}
-              allowFontScaling={false}
             >
               {item.transactionType.includes("PURCHASE") ||
               item.transactionType === "CABLE_SUBSCRIPTION"
@@ -276,7 +273,7 @@ const AllTransactionsScreen: React.FC<{
             </Text>
           </View>
           <View style={styles.transactionTextRow}>
-            <Text style={styles.date} allowFontScaling={false}>
+            <Text style={styles.date}>
               {formattedTime}
             </Text>
             <View
@@ -302,7 +299,6 @@ const AllTransactionsScreen: React.FC<{
                         : "#FF3B30",
                   },
                 ]}
-                allowFontScaling={false}
               >
                 {item.paymentStatus}
               </Text>
@@ -496,7 +492,7 @@ const styles = StyleSheet.create({
   },
   item: {
     fontFamily: "Outfit-Medium",
-    fontSize: RFValue(12),
+    fontSize: RFValue(14),
   },
   valueText: {
     fontFamily: "Outfit-Medium",

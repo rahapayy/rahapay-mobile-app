@@ -56,12 +56,12 @@ const EducationServiceType: React.FC<EducationServiceTypeProps> = ({
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={[styles.headerText]} allowFontScaling={false}>
+            <Text style={[styles.headerText]} >
               {exam}
             </Text>
           </View>
 
-          <Text style={styles.titleText} allowFontScaling={false}>
+          <Text style={styles.titleText}>
             Choose your meter type
           </Text>
 
@@ -71,7 +71,7 @@ const EducationServiceType: React.FC<EducationServiceTypeProps> = ({
               onPress={() => handleServiceTypeSelect("Result checker PIN")}
             >
               <View className="flex-row items-center">
-                <Text style={styles.optionText} allowFontScaling={false}>
+                <Text style={styles.optionText} >
                   Result checker PIN
                 </Text>
                 <Text> - </Text>

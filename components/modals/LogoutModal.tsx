@@ -33,9 +33,7 @@ const LogOutModal: React.FC<{
                 style={styles.modalButton}
                 onPress={handleLogout}
               >
-                <Text style={styles.modalButtonText} allowFontScaling={false}>
-                  Yes
-                </Text>
+                <Text style={styles.modalButtonText}>Yes</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
@@ -48,10 +46,7 @@ const LogOutModal: React.FC<{
                 ]}
                 onPress={onClose}
               >
-                <Text
-                  style={[styles.modalButtonText, { color: "#FF2E2E" }]}
-                  allowFontScaling={false}
-                >
+                <Text style={[styles.modalButtonText, { color: "#FF2E2E" }]}>
                   No
                 </Text>
               </TouchableOpacity>

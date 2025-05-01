@@ -8,7 +8,7 @@ import {
   View,
   Image,
 } from "react-native";
-import * as Clipboard from 'expo-clipboard';
+import * as Clipboard from "expo-clipboard";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import {
@@ -31,7 +31,7 @@ import Dstv from "../assets/svg/dstv.svg";
 import Gotv from "../assets/svg/gotv.svg";
 import Startimes from "../assets/svg/startimes.svg";
 import { handleShowFlash } from "@/components/FlashMessageComponent";
-import { MediumText } from "@/components/common/Text";
+import { MediumText, RegularText } from "@/components/common/Text";
 
 type TransactionSummaryRouteParams = {
   transaction: {
@@ -81,16 +81,15 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
   const cableName = transaction.metadata?.cableName;
   const discoId = transaction.metadata?.discoId;
 
- // Helper function to extract token numbers
- const getDisplayToken = (token: string | undefined): string => {
-  if (!token || token === "Processing, check notifications later") {
-    return token || "N/A";
-  }
-  // Split on " : " and take the second part
-  const parts = token.split(" : ");
-  return parts[1] || token; // Return numbers or original token if no " : "
-};
-
+  // Helper function to extract token numbers
+  const getDisplayToken = (token: string | undefined): string => {
+    if (!token || token === "Processing, check notifications later") {
+      return token || "N/A";
+    }
+    // Split on " : " and take the second part
+    const parts = token.split(" : ");
+    return parts[1] || token; // Return numbers or original token if no " : "
+  };
 
   const getDiscoIcon = (discoId: string | undefined) => {
     if (!discoId) return null;
@@ -338,9 +337,7 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={[styles.headerText]} allowFontScaling={false}>
-              Transaction Summary
-            </Text>
+            <RegularText color="black">Transaction Summary</RegularText>
           </View>
 
           <View style={styles.iconWrapper}>
@@ -351,7 +348,7 @@ const TransactionSummaryScreen: React.FC<TransactionSummaryScreenProps> = ({
             ) : (
               renderServiceIcon(networkType || cableName, discoId)
             )}
-            <Text style={styles.itemText} allowFontScaling={false}>
+            <Text style={styles.itemText}>
               {transaction.tranxType.replace("_", " ")}
             </Text>
           </View>

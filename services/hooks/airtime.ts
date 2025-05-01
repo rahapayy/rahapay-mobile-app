@@ -6,7 +6,7 @@ import { IAirtimePurchasePayload } from "../modules/airtime";
 
 export const useAirtimePurchase = () => {
   return useMutation({
-    mutationFn: (payload: IAirtimePurchasePayload) => 
+    mutationFn: (payload: IAirtimePurchasePayload) =>
       services.airtimeService.purchaseAirtime(payload),
     onError: (error) => handleError(error),
   });

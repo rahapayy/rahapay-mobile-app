@@ -123,13 +123,15 @@ const CreateTransactionPinScreen: React.FC<CreateTransactionPinScreenProps> = ({
                 </View>
               </View>
             </View>
-            <Button
-              title="Confirm"
-              onPress={handleConfirmPin}
-              isLoading={loading}
-              style={{ marginTop: SPACING * 10 }}
-              textColor="#fff"
-            />
+            <View className="justify-center items-center">
+              <Button
+                title="Confirm"
+                onPress={handleConfirmPin}
+                isLoading={loading}
+                style={{ marginTop: SPACING * 10 }}
+                textColor="#fff"
+              />
+            </View>
           </View>
         </ScrollView>
       </SafeAreaView>

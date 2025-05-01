@@ -19,6 +19,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { useNotification } from "../../context/NotificationContext";
 import * as Notifications from "expo-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { RegularText } from "@/components/common/Text";
 
 const EnableNotificationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -98,9 +99,9 @@ const EnableNotificationScreen: React.FC<{
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={styles.headerText} allowFontScaling={false}>
+            <RegularText color="black" size="large">
               Notification
-            </Text>
+            </RegularText>
           </View>
 
           <View style={styles.container}>
@@ -111,9 +112,9 @@ const EnableNotificationScreen: React.FC<{
                   color={COLORS.violet400}
                   size={24}
                 />
-                <Text style={styles.titleText} allowFontScaling={false}>
+                <RegularText color="black" marginLeft={8}>
                   Enable Push Notification
-                </Text>
+                </RegularText>
               </View>
               <Switch
                 thumbColor={COLORS.white}
@@ -129,9 +130,9 @@ const EnableNotificationScreen: React.FC<{
                   color={COLORS.violet400}
                   size={24}
                 />
-                <Text style={styles.titleText} allowFontScaling={false}>
+                <RegularText color="black" marginLeft={8}>
                   Enable SMS Notification
-                </Text>
+                </RegularText>
               </View>
               <Switch
                 thumbColor={COLORS.white}

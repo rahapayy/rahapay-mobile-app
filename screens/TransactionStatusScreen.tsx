@@ -4,7 +4,6 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Clipboard,
 } from "react-native";
 import React from "react";
 import COLORS from "../constants/colors";
@@ -18,6 +17,8 @@ import { ReceiptText, Timer, Warning2, Copy } from "iconsax-react-native";
 import { AppStackParamList } from "../types/RootStackParams";
 import useWallet from "@/hooks/use-wallet";
 import { handleShowFlash } from "@/components/FlashMessageComponent";
+import * as Clipboard from "expo-clipboard";
+import { MediumText, RegularText } from "@/components/common/Text";
 
 type TransactionStatusScreenNavigationProp = NativeStackNavigationProp<
   AppStackParamList,
@@ -56,10 +57,13 @@ const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
     }
     navigation.navigate("HomeScreen");
   };
+  const ShareReciept = () => {
+    navigation.navigate("TransactionHistoryScreen");
+  };
 
   const copyToken = () => {
     if (token) {
-      Clipboard.setString(token);
+      Clipboard.setStringAsync(token);
       handleShowFlash({
         message: "Token copied to clipboard",
         type: "success",
@@ -118,28 +122,21 @@ const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
             </Animatable.View>
           </View>
           <View style={styles.textContainer}>
-            <Text style={styles.headText} allowFontScaling={false}>
+            <MediumText color="black" size="xlarge">
               {headText}
-            </Text>
-            <Text style={styles.subText} allowFontScaling={false}>
-              {subText}
-            </Text>
+            </MediumText>
+            <RegularText color="light">{subText}</RegularText>
             {status === "success" &&
               tranxType === "ELECTRICITY_PURCHASE" &&
               meterType === "Prepaid" &&
               token && (
                 <View style={styles.tokenContainer}>
-                  <Text style={styles.tokenText} allowFontScaling={false}>
-                    Token: {token}
-                  </Text>
+                  <Text style={styles.tokenText}>Token: {token}</Text>
                   <TouchableOpacity
                     onPress={copyToken}
                     style={styles.copyButton}
                   >
                     <Copy size={20} color={COLORS.violet400} />
-                    <Text style={styles.copyText} allowFontScaling={false}>
-                      Copy
-                    </Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -147,17 +144,7 @@ const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
         </View>
 
         <View style={styles.buttonContainer}>
-          <Button
-            title={"Share Receipt"}
-            textColor="#fff"
-            // onPress={() => navigation.navigate("TransactionSummaryScreen")}
-          />
-          <Button
-            title={"Done"}
-            textColor="black"
-            borderOnly
-            onPress={handleDone}
-          />
+          <Button title={"Done"} textColor="#fff" onPress={handleDone} />
         </View>
       </View>
     </SafeAreaView>
@@ -230,6 +217,7 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "flex-end",
     gap: 10,
+    marginBottom: SPACING * 4,
   },
 });
 

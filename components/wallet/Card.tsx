@@ -30,7 +30,7 @@ import { useAuth } from "../../services/AuthContext";
 import { PanResponder } from "react-native";
 import { Skeleton } from "@rneui/themed";
 
-const { height: screenHeight } = Dimensions.get("window");
+const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
 const Card: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -132,10 +132,10 @@ const Card: React.FC<{
                 </BoldText>
               </TouchableOpacity>
               <View>
-                <SemiBoldText color="white" size="large">
+                <SemiBoldText color="white" size="medium">
                   Hello, {firstName} 👋
                 </SemiBoldText>
-                <RegularText color="white">
+                <RegularText color="white" size="small">
                   Let's make some bills payment!
                 </RegularText>
               </View>
@@ -181,18 +181,14 @@ const Card: React.FC<{
               />
             ) : isConnected === false ? (
               <View style={styles.errorContainer}>
-                <Text style={styles.errorText} allowFontScaling={false}>
-                  Service Unavailable
-                </Text>
-                <Text style={styles.errorSubText} allowFontScaling={false}>
+                <Text style={styles.errorText}>Service Unavailable</Text>
+                <Text style={styles.errorSubText}>
                   Please check your internet connection and try again.
                 </Text>
               </View>
             ) : error ? (
               <View style={styles.errorContainer}>
-                <Text style={styles.errorText} allowFontScaling={false}>
-                  {error}
-                </Text>
+                <Text style={styles.errorText}>{error}</Text>
                 <TouchableOpacity onPress={handleRefresh}>
                   <Text style={styles.retryText}>Retry</Text>
                 </TouchableOpacity>
@@ -254,9 +250,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   avatar: {
-    width: 45,
-    height: 45,
-    borderRadius: 25,
+    width: screenWidth * 0.13, // 12% of the screen width
+    height: screenWidth * 0.13, // Same as width to maintain a circle
+    borderRadius: screenWidth * 0.07, // Half of the width/height to make it a perfect circle
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     justifyContent: "center",
     alignItems: "center",
@@ -270,6 +266,7 @@ const styles = StyleSheet.create({
   balanceContent: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 6,
   },
   eyeIcon: {
     marginLeft: 10,

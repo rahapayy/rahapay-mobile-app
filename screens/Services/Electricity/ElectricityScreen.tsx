@@ -298,19 +298,13 @@ const ElectricityScreen: React.FC<{
               >
                 <ArrowLeft color={"#000"} size={24} />
               </TouchableOpacity>
-              <Text style={[styles.headerText]} allowFontScaling={false}>
-                Electricity
-              </Text>
+              <Text style={[styles.headerText]}>Electricity</Text>
             </View>
           </View>
 
           <View className="justify-center px-4">
             <View className="">
-              <RegularText
-                color="black"
-                marginBottom={8}
-                allowFontScaling={false}
-              >
+              <RegularText color="black" marginBottom={8}>
                 Saved Beneficiaries
               </RegularText>
               {isBeneficiariesLoading ? (
@@ -337,12 +331,11 @@ const ElectricityScreen: React.FC<{
                   )}
                 />
               ) : (
-                <View className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 w-44 justify-center items-center">
+                <View className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 w-48 justify-center items-center">
                   <RegularText
                     color="mediumGrey"
                     style={{ flexShrink: 1, fontSize: RFValue(12) }}
                     size="small"
-                    allowFontScaling={false}
                   >
                     No beneficiaries found
                   </RegularText>
@@ -354,7 +347,7 @@ const ElectricityScreen: React.FC<{
               className="bg-white shadow-md rounded-lg py-4 px-4 mt-4"
               style={shadowStyle}
             >
-              <RegularText color="black">
+              <RegularText color="black" size="small">
                 Select an electricity provider
               </RegularText>
               <TouchableOpacity onPress={() => setServiceModalVisible(true)}>
@@ -394,7 +387,10 @@ const ElectricityScreen: React.FC<{
               ]}
               onPress={() => setMeterType("Prepaid")}
             >
-              <MediumText color={meterType === "Prepaid" ? "primary" : "black"}>
+              <MediumText
+                size="small"
+                color={meterType === "Prepaid" ? "primary" : "black"}
+              >
                 Prepaid
               </MediumText>
             </TouchableOpacity>
@@ -406,6 +402,7 @@ const ElectricityScreen: React.FC<{
               onPress={() => setMeterType("Postpaid")}
             >
               <MediumText
+                size="small"
                 color={meterType === "Postpaid" ? "primary" : "black"}
               >
                 Postpaid
@@ -464,7 +461,7 @@ const ElectricityScreen: React.FC<{
               <View className="mb-4">
                 <View className="flex-row justify-between items-center">
                   <Label text="Amount" marked={false} />
-                  <RegularText color="black" marginBottom={10}>
+                  <RegularText color="black" marginBottom={10} size="small">
                     Balance: ₦
                     {balance.toLocaleString("en-US", {
                       minimumFractionDigits: 2,

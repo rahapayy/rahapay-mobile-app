@@ -135,7 +135,7 @@ const PersonalInformationScreen: React.FC<{
             <BoldText color="white">{initials}</BoldText>
           </View>
           <View>
-            <View style={{ alignSelf: 'flex-end' }}>
+            <View style={{ alignSelf: "flex-end" }}>
               <BoldText color="dark" size="large">
                 {userInfo?.fullName}
               </BoldText>

@@ -79,29 +79,22 @@ const CreateTagScreen: React.FC<{
         <View className="p-4">
           <BackButton navigation={navigation} />
           <View className="mt-4">
-            <Text style={styles.headText} allowFontScaling={false}>
-              Create a RahaPay Tag
-            </Text>
-            <Text style={styles.subText} allowFontScaling={false}>
+            <Text style={styles.headText}>Create a RahaPay Tag</Text>
+            <Text style={styles.subText}>
               Send and receive money from your loved ones with your RahaPay tag
             </Text>
           </View>
 
           <View className="mt-6">
             <View>
-              <Text style={styles.label} allowFontScaling={false}>
-                Set Username
-              </Text>
+              <Text style={styles.label}>Set Username</Text>
             </View>
             <View style={styles.inputContainer}>
-              <Text style={{}} allowFontScaling={false}>
-                @{" "}
-              </Text>
+              <Text style={{}}>@ </Text>
               <TextInput
                 style={styles.input}
                 placeholder="eg. john"
                 placeholderTextColor="#BABFC3"
-                allowFontScaling={false}
                 value={tag}
                 onChangeText={setTag}
                 autoComplete="off"
@@ -131,7 +124,6 @@ const CreateTagScreen: React.FC<{
                       color: "#5136C1",
                       fontSize: FONT_SIZE.extraSmall,
                     }}
-                    allowFontScaling={false}
                   >
                     {suggestedTag}
                   </Text>

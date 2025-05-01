@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { getItem, setItem } from "../utils/storage";
-import LoadingIndicator from "../components/LoadingIndicator";
 import WelcomeScreen from "../screens/WelcomeScreen";
 import Onboarding from "../components/onboarding/Onboarding";
 import CreateAccountScreen from "../screens/Auth/CreateAccount/CreateAccountScreen";
@@ -17,26 +15,7 @@ import { AuthStackParamList } from "../types/RootStackParams";
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
-const AuthRoute = () => {
-  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
-  useEffect(() => {
-    checkIfAlreadyOnboarded();
-  }, []);
-
-  const checkIfAlreadyOnboarded = async () => {
-    let onboarded = await getItem("ONBOARDED");
-    if (onboarded == "1") {
-      setShowOnboarding(false);
-    } else {
-      setShowOnboarding(true);
-      await setItem("ONBOARDED", "1");
-    }
-  };
-
-  if (showOnboarding === null) {
-    return <LoadingIndicator />;
-  }
-
+const AuthRoute = ({ showOnboarding }: { showOnboarding: boolean }) => {
   return (
     <Stack.Navigator>
       {showOnboarding && (

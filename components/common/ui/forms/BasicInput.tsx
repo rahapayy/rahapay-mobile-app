@@ -56,7 +56,6 @@ const BasicInput: React.FC<BasicInputProps> = ({
         style={[styles.input, inputStyle]}
         placeholder={placeholder}
         placeholderTextColor="#BABFC3"
-        allowFontScaling={false}
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={showPassword}

@@ -19,6 +19,8 @@ import { handleShowFlash } from "../../components/FlashMessageComponent";
 import FONT_SIZE from "../../constants/font-size";
 import { services } from "@/services";
 import { Skeleton } from "@rneui/themed";
+import { RegularText } from "@/components/common/Text";
+import Label from "@/components/common/ui/forms/Label";
 
 const EditTagScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -72,7 +74,7 @@ const EditTagScreen: React.FC<{
   useEffect(() => {
     fetchSuggestedTags();
   }, []);
-  
+
   return (
     <SafeAreaView className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -81,29 +83,24 @@ const EditTagScreen: React.FC<{
             <ArrowLeft color="#000" />
           </TouchableOpacity>
           <View className="mt-4">
-            <Text style={styles.headText} allowFontScaling={false}>
+            <RegularText size="large" color="black">
               Edit your RahaPay Tag
-            </Text>
-            <Text style={styles.subText} allowFontScaling={false}>
+            </RegularText>
+            <RegularText color="light" size="small" marginTop={10}>
               Update your RahaPay tag for sending and receiving money
-            </Text>
+            </RegularText>
           </View>
 
           <View className="mt-6">
             <View>
-              <Text style={styles.label} allowFontScaling={false}>
-                Edit Username
-              </Text>
+              <Label text="Edit Username" marked={false} />
             </View>
             <View style={styles.inputContainer}>
-              <Text style={{}} allowFontScaling={false}>
-                @{" "}
-              </Text>
+              <RegularText color="black">@</RegularText>
               <TextInput
                 style={styles.input}
                 placeholder="eg. john"
                 placeholderTextColor="#BABFC3"
-                allowFontScaling={false}
                 value={tag}
                 onChangeText={setTag}
                 autoComplete="off"
@@ -143,7 +140,6 @@ const EditTagScreen: React.FC<{
                       color: "#5136C1",
                       fontSize: FONT_SIZE.extraSmall,
                     }}
-                    allowFontScaling={false}
                   >
                     {suggestedTag}
                   </Text>

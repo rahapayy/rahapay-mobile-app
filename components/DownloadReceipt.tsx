@@ -15,7 +15,6 @@ import { DocumentDownload } from "iconsax-react-native";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import * as Print from "expo-print";
-import * as MediaLibrary from "expo-media-library";
 import SPACING from "../constants/SPACING";
 import COLORS from "../constants/colors";
 import { formatDate } from "../utils/dateFormatter";
@@ -151,7 +150,9 @@ const generateTransactionSpecificDetailsHTML = (
         </div>
         <div class="details-row">
           <span class="label">Smart Card Number</span>
-          <span class="value">${transaction.metadata?.smartCardNo || "N/A"}</span>
+          <span class="value">${
+            transaction.metadata?.smartCardNo || "N/A"
+          }</span>
         </div>
         <div class="details-row">
           <span class="label">Plan</span>
@@ -180,9 +181,7 @@ const generateTransactionSpecificDetailsHTML = (
         </div>
         <div class="details-row">
           <span class="label">Meter Type</span>
-          <span class="value">${
-            transaction.metadata?.meterType || "N/A"
-          }</span>
+          <span class="value">${transaction.metadata?.meterType || "N/A"}</span>
         </div>
         <div class="details-row">
           <span class="label">Customer Name</span>
@@ -273,12 +272,6 @@ const requestStoragePermission = async (): Promise<boolean> => {
   }
 };
 
-// Request media library permission
-const requestMediaLibraryPermission = async (): Promise<boolean> => {
-  const { status } = await MediaLibrary.requestPermissionsAsync();
-  return status === "granted";
-};
-
 // Function to save the receipt as a PDF
 const saveAsPDF = async (transaction: Transaction): Promise<void> => {
   try {
@@ -317,23 +310,6 @@ const saveAsPDF = async (transaction: Transaction): Promise<void> => {
   }
 };
 
-// Function to save the receipt as an image (placeholder for now)
-const saveAsImage = async (transaction: Transaction): Promise<void> => {
-  try {
-    Alert.alert(
-      "Image Saving Not Supported",
-      "Saving as an image is not directly supported in this app yet. Please save as PDF instead.",
-      [{ text: "OK" }]
-    );
-  } catch (error) {
-    console.error("Error generating image:", error);
-    Alert.alert(
-      "Download Failed",
-      "There was an error generating your image receipt"
-    );
-  }
-};
-
 // Component props type
 interface DownloadReceiptButtonProps {
   transaction: Transaction;
@@ -347,12 +323,11 @@ const DownloadReceiptButton: React.FC<DownloadReceiptButtonProps> = ({
 
   const showActionSheet = async () => {
     const hasStoragePermission = await requestStoragePermission();
-    const hasMediaPermission = await requestMediaLibraryPermission();
 
-    if (!hasStoragePermission || !hasMediaPermission) {
+    if (!hasStoragePermission) {
       Alert.alert(
         "Permission Denied",
-        "You need to grant storage and media permissions to save receipts"
+        "You need to grant storage permission to save receipts"
       );
       return;
     }
@@ -361,14 +336,12 @@ const DownloadReceiptButton: React.FC<DownloadReceiptButtonProps> = ({
       ActionSheetIOS.showActionSheetWithOptions(
         {
           title: "Share Receipt",
-          options: ["PDF", "Image", "Cancel"],
-          cancelButtonIndex: 2,
+          options: ["PDF", "Cancel"],
+          cancelButtonIndex: 1,
         },
         (buttonIndex) => {
           if (buttonIndex === 0) {
             saveAsPDF(transaction);
-          } else if (buttonIndex === 1) {
-            saveAsImage(transaction);
           }
         }
       );
@@ -409,15 +382,6 @@ const DownloadReceiptButton: React.FC<DownloadReceiptButtonProps> = ({
               }}
             >
               <Text style={styles.modalOptionText}>PDF</Text>
-            </Pressable>
-            <Pressable
-              style={styles.modalOption}
-              onPress={() => {
-                setModalVisible(false);
-                saveAsImage(transaction);
-              }}
-            >
-              <Text style={styles.modalOptionText}>Image</Text>
             </Pressable>
             <Pressable
               style={styles.modalCancel}
@@ -491,4 +455,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export { DownloadReceiptButton, saveAsPDF, saveAsImage };
+export { DownloadReceiptButton, saveAsPDF };

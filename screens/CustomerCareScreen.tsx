@@ -69,7 +69,7 @@ const CustomerCareScreen: React.FC<{
             >
               <ArrowLeft color={"#000"} size={24} />
             </TouchableOpacity>
-            <Text style={[styles.headerText]} allowFontScaling={false}>
+            <Text style={[styles.headerText]}>
               Customer Care Screen
             </Text>
           </View>
@@ -81,10 +81,10 @@ const CustomerCareScreen: React.FC<{
               style={styles.centerImg}
             />
 
-            <Text style={styles.headText} allowFontScaling={false}>
+            <Text style={styles.headText}>
               RahaPay Support
             </Text>
-            <Text style={styles.subHead} allowFontScaling={false}>
+            <Text style={styles.subHead}>
               Message or call us if you are having trouble using any of our
               services
             </Text>
@@ -94,7 +94,7 @@ const CustomerCareScreen: React.FC<{
               style={styles.chatButton}
             >
               <Messages2 color="#fff" />
-              <Text style={styles.chatText} allowFontScaling={false}>
+              <Text style={styles.chatText}>
                 Start live Chat
               </Text>
             </TouchableOpacity> */}

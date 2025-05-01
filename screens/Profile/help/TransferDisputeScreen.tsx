@@ -37,7 +37,7 @@ const TransferDisputeScreen: React.FC<{
           >
             <ArrowLeft color="#000" size={24} />
           </TouchableOpacity>
-          <Text style={styles.headerText} allowFontScaling={false}>
+          <Text style={styles.headerText}>
             Transfer Dispute
           </Text>
         </View>
@@ -51,7 +51,7 @@ const TransferDisputeScreen: React.FC<{
                 styles.tabText,
                 activeTab === "Processing" && styles.activeTabText,
               ]}
-              allowFontScaling={false}
+             
             >
               Processing
             </Text>
@@ -65,14 +65,14 @@ const TransferDisputeScreen: React.FC<{
                 styles.tabText,
                 activeTab === "Completed" && styles.activeTabText,
               ]}
-              allowFontScaling={false}
+          
             >
               Completed
             </Text>
           </TouchableOpacity>
         </View>
         <View style={styles.noDataContainer}>
-          <Text style={styles.noDataText} allowFontScaling={false}>
+          <Text style={styles.noDataText} >
             You don’t have any data
           </Text>
         </View>

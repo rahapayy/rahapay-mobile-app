@@ -39,7 +39,7 @@ const ReportNewIssueScreen: React.FC<{
           >
             <ArrowLeft color="#000" size={24} />
           </TouchableOpacity>
-          <Text style={styles.headerText} allowFontScaling={false}>
+          <Text style={styles.headerText}>
             Report new issue
           </Text>
         </View>
@@ -73,7 +73,7 @@ const ReportNewIssueScreen: React.FC<{
               })
             }
           >
-            <Text style={styles.optionText} allowFontScaling={false}>
+            <Text style={styles.optionText}>
               {type.label}
             </Text>
             <ArrowLeft color="#000" size={24} style={styles.optionIcon} />

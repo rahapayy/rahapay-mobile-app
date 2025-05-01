@@ -35,7 +35,7 @@ const SelectQuestionTypeScreen: React.FC<Props> = ({ navigation, route }) => {
           >
             <ArrowLeft color="#000" size={24} />
           </TouchableOpacity>
-          <Text style={styles.headerText} allowFontScaling={false}>
+          <Text style={styles.headerText} >
             {businessType}
           </Text>
         </View>
@@ -70,7 +70,7 @@ const SelectQuestionTypeScreen: React.FC<Props> = ({ navigation, route }) => {
               })
             }
           >
-            <Text style={styles.optionText} allowFontScaling={false}>
+            <Text style={styles.optionText} >
               {type.label}
             </Text>
             <ArrowLeft color="#000" size={24} style={styles.optionIcon} />

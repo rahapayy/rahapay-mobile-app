@@ -1,5 +1,13 @@
 import React from "react";
-import { StyleSheet, Text, TextProps, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextProps,
+  View,
+  useWindowDimensions,
+  Platform,
+  SafeAreaView,
+} from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   Home,
@@ -12,6 +20,7 @@ import HomeScreen from "../screens/HomeScreen";
 import ServicesScreen from "../screens/ServicesScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import CardsScreen from "../screens/CardsScreen";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const Tab = createBottomTabNavigator();
 
@@ -27,6 +36,9 @@ interface TabBarLabelProps extends TextProps {
 }
 
 const TabBarLabel: React.FC<TabBarLabelProps> = ({ focused, title }) => {
+  const { width: screenWidth } = useWindowDimensions();
+  const isTablet = Platform.OS === "ios" && screenWidth >= 768;
+
   return (
     <Text
       style={[
@@ -35,11 +47,11 @@ const TabBarLabel: React.FC<TabBarLabelProps> = ({ focused, title }) => {
           color: focused
             ? customColors.activeTintColor
             : customColors.inactiveTintColor,
+          fontSize: isTablet ? RFValue(16) : RFValue(14),
         },
       ]}
       numberOfLines={1}
       ellipsizeMode="tail"
-      allowFontScaling={false}
     >
       {title}
     </Text>
@@ -52,9 +64,12 @@ interface IconProps {
 }
 
 const TabIcon: React.FC<IconProps> = ({ focused, IconComponent }) => {
+  const { width: screenWidth } = useWindowDimensions();
+  const isTablet = Platform.OS === "ios" && screenWidth >= 768;
+
   return (
     <IconComponent
-      size={27}
+      size={isTablet ? 32 : 27}
       color={
         focused ? customColors.activeTintColor : customColors.inactiveTintColor
       }
@@ -64,6 +79,9 @@ const TabIcon: React.FC<IconProps> = ({ focused, IconComponent }) => {
 };
 
 const BottomTab: React.FC = () => {
+  const { width: screenWidth } = useWindowDimensions();
+  const isTablet = Platform.OS === "ios" && screenWidth >= 768;
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -73,8 +91,10 @@ const BottomTab: React.FC = () => {
           elevation: 0,
           shadowOpacity: 0,
           borderTopColor: "transparent",
-          height: "11%",
+          height: isTablet ? "12%" : "10%",
           position: "absolute",
+          paddingBottom: Platform.OS === "ios" ? 24 : 4,
+          paddingTop: 8,
         },
         tabBarActiveTintColor: customColors.activeTintColor,
         tabBarInactiveTintColor: customColors.inactiveTintColor,
@@ -89,7 +109,7 @@ const BottomTab: React.FC = () => {
           ),
           tabBarLabel: ({ focused }) => (
             <TabBarLabel focused={focused} title="Home" />
-          ), // Removed conditional
+          ),
           headerShown: false,
         }}
       />
@@ -102,7 +122,7 @@ const BottomTab: React.FC = () => {
           ),
           tabBarLabel: ({ focused }) => (
             <TabBarLabel focused={focused} title="Services" />
-          ), // Removed conditional
+          ),
           headerShown: false,
         }}
       />
@@ -115,7 +135,7 @@ const BottomTab: React.FC = () => {
           ),
           tabBarLabel: ({ focused }) => (
             <TabBarLabel focused={focused} title="Card" />
-          ), // Removed conditional
+          ),
           headerShown: false,
         }}
       />
@@ -128,7 +148,7 @@ const BottomTab: React.FC = () => {
           ),
           tabBarLabel: ({ focused }) => (
             <TabBarLabel focused={focused} title="Profile" />
-          ), // Removed conditional
+          ),
           headerShown: false,
         }}
       />
@@ -138,9 +158,8 @@ const BottomTab: React.FC = () => {
 
 const styles = StyleSheet.create({
   tabBarLabel: {
-    fontSize: 14,
     fontFamily: "Outfit-Medium",
-    paddingBottom: 5,
+    paddingBottom: 3,
   },
 });
 

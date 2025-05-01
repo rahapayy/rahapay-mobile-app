@@ -48,7 +48,6 @@ export const BasicPasswordInput: React.FC<BasicPasswordInputProps> = ({
         style={[styles.input, inputStyle]}
         placeholder={placeholder}
         placeholderTextColor="#BABFC3"
-        allowFontScaling={false}
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={showPassword}
@@ -81,7 +80,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: RFValue(11),
+    fontSize: RFValue(12),
     fontFamily: "Outfit-Regular",
   },
   focusedInput: {
