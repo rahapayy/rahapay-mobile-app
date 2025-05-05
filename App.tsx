@@ -18,6 +18,11 @@ import { LockProvider } from "./context/LockContext";
 import * as Sentry from "@sentry/react-native";
 import { getItem, setItem } from "./utils/storage";
 
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync().catch(() => {
+  /* reloading the app might trigger some race conditions, ignore them */
+});
+
 Sentry.init({
   dsn: "https://b6d56a13d87e9557b6e7b3c7b14ee515@o4508189082648576.ingest.de.sentry.io/4509181912678480",
   tracesSampleRate: 1.0,
@@ -25,8 +30,6 @@ Sentry.init({
 });
 
 const queryClient = new QueryClient();
-
-SplashScreen.preventAutoHideAsync();
 
 export default Sentry.wrap(function App() {
   const [fontsLoaded, fontError] = useFonts({
@@ -44,7 +47,7 @@ export default Sentry.wrap(function App() {
   const navigationRef = useNavigationContainerRef();
   const [initialState, setInitialState] = React.useState();
   const [appIsReady, setAppIsReady] = React.useState(false);
-  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null); // New state for onboarding
+  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
 
   useEffect(() => {
     async function prepare() {
@@ -90,7 +93,7 @@ export default Sentry.wrap(function App() {
   }, [appIsReady, fontsLoaded, fontError, showOnboarding]);
 
   if (!appIsReady || (!fontsLoaded && !fontError) || showOnboarding === null) {
-    return null; // Keep splash screen visible
+    return null;
   }
 
   return (
