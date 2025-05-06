@@ -1,30 +1,20 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NetInfo from "@react-native-community/netinfo";
-import {
-  AppState,
-  AppStateStatus,
-  View,
-  ActivityIndicator,
-  Image,
-} from "react-native";
+import { AppState, AppStateStatus, View, Image } from "react-native";
 import AppStack from "./AppStack";
 import AuthRoute from "./AuthRouter";
 import { useAuth } from "../services/AuthContext";
 import OfflineScreen from "@/screens/OfflineScreen";
-import LockScreen from "@/screens/reauth/LockScreen";
-import {
-  RootStackParamList,
-  LockStackParamList,
-} from "../types/RootStackParams";
-import PasswordReauthScreen from "@/screens/reauth/PasswordReauthScreen.tsx";
+import LockStackNavigator from "@/screens/reauth/LockStackNavigator";
+import { RootStackParamList } from "../types/RootStackParams";
 import { services } from "../services";
 import { getItem, setItem, removeItem } from "../utils/storage";
 import * as Sentry from "@sentry/react-native";
 import { handleShowFlash } from "../components/FlashMessageComponent";
+import { UserInfo } from "../types/user";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
-const LockStack = createNativeStackNavigator<LockStackParamList>();
 
 const LoadingScreen = () => {
   return (
@@ -45,43 +35,20 @@ const LoadingScreen = () => {
   );
 };
 
-const LockStackNavigator = ({
-  onBiometricSuccess,
-  onBiometricFailure,
-  onPasswordLogin,
-  onSwitchAccount,
-  userInfo,
-}: {
-  onBiometricSuccess: () => void;
-  onBiometricFailure: () => void;
-  onPasswordLogin: () => void;
-  onSwitchAccount: () => void;
-  userInfo: { fullName?: string } | null;
-}) => {
-  return (
-    <LockStack.Navigator screenOptions={{ gestureEnabled: false }}>
-      <LockStack.Screen
-        name="LockScreen"
-        options={{ headerShown: false, presentation: "containedModal" }}
-      >
-        {(props) => (
-          <LockScreen
-            {...props}
-            onBiometricSuccess={onBiometricSuccess}
-            onBiometricFailure={onBiometricFailure}
-            onPasswordLogin={onPasswordLogin}
-            onSwitchAccount={onSwitchAccount}
-            userInfo={userInfo}
-          />
-        )}
-      </LockStack.Screen>
-      <LockStack.Screen
-        name="PasswordReauthScreen"
-        component={PasswordReauthScreen}
-        options={{ headerShown: false }}
-      />
-    </LockStack.Navigator>
-  );
+// Utility function to clear lock states
+const clearLockStates = async () => {
+  try {
+    await Promise.all([
+      setItem("IS_LOCKED", "false"),
+      removeItem("BACKGROUND_TIMESTAMP"),
+      removeItem("LOCK_TIMESTAMP"),
+      removeItem("WAS_TERMINATED"),
+    ]);
+    console.log("Lock states cleared successfully");
+  } catch (error) {
+    console.error("Error clearing lock states:", error);
+    Sentry.captureException(error);
+  }
 };
 
 const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
@@ -141,18 +108,7 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
       console.log("Fresh login detected, bypassing lock screen");
       setIsLockScreenRequired(false);
       setBiometricFailed(false);
-      // Clear storage to prevent lock screen
-      Promise.all([
-        removeItem("WAS_TERMINATED"),
-        removeItem("BACKGROUND_TIMESTAMP"),
-        removeItem("IS_LOCKED"),
-        removeItem("LOCK_TIMESTAMP"),
-      ])
-        .then(() => console.log("Storage cleared for fresh login"))
-        .catch((error) => {
-          console.error("Error clearing storage:", error);
-          Sentry.captureException(error);
-        });
+      clearLockStates();
     }
   }, [isFreshLogin, isAuthenticated, isAppReady, isLockStateReady]);
 
@@ -165,12 +121,7 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
           console.log("Not authenticated, clearing lock state");
           setIsLockScreenRequired(false);
           setBiometricFailed(false);
-          await Promise.all([
-            removeItem("WAS_TERMINATED"),
-            removeItem("BACKGROUND_TIMESTAMP"),
-            removeItem("IS_LOCKED"),
-            removeItem("LOCK_TIMESTAMP"),
-          ]);
+          await clearLockStates();
         } else {
           const wasTerminated = await getItem("WAS_TERMINATED");
           const backgroundTimestamp = await getItem("BACKGROUND_TIMESTAMP");
@@ -300,12 +251,7 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
         console.log("Biometric success, unlocking app");
         setIsLockScreenRequired(false);
         setBiometricFailed(false);
-        await Promise.all([
-          setItem("IS_LOCKED", "false"),
-          removeItem("BACKGROUND_TIMESTAMP"),
-          removeItem("LOCK_TIMESTAMP"),
-          removeItem("WAS_TERMINATED"),
-        ]);
+        await clearLockStates();
       } else {
         console.log("No access token, keeping lock screen");
         handleShowFlash({
@@ -339,9 +285,17 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
     });
   };
 
-  // Handle password login navigation
-  const handlePasswordLogin = () => {
-    console.log("Navigating to PasswordReauthScreen");
+  // Handle password success
+  const handlePasswordSuccess = async () => {
+    console.log("Password success, unlocking app");
+    setIsLockScreenRequired(false);
+    setBiometricFailed(false);
+    await clearLockStates();
+    console.log("Password success state:", {
+      isLockScreenRequired: false,
+      biometricFailed: false,
+      isAuthenticated,
+    });
   };
 
   // Handle account switch (logout)
@@ -350,6 +304,7 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
     await logOut();
     setIsLockScreenRequired(false);
     setBiometricFailed(false);
+    await clearLockStates();
   };
 
   // Handle network retry
@@ -358,14 +313,6 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
       setIsOnline(state.isConnected ?? true);
     });
   };
-
-  // Ensure lock screen after biometric failure
-  useEffect(() => {
-    if (biometricFailed) {
-      console.log("Biometric failed effect: Enforcing LockScreen");
-      setIsLockScreenRequired(true);
-    }
-  }, [biometricFailed]);
 
   // Navigation stack
   const navigationStack = useMemo(() => {
@@ -407,7 +354,7 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
                 {...props}
                 onBiometricSuccess={handleBiometricSuccess}
                 onBiometricFailure={handleBiometricFailure}
-                onPasswordLogin={handlePasswordLogin}
+                onPasswordSuccess={handlePasswordSuccess}
                 onSwitchAccount={handleSwitchAccount}
                 userInfo={userInfo}
               />

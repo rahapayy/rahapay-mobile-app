@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-} from "react-native";
+import { View, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { COLORS, SPACING } from "@/constants/ui";
@@ -14,6 +9,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { FaceIdIcon } from "@/components/common/ui/icons";
 import * as Sentry from "@sentry/react-native";
+import { UserInfo } from "../../types/user";
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,7 +18,7 @@ type LockScreenProps = {
   onBiometricFailure: () => void;
   onPasswordLogin: () => void;
   onSwitchAccount: () => void;
-  userInfo: { fullName?: string } | null;
+  userInfo: UserInfo | null;
 };
 
 const LockScreen: React.FC<LockScreenProps> = ({
@@ -243,7 +239,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    backgroundColor: COLORS.brand.primaryLight,
+    backgroundColor: COLORS.brand.primary,
     marginBottom: 16,
   },
   optionButton: {

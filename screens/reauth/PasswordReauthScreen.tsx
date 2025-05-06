@@ -63,13 +63,13 @@ const PasswordReauthScreen: React.FC<PasswordReauthScreenProps> = ({
       console.log("Login response:", response);
 
       if (response) {
-        // First set the tokens
+        // Set tokens
         await Promise.all([
           setItem("ACCESS_TOKEN", response.data.accessToken, true),
           setItem("REFRESH_TOKEN", response.data.refreshToken, true),
         ]);
 
-        // Then get user details
+        // Get user details
         const userResponse = await services.authServiceToken.getUserDetails();
         console.log("User details response:", userResponse);
 
@@ -77,7 +77,7 @@ const PasswordReauthScreen: React.FC<PasswordReauthScreenProps> = ({
         setUserInfo(userResponse.data);
         setIsAuthenticated(true);
 
-        // Clear all lock screen states
+        // Clear lock screen states
         await Promise.all([
           setItem("IS_LOCKED", "false"),
           removeItem("BACKGROUND_TIMESTAMP"),
@@ -91,6 +91,7 @@ const PasswordReauthScreen: React.FC<PasswordReauthScreenProps> = ({
         });
 
         // Trigger parent callback to update Router state
+        console.log("Calling onPasswordSuccess");
         onPasswordSuccess();
       }
     } catch (error: any) {

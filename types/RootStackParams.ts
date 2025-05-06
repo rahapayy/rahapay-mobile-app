@@ -211,8 +211,8 @@ export type AuthStackParamList = {
 
 // Lock Stack (Lock screen-related screens)
 export type LockStackParamList = {
-  LockScreen: { onUnlock: () => void };
-  PasswordReauthScreen: { onUnlock: () => void };
+  LockScreen: undefined;
+  PasswordReauthScreen: { onPasswordSuccess: () => void };
 };
 
 // Root Stack (Top-level navigation)
