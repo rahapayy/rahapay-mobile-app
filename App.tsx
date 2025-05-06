@@ -17,6 +17,7 @@ import "./global.css";
 import { LockProvider } from "./context/LockContext";
 import * as Sentry from "@sentry/react-native";
 import { getItem, setItem } from "./utils/storage";
+import { VersionUpdateProvider } from "./context/VersionUpdateContext";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync().catch(() => {
@@ -102,18 +103,20 @@ export default Sentry.wrap(function App() {
         <QueryClientProvider client={queryClient}>
           <NotificationProvider>
             <LockProvider>
-              <NavigationContainer
-                ref={navigationRef}
-                initialState={initialState}
-              >
-                <StatusBar barStyle={"default"} />
-                <Router showOnboarding={showOnboarding} />
-                <FlashMessage
-                  statusBarHeight={StatusBar.currentHeight || 0}
-                  position="top"
-                  MessageComponent={FlashMessageComponent}
-                />
-              </NavigationContainer>
+              <VersionUpdateProvider>
+                <NavigationContainer
+                  ref={navigationRef}
+                  initialState={initialState}
+                >
+                  <StatusBar barStyle={"default"} />
+                  <Router showOnboarding={showOnboarding} />
+                  <FlashMessage
+                    statusBarHeight={StatusBar.currentHeight || 0}
+                    position="top"
+                    MessageComponent={FlashMessageComponent}
+                  />
+                </NavigationContainer>
+              </VersionUpdateProvider>
             </LockProvider>
           </NotificationProvider>
         </QueryClientProvider>
