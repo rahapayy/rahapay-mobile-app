@@ -51,6 +51,10 @@ const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
   const { status, tranxType, token, meterType } = route.params;
   const { refreshAll } = useWallet();
 
+  const handlePayAnotherBill = () => {
+    navigation.navigate("ServicesScreen");
+  };
+
   const handleDone = () => {
     if (status === "success") {
       refreshAll();
@@ -145,6 +149,12 @@ const TransactionStatusScreen: React.FC<Props> = ({ navigation, route }) => {
 
         <View style={styles.buttonContainer}>
           <Button title={"Done"} textColor="#fff" onPress={handleDone} />
+          <Button
+            title={"Pay another bill"}
+            textColor="#4931AE"
+            onPress={handlePayAnotherBill}
+            borderOnly
+          />
         </View>
       </View>
     </SafeAreaView>

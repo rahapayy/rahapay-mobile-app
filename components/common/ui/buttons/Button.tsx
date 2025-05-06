@@ -57,11 +57,11 @@ const Button: React.FC<ButtonProps> = ({
           <View style={styles.icon}>{icon}</View>
         )}
         {isLoading ? (
-          <ActivityIndicator size="small" color="#fff" style={styles.spinner} />
+          <ActivityIndicator size="small" color={borderOnly ? COLORS.violet400 : "#fff"} style={styles.spinner} />
         ) : (
           <MediumText
-            color="white"
-            style={[styles.buttonText, { color: textColor }]}
+            color={borderOnly ? "#4931AE" : "white"}
+            style={[styles.buttonText, { color: borderOnly ? COLORS.violet400 : textColor }]}
           >
             {title}
           </MediumText>
@@ -95,7 +95,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: RFValue(12),
-
     fontFamily: "Outfit-Medium",
   },
   contentContainer: {
