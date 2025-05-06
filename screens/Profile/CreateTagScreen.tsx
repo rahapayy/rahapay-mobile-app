@@ -19,15 +19,17 @@ import { handleShowFlash } from "../../components/FlashMessageComponent";
 import FONT_SIZE from "../../constants/font-size";
 import BackButton from "../../components/common/ui/buttons/BackButton";
 import { services } from "@/services";
+import { useUpdateUsername } from "@/services/hooks/user";
 
 const CreateTagScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const [tag, setTag] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
   const [error, setError] = useState(null);
+
+  const updateUsernameMutation = useUpdateUsername();
 
   const isFormComplete = tag;
 
@@ -35,8 +37,6 @@ const CreateTagScreen: React.FC<{
     setLoading(true);
     try {
       const response = await services.userService.suggestUsername(7);
-
-      // Remove the .data reference since suggestedUserNames is at the top level
       const suggestedUsernames = response?.suggestedUserNames;
       if (Array.isArray(suggestedUsernames) && suggestedUsernames.length > 0) {
         setSuggestedTags(suggestedUsernames);
@@ -52,8 +52,7 @@ const CreateTagScreen: React.FC<{
 
   const updateTag = async () => {
     try {
-      setIsLoading(true);
-      await services.userService.updateUsername({ userName: tag });
+      await updateUsernameMutation.mutateAsync({ userName: tag });
       handleShowFlash({
         message: "Tag updated successfully!",
         type: "success",
@@ -64,8 +63,6 @@ const CreateTagScreen: React.FC<{
         message: "Failed to update tag. Please try another.",
         type: "danger",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -135,13 +132,13 @@ const CreateTagScreen: React.FC<{
           <Button
             title="Set My Tag"
             onPress={updateTag}
-            isLoading={isLoading}
+            isLoading={updateUsernameMutation.isPending}
             style={[
               styles.proceedButton,
               !isFormComplete && styles.proceedButtonDisabled,
             ]}
             textColor={COLORS.white}
-            disabled={!isFormComplete || isLoading}
+            disabled={!isFormComplete || updateUsernameMutation.isPending}
           />
         </View>
       </ScrollView>

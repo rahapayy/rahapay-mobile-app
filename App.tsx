@@ -3,7 +3,7 @@ import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import FlashMessageComponent from "./components/FlashMessageComponent";
 import FlashMessage from "react-native-flash-message";
 import { NotificationProvider } from "./context/NotificationContext";
@@ -30,7 +30,17 @@ Sentry.init({
   sendDefaultPii: true,
 });
 
-const queryClient = new QueryClient();
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      gcTime: 1000 * 60 * 30, // 30 minutes (previously cacheTime)
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 export default Sentry.wrap(function App() {
   const [fontsLoaded, fontError] = useFonts({
@@ -98,9 +108,9 @@ export default Sentry.wrap(function App() {
   }
 
   return (
-    <AuthProvider>
-      <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
-        <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
           <NotificationProvider>
             <LockProvider>
               <VersionUpdateProvider>
@@ -119,8 +129,8 @@ export default Sentry.wrap(function App() {
               </VersionUpdateProvider>
             </LockProvider>
           </NotificationProvider>
-        </QueryClientProvider>
-      </GestureHandlerRootView>
-    </AuthProvider>
+        </GestureHandlerRootView>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 });

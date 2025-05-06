@@ -9,6 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
 import React, { useContext, useState, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -23,16 +24,16 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { BoldText, LightText, MediumText } from "../../components/common/Text";
 import useWallet from "../../hooks/use-wallet";
 import * as Clipboard from "expo-clipboard";
-import { AuthContext, useAuth } from "../../services/AuthContext";
-import { IUpdateProfilePayload, UserInfoType } from "@/services/dtos/user";
-import { services } from "@/services";
+import { useAuth } from "../../services/AuthContext";
 import { handleError } from "@/services/handleError";
+import { useUpdateProfile } from "@/services/hooks/user";
 
 const PersonalInformationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
-  const { userInfo, setUserInfo } = useAuth();
+  const { userInfo } = useAuth();
   const { account } = useWallet();
+  const updateProfileMutation = useUpdateProfile();
 
   const fullName = userInfo?.fullName || "";
   const initials = fullName
@@ -62,16 +63,16 @@ const PersonalInformationScreen: React.FC<{
     }
 
     try {
-      const data = await services.userService.updateProfile({
+      await updateProfileMutation.mutateAsync({
         fullName: formValues.fullName,
         phoneNumber: formValues.phone,
         email: formValues.email,
       });
+
       handleShowFlash({
         message: "Profile updated successfully!",
         type: "success",
       });
-      // setUserInfo(data.data as unknown as UserInfoType); // Update global user info
       setIsEditing(false);
     } catch (error) {
       const errorMessage = handleError(error);
@@ -90,6 +91,7 @@ const PersonalInformationScreen: React.FC<{
       email: userInfo?.email || "",
     });
   }, [userInfo]);
+
   function handleEditToggle() {
     if (isEditing) {
       handleSaveChanges();
@@ -97,6 +99,7 @@ const PersonalInformationScreen: React.FC<{
       setIsEditing(true);
     }
   }
+
   const copyToClipboard = async (textToCopy: string) => {
     await Clipboard.setStringAsync(textToCopy);
     handleShowFlash({
@@ -119,11 +122,18 @@ const PersonalInformationScreen: React.FC<{
             <TouchableOpacity
               onPress={handleEditToggle}
               style={styles.editIcon}
+              disabled={updateProfileMutation.isPending}
             >
               {isEditing ? (
-                <BoldText color="primary" size="small">
-                  Save
-                </BoldText>
+                <View style={styles.saveButton}>
+                  {updateProfileMutation.isPending ? (
+                    <ActivityIndicator color={COLORS.violet400} size="small" />
+                  ) : (
+                    <BoldText color="primary" size="small">
+                      Save
+                    </BoldText>
+                  )}
+                </View>
               ) : (
                 <Edit2 color={COLORS.violet400} size={24} />
               )}
@@ -346,5 +356,10 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     fontFamily: "Outfit-Regular",
     // color: COLORS.dark,
+  },
+  saveButton: {
+    minWidth: 40,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
