@@ -10,6 +10,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { FaceIdIcon } from "@/components/common/ui/icons";
 import * as Sentry from "@sentry/react-native";
 import { UserInfo } from "../../types/user";
+import { getItem } from "@/utils/storage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -29,6 +30,7 @@ const LockScreen: React.FC<LockScreenProps> = ({
   userInfo,
 }) => {
   const [biometricType, setBiometricType] = useState<string>("biometric");
+  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const insets = useSafeAreaInsets();
 
   const fullName = userInfo?.fullName || "";
@@ -37,6 +39,13 @@ const LockScreen: React.FC<LockScreenProps> = ({
   useEffect(() => {
     (async () => {
       try {
+        const biometricEnabled = await getItem("BIOMETRIC_ENABLED");
+        setIsBiometricEnabled(biometricEnabled === "true");
+
+        if (biometricEnabled !== "true") {
+          return; // Skip biometric authentication if not enabled
+        }
+
         const supportedTypes =
           await LocalAuthentication.supportedAuthenticationTypesAsync();
         if (
@@ -149,28 +158,30 @@ const LockScreen: React.FC<LockScreenProps> = ({
         </View>
       </View>
 
-      <View style={styles.authSection}>
-        <TouchableOpacity
-          onPress={handleBiometricLogin}
-          style={styles.biometricButton}
-          activeOpacity={0.8}
-        >
-          <View style={styles.biometricButtonCircle}>
-            {biometricType === "Face ID" ? (
-              <FaceIdIcon fill={COLORS.brand.primary} />
-            ) : (
-              <MaterialIcons name="fingerprint" size={30} color="#FFFFFF" />
-            )}
-          </View>
-          <RegularText
-            color="mediumGrey"
-            size="medium"
-            style={styles.biometricText}
+      {isBiometricEnabled && (
+        <View style={styles.authSection}>
+          <TouchableOpacity
+            onPress={handleBiometricLogin}
+            style={styles.biometricButton}
+            activeOpacity={0.8}
           >
-            Unlock with {biometricType}
-          </RegularText>
-        </TouchableOpacity>
-      </View>
+            <View style={styles.biometricButtonCircle}>
+              {biometricType === "Face ID" ? (
+                <FaceIdIcon fill={COLORS.brand.primary} />
+              ) : (
+                <MaterialIcons name="fingerprint" size={30} color="#FFFFFF" />
+              )}
+            </View>
+            <RegularText
+              color="mediumGrey"
+              size="medium"
+              style={styles.biometricText}
+            >
+              Unlock with {biometricType}
+            </RegularText>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <View style={styles.footerSection}>
         <Button

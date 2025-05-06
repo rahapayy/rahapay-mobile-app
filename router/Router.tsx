@@ -71,6 +71,7 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
   );
   const [biometricFailed, setBiometricFailed] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
 
   // Debug state changes
   useEffect(() => {
@@ -314,6 +315,15 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
     });
   };
 
+  // Check biometric preference
+  useEffect(() => {
+    const checkBiometricPreference = async () => {
+      const biometricEnabled = await getItem("BIOMETRIC_ENABLED");
+      setIsBiometricEnabled(biometricEnabled === "true");
+    };
+    checkBiometricPreference();
+  }, []);
+
   // Navigation stack
   const navigationStack = useMemo(() => {
     console.log("Navigation decision:", {
@@ -324,6 +334,7 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
       isLockStateReady,
       isFreshLogin,
       isLoading,
+      isBiometricEnabled,
     });
 
     if (isLoading || !isAppReady || !isLockStateReady) {
@@ -344,7 +355,11 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
       return <OfflineScreen onRetry={handleRetry} />;
     }
 
-    if (isAuthenticated && (isLockScreenRequired || biometricFailed)) {
+    if (
+      isAuthenticated &&
+      (isLockScreenRequired || biometricFailed) &&
+      isBiometricEnabled
+    ) {
       console.log("Rendering LockStack");
       return (
         <RootStack.Navigator screenOptions={{ gestureEnabled: false }}>
@@ -395,6 +410,7 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
     userInfo,
     showOnboarding,
     isLoading,
+    isBiometricEnabled,
   ]);
 
   // Set loading state based on app readiness

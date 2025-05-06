@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LockScreen from "./LockScreen";
 import PasswordReauthScreen from "./PasswordReauthScreen";
 import { UserInfo } from "@/types/user";
+import { getItem } from "@/utils/storage";
 
 type LockStackParamList = {
   LockScreen: undefined;
@@ -26,6 +27,28 @@ const LockStackNavigator: React.FC<LockStackNavigatorProps> = ({
   onSwitchAccount,
   userInfo,
 }) => {
+  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
+
+  useEffect(() => {
+    const checkBiometricPreference = async () => {
+      const biometricEnabled = await getItem("BIOMETRIC_ENABLED");
+      setIsBiometricEnabled(biometricEnabled === "true");
+    };
+    checkBiometricPreference();
+  }, []);
+
+  if (!isBiometricEnabled) {
+    return (
+      <LockScreen
+        onBiometricSuccess={onBiometricSuccess}
+        onBiometricFailure={onBiometricFailure}
+        onPasswordLogin={() => onPasswordSuccess()}
+        onSwitchAccount={onSwitchAccount}
+        userInfo={userInfo}
+      />
+    );
+  }
+
   return (
     <Stack.Navigator screenOptions={{ gestureEnabled: false }}>
       <Stack.Screen name="LockScreen" options={{ headerShown: false }}>
