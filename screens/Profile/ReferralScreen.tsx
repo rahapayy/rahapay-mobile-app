@@ -103,7 +103,7 @@ const ReferralScreen: React.FC<{
             <Button
               onPress={shareWithFriends}
               title="Share to invite your friends"
-              frontIcon={<Send2 variant="Bold" color="#fff" />}
+              icon={<Send2 variant="Bold" color="#fff" />}
               textColor="white"
               style={styles.shareButton}
               className="mb-4"
@@ -193,7 +193,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   shareButton: {
-    paddingVertical: SPACING * 1.7,
     width: 250,
   },
   shareText: {
