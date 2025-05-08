@@ -96,7 +96,7 @@ export type AppStackParamList = {
       };
     };
   };
-  VerifyOtp: undefined;
+  VerifyOtp: { type: string };
   FundWalletScreen: undefined;
   NotificationScreen: undefined;
   AgentAccountVerificationScreen: undefined;

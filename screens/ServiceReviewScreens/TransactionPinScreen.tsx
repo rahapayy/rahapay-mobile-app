@@ -17,6 +17,7 @@ import { services } from "@/services";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
 import { AxiosError } from "axios";
 import { DataPurchasePayload } from "@/services/modules/data";
+import { Loading } from "@/components/common/ui/loading";
 
 type TransactionPinScreenProps = NativeStackScreenProps<
   AppStackParamList,
@@ -30,9 +31,27 @@ const TransactionPinScreen: React.FC<TransactionPinScreenProps> = ({
   const { transactionType, params } = route.params;
   const [pin, setPin] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isRequestingPinReset, setIsRequestingPinReset] = useState(false);
 
   const handleDelete = () => {
     setPin((prev) => prev.slice(0, -1));
+  };
+
+  const handleForgotPin = async () => {
+    setIsRequestingPinReset(true);
+    try {
+      await services.userService.requestTransactionPinReset();
+      handleShowFlash({ message: "OTP sent successfully!", type: "success" });
+      navigation.navigate("VerifyOtp", { type: "transactionPin" });
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message instanceof Array
+          ? error.response.data.message[0]
+          : error.response?.data?.message || "Failed to send OTP";
+      handleShowFlash({ message: errorMessage, type: "danger" });
+    } finally {
+      setIsRequestingPinReset(false);
+    }
   };
 
   const handlePinComplete = async (pin: string) => {
@@ -174,11 +193,8 @@ const TransactionPinScreen: React.FC<TransactionPinScreenProps> = ({
         message: errorMessage,
       });
 
-      // Navigate to TransactionStatusScreen with failed status for user feedback
-      // navigation.navigate("TransactionStatusScreen", {
-      //   status: "failed",
-      //   errorMessage,
-      // });
+      // Clear the pin input on error
+      setPin("");
     } finally {
       setIsLoading(false);
     }
@@ -206,6 +222,10 @@ const TransactionPinScreen: React.FC<TransactionPinScreenProps> = ({
       ));
   };
 
+  if (isRequestingPinReset) {
+    return <Loading size="large" color={COLORS.brand.primary} />;
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -232,6 +252,13 @@ const TransactionPinScreen: React.FC<TransactionPinScreenProps> = ({
             Confirm transaction by entering 4-digit pin
           </Text>
           <View style={styles.pinDotsContainer}>{renderPinDots()}</View>
+          <TouchableOpacity
+            style={styles.forgotPinButton}
+            onPress={handleForgotPin}
+            disabled={isLoading || isRequestingPinReset}
+          >
+            <Text style={styles.forgotPinText}>Forgot PIN?</Text>
+          </TouchableOpacity>
           <View style={styles.keypad}>
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
               <TouchableOpacity
@@ -320,7 +347,7 @@ const styles = StyleSheet.create({
   },
   pinDotsContainer: {
     flexDirection: "row",
-    marginBottom: SPACING * 20,
+    marginBottom: SPACING * 4,
   },
   pinDot: {
     width: 20,
@@ -331,6 +358,14 @@ const styles = StyleSheet.create({
   },
   filledPinDot: {
     backgroundColor: COLORS.brand.primary,
+  },
+  forgotPinButton: {
+    marginBottom: SPACING * 4,
+  },
+  forgotPinText: {
+    color: COLORS.brand.primary,
+    fontSize: 16,
+    fontFamily: "Outfit-Regular",
   },
   keypad: {
     width: "100%",

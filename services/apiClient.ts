@@ -32,7 +32,7 @@ export const axiosInstanceWithoutToken = axios.create({
   },
 });
 
-console.log("Base URL:", axiosInstance.defaults.baseURL);
+// console.log("Base URL:", axiosInstance.defaults.baseURL);
 
 interface RetryQueueItem {
   resolve: (value?: any) => void;
@@ -52,10 +52,10 @@ export const setLogoutCallback = (callback: () => Promise<void>) => {
 
 axiosInstance.interceptors.response.use(
   (res: AxiosResponse) => {
-    // console.log("Response Interceptor - Success:", {
-    //   status: res.status,
-    //   data: res.data,
+    // console.log("[API] Request Success:", {
     //   url: res.config.url,
+    //   method: res.config.method,
+    //   status: res.status,
     // });
     return res;
   },
@@ -63,13 +63,23 @@ axiosInstance.interceptors.response.use(
     const status = error.response ? error.response.status : null;
     const originalRequest = error.config as CustomAxiosRequestConfig;
 
+    // console.log("[API] Request Error:", {
+    //   url: originalRequest.url,
+    //   method: originalRequest.method,
+    //   status,
+    //   isRetry: originalRequest._retry,
+    //   error: error.message,
+    // });
+
     // Don't retry if the request has already been retried
     if (originalRequest._retry) {
+      // console.log("[API] Skipping retry - already attempted");
       return Promise.reject(error);
     }
 
     // Handle 401 errors
     if (status === 401) {
+      // console.log("[API] 401 detected, checking refresh status");
       if (!isRefreshing) {
         isRefreshing = true;
         try {
@@ -78,51 +88,53 @@ axiosInstance.interceptors.response.use(
           const accessTokenFromStorage =
             (await getItem("ACCESS_TOKEN", true)) ?? "";
 
+          // console.log("[API] Token refresh attempt:", {
+          //   hasRefreshToken: !!refreshTokenFromStorage,
+          //   hasAccessToken: !!accessTokenFromStorage,
+          // });
+
           if (!refreshTokenFromStorage) {
+            // console.log("[API] No refresh token available");
             throw new Error("No refresh token available");
           }
-
-          console.log("Attempting to refresh tokens:", {
-            accessToken: accessTokenFromStorage ? "Present" : "Not present",
-            refreshToken: refreshTokenFromStorage ? "Present" : "Not present",
-          });
 
           const response = await services.authService.refreshToken({
             refreshToken: refreshTokenFromStorage,
           });
 
+          // console.log("[API] Token refresh response:", {
+          //   hasNewAccessToken: !!response.accessToken,
+          //   hasNewRefreshToken: !!response.refreshToken,
+          // });
+
           const newAccessToken = response.accessToken;
-          // Use new refreshToken if provided, otherwise reuse existing
           const newRefreshToken =
             response.refreshToken || refreshTokenFromStorage;
 
           if (!newAccessToken) {
-            throw new Error("No access token returned from refresh endpoint");
+            // console.error("[API] No access token in refresh response");
+            throw new Error("Failed to refresh access token");
           }
-
-          if (!response.refreshToken) {
-            console.warn(
-              "Refresh token endpoint did not return a new refresh token. Reusing existing refresh token."
-            );
-            Sentry.captureMessage(
-              "Refresh token endpoint did not return a new refresh token",
-              "warning"
-            );
-          }
-
-          console.log("New tokens received:", {
-            accessToken: newAccessToken,
-            refreshToken: newRefreshToken,
-          });
 
           await Promise.all([
             setItem("ACCESS_TOKEN", newAccessToken, true),
             setItem("REFRESH_TOKEN", newRefreshToken, true),
           ]);
 
+          // console.log("[API] New tokens stored successfully");
+
           axiosInstance.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
 
+          // Process queued requests
+          // console.log(
+          //   "[API] Processing queued requests:",
+          //   refreshAndRetryQueue.length
+          // );
           refreshAndRetryQueue.forEach(({ config, resolve, reject }) => {
+            config.headers = {
+              ...config.headers,
+              Authorization: `Bearer ${newAccessToken}`,
+            };
             axiosInstance.request(config).then(resolve).catch(reject);
           });
 
@@ -130,52 +142,63 @@ axiosInstance.interceptors.response.use(
 
           // Retry the original request
           originalRequest._retry = true;
+          originalRequest.headers = {
+            ...originalRequest.headers,
+            Authorization: `Bearer ${newAccessToken}`,
+          };
+
+          // console.log("[API] Retrying original request:", originalRequest.url);
           return await axiosInstance(originalRequest);
         } catch (refreshError: any) {
-          console.error("Token refresh failed:", refreshError);
+          // console.error("[API] Token refresh failed:", {
+          //   error: refreshError,
+          //   status: refreshError.response?.status,
+          //   data: refreshError.response?.data,
+          //   message: refreshError.message,
+          // });
           Sentry.captureException(refreshError);
 
-          // Trigger logout if refresh fails
-          if (logoutCallback) {
-            await logoutCallback();
-          } else {
-            // Fallback: Clear tokens manually
-            await Promise.all([
-              removeItem("ACCESS_TOKEN", true),
-              removeItem("REFRESH_TOKEN", true),
-            ]);
+          // Only trigger logout if it's a genuine authentication error
+          if (
+            refreshError.response?.status === 401 ||
+            refreshError.response?.status === 403
+          ) {
+            // console.log(
+            //   "[API] Authentication error detected, triggering logout"
+            // );
+            if (logoutCallback) {
+              await logoutCallback();
+            } else {
+              await Promise.all([
+                removeItem("ACCESS_TOKEN", true),
+                removeItem("REFRESH_TOKEN", true),
+              ]);
+            }
+            return Promise.reject(
+              new Error("Session expired. Please log in again.")
+            );
           }
 
-          return Promise.reject(
-            new Error("Session expired. Please log in again.")
-          );
+          // console.log(
+          //   "[API] Non-auth error during refresh, not logging out:",
+          //   refreshError.message
+          // );
+          return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;
         }
       }
 
       return new Promise((resolve, reject) => {
+        // console.log("[API] Adding request to refresh queue");
         refreshAndRetryQueue.push({ config: originalRequest, resolve, reject });
       });
     }
 
-    // console.log("Response Interceptor - Error:", {
-    //   status,
-    //   message: error.message,
-    //   responseData: error.response?.data,
-    //   url: originalRequest.url,
-    //   method: originalRequest.method,
-    // });
-
     if (status === 403 && error.response?.data) {
-      // console.log(
-      //   "403 Forbidden - Rejecting with response data:",
-      //   error.response.data
-      // );
       return Promise.reject(new Error(JSON.stringify(error.response.data)));
     }
 
-    // console.log("Rejecting error to caller:", error.message);
     return Promise.reject(error);
   }
 );
@@ -183,12 +206,6 @@ axiosInstance.interceptors.response.use(
 axiosInstance.interceptors.request.use(
   async (config) => {
     const token = await getItem("ACCESS_TOKEN", true);
-    // console.log("Request Interceptor - Adding token:", {
-    //   url: config.url,
-    //   method: config.method,
-    //   token: token ? "Present" : "Not present",
-    // });
-
     if (token && token !== "") {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -196,7 +213,6 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => {
-    // console.error("Request Interceptor - Error:", error.message);
     return Promise.reject(new Error(error));
   }
 );
