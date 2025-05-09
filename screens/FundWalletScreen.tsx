@@ -145,7 +145,7 @@ const FundWalletScreen: React.FC<{
                           )
                         }
                       >
-                        <Copy color="#fff" />
+                        <Copy color="#fff" size={20} />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -227,7 +227,9 @@ const styles = StyleSheet.create({
   accountNumberContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 2,
+    marginTop: 4,
+    gap: 5,
+    marginBottom: 5,
   },
   accountNumber: {
     fontFamily: "Outfit-Medium",
