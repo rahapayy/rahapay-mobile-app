@@ -14,7 +14,7 @@ const CardsScreen = () => {
 
       <View className="flex-1 justify-center items-center p-4 mb-14">
         <ComingSoon />
-        <RegularText color="black" size="base">
+        <RegularText color="black" size="base" center>
           We are creating something amazing. Stay tuned!
         </RegularText>
       </View>

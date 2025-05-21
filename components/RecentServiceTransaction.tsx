@@ -257,13 +257,13 @@ const RecentServiceTransaction: React.FC<{
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <BoldText color="black" size="medium">
+        <BoldText color="black" size="medium" numberOfLines={1}>
           Recent Transactions
         </BoldText>
         <TouchableOpacity
           onPress={() => navigation.navigate("TransactionHistoryScreen")}
         >
-          <LightText color="mediumGrey">View More</LightText>
+          <LightText color="mediumGrey" numberOfLines={1}>View More</LightText>
         </TouchableOpacity>
       </View>
 

@@ -101,6 +101,7 @@ const QuickAction: React.FC<{
               color="black"
               marginTop={8}
               size={isTablet ? "medium" : "small"}
+              numberOfLines={1}
             >
               {item.title}
             </RegularText>

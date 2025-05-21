@@ -1,7 +1,6 @@
 import axios, {
   AxiosError,
   AxiosRequestConfig,
-  AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
 import { getItem, setItem, removeItem } from "@/utils/storage";
@@ -28,7 +27,7 @@ export const axiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-    "App-Version": "1.0.0",
+    "App-Version": "1.0.1",
   },
 });
 
@@ -38,7 +37,7 @@ export const axiosInstanceWithoutToken = axios.create({
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-    "App-Version": "1.0.0",
+    "App-Version": "1.0.1",
   },
 });
 

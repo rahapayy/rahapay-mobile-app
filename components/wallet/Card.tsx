@@ -127,15 +127,15 @@ const Card: React.FC<{
                 onPress={() => navigation.navigate("PersonalInformationScreen")}
                 style={styles.avatar}
               >
-                <BoldText color="white" size="medium">
+                <BoldText color="white" size="medium" numberOfLines={1}>
                   {initials}
                 </BoldText>
               </TouchableOpacity>
               <View>
-                <SemiBoldText color="white" size="medium">
+                <SemiBoldText color="white" size="medium" numberOfLines={1}>
                   Hello, {firstName} 👋
                 </SemiBoldText>
-                <RegularText color="white" size="small">
+                <RegularText color="white" size="small" numberOfLines={1}>
                   Let's make some bills payment!
                 </RegularText>
               </View>
@@ -157,7 +157,7 @@ const Card: React.FC<{
           <View style={styles.balanceContainer}>
             <View style={styles.balanceContent}>
               <WalletAdd1 color="#fff" size={24} className="mr-2" />
-              <RegularText color="white" size="medium">
+              <RegularText color="white" size="medium" numberOfLines={1}>
                 Available Balance
               </RegularText>
             </View>
@@ -194,7 +194,7 @@ const Card: React.FC<{
                 </TouchableOpacity>
               </View>
             ) : showBalance ? (
-              <BoldText color="white" size="xxlarge">
+              <BoldText color="white" size="xxlarge" numberOfLines={1}>
                 ₦{" "}
                 {balance.toLocaleString("en-US", {
                   minimumFractionDigits: 2,
@@ -212,7 +212,12 @@ const Card: React.FC<{
             style={styles.fundWalletButton}
           >
             <AddCircle variant="Bold" color="#573CC7" />
-            <RegularText color="primary" size="medium" marginLeft={5}>
+            <RegularText
+              color="primary"
+              size="medium"
+              marginLeft={5}
+              numberOfLines={1}
+            >
               Fund Wallet
             </RegularText>
           </TouchableOpacity>
