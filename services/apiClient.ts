@@ -1,239 +1,230 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, {
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from "axios";
 import { getItem, setItem, removeItem } from "@/utils/storage";
-import { AuthServices } from "./modules";
-import UserServices from "./modules/user";
+import { handleShowFlash } from "@/components/FlashMessageComponent";
+import * as Sentry from "@sentry/react-native";
+import { AuthServices, UserServices } from "./modules";
 import DeviceToken from "./modules/notificaiton";
 import AirtimeService from "./modules/airtime";
 import DataService from "./modules/data";
 import BeneficiaryService from "./modules/beneficiary";
 import CableService from "./modules/cable";
 import ElectricityService from "./modules/electricity";
-import * as Sentry from "@sentry/react-native";
 
 // Types
 interface CustomAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean;
 }
 
-interface RefreshTokenResponse {
-  accessToken: string;
-  refreshToken?: string;
-}
-
-// Constants
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
-const TOKEN_REFRESH_ENDPOINT = "/auth/refresh-token";
-
-// Create axios instances
+// Axios Instances
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL || "https://api.yourapp.com";
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true,
-  timeout: 840000,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
+    "App-Version": "1.0.0",
   },
 });
 
 export const axiosInstanceWithoutToken = axios.create({
   baseURL: BASE_URL,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
+    "App-Version": "1.0.0",
   },
 });
 
-console.log("Base URL:", axiosInstance.defaults.baseURL);
-
-// Token refresh state
+// Token Refresh State
 let isRefreshing = false;
-let refreshPromise: Promise<string> | null = null;
+let refreshSubscribers: Array<(token: string) => void> = [];
 
-// Logout callback
+// Logout Callback
 let logoutCallback: (() => Promise<void>) | null = null;
-
 export const setLogoutCallback = (callback: () => Promise<void>) => {
   logoutCallback = callback;
 };
 
-// Token refresh function
-const refreshAccessToken = async (): Promise<string> => {
+// Token Refresh Logic
+const authService = new AuthServices(axiosInstanceWithoutToken);
+
+const refreshAccessToken = async () => {
   try {
     const refreshToken = await getItem("REFRESH_TOKEN", true);
-    if (!refreshToken) {
-      throw new Error("No refresh token available");
-    }
+    if (!refreshToken) throw new Error("No refresh token");
 
-    const response = await axiosInstanceWithoutToken.post<RefreshTokenResponse>(
-      TOKEN_REFRESH_ENDPOINT,
-      { refreshToken }
-    );
-
-    const { accessToken, refreshToken: newRefreshToken } = response.data;
-
-    if (!accessToken) {
-      throw new Error("Failed to refresh access token");
-    }
+    const { accessToken, refreshToken: newRefreshToken } =
+      await authService.refreshToken({ refreshToken });
 
     await Promise.all([
       setItem("ACCESS_TOKEN", accessToken, true),
-      setItem("REFRESH_TOKEN", newRefreshToken || refreshToken, true),
+      newRefreshToken && setItem("REFRESH_TOKEN", newRefreshToken, true),
     ]);
 
     return accessToken;
   } catch (error: any) {
-    console.error("[API] Token refresh failed:", error);
     Sentry.captureException(error);
-
-    // Only logout for specific authentication errors
     if (
       error.response?.status === 401 &&
-      (error.response?.data?.message === "Unauthorized" ||
-        error.response?.data?.message === "Invalid Token" ||
-        error.response?.data?.message === "Token expired")
+      ["Unauthorized", "Invalid Token", "Token expired"].includes(
+        error.response?.data?.message
+      )
     ) {
-      // Clear tokens and trigger logout
       await Promise.all([
         removeItem("ACCESS_TOKEN", true),
         removeItem("REFRESH_TOKEN", true),
       ]);
-
-      if (logoutCallback) {
-        await logoutCallback();
-      }
+      if (logoutCallback) await logoutCallback();
+      handleShowFlash({ message: "Session expired", type: "danger" });
     }
-
     throw error;
   }
 };
 
-// Request interceptor
+// Request Interceptor
 axiosInstance.interceptors.request.use(
-  async (config) => {
+  async (config: InternalAxiosRequestConfig) => {
     const token = await getItem("ACCESS_TOKEN", true);
     if (token) {
+      config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    Sentry.captureException(error);
+    return Promise.reject(error);
+  }
 );
 
-// Response interceptor
+// Response Interceptor
 axiosInstance.interceptors.response.use(
-  (response: AxiosResponse) => {
-    console.log("[API] Request Success:", {
-      url: response.config.url,
-      method: response.config.method,
-      status: response.status,
-    });
-    return response;
-  },
+  (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as CustomAxiosRequestConfig;
 
-    // Log error
-    console.log("[API] Request Error:", {
-      url: originalRequest.url,
-      method: originalRequest.method,
-      status: error.response?.status,
-      isRetry: originalRequest._retry,
-      error: error.message,
-    });
-
-    // Handle 401 errors
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          refreshSubscribers.push((token: string) => {
+            originalRequest.headers = originalRequest.headers || {};
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            resolve(axiosInstance(originalRequest));
+          });
+        });
+      }
+
+      isRefreshing = true;
       try {
-        // Use existing refresh promise if one is in progress
-        if (!isRefreshing) {
-          isRefreshing = true;
-          refreshPromise = refreshAccessToken();
-        }
-
-        const newToken = await refreshPromise;
-
-        // Update the failed request's headers
+        const newToken = await refreshAccessToken();
+        refreshSubscribers.forEach((cb) => cb(newToken));
+        refreshSubscribers = [];
         originalRequest.headers = originalRequest.headers || {};
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
-
-        // Retry the original request
         return axiosInstance(originalRequest);
       } catch (refreshError) {
+        refreshSubscribers.forEach((cb) => cb(""));
+        refreshSubscribers = [];
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
-        refreshPromise = null;
       }
-    }
-
-    // Handle 403 errors
-    if (error.response?.status === 403 && error.response?.data) {
-      return Promise.reject(new Error(JSON.stringify(error.response.data)));
     }
 
     return Promise.reject(error);
   }
 );
 
-// API Client helper function
+// API Client Helper
 export const apiClient = async <T>(
   path: string,
   method: "get" | "post" | "put" | "delete" | "patch" = "get",
   data?: any,
-  extraHeaders = {}
+  headers: Record<string, string> = {}
 ): Promise<T> => {
   try {
-    const response = await axiosInstance({
-      method,
-      url: path,
-      data,
-      headers: {
-        ...extraHeaders,
-      },
-    });
+    const response = await axiosInstance({ method, url: path, data, headers });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
-      const message = error.response?.data?.message;
+      const message = error.response?.data?.message || "An error occurred";
+      Sentry.captureException(error);
 
-      // Handle specific error cases
       switch (status) {
         case 400:
-          throw new Error(message || "Bad request");
-        case 401:
-          // Only logout for specific authentication errors
-          if (
-            message === "Unauthorized" ||
-            message === "Invalid Token" ||
-            message === "Token expired"
-          ) {
-            if (logoutCallback) {
-              await logoutCallback();
-            }
-            throw new Error("Session expired");
+          if (message === "OTP not found") {
+            handleShowFlash({ message: "OTP not found", type: "danger" });
+          } else if (message.includes("Validation errors")) {
+            const errors = error.response?.data?.data;
+            const errorMessage = Array.isArray(errors)
+              ? Object.values(errors[0]).join(", ")
+              : message;
+            handleShowFlash({
+              message: errorMessage || "Invalid request",
+              type: "danger",
+            });
+          } else {
+            handleShowFlash({
+              message: message || "Invalid request",
+              type: "danger",
+            });
           }
-          // For other 401 errors (like invalid PIN), just throw the error
-          throw new Error(message || "Authentication failed");
+          break;
+        case 401:
+          if (message === "Invalid transaction PIN") {
+            handleShowFlash({
+              message: "Invalid transaction PIN",
+              type: "danger",
+            });
+          } else if (
+            ["Unauthorized", "Invalid Token", "Token expired"].includes(message)
+          ) {
+            if (logoutCallback) await logoutCallback();
+            handleShowFlash({ message: "Session expired", type: "danger" });
+          } else {
+            handleShowFlash({
+              message: message || "Authentication failed",
+              type: "danger",
+            });
+          }
+          break;
         case 403:
-          throw new Error(message || "Access forbidden");
+          handleShowFlash({
+            message: message || "Access forbidden",
+            type: "danger",
+          });
+          break;
         case 500:
-          throw new Error("Internal server error");
+          handleShowFlash({
+            message: "Something went wrong. Please try again",
+            type: "danger",
+          });
+          break;
         case 503:
-          throw new Error("Service unavailable");
+          handleShowFlash({ message: "Service unavailable", type: "danger" });
+          break;
         default:
-          throw new Error(message || "An error occurred");
+          handleShowFlash({ message, type: "danger" });
       }
+      throw new Error(message);
     }
     throw error;
   }
 };
 
-// Export services
+// Export Services
 export const services = {
-  authService: new AuthServices(axiosInstanceWithoutToken),
+  authService,
   authServiceToken: new AuthServices(axiosInstance),
   userService: new UserServices(axiosInstance),
   notificationService: new DeviceToken(axiosInstance),
