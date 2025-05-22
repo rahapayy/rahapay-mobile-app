@@ -31,6 +31,7 @@ import { PanResponder } from "react-native";
 import { Skeleton } from "@rneui/themed";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
+const isTablet = Platform.OS === "ios" && screenWidth >= 768;
 
 const Card: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -255,9 +256,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   avatar: {
-    width: screenWidth * 0.13, // 12% of the screen width
-    height: screenWidth * 0.13, // Same as width to maintain a circle
-    borderRadius: screenWidth * 0.07, // Half of the width/height to make it a perfect circle
+    width: isTablet ? screenWidth * 0.08 : screenWidth * 0.13,
+    height: isTablet ? screenWidth * 0.08 : screenWidth * 0.13,
+    borderRadius: isTablet ? screenWidth * 0.04 : screenWidth * 0.07,
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     justifyContent: "center",
     alignItems: "center",

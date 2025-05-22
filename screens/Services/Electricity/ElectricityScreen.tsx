@@ -37,6 +37,7 @@ import { useAuth } from "@/services/AuthContext";
 import { Beneficiary } from "@/services/modules/beneficiary";
 import { Skeleton } from "@rneui/base";
 import useWallet from "../../../hooks/use-wallet"; // Added for balance
+import BackButton from "@/components/common/ui/buttons/BackButton";
 
 const ElectricityScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -292,13 +293,10 @@ const ElectricityScreen: React.FC<{
         <ScrollView>
           <View className="justify-center items-center">
             <View style={styles.header}>
-              <TouchableOpacity
-                onPress={() => navigation.goBack()}
-                style={styles.leftIcon}
-              >
-                <ArrowLeft color={"#000"} size={24} />
-              </TouchableOpacity>
-              <Text style={[styles.headerText]}>Electricity</Text>
+              <BackButton navigation={navigation} />
+              <RegularText color="black" size="large" marginLeft={10}>
+                Electricity
+              </RegularText>
             </View>
           </View>
 
@@ -331,13 +329,12 @@ const ElectricityScreen: React.FC<{
                   )}
                 />
               ) : (
-                <View className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 w-48 justify-center items-center">
-                  <RegularText
-                    color="mediumGrey"
-                    style={{ flexShrink: 1, fontSize: RFValue(12) }}
-                    size="small"
-                  >
-                    No beneficiaries found
+                <View
+                  className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 justify-center items-center"
+                  style={{ alignSelf: "flex-start" }}
+                >
+                  <RegularText color="mediumGrey" className="mb-4" size="small">
+                    No beneficiaries found.
                   </RegularText>
                 </View>
               )}

@@ -21,7 +21,7 @@ const BackButton = <
 }: BackButtonProps<StackParamList, RouteName>) => {
   return (
     <TouchableOpacity onPress={() => navigation.goBack()}>
-      <ArrowLeft color={color} size={24} />
+      <ArrowLeft color={color} size={32} />
     </TouchableOpacity>
   );
 };

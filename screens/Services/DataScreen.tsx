@@ -393,7 +393,10 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
                       )}
                     />
                   ) : (
-                    <View className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 w-48 justify-center items-center">
+                    <View
+                      className="bg-[#EEEBF9] p-2.5 rounded-2xl mr-2 justify-center items-center"
+                      style={{ alignSelf: "flex-start" }}
+                    >
                       <RegularText
                         color="mediumGrey"
                         className="mb-4"

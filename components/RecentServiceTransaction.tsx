@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Platform,
   Image,
+  Dimensions,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import LottieView from "lottie-react-native";
@@ -23,6 +24,9 @@ import Glo from "../assets/svg/globig.svg";
 import Dstv from "../assets/svg/dstv.svg";
 import Gotv from "../assets/svg/gotv.svg";
 import Startimes from "../assets/svg/startimes.svg";
+
+const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
+const isTablet = Platform.OS === "ios" && screenWidth >= 768;
 
 interface Transaction {
   _id: string;

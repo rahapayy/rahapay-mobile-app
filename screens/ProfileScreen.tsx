@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   View,
   Switch,
+  Dimensions,
+  Platform,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import {
@@ -31,6 +33,9 @@ import LogOutModal from "@/components/modals/LogoutModal";
 import { handleShowFlash } from "@/components/FlashMessageComponent";
 import { services } from "@/services";
 import { Loading } from "@/components/common/ui/loading";
+
+const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
+const isTablet = Platform.OS === "ios" && screenWidth >= 768;
 
 const options = [
   {
@@ -375,8 +380,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   avatar: {
-    width: 55,
-    height: 55,
+    width: isTablet ? screenWidth * 0.08 : screenWidth * 0.13,
+    height: isTablet ? screenWidth * 0.08 : screenWidth * 0.13,
+    borderRadius: isTablet ? screenWidth * 0.04 : screenWidth * 0.07,
     borderColor: COLORS.violet400,
     borderWidth: 2,
     backgroundColor: COLORS.violet100,

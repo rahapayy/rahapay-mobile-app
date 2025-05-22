@@ -27,6 +27,7 @@ import * as Clipboard from "expo-clipboard";
 import { useAuth } from "../../services/AuthContext";
 import { handleError } from "@/services/handleError";
 import { useUpdateProfile } from "@/services/hooks/user";
+import BackButton from "@/components/common/ui/buttons/BackButton";
 
 const PersonalInformationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -113,12 +114,7 @@ const PersonalInformationScreen: React.FC<{
       <KeyboardAwareScrollView>
         <View>
           <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.leftIcon}
-            >
-              <ArrowLeft color={"#000"} size={24} />
-            </TouchableOpacity>
+            <BackButton navigation={navigation} />
             <TouchableOpacity
               onPress={handleEditToggle}
               style={styles.editIcon}
@@ -140,10 +136,7 @@ const PersonalInformationScreen: React.FC<{
             </TouchableOpacity>
           </View>
         </View>
-        <View className="p-4 flex-row justify-between items-center">
-          <View style={styles.avatar}>
-            <BoldText color="white">{initials}</BoldText>
-          </View>
+        <View className="p-4 flex-row justify-end items-end">
           <View>
             <View style={{ alignSelf: "flex-end" }}>
               <BoldText color="dark" size="large">

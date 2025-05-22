@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   shareButton: {
-    width: 250,
+    // width: 350,
   },
   shareText: {
     fontFamily: "Outfit-Regular",

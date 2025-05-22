@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import React from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ArrowLeft, Copy } from "iconsax-react-native";
+import {  Copy } from "iconsax-react-native";
 import SPACING from "../constants/SPACING";
 import FONT_SIZE from "../constants/font-size";
 import COLORS from "../constants/colors";
@@ -20,15 +20,14 @@ import Circle from "../assets/svg/Group 803.svg";
 import useWallet from "../hooks/use-wallet";
 import { handleShowFlash } from "../components/FlashMessageComponent";
 import * as Clipboard from "expo-clipboard";
-import { useAuth } from "../services/AuthContext";
 import { Skeleton } from "@rneui/themed";
 import { RegularText } from "@/components/common/Text";
+import BackButton from "@/components/common/ui/buttons/BackButton";
 
 const FundWalletScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const { account, isLoading } = useWallet();
-  const { userInfo } = useAuth();
 
   const copyToClipboard = async (textToCopy: string) => {
     await Clipboard.setStringAsync(textToCopy);
@@ -50,12 +49,7 @@ const FundWalletScreen: React.FC<{
         <View>
           {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.leftIcon}
-            >
-              <ArrowLeft color={"#000"} size={24} />
-            </TouchableOpacity>
+            <BackButton navigation={navigation} />
             <RegularText color="black" size="large">
               Virtual Funding Accounts
             </RegularText>
@@ -171,6 +165,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING * 2,
     paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
     paddingBottom: SPACING * 3,
+    gap: 6,
   },
   leftIcon: {
     marginRight: SPACING,
@@ -188,7 +183,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING * 2,
   },
   walletContain: {
-    paddingHorizontal: SPACING * 2,
+    paddingHorizontal: SPACING * 1.5,
     paddingVertical: SPACING,
     backgroundColor: "#5136C1", // COLORS.violet300
     borderRadius: 10,
@@ -215,7 +210,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingVertical: 2,
     paddingHorizontal: SPACING,
-    width: 220,
     marginBottom: 5,
   },
   copyText: {

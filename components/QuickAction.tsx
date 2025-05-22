@@ -15,7 +15,6 @@ import {
   TvIcon,
 } from "./common/ui/icons";
 import { BoldText, RegularText } from "./common/Text";
-import { useAuth } from "../services/AuthContext";
 
 interface ActionItem {
   icon: React.ElementType;
@@ -28,13 +27,12 @@ const QuickAction: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
 }> = ({ navigation }) => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
-  const { isLoading } = useAuth();
 
   // Calculate card size based on screen dimensions and device type
   const isTablet = Platform.OS === "ios" && screenWidth >= 768;
-  const baseCardSize = isTablet ? 120 : 100;
+  const baseCardSize = isTablet ? 200 : 100;
   const cardSize = Math.min(
-    (screenWidth - (isTablet ? 96 : 64)) / (isTablet ? 6 : 4),
+    (screenWidth - (isTablet ? 80 : 64)) / 4,
     baseCardSize
   );
   const fill = COLORS.violet300;
@@ -66,7 +64,7 @@ const QuickAction: React.FC<{
         Quick Action
       </BoldText>
       <View
-        className={`flex-row flex-wrap items-center ${
+        className={`flex flex-row flex-wrap items-center ${
           isTablet ? "justify-start" : "justify-between"
         } mt-4 mb-2`}
       >
@@ -81,7 +79,7 @@ const QuickAction: React.FC<{
             }`}
             style={{
               width: cardSize,
-              height: cardSize * 1.1,
+              height: isTablet ? 120 : cardSize * 1.1,
               ...(isTablet && { marginRight: 16, marginBottom: 16 }),
             }}
           >

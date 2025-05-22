@@ -19,6 +19,7 @@ import LottieView from "lottie-react-native";
 import { useNotification } from "../context/NotificationContext";
 import * as Notifications from "expo-notifications";
 import { LightText, MediumText, RegularText } from "@/components/common/Text";
+import BackButton from "@/components/common/ui/buttons/BackButton";
 
 const NotificationScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "Notifications">;
@@ -84,12 +85,7 @@ const NotificationScreen: React.FC<{
       <ScrollView>
         <View>
           <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.leftIcon}
-            >
-              <ArrowLeft color={"#000"} size={24} />
-            </TouchableOpacity>
+            <BackButton navigation={navigation} />
             <RegularText size="large" color="black">
               Notifications
             </RegularText>
@@ -129,6 +125,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING * 2,
     paddingTop: Platform.OS === "ios" ? SPACING * 2 : SPACING * 2,
     paddingBottom: SPACING * 3,
+    gap: 2,
   },
   leftIcon: {
     marginRight: SPACING,
