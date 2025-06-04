@@ -5,13 +5,14 @@ import { AppState, AppStateStatus, View, Image } from "react-native";
 import AppStack from "./AppStack";
 import AuthRoute from "./AuthRouter";
 import { useAuth } from "../services/AuthContext";
-import OfflineScreen from "@/screens/OfflineScreen";
+import OfflineScreen from "@/screens/OfflineModal";
 import LockStackNavigator from "@/screens/reauth/LockStackNavigator";
 import { RootStackParamList } from "../types/RootStackParams";
 import { services } from "../services";
 import { getItem, setItem, removeItem } from "../utils/storage";
 import { handleShowFlash } from "../components/FlashMessageComponent";
 import { UserInfo } from "../types/user";
+import OfflineModal from "@/screens/OfflineModal";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -349,56 +350,53 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
       );
     }
 
-    if (!isOnline) {
-      console.log("Offline, rendering OfflineScreen");
-      return <OfflineScreen onRetry={handleRetry} />;
-    }
+    const renderMainContent = () => {
+      if (isAuthenticated && (isLockScreenRequired || biometricFailed) && isBiometricEnabled) {
+        return (
+          <RootStack.Navigator screenOptions={{ gestureEnabled: false }}>
+            <RootStack.Screen name="LockStack" options={{ headerShown: false }}>
+              {(props) => (
+                <LockStackNavigator
+                  {...props}
+                  onBiometricSuccess={handleBiometricSuccess}
+                  onBiometricFailure={handleBiometricFailure}
+                  onPasswordSuccess={handlePasswordSuccess}
+                  onSwitchAccount={handleSwitchAccount}
+                  userInfo={userInfo}
+                />
+              )}
+            </RootStack.Screen>
+          </RootStack.Navigator>
+        );
+      } else if (isAuthenticated) {
+        return (
+          <RootStack.Navigator screenOptions={{ gestureEnabled: false }}>
+            <RootStack.Screen
+              name="AppStack"
+              component={AppStack}
+              options={{ headerShown: false }}
+            />
+          </RootStack.Navigator>
+        );
+      } else {
+        return (
+          <RootStack.Navigator screenOptions={{ gestureEnabled: false }}>
+            <RootStack.Screen name="AuthRoute" options={{ headerShown: false }}>
+              {(props) => (
+                <AuthRoute {...props} showOnboarding={showOnboarding} />
+              )}
+            </RootStack.Screen>
+          </RootStack.Navigator>
+        );
+      }
+    };
 
-    if (
-      isAuthenticated &&
-      (isLockScreenRequired || biometricFailed) &&
-      isBiometricEnabled
-    ) {
-      console.log("Rendering LockStack");
-      return (
-        <RootStack.Navigator screenOptions={{ gestureEnabled: false }}>
-          <RootStack.Screen name="LockStack" options={{ headerShown: false }}>
-            {(props) => (
-              <LockStackNavigator
-                {...props}
-                onBiometricSuccess={handleBiometricSuccess}
-                onBiometricFailure={handleBiometricFailure}
-                onPasswordSuccess={handlePasswordSuccess}
-                onSwitchAccount={handleSwitchAccount}
-                userInfo={userInfo}
-              />
-            )}
-          </RootStack.Screen>
-        </RootStack.Navigator>
-      );
-    } else if (isAuthenticated) {
-      console.log("Rendering AppStack");
-      return (
-        <RootStack.Navigator screenOptions={{ gestureEnabled: false }}>
-          <RootStack.Screen
-            name="AppStack"
-            component={AppStack}
-            options={{ headerShown: false }}
-          />
-        </RootStack.Navigator>
-      );
-    } else {
-      console.log("Rendering AuthRoute");
-      return (
-        <RootStack.Navigator screenOptions={{ gestureEnabled: false }}>
-          <RootStack.Screen name="AuthRoute" options={{ headerShown: false }}>
-            {(props) => (
-              <AuthRoute {...props} showOnboarding={showOnboarding} />
-            )}
-          </RootStack.Screen>
-        </RootStack.Navigator>
-      );
-    }
+    return (
+      <>
+        {renderMainContent()}
+        <OfflineModal visible={!isOnline} onRetry={handleRetry} />
+      </>
+    );
   }, [
     isAuthenticated,
     isLockScreenRequired,

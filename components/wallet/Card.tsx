@@ -182,10 +182,9 @@ const Card: React.FC<{
               />
             ) : isConnected === false ? (
               <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>Service Unavailable</Text>
-                <Text style={styles.errorSubText}>
+                <RegularText color="white" size="xsmall">
                   Please check your internet connection and try again.
-                </Text>
+                </RegularText>
               </View>
             ) : error ? (
               <View style={styles.errorContainer}>
@@ -294,11 +293,6 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-SemiBold",
     color: "#fff",
     fontSize: RFValue(14),
-  },
-  errorSubText: {
-    fontFamily: "Outfit-Regular",
-    color: "#fff",
-    fontSize: RFValue(12),
   },
   retryText: {
     fontFamily: "Outfit-Medium",
