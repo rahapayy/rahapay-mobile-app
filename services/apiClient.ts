@@ -5,7 +5,6 @@ import axios, {
 } from "axios";
 import { getItem, setItem, removeItem } from "@/utils/storage";
 import { handleShowFlash } from "@/components/FlashMessageComponent";
-import * as Sentry from "@sentry/react-native";
 import { AuthServices, UserServices } from "./modules";
 import DeviceToken from "./modules/notificaiton";
 import AirtimeService from "./modules/airtime";
@@ -69,7 +68,7 @@ const refreshAccessToken = async () => {
 
     return accessToken;
   } catch (error: any) {
-    Sentry.captureException(error);
+    console.error(error);
     if (
       error.response?.status === 401 &&
       ["Unauthorized", "Invalid Token", "Token expired"].includes(
@@ -98,7 +97,7 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => {
-    Sentry.captureException(error);
+    console.error(error);
     return Promise.reject(error);
   }
 );
@@ -157,7 +156,7 @@ export const apiClient = async <T>(
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
       const message = error.response?.data?.message || "An error occurred";
-      Sentry.captureException(error);
+      console.error(error);
 
       switch (status) {
         case 400:

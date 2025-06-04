@@ -8,7 +8,6 @@ import { BoldText, MediumText, RegularText } from "@/components/common/Text";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { FaceIdIcon } from "@/components/common/ui/icons";
-import * as Sentry from "@sentry/react-native";
 import { UserInfo } from "../../types/user";
 import { getItem } from "@/utils/storage";
 
@@ -76,7 +75,7 @@ const LockScreen: React.FC<LockScreenProps> = ({
         }
       } catch (error) {
         console.error("Error checking biometric support:", error);
-        Sentry.captureException(error);
+        console.error(error);
         handleShowFlash({
           message: "Error checking biometric support",
           type: "danger",
@@ -131,7 +130,7 @@ const LockScreen: React.FC<LockScreenProps> = ({
       }
     } catch (error) {
       console.error("Biometric login error:", error);
-      Sentry.captureException(error);
+      console.error(error);
       handleShowFlash({
         message: "An error occurred during biometric login",
         type: "danger",

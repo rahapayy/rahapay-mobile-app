@@ -69,14 +69,6 @@
         {
           "contactsPermission": "Allow $(PRODUCT_NAME) to access your contacts."
         }
-      ],
-      [
-        "@sentry/react-native/expo",
-        {
-          "url": "https://sentry.io/",
-          "project": "rahapay",
-          "organization": "voltcore-technologies"
-        }
       ]
     ],
     "extra": {

@@ -2,7 +2,6 @@ import React, { useEffect, ReactNode, useContext } from "react";
 import { AppState, AppStateStatus } from "react-native";
 import { useAuth } from "../services/AuthContext";
 import { setItem } from "@/utils/storage";
-import * as Sentry from "@sentry/react-native";
 
 interface LockContextType {}
 
@@ -22,7 +21,7 @@ export const LockProvider = ({ children }: { children: ReactNode }) => {
           await setItem("WAS_TERMINATED", "true");
         } catch (error) {
           console.error("Error setting WAS_TERMINATED:", error);
-          Sentry.captureException(error);
+          console.error(error);
         }
       }
     };

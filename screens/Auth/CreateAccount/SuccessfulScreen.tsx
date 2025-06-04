@@ -10,7 +10,6 @@ import { useAuth } from "@/services/AuthContext";
 import { services } from "@/services";
 import { handleShowFlash } from "@/components/FlashMessageComponent";
 import { removeItem, getItem } from "@/utils/storage";
-import * as Sentry from "@sentry/react-native";
 
 const SuccessfulScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
@@ -56,7 +55,7 @@ const SuccessfulScreen: React.FC<{
         type: "success",
       });
     } catch (error: any) {
-      Sentry.captureException(error);
+      console.error(error);
       console.error("Failed to fetch user details:", error);
       handleShowFlash({
         message: "Failed to complete setup. Please try again.",

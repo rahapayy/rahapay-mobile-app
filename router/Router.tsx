@@ -10,7 +10,6 @@ import LockStackNavigator from "@/screens/reauth/LockStackNavigator";
 import { RootStackParamList } from "../types/RootStackParams";
 import { services } from "../services";
 import { getItem, setItem, removeItem } from "../utils/storage";
-import * as Sentry from "@sentry/react-native";
 import { handleShowFlash } from "../components/FlashMessageComponent";
 import { UserInfo } from "../types/user";
 
@@ -47,7 +46,7 @@ const clearLockStates = async () => {
     console.log("Lock states cleared successfully");
   } catch (error) {
     console.error("Error clearing lock states:", error);
-    Sentry.captureException(error);
+    console.error(error);
   }
 };
 
@@ -163,7 +162,7 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
         }
       } catch (error) {
         console.error("Error initializing lock state:", error);
-        Sentry.captureException(error);
+        console.error(error);
         setIsLockScreenRequired(true); // Default to locked on error
       } finally {
         setIsLockStateReady(true);
@@ -201,7 +200,7 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
           ]);
         } catch (error) {
           console.error("Error setting background timestamps:", error);
-          Sentry.captureException(error);
+          console.error(error);
         }
       }
 
@@ -264,7 +263,7 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
       }
     } catch (error) {
       console.error("Error verifying user after biometric success:", error);
-      Sentry.captureException(error);
+      console.error(error);
       handleShowFlash({
         message: "Failed to verify user. Please try again.",
         type: "danger",

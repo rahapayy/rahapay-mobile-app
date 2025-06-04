@@ -34,7 +34,6 @@ import { useAuth } from "@/services/AuthContext";
 import { getItem, setItem, removeItem } from "@/utils/storage";
 import Divider from "@/components/Divider";
 import { BasicPasswordInput } from "@/components/common/ui/forms/BasicPasswordInput";
-import * as Sentry from "@sentry/react-native";
 
 const validationSchema = Yup.object().shape({
   id: Yup.string()
@@ -100,7 +99,7 @@ const LoginScreen: React.FC<{
           ? error.response.data.message[0]
           : error.response?.data?.message || "An unexpected error occurred";
       console.error("Login error:", errorMessage);
-      Sentry.captureException(error);
+      console.error(error);
       handleShowFlash({
         message: errorMessage,
         type: "danger",

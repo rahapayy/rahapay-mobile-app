@@ -12,7 +12,6 @@ import { axiosInstance, services, setLogoutCallback } from "./apiClient";
 import { UserInfoType } from "./dtos";
 import { getItem, removeItem } from "@/utils/storage";
 import { mutate } from "swr";
-import * as Sentry from "@sentry/react-native";
 
 interface AuthContextType {
   isLoading: boolean;
@@ -63,7 +62,7 @@ const SWR: React.FC<SWRProps> = ({ children, logOut }) => {
         if (error.response?.status === 401) {
           throw new Error("Unauthorized");
         }
-        Sentry.captureException(error);
+        console.error(error);
         throw error;
       }
     },
@@ -113,7 +112,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error) {
       console.error("Auth check failed:", error);
-      Sentry.captureException(error);
+      console.error(error);
       setIsAuthenticated(false);
       setIsFreshLogin(false);
     } finally {
@@ -143,7 +142,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsFreshLogin(false);
     } catch (error) {
       console.error("Logout error:", error);
-      Sentry.captureException(error);
+      console.error(error);
     }
   }, []);
 

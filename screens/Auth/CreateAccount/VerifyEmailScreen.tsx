@@ -22,7 +22,6 @@ import { services } from "@/services";
 import { setItem, removeItem } from "@/utils/storage";
 import { useAuth } from "@/services/AuthContext";
 import OtpInput from "@/components/common/ui/forms/OtpInput";
-import * as Sentry from "@sentry/react-native";
 
 type VerifyEmailScreenRouteParams = { email: string; id: string };
 
@@ -106,7 +105,6 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
           });
         }
       } catch (error: any) {
-        Sentry.captureException(error);
         const errorMessage =
           error.response?.data?.message || error.message || "An error occurred";
 
@@ -118,6 +116,7 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
         } else {
           handleShowFlash({ message: errorMessage, type: "danger" });
         }
+        console.error(error);
       } finally {
         setIsSubmitting(false);
         setIsLoading(false);
@@ -137,9 +136,9 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
       handleShowFlash({ message: "OTP resent successfully!", type: "success" });
       setResendCountdown(60);
     } catch (error: any) {
-      Sentry.captureException(error);
       const errorMessage =
         error.response?.data?.message || error.message || "An error occurred";
+      console.error(error);
       handleShowFlash({ message: errorMessage, type: "danger" });
     }
   };

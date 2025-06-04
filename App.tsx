@@ -15,19 +15,12 @@ import {
 } from "@react-navigation/native";
 import "./global.css";
 import { LockProvider } from "./context/LockContext";
-import * as Sentry from "@sentry/react-native";
 import { getItem, setItem } from "./utils/storage";
 import { VersionUpdateProvider } from "./context/VersionUpdateContext";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync().catch(() => {
   /* reloading the app might trigger some race conditions, ignore them */
-});
-
-Sentry.init({
-  dsn: "https://b6d56a13d87e9557b6e7b3c7b14ee515@o4508189082648576.ingest.de.sentry.io/4509181912678480",
-  tracesSampleRate: 1.0,
-  sendDefaultPii: true,
 });
 
 // Create a client
@@ -42,7 +35,7 @@ const queryClient = new QueryClient({
   },
 });
 
-export default Sentry.wrap(function App() {
+export default function App() {
   const [fontsLoaded, fontError] = useFonts({
     "Outfit-Black": require("./assets/fonts/Outfit-Black.ttf"),
     "Outfit-Bold": require("./assets/fonts/Outfit-Bold.ttf"),
@@ -82,7 +75,7 @@ export default Sentry.wrap(function App() {
         }
       } catch (error) {
         console.warn("Error during app preparation:", error);
-        Sentry.captureException(error);
+        console.error(error);
         // Default to skipping onboarding on error
         setShowOnboarding(false);
       } finally {
@@ -98,7 +91,7 @@ export default Sentry.wrap(function App() {
         await SplashScreen.hideAsync();
       } catch (error) {
         console.warn("Error hiding splash screen:", error);
-        Sentry.captureException(error);
+        console.error(error);
       }
     }
   }, [appIsReady, fontsLoaded, fontError, showOnboarding]);
@@ -133,4 +126,4 @@ export default Sentry.wrap(function App() {
       </AuthProvider>
     </QueryClientProvider>
   );
-});
+}
