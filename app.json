@@ -2,8 +2,8 @@
   "expo": {
     "name": "RahaPay",
     "slug": "rahapay-mobile-app",
-    "version": "1.0.3",
-    "runtimeVersion": "1.0.3",
+    "version": "0.0.1",
+    "runtimeVersion": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -22,7 +22,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.app.rahapay",
+      "bundleIdentifier": "com.voltcore.rahapay",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSFaceIDUsageDescription": "Allow RahaPay to use Face ID for secure login"
@@ -33,11 +33,13 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#5136C1"
       },
-      "package": "com.app.rahapay",
+      "package": "com.voltcore.rahapay",
       "googleServicesFile": "./google-services.json",
       "permissions": [
         "android.permission.USE_BIOMETRIC",
-        "android.permission.USE_FINGERPRINT"
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.READ_CONTACTS",
+        "android.permission.WRITE_CONTACTS"
       ]
     },
     "web": {
@@ -79,9 +81,10 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "6c9dcd70-fdd4-4f28-a0d5-e1d1a6680543"
+        "projectId": "63a2abae-b0d8-4e2e-b79d-c23f89072726"
       }
     },
-    "description": "RahaPay Mobile App - Secure payments made simple"
+    "description": "RahaPay Mobile App - Secure payments made simple",
+    "owner": "rahapayy"
   }
 }
