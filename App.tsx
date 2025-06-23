@@ -52,6 +52,7 @@ export default function App() {
   const [initialState, setInitialState] = React.useState();
   const [appIsReady, setAppIsReady] = React.useState(false);
   const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
+  const [pendingOnboarding, setPendingOnboarding] = useState<null | { email: string; userId: string; step: string }>(null);
 
   useEffect(() => {
     async function prepare() {
@@ -72,6 +73,20 @@ export default function App() {
         } else {
           setShowOnboarding(true);
           await setItem("ONBOARDED", "1");
+        }
+
+        // Check for pending onboarding state
+        const onboardingStateString = await getItem("ONBOARDING_STATE");
+        if (onboardingStateString) {
+          try {
+            const onboardingState = JSON.parse(onboardingStateString);
+            console.log("Read ONBOARDING_STATE on app launch:", onboardingState);
+            if (onboardingState.step === "verifyEmail" && onboardingState.email && onboardingState.userId) {
+              setPendingOnboarding(onboardingState);
+            }
+          } catch (e) {
+            // Ignore parse errors
+          }
         }
       } catch (error) {
         console.warn("Error during app preparation:", error);
@@ -95,6 +110,22 @@ export default function App() {
       }
     }
   }, [appIsReady, fontsLoaded, fontError, showOnboarding]);
+
+  // Navigate to VerifyEmailScreen if pending onboarding state exists
+  useEffect(() => {
+    if (
+      appIsReady &&
+      pendingOnboarding &&
+      navigationRef.current != null &&
+      showOnboarding === false
+    ) {
+      console.log("Navigating to VerifyEmailScreen with:", pendingOnboarding);
+      (navigationRef as any).navigate("VerifyEmailScreen", {
+        email: pendingOnboarding.email,
+        id: pendingOnboarding.userId,
+      });
+    }
+  }, [appIsReady, pendingOnboarding, navigationRef, showOnboarding]);
 
   if (!appIsReady || (!fontsLoaded && !fontError) || showOnboarding === null) {
     return null;

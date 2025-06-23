@@ -6,9 +6,10 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  BackHandler,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
 import { RFValue } from "react-native-responsive-fontsize";
 import SPACING from "../../../constants/SPACING";
 import COLORS from "../../../constants/colors";
@@ -44,6 +45,19 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
   const [isInputFilled, setIsInputFilled] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(60);
   const [isLoading, setIsLoading] = useState(false);
+
+  const rootNavigation = useNavigation();
+
+  // Persist onboarding state as soon as the user lands on this screen
+  useEffect(() => {
+    const state = { email, userId: id, step: "verifyEmail" };
+    AsyncStorage.setItem(
+      "ONBOARDING_STATE",
+      JSON.stringify(state)
+    ).then(() => {
+      console.log("Saved ONBOARDING_STATE:", state);
+    });
+  }, [email, id]);
 
   useEffect(() => {
     setIsInputFilled(boxes.every((box) => box !== ""));
@@ -143,6 +157,46 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
     }
   };
 
+  // Handler for abandoning the account creation
+  const handleCancel = async () => {
+    await AsyncStorage.removeItem("ONBOARDING_STATE");
+    rootNavigation.reset({
+      index: 0,
+      routes: [{ name: "LoginScreen" }] as any,
+    });
+  };
+
+  // Custom back handler: if ONBOARDING_STATE exists, cancel; else, default
+  useEffect(() => {
+    let onboardingStateRef = { current: null as string | null };
+    // Prefetch onboarding state
+    AsyncStorage.getItem("ONBOARDING_STATE").then(val => { onboardingStateRef.current = val; });
+
+    const onBackPress = () => {
+      if (onboardingStateRef.current) {
+        handleCancel();
+        return true; // prevent default
+      }
+      return false; // allow default
+    };
+    BackHandler.addEventListener("hardwareBackPress", onBackPress);
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+    };
+  }, []);
+
+  // Intercept header back button (if present)
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', async (e: any) => {
+      const onboardingStateString = await AsyncStorage.getItem("ONBOARDING_STATE");
+      if (onboardingStateString) {
+        e.preventDefault();
+        await handleCancel();
+      }
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   return (
     <SafeAreaView className="flex-1">
       <View className="p-4">
@@ -150,6 +204,7 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
           navigation={navigation}
           currentStep={1}
           totalSteps={3}
+          clearOnboardingOnBack={true}
         />
         <View className="mt-8">
           <SemiBoldText color="black" size="xlarge" marginBottom={5}>

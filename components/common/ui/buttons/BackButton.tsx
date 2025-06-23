@@ -10,6 +10,7 @@ interface BackButtonProps<
 > {
   navigation: NativeStackNavigationProp<StackParamList, RouteName>;
   color?: string;
+  onPress?: () => void | Promise<void>;
 }
 
 const BackButton = <
@@ -18,9 +19,10 @@ const BackButton = <
 >({
   navigation,
   color = "#000",
+  onPress,
 }: BackButtonProps<StackParamList, RouteName>) => {
   return (
-    <TouchableOpacity onPress={() => navigation.goBack()}>
+    <TouchableOpacity onPress={onPress ? onPress : () => navigation.goBack()}>
       <ArrowLeft color={color} size={32} />
     </TouchableOpacity>
   );
