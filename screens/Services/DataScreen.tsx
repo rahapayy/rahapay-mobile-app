@@ -56,6 +56,43 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
 
   const isButtonDisabled = !selectedOperator || !phoneNumber || !selectedPlan;
 
+  // Extract fetchDataPlans function for retry functionality
+  const fetchDataPlans = async () => {
+    if (!selectedOperator) {
+      console.log("No selected operator. Fetching data plans aborted.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await services.dataService.getDataPlans(
+        selectedOperator
+      );
+      // console.log("Data plans fetched successfully:", response);
+      const validPlans = response
+        .filter(
+          (plan: DataPlan) =>
+            plan.plan_id && plan.plan_name && plan.amount && plan.validity
+        )
+        .reduce((unique: DataPlan[], plan: DataPlan) => {
+          return unique.some((p) => p.plan_id === plan.plan_id)
+            ? unique
+            : [...unique, plan];
+        }, []);
+      setDataPlans(validPlans);
+      // console.log("Valid data plans set:", validPlans);
+    } catch (err) {
+      setError("Failed to load data plans. Please try again.");
+      console.error("Error fetching data plans:", err);
+      setDataPlans([]);
+      console.log("Data plans fetching failed. Error:", err);
+    } finally {
+      setLoading(false);
+      console.log("Data plans fetching completed.");
+    }
+  };
+
   const shadowStyle = Platform.select({
     ios: {
       shadowColor: "#000",
@@ -75,7 +112,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
         const response = await services.beneficiaryService.getBeneficiaries(
           "data"
         );
-        setBeneficiaries(response.data?.beneficiaries || []);
+        setBeneficiaries(response.data || []);
       } catch (error) {
         console.error("Failed to fetch data beneficiaries:", error);
         setBeneficiaries([]);
@@ -87,44 +124,14 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
     fetchBeneficiaries();
   }, []);
 
+  // Log selected operator changes
   useEffect(() => {
-    const fetchDataPlans = async () => {
-      // console.log("Fetching data plans for operator:", selectedOperator);
-      // if (!selectedOperator) {
-      //   console.log("No selected operator. Fetching data plans aborted.");
-      //   return;
-      // }
+    if (selectedOperator) {
+      console.log('Selected operator changed to:', selectedOperator);
+    }
+  }, [selectedOperator]);
 
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await services.dataService.getDataPlans(
-          selectedOperator
-        );
-        // console.log("Data plans fetched successfully:", response);
-        const validPlans = response
-          .filter(
-            (plan: DataPlan) =>
-              plan.plan_id && plan.plan_name && plan.amount && plan.validity
-          )
-          .reduce((unique: DataPlan[], plan: DataPlan) => {
-            return unique.some((p) => p.plan_id === plan.plan_id)
-              ? unique
-              : [...unique, plan];
-          }, []);
-        setDataPlans(validPlans);
-        // console.log("Valid data plans set:", validPlans);
-      } catch (err) {
-        setError("Failed to load data plans. Please try again.");
-        console.error("Error fetching data plans:", err);
-        setDataPlans([]);
-        console.log("Data plans fetching failed. Error:", err);
-      } finally {
-        setLoading(false);
-        console.log("Data plans fetching completed.");
-      }
-    };
-
+  useEffect(() => {
     fetchDataPlans();
   }, [selectedOperator]);
 
@@ -135,7 +142,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
       const networkMap: { [key: string]: OperatorType } = {
         mtn: "Mtn",
         airtel: "Airtel",
-        "9mobile": "9Mobile",
+        "9mobile": "9mobile",
         glo: "Glo",
       };
       const selectedNetwork = networkMap[normalizedNetworkType];
@@ -172,7 +179,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
     });
   };
 
-  type OperatorType = "Airtel" | "Mtn" | "9Mobile" | "Glo";
+  type OperatorType = "Airtel" | "Mtn" | "9mobile" | "Glo";
 
   const prefixes: { [key in OperatorType]: string[] } = {
     Airtel: ["0802", "0808", "0708", "0812", "0902", "0907", "0901", "0904"],
@@ -190,8 +197,15 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
       "0916",
       "0913",
     ],
-    "9Mobile": ["0809", "0817", "0818", "0909", "0908"],
+    "9mobile": ["0809", "0817", "0818", "0909", "0908"],
     Glo: ["0805", "0807", "0705", "0811", "0815", "0905"],
+  };
+
+  const networkMap: { [key: string]: OperatorType } = {
+    mtn: "Mtn",
+    airtel: "Airtel",
+    "9mobile": "9mobile",
+    glo: "Glo",
   };
 
   const detectOperator = (number: string) => {
@@ -297,12 +311,12 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
         </View>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => setSelectedOperator("9Mobile")}
-        style={[selectedOperator === "9Mobile" && styles.selectedOperator]}
+        onPress={() => setSelectedOperator("9mobile")}
+        style={[selectedOperator === "9mobile" && styles.selectedOperator]}
       >
         <View>
           <Eti />
-          {selectedOperator === "9Mobile" && (
+          {selectedOperator === "9mobile" && (
             <TickCircle
               size={18}
               variant="Bold"
@@ -497,6 +511,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
               onSelectPackage={onSelectPackage}
               isLoading={loading}
               error={error}
+              onRetry={fetchDataPlans}
             />
           </View>
         </View>

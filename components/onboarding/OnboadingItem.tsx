@@ -3,13 +3,10 @@ import {
   View,
   StyleSheet,
   Image,
-  Text,
   useWindowDimensions,
   SafeAreaView,
 } from "react-native";
-import COLORS from "../../constants/colors";
-import { RFValue } from "react-native-responsive-fontsize";
-import { BoldText, MediumText, RegularText } from "../common/Text";
+import { MediumText, RegularText } from "../common/Text";
 
 interface Slide {
   id: string;

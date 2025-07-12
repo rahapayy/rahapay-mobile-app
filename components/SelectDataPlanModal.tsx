@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   StyleSheet,
   Text,
@@ -12,6 +12,7 @@ import {
 import { DataPlan } from "@/services/modules/data";
 import COLORS from "@/constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
+import Button from "./common/ui/buttons/Button";
 
 // Constants
 const SPACING = 16;
@@ -25,10 +26,8 @@ interface SelectDataPlanModalProps {
   onSelectPackage: (plan: DataPlan) => void;
   isLoading: boolean;
   error: string | null;
+  onRetry?: () => void | Promise<void>; // Add onRetry prop
 }
-
-// Define validity category type
-type ValidityCategory = "Daily" | "Weekly" | "Monthly";
 
 const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
   visible,
@@ -37,58 +36,59 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
   onSelectPackage,
   isLoading,
   error,
+  onRetry,
 }) => {
-  // Default to "Daily" category
-  const [selectedCategory, setSelectedCategory] =
-    useState<ValidityCategory>("Daily");
+  // Get unique plan types
+  const planTypes = React.useMemo(() => {
+    const types = Array.from(
+      new Set(dataPlans.map((plan) => plan.plan_type || "Other"))
+    );
+    return types;
+  }, [dataPlans]);
 
-  // Function to determine the validity category (Daily, Weekly, Monthly)
-  const getValidityCategory = (validity: string): ValidityCategory => {
-    const validityLower = validity?.toLowerCase().trim() || "";
-
-    // Daily: Plans valid for 1-2 days or less (including hours)
-    if (
-      validityLower.includes("hour") ||
-      validityLower.includes("hrs") ||
-      validityLower === "1 day" ||
-      validityLower === "2 day" ||
-      validityLower === "2 days" ||
-      validityLower === "1day"
-    ) {
-      return "Daily";
-    }
-
-    // Weekly: Plans valid for 3-14 days
-    if (
-      validityLower.includes("7 days") ||
-      validityLower.includes("7days") ||
-      validityLower.includes("2 days") ||
-      validityLower.includes("14 days") ||
-      validityLower === "7 day"
-    ) {
-      return "Weekly";
-    }
-
-    // Monthly: Plans valid for 30 days, 1 month, or longer
-    if (
-      validityLower.includes("30 days") ||
-      validityLower.includes("30days") ||
-      validityLower.includes("1 month") ||
-      validityLower.includes("365 days")
-    ) {
-      return "Monthly";
-    }
-
-    // Default to Monthly for anything longer or unrecognized
-    return "Monthly";
-  };
-
-  // Filter data plans based on the selected category (Daily, Weekly, Monthly)
-  const filteredDataPlans = dataPlans.filter(
-    (plan) => getValidityCategory(plan.validity) === selectedCategory
+  // State for selected plan type, default to first available
+  const [selectedPlanType, setSelectedPlanType] = React.useState<string>(
+    planTypes[0] || ""
   );
 
-  // Render each data plan item with a concise format
+  // State for refresh loading
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+  // Update selectedPlanType if planTypes change
+  React.useEffect(() => {
+    if (planTypes.length > 0 && !planTypes.includes(selectedPlanType)) {
+      setSelectedPlanType(planTypes[0]);
+    }
+  }, [planTypes, selectedPlanType]);
+
+  // Filter plans by selected plan type
+  const filteredPlans = dataPlans.filter(
+    (plan) => (plan.plan_type || "Other") === selectedPlanType
+  );
+
+  // Handle refresh with loading state
+  const handleRefresh = () => {
+    if (onRetry) {
+      setIsRefreshing(true);
+      try {
+        // Handle both sync and async functions
+        const result = onRetry();
+        if (result && typeof result.then === "function") {
+          // It's a Promise
+          result.finally(() => {
+            setIsRefreshing(false);
+          });
+        } else {
+          // It's a synchronous function
+          setTimeout(() => setIsRefreshing(false), 100);
+        }
+      } catch (error) {
+        console.error("Refresh error:", error);
+        setIsRefreshing(false);
+      }
+    }
+  };
+
   const renderDataPlan = ({ item }: { item: DataPlan }) => (
     <TouchableOpacity
       style={styles.dataPlanContainer}
@@ -124,80 +124,71 @@ const SelectDataPlanModal: React.FC<SelectDataPlanModalProps> = ({
             </TouchableOpacity>
           </View>
 
-          {/* Category Buttons */}
+          {/* Plan Type Buttons */}
           <View style={styles.categoryContainer}>
-            <TouchableOpacity
-              style={[
-                styles.categoryButton,
-                selectedCategory === "Daily" && styles.selectedCategoryButton,
-              ]}
-              onPress={() => setSelectedCategory("Daily")}
-              accessibilityLabel="Show daily plans"
-            >
-              <Text
+            {planTypes.map((type) => (
+              <TouchableOpacity
+                key={type}
                 style={[
-                  styles.categoryButtonText,
-                  selectedCategory === "Daily" &&
-                    styles.selectedCategoryButtonText,
+                  styles.categoryButton,
+                  selectedPlanType === type && styles.selectedCategoryButton,
                 ]}
+                onPress={() => setSelectedPlanType(type)}
+                accessibilityLabel={`Show ${type} plans`}
               >
-                Daily
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.categoryButton,
-                selectedCategory === "Weekly" && styles.selectedCategoryButton,
-              ]}
-              onPress={() => setSelectedCategory("Weekly")}
-              accessibilityLabel="Show weekly plans"
-            >
-              <Text
-                style={[
-                  styles.categoryButtonText,
-                  selectedCategory === "Weekly" &&
-                    styles.selectedCategoryButtonText,
-                ]}
-              >
-                Weekly
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.categoryButton,
-                selectedCategory === "Monthly" && styles.selectedCategoryButton,
-              ]}
-              onPress={() => setSelectedCategory("Monthly")}
-              accessibilityLabel="Show monthly plans"
-            >
-              <Text
-                style={[
-                  styles.categoryButtonText,
-                  selectedCategory === "Monthly" &&
-                    styles.selectedCategoryButtonText,
-                ]}
-              >
-                Monthly
-              </Text>
-            </TouchableOpacity>
+                <Text
+                  style={[
+                    styles.categoryButtonText,
+                    selectedPlanType === type &&
+                      styles.selectedCategoryButtonText,
+                  ]}
+                >
+                  {type}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
 
           {isLoading && (
             <ActivityIndicator size="large" color={COLORS.violet200} />
           )}
 
-          {error && <Text style={styles.errorText}>{error}</Text>}
+          {error && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+              <Button
+                title={isRefreshing ? "Refreshing..." : "Refresh"}
+                onPress={handleRefresh}
+                accessibilityLabel="Retry fetching data plans"
+                style={{ width: "30%" }}
+                disabled={isRefreshing}
+              />
+            </View>
+          )}
 
-          {!isLoading && !error && filteredDataPlans.length > 0 && (
+          {!isLoading && !error && dataPlans.length === 0 && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>No data plans available</Text>
+              <Button
+                title={isRefreshing ? "Refreshing..." : "Refresh"}
+                onPress={handleRefresh}
+                accessibilityLabel="Retry fetching data plans"
+                style={{ width: "30%" }}
+                disabled={isRefreshing}
+              />
+            </View>
+          )}
+
+          {!isLoading && !error && filteredPlans.length > 0 && (
             <FlatList
-              data={filteredDataPlans}
+              data={filteredPlans}
               renderItem={renderDataPlan}
-              keyExtractor={(item) => item.plan_id || Math.random().toString()} // Fallback for keyExtractor
+              keyExtractor={(item) => item.plan_id || Math.random().toString()}
               showsVerticalScrollIndicator={false}
             />
           )}
 
-          {!isLoading && !error && filteredDataPlans.length === 0 && (
+          {!isLoading && !error && filteredPlans.length === 0 && (
             <Text style={styles.noPlansText}>
               No plans available for this category
             </Text>
@@ -225,7 +216,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: "100%",
-    height: height * 0.7, // Increased height to 60% of screen
+    height: height * 0.5, // Increased height to 60% of screen
     backgroundColor: "white",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -255,10 +246,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  errorContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 20,
+  },
   errorText: {
     color: "red",
     textAlign: "center",
     marginBottom: 15,
+    fontSize: 16,
+    fontFamily: "Outfit-Regular",
   },
   noPlansText: {
     textAlign: "center",
@@ -304,5 +302,29 @@ const styles = StyleSheet.create({
   },
   selectedCategoryButtonText: {
     color: "white",
+  },
+  retryButton: {
+    marginTop: 15,
+    alignSelf: "center",
+    backgroundColor: COLORS.violet200,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 25,
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  retryButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+    fontFamily: "Outfit-SemiBold",
   },
 });

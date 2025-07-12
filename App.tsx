@@ -17,6 +17,7 @@ import "./global.css";
 import { LockProvider } from "./context/LockContext";
 import { getItem, setItem } from "./utils/storage";
 import { VersionUpdateProvider } from "./context/VersionUpdateContext";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync().catch(() => {

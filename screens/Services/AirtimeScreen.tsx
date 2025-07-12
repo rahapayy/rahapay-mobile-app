@@ -129,7 +129,7 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
     });
   };
 
-  type OperatorType = "Airtel" | "Mtn" | "9Mobile" | "Glo";
+  type OperatorType = "Airtel" | "Mtn" | "9MOBILE" | "Glo";
 
   const prefixes: { [key in OperatorType]: string[] } = {
     Airtel: ["0802", "0808", "0708", "0812", "0902", "0907", "0901", "0904"],
@@ -147,8 +147,15 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
       "0916",
       "0913",
     ],
-    "9Mobile": ["0809", "0817", "0818", "0909", "0908"],
+    "9MOBILE": ["0809", "0817", "0818", "0909", "0908"],
     Glo: ["0805", "0807", "0705", "0811", "0815", "0905"],
+  };
+
+  const networkMap: { [key: string]: OperatorType } = {
+    mtn: "Mtn",
+    airtel: "Airtel",
+    "9mobile": "9MOBILE",
+    glo: "Glo",
   };
 
   const detectOperator = (number: string) => {
@@ -169,12 +176,6 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
     setPhoneNumber(beneficiary.number);
     if (beneficiary.networkType) {
       const normalizedNetworkType = beneficiary.networkType.toLowerCase();
-      const networkMap: { [key: string]: OperatorType } = {
-        mtn: "Mtn",
-        airtel: "Airtel",
-        "9mobile": "9Mobile",
-        glo: "Glo",
-      };
       const selectedNetwork = networkMap[normalizedNetworkType];
       if (selectedNetwork) {
         setSelectedOperator(selectedNetwork);
@@ -275,12 +276,12 @@ const AirtimeScreen: React.FC<AirtimeScreenProps> = ({ navigation }) => {
         </View>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => setSelectedOperator("9Mobile")}
-        style={[selectedOperator === "9Mobile" && styles.selectedOperator]}
+        onPress={() => setSelectedOperator("9MOBILE")}
+        style={[selectedOperator === "9MOBILE" && styles.selectedOperator]}
       >
         <View>
           <Eti />
-          {selectedOperator === "9Mobile" && (
+          {selectedOperator === "9MOBILE" && (
             <TickCircle
               size={18}
               variant="Bold"
