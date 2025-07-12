@@ -50,25 +50,75 @@ export const setLogoutCallback = (callback: () => Promise<void>) => {
   logoutCallback = callback;
 };
 
+// JWT Token Validation Utility
+const validateJWTToken = (token: string): { isValid: boolean; expiresAt?: number; userId?: string } => {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      return { isValid: false };
+    }
+    
+    const payload = JSON.parse(atob(parts[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+    
+    return {
+      isValid: payload.exp ? currentTime < payload.exp : true,
+      expiresAt: payload.exp,
+      userId: payload.userId
+    };
+  } catch (error) {
+    return { isValid: false };
+  }
+};
+
 // Token Refresh Logic
 const authService = new AuthServices(axiosInstanceWithoutToken);
 
 const refreshAccessToken = async () => {
   try {
     const refreshToken = await getItem("REFRESH_TOKEN", true);
-    if (!refreshToken) throw new Error("No refresh token");
+    
+    if (!refreshToken) {
+      throw new Error("No refresh token");
+    }
 
-    const { accessToken, refreshToken: newRefreshToken } =
-      await authService.refreshToken({ refreshToken });
+    // Validate current refresh token
+    const refreshTokenValidation = validateJWTToken(refreshToken);
+    
+    if (!refreshTokenValidation.isValid) {
+      throw new Error("Refresh token is invalid or expired");
+    }
+
+    const response = await authService.refreshToken({ refreshToken });
+    const { accessToken, refreshToken: newRefreshToken } = response;
+
+    // Validate new tokens before saving
+    if (!accessToken) {
+      throw new Error("No access token received");
+    }
+
+    const newAccessTokenValidation = validateJWTToken(accessToken);
+    
+    if (!newAccessTokenValidation.isValid) {
+      throw new Error("New access token is invalid");
+    }
+
+    if (newRefreshToken) {
+      const newRefreshTokenValidation = validateJWTToken(newRefreshToken);
+      
+      if (!newRefreshTokenValidation.isValid) {
+        throw new Error("New refresh token is invalid");
+      }
+    }
 
     await Promise.all([
       setItem("ACCESS_TOKEN", accessToken, true),
       newRefreshToken && setItem("REFRESH_TOKEN", newRefreshToken, true),
     ]);
-
+    
     return accessToken;
   } catch (error: any) {
-    console.error(error);
+    // Handle specific error cases
     if (
       error.response?.status === 401 &&
       ["Unauthorized", "Invalid Token", "Token expired"].includes(
@@ -79,7 +129,9 @@ const refreshAccessToken = async () => {
         removeItem("ACCESS_TOKEN", true),
         removeItem("REFRESH_TOKEN", true),
       ]);
-      if (logoutCallback) await logoutCallback();
+      if (logoutCallback) {
+        await logoutCallback();
+      }
       handleShowFlash({ message: "Session expired", type: "danger" });
     }
     throw error;
@@ -97,7 +149,6 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error(error);
     return Promise.reject(error);
   }
 );
@@ -126,6 +177,7 @@ axiosInstance.interceptors.response.use(
         const newToken = await refreshAccessToken();
         refreshSubscribers.forEach((cb) => cb(newToken));
         refreshSubscribers = [];
+        
         originalRequest.headers = originalRequest.headers || {};
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return axiosInstance(originalRequest);

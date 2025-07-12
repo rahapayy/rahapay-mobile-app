@@ -298,6 +298,7 @@ const ProfileScreen: React.FC<{
                     Notification
                   </LightText>
                 </TouchableOpacity>
+
                 <TouchableOpacity
                   onPress={() => navigation.navigate("HelpAndSupportScreen")}
                   style={styles.settingsItem}
