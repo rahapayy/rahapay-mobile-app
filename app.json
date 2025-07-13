@@ -2,8 +2,8 @@
   "expo": {
     "name": "RahaPay",
     "slug": "rahapay-mobile-app",
-    "version": "1.1.0",
-    "runtimeVersion": "1.1.0",
+    "version": "1.1.1",
+    "runtimeVersion": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
