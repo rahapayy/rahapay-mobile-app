@@ -15,7 +15,7 @@ const Loading: React.FC<LoadingProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      <View className="bg-white p-6 rounded-lg">
+      <View style={styles.loaderBox}>
         <ActivityIndicator size={size} color={color} />
         {text && (
           <RegularText color="black" style={styles.text}>
@@ -30,10 +30,22 @@ const Loading: React.FC<LoadingProps> = ({
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    backgroundColor: "rgba(0,0,0,0.1)",
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 0,
+    zIndex: 9999,
+  },
+  loaderBox: {
+    backgroundColor: '#fff',
+    padding: 24,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   text: {
     marginTop: 10,

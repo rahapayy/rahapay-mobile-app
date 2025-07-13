@@ -5,12 +5,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
   Image,
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { ArrowLeft } from "iconsax-react-native";
 import SPACING from "../../constants/SPACING";
 import FONT_SIZE from "../../constants/font-size";
 import COLORS from "../../constants/colors";
@@ -24,6 +22,8 @@ import Startimes from "../../assets/svg/startimes.svg";
 import { RFValue } from "react-native-responsive-fontsize";
 import { AppStackParamList } from "../../types/RootStackParams";
 import Button from "@/components/common/ui/buttons/Button";
+import BackButton from "@/components/common/ui/buttons/BackButton";
+import { RegularText } from "@/components/common/Text";
 
 type ReviewSummaryScreenProps = NativeStackScreenProps<
   AppStackParamList,
@@ -53,47 +53,30 @@ const ReviewSummaryScreen: React.FC<ReviewSummaryScreenProps> = ({
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.leftIcon}
-          >
-            <ArrowLeft color="#000" size={24} />
-          </TouchableOpacity>
-          <Text style={styles.headerText} >
+          <BackButton navigation={navigation} />
+          <RegularText color="black" size="large" marginLeft={10}>
             Review Summary
-          </Text>
+          </RegularText>
         </View>
 
         <View style={styles.imageContainer}>
           {icon}
-          <Text style={styles.itemText} >
-            {title}
-          </Text>
+          <Text style={styles.itemText}>{title}</Text>
         </View>
 
         <View style={styles.content}>
           <View style={styles.container}>
-            <Text style={styles.headText}>
-              Transaction Summary
-            </Text>
+            <Text style={styles.headText}>Transaction Summary</Text>
             {summaryItems.map((item, index) => (
               <View key={index} style={styles.row}>
-                <Text style={styles.titleText} >
-                  {item.label}
-                </Text>
-                <Text style={styles.descriptionText}>
-                  {item.value}
-                </Text>
+                <Text style={styles.titleText}>{item.label}</Text>
+                <Text style={styles.descriptionText}>{item.value}</Text>
               </View>
             ))}
             <View style={styles.row}>
-              <Text style={styles.titleText}>
-                Status
-              </Text>
+              <Text style={styles.titleText}>Status</Text>
               <View style={styles.statusContainer}>
-                <Text style={styles.completedText} >
-                  Pending
-                </Text>
+                <Text style={styles.completedText}>Pending</Text>
               </View>
             </View>
           </View>

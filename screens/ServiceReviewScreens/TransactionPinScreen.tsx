@@ -15,7 +15,6 @@ import Backspace from "@/assets/svg/backspace.svg";
 import LottieView from "lottie-react-native";
 import { services } from "@/services";
 import { handleShowFlash } from "../../components/FlashMessageComponent";
-import { AxiosError } from "axios";
 import { DataPurchasePayload } from "@/services/modules/data";
 import { Loading } from "@/components/common/ui/loading";
 
@@ -223,22 +222,16 @@ const TransactionPinScreen: React.FC<TransactionPinScreenProps> = ({
   };
 
   if (isRequestingPinReset) {
-    return <Loading size="large" color={COLORS.brand.primary} />;
+    return (
+      <View className="bg-white p-4">
+        <Loading size="large" color={COLORS.brand.primary} />
+      </View>
+    );
   }
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      {isLoading && (
-        <View style={styles.loaderOverlay}>
-          <LottieView
-            source={require("@/assets/animation/loader.json")}
-            autoPlay
-            loop
-            style={{ width: 200, height: 200 }}
-          />
-        </View>
-      )}
       <View style={styles.contentWrapper}>
         <View style={styles.header}>
           <BackButton navigation={navigation as any} />
@@ -260,6 +253,7 @@ const TransactionPinScreen: React.FC<TransactionPinScreenProps> = ({
             <Text style={styles.forgotPinText}>Forgot PIN?</Text>
           </TouchableOpacity>
           <View style={styles.keypad}>
+            {/* First 3 rows: 1-9 */}
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
               <TouchableOpacity
                 key={num}
@@ -267,28 +261,35 @@ const TransactionPinScreen: React.FC<TransactionPinScreenProps> = ({
                 onPress={() => handleNumberPress(num.toString())}
                 disabled={isLoading}
               >
-                <Text style={styles.keypadButtonText}>{num}</Text>
+                <View style={styles.keypadButtonCircle}>
+                  <Text style={styles.keypadButtonText}>{num}</Text>
+                </View>
               </TouchableOpacity>
             ))}
+            {/* Last row: empty, 0, backspace */}
+            <View style={{ width: "33.33%" }} />
             <TouchableOpacity
               style={styles.keypadButton}
               onPress={() => handleNumberPress("0")}
               disabled={isLoading}
             >
-              <Text style={styles.keypadButtonText}>0</Text>
+              <View style={styles.keypadButtonCircle}>
+                <Text style={styles.keypadButtonText}>0</Text>
+              </View>
             </TouchableOpacity>
-            <View style={styles.bottomRowButtons}>
-              <TouchableOpacity
-                style={styles.bottomButton}
-                onPress={handleDelete}
-                disabled={isLoading}
-              >
+            <TouchableOpacity
+              style={styles.keypadButton}
+              onPress={handleDelete}
+              disabled={isLoading}
+            >
+              <View style={styles.keypadButtonCircle}>
                 <Backspace />
-              </TouchableOpacity>
-            </View>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
+      {isLoading && <Loading size="large" color={COLORS.brand.primary} />}
     </SafeAreaView>
   );
 };
@@ -385,11 +386,21 @@ const styles = StyleSheet.create({
     color: "#000",
     fontFamily: "Outfit-Regular",
   },
+  keypadButtonCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#F5F5F5",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+  },
   bottomRowButtons: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    paddingHorizontal: SPACING * 3,
+    // width: "100%",
+    // flexDirection: "row",
+    // justifyContent: "flex-end",
+    // paddingHorizontal: SPACING * 3,
   },
   bottomButton: {
     padding: 10,

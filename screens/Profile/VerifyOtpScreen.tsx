@@ -107,7 +107,7 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
             <View className="flex-1">
               <View style={styles.inputContainer}>
                 <Label text="OTP" marked={false} />
-                <View className="justify-start items-start">
+                <View style={styles.otpContainer}>
                   <OtpInput
                     length={otpLength}
                     value={formValues.otp}
@@ -150,5 +150,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: COLORS.white,
     marginTop: SPACING * 2,
+  },
+  otpContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: SPACING,
   },
 });

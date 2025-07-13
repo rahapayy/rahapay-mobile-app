@@ -112,7 +112,7 @@ const DataScreen: React.FC<DataScreenProps> = ({ navigation }) => {
         const response = await services.beneficiaryService.getBeneficiaries(
           "data"
         );
-        setBeneficiaries(response.data || []);
+        setBeneficiaries(response.data?.beneficiaries || []);
       } catch (error) {
         console.error("Failed to fetch data beneficiaries:", error);
         setBeneficiaries([]);

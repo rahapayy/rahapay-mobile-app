@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     gap: SPACING / 2,
   },
   inputBox: {
-    width: RFValue(45),
+    width: RFValue(40),
     height: RFValue(45),
     textAlign: "center",
     borderRadius: 8,
