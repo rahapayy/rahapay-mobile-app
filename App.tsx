@@ -14,10 +14,10 @@ import {
   useNavigationContainerRef,
 } from "@react-navigation/native";
 import "./global.css";
-import { LockProvider } from "./context/LockContext";
 import { getItem, setItem } from "./utils/storage";
 import { VersionUpdateProvider } from "./context/VersionUpdateContext";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { navigationRef } from './router/navigationService';
+import { InactivityGuard } from './components/InactivityGuard';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync().catch(() => {
@@ -49,7 +49,6 @@ export default function App() {
     "Outfit-Thin": require("./assets/fonts/Outfit-Thin.ttf"),
   });
 
-  const navigationRef = useNavigationContainerRef();
   const [initialState, setInitialState] = React.useState();
   const [appIsReady, setAppIsReady] = React.useState(false);
   const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
@@ -137,13 +136,13 @@ export default function App() {
       <AuthProvider>
         <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
           <NotificationProvider>
-            <LockProvider>
               <VersionUpdateProvider>
                 <NavigationContainer
                   ref={navigationRef}
                   initialState={initialState}
                 >
                   <StatusBar barStyle={"default"} />
+                  <InactivityGuard />
                   <Router showOnboarding={showOnboarding} />
                   <FlashMessage
                     statusBarHeight={StatusBar.currentHeight || 0}
@@ -152,7 +151,6 @@ export default function App() {
                   />
                 </NavigationContainer>
               </VersionUpdateProvider>
-            </LockProvider>
           </NotificationProvider>
         </GestureHandlerRootView>
       </AuthProvider>

@@ -209,17 +209,10 @@ export type AuthStackParamList = {
   CreateTransactionPinScreen: undefined;
 };
 
-// Lock Stack (Lock screen-related screens)
-export type LockStackParamList = {
-  LockScreen: undefined;
-  PasswordReauthScreen: { onPasswordSuccess: () => void };
-};
-
 // Root Stack (Top-level navigation)
 export type RootStackParamList = {
   AppStack: undefined;
   AuthRoute: { showOnboarding: boolean };
-  LockStack: undefined;
   LoadingScreen: undefined;
 };
 

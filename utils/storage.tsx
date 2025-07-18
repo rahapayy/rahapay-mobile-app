@@ -62,4 +62,5 @@ export const StorageKeys = {
   LOCK_TIMESTAMP: "lockTimestamp",
   WAS_TERMINATED: "wasTerminated",
   NAVIGATION_STATE: "navigationState",
+  SECURITY_LOCK: "securityLock",
 };
