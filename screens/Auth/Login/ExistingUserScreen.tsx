@@ -4,17 +4,17 @@ import {
   StyleSheet,
   SafeAreaView,
   StatusBar,
+  Image,
 } from "react-native";
 import { COLORS, SPACING } from "@/constants/ui";
 import { Loading } from "@/components/common/ui/loading";
 import { getItem, removeItem, setItem } from "@/utils/storage";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "@/services/AuthContext";
 import {
   MediumText,
   RegularText,
 } from "@/components/common/Text";
-import { FaceIdIcon } from "@/components/common/ui/icons";
+import { FaceIdIcon, TouchIdIcon } from "@/components/common/ui/icons";
 import { Spacer } from "@/components/Spacer";
 import Button from "@/components/common/ui/buttons/Button";
 import { BasicPasswordInput } from "@/components/common/ui/forms/BasicPasswordInput";
@@ -34,6 +34,14 @@ const ExistingUserScreen: React.FC<any> = ({ navigation }) => {
     biometricType, 
     authenticateWithBiometrics 
   } = useBiometrics();
+
+  // Helper to get display name for biometric type
+  const getBiometricDisplayName = () => {
+    if (biometricType.toLowerCase().includes('touch')) {
+      return 'Fingerprint';
+    }
+    return biometricType;
+  };
 
   // Helper to get the best display name
   const getDisplayName = () => {
@@ -85,7 +93,7 @@ const ExistingUserScreen: React.FC<any> = ({ navigation }) => {
     
     try {
       const isAuthenticated = await authenticateWithBiometrics(
-        `Authenticate with ${biometricType}`
+        `Authenticate with ${getBiometricDisplayName()}`
       );
 
       if (isAuthenticated) {
@@ -267,6 +275,7 @@ const ExistingUserScreen: React.FC<any> = ({ navigation }) => {
   const renderBiometricMode = () => (
     <View style={styles.content}>
       <View style={styles.headerSection}>
+        <Image source={require("@/assets/images/logo-horizontal-black.png")} style={styles.logo} />
         <MediumText color="primary" size="xlarge" center marginBottom={8}>
           {isLoadingUserInfo 
             ? "Loading..." 
@@ -283,20 +292,24 @@ const ExistingUserScreen: React.FC<any> = ({ navigation }) => {
       <View style={styles.biometricSection}>
         <View style={styles.biometricCircle}>
           <View style={styles.biometricIconWrapper}>
-            <FaceIdIcon width={40} height={40} fill={COLORS.brand.primary} />
+            {biometricType.toLowerCase().includes('face') ? (
+              <FaceIdIcon width={32} height={32} fill={COLORS.brand.primary} />
+            ) : (
+              <TouchIdIcon width={32} height={32} fill={COLORS.brand.primary} />
+            )}
           </View>
         </View>
 
         <Spacer size={SPACING * 2} />
 
         <RegularText color="black" size="base" center marginBottom={12}>
-          Click to authenticate with {biometricType}
+          Click to authenticate with {getBiometricDisplayName()}
         </RegularText>
 
         <Spacer size={SPACING * 2} />
         
         <Button
-          title={isLoading ? "Authenticating..." : `Use ${biometricType}`}
+          title={isLoading ? "Authenticating..." : `Use ${getBiometricDisplayName()}`}
           onPress={handleBiometricAuth}
           isLoading={isLoading}
           style={{
@@ -311,7 +324,8 @@ const ExistingUserScreen: React.FC<any> = ({ navigation }) => {
   const renderPasswordMode = () => (
     <View style={styles.content}>
       <View style={styles.headerSection}>
-        <MediumText color="primary" size="xlarge" center marginBottom={8}>
+      <Image source={require("@/assets/images/logo-horizontal-black.png")} style={styles.logo} />
+        <MediumText color="primary" size="xlarge" center marginBottom={10}>
           {isLoadingUserInfo 
             ? "Loading..." 
             : `Welcome back${getDisplayName() ? ", " + getDisplayName() : ""}`
@@ -380,7 +394,7 @@ const ExistingUserScreen: React.FC<any> = ({ navigation }) => {
           />
           {isBiometricEnabled && isBiometricAvailable && (
             <Button
-              title={isPasswordMode ? `Use ${biometricType}` : "Login with password"}
+              title={isPasswordMode ? `Use ${getBiometricDisplayName()}` : "Login with password"}
               onPress={isPasswordMode ? switchToBiometricMode : switchToPasswordMode}
               borderOnly
               style={{
@@ -412,16 +426,16 @@ const styles = StyleSheet.create({
   },
   headerSection: {
     alignItems: "center",
-    marginBottom: SPACING * 2,
+    marginBottom: SPACING,
   },
   biometricSection: {
     alignItems: "center",
-    marginBottom: SPACING * 2,
+    marginBottom: SPACING,
   },
   biometricCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 70,
+    height: 70,
+    borderRadius: 40,
     backgroundColor: COLORS.brand.primaryLight,
     justifyContent: "center",
     alignItems: "center",
@@ -481,6 +495,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 16,
     fontFamily: "Outfit-Regular",
+  },
+  logo: {
+    width: 160,
+    height: 40,
+    marginBottom: SPACING * 2,
   },
 });
 

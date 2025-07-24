@@ -49,7 +49,8 @@ const Button: React.FC<ButtonProps> = ({
         style,
         disabled && { opacity: 0.5 },
       ]}
-      onPress={onPress}
+      onPress={disabled ? undefined : onPress}
+      disabled={disabled}
       {...rest}
     >
       <View style={styles.contentContainer}>
@@ -60,7 +61,7 @@ const Button: React.FC<ButtonProps> = ({
           <ActivityIndicator size="small" color={borderOnly ? COLORS.violet400 : "#fff"} style={styles.spinner} />
         ) : (
           <MediumText
-            color={borderOnly ? "#4931AE" : "white"}
+            color={borderOnly ? "primary" : "white"}
             style={[styles.buttonText, { color: borderOnly ? COLORS.violet400 : textColor }]}
           >
             {title}
