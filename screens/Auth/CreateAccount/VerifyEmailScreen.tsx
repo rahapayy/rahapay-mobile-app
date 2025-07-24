@@ -107,6 +107,12 @@ const VerifyEmailScreen: React.FC<VerifyEmailScreenProps> = ({
           setIsFreshLogin(true);
           console.log("Email verification successful, set isFreshLogin: true");
 
+          // Store the user email and user info for future use
+          await Promise.all([
+            setItem("LAST_USER_EMAIL", userResponse.data.email, true),
+            setItem("USER_INFO", JSON.stringify(userResponse.data), true),
+          ]);
+
           await AsyncStorage.setItem(
             "ONBOARDING_STATE",
             JSON.stringify({ email, userId: id, step: "createPin" })

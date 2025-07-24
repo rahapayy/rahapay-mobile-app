@@ -10,7 +10,7 @@ import CreateNewPasswordScreen from "../screens/Auth/ForgotPassword/CreateNewPas
 import LoginScreen from "../screens/Auth/Login/LoginScreen";
 import SuccessfulScreen from "../screens/Auth/CreateAccount/SuccessfulScreen";
 import CreateTransactionPinScreen from "../screens/Auth/CreateAccount/CreateTransactionPinScreen";
-import ExistingUserScreen from "../screens/Auth/Login/ExistingUserScreen";
+
 import { AuthStackParamList } from "../types/RootStackParams";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -104,11 +104,7 @@ const AuthRoute = ({ showOnboarding }: { showOnboarding: boolean }) => {
         component={SuccessfulScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="ExistingUserScreen"
-        component={ExistingUserScreen}
-        options={{ headerShown: false }}
-      />
+
       <Stack.Screen
         name="CreateTransactionPinScreen"
         component={CreateTransactionPinScreen}

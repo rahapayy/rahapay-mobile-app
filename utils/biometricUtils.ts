@@ -1,10 +1,9 @@
 // utils/biometricUtils.ts
 import * as LocalAuthentication from "expo-local-authentication";
-import { getItem } from "@/utils/storage";
 
-export const verifyBiometricsForTransaction = async (): Promise<boolean> => {
-  const isBiometricEnabled = (await getItem("BIOMETRIC_ENABLED")) === "true";
-
+export const verifyBiometricsForTransaction = async (
+  isBiometricEnabled: boolean
+): Promise<boolean> => {
   if (!isBiometricEnabled) {
     return true; // Skip biometric check if not enabled
   }

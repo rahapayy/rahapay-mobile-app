@@ -63,4 +63,7 @@ export const StorageKeys = {
   WAS_TERMINATED: "wasTerminated",
   NAVIGATION_STATE: "navigationState",
   SECURITY_LOCK: "securityLock",
+  LAST_USER_EMAIL: "lastUserEmail",
+  USER_INFO: "userInfo",
+  USER_PASSWORD: "userPassword",
 };

@@ -8,7 +8,7 @@ import {
   Dimensions,
   Platform,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Document,
   FingerScan,
@@ -24,15 +24,14 @@ import {
 import COLORS from "../constants/colors";
 import SPACING from "../constants/SPACING";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import BiometricModal from "../components/modals/BiometricModal";
 import CloseAccountModal from "../components/modals/CloseAccountModal";
 import { BoldText, LightText, MediumText } from "../components/common/Text";
 import { useAuth } from "../services/AuthContext";
-import { getItem, setItem } from "@/utils/storage";
 import LogOutModal from "@/components/modals/LogoutModal";
 import { handleShowFlash } from "@/components/FlashMessageComponent";
 import { services } from "@/services";
 import { Loading } from "@/components/common/ui/loading";
+import { useBiometrics } from "@/context/BiometricContext";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 const isTablet = Platform.OS === "ios" && screenWidth >= 768;
@@ -60,32 +59,9 @@ const ProfileScreen: React.FC<{
   const [isCloseAccountModalVisible, setIsCloseAccountModalVisible] =
     useState(false);
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
-  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
-  const [biometricModalVisible, setBiometricModalVisible] = useState(false);
   const [isRequestingPinReset, setIsRequestingPinReset] = useState(false);
 
-  // Load biometric preference on mount
-  useEffect(() => {
-    const loadBiometricPreference = async () => {
-      const storedValue = await getItem("BIOMETRIC_ENABLED");
-      setIsBiometricEnabled(storedValue === "true");
-    };
-    loadBiometricPreference();
-  }, []);
-
-  const toggleBiometricSwitch = () => {
-    setBiometricModalVisible(true);
-  };
-
-  const handleModalClose = () => {
-    setBiometricModalVisible(false);
-  };
-
-  const handleToggleBiometrics = async (newValue: boolean) => {
-    setIsBiometricEnabled(newValue);
-    await setItem("BIOMETRIC_ENABLED", newValue.toString());
-    setBiometricModalVisible(false);
-  };
+  const { isBiometricEnabled, toggleBiometrics } = useBiometrics();
 
   const handleToggleLogout = () => {
     setIsLogoutModalVisible(true);
@@ -272,7 +248,7 @@ const ProfileScreen: React.FC<{
                       true: COLORS.violet400,
                     }}
                     value={isBiometricEnabled}
-                    onValueChange={toggleBiometricSwitch}
+                    onValueChange={toggleBiometrics}
                   />
                 </View>
               </View>
@@ -343,12 +319,6 @@ const ProfileScreen: React.FC<{
           </View>
         </View>
       </ScrollView>
-      <BiometricModal
-        visible={biometricModalVisible}
-        onClose={handleModalClose}
-        onToggle={handleToggleBiometrics}
-        isEnabled={isBiometricEnabled}
-      />
       <CloseAccountModal
         visible={isCloseAccountModalVisible}
         onClose={handleCloseAccountModalClose}

@@ -5,10 +5,10 @@ import { View, Image } from "react-native";
 import AppStack from "./AppStack";
 import AuthRoute from "./AuthRouter";
 import { useAuth } from "../services/AuthContext";
-import OfflineModal from "@/screens/OfflineModal";
 import { RootStackParamList } from "../types/RootStackParams";
 import { getItem } from "@/utils/storage";
 import { navigationRef } from "@/router/navigationService";
+import { handleShowFlash } from "@/components/FlashMessageComponent";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -38,17 +38,28 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
     userInfo,
   } = useAuth();
   const [isOnline, setIsOnline] = useState<boolean>(true);
+  const [wasOnline, setWasOnline] = useState<boolean>(true); // Track previous state
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
-      setIsOnline(state.isConnected ?? true);
+      const connected = state.isConnected ?? true;
+      setIsOnline(connected);
+      if (!connected && wasOnline) {
+        handleShowFlash({
+          message: "No internet connection. Some features may not work.",
+          type: "danger",
+        });
+      }
+      setWasOnline(connected);
     });
     NetInfo.fetch().then((state) => {
-      setIsOnline(state.isConnected ?? true);
+      const connected = state.isConnected ?? true;
+      setIsOnline(connected);
+      setWasOnline(connected);
     });
     return () => unsubscribe();
-  }, []);
+  }, [wasOnline]);
 
   const handleRetry = () => {
     NetInfo.fetch().then((state) => {
@@ -97,15 +108,17 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
     }
   }, [isAppReady]);
 
-  // Security lock check: always show ExistingUserScreen if locked
+  // Security lock check: only navigate if user is authenticated
   useEffect(() => {
     const checkSecurityLock = async () => {
       const lock = await getItem("SECURITY_LOCK");
-      if (lock === "true" && navigationRef.isReady()) {
-        navigationRef.reset({
-          index: 0,
-          routes: [{ name: "ExistingUserScreen" }],
-        });
+      // Only handle security lock if user is authenticated and we're in AppStack
+      if (lock === "true" && navigationRef.isReady() && isAuthenticated) {
+        // Check if we're currently in AppStack before navigating
+        const currentRoute = navigationRef.getCurrentRoute();
+        if (currentRoute && currentRoute.name === "AppStack") {
+          navigationRef.navigate("ExistingUserScreen");
+        }
       }
     };
     if (isAppReady) {
@@ -116,7 +129,6 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
   return (
     <>
       {navigationStack}
-      <OfflineModal visible={!isOnline} onRetry={handleRetry} />
     </>
   );
 };
