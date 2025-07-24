@@ -89,6 +89,16 @@ const LoginScreen: React.FC<{
       setIsFreshLogin(true);
       console.log("Login successful, set isFreshLogin: true");
 
+      // Store the user email, user info, and password for future use
+      await Promise.all([
+        setItem("LAST_USER_EMAIL", userResponse.data.email, true),
+        setItem("USER_INFO", JSON.stringify(userResponse.data), true),
+        setItem("USER_PASSWORD", values.password, true), // Store password securely for biometric auth
+      ]);
+
+      console.log("USER_INFO", userResponse.data);
+      
+
       handleShowFlash({
         message: "Login successful! Welcome back!",
         type: "success",
@@ -180,7 +190,7 @@ const LoginScreen: React.FC<{
                     <View className="justify-center items-center">
                       <Button
                         title="Login"
-                        onPress={handleSubmit}
+                        onPress={() => handleSubmit()}
                         isLoading={isSubmitting}
                         style={styles.proceedButton}
                         textColor="#fff"

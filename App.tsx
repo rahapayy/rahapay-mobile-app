@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import FlashMessageComponent from "./components/FlashMessageComponent";
 import FlashMessage from "react-native-flash-message";
 import { NotificationProvider } from "./context/NotificationContext";
+import { BiometricProvider } from "./context/BiometricContext";
 import Router from "./router/Router";
 import { AuthProvider } from "./services/AuthContext";
 import {
@@ -134,25 +135,27 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
-          <NotificationProvider>
-              <VersionUpdateProvider>
-                <NavigationContainer
-                  ref={navigationRef}
-                  initialState={initialState}
-                >
-                  <StatusBar barStyle={"default"} />
-                  <InactivityGuard />
-                  <Router showOnboarding={showOnboarding} />
-                  <FlashMessage
-                    statusBarHeight={StatusBar.currentHeight || 0}
-                    position="top"
-                    MessageComponent={FlashMessageComponent}
-                  />
-                </NavigationContainer>
-              </VersionUpdateProvider>
-          </NotificationProvider>
-        </GestureHandlerRootView>
+        <BiometricProvider>
+          <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
+            <NotificationProvider>
+                <VersionUpdateProvider>
+                  <NavigationContainer
+                    ref={navigationRef}
+                    initialState={initialState}
+                  >
+                    <StatusBar barStyle={"default"} />
+                    <InactivityGuard />
+                    <Router showOnboarding={showOnboarding} />
+                    <FlashMessage
+                      statusBarHeight={StatusBar.currentHeight || 0}
+                      position="top"
+                      MessageComponent={FlashMessageComponent}
+                    />
+                  </NavigationContainer>
+                </VersionUpdateProvider>
+            </NotificationProvider>
+          </GestureHandlerRootView>
+        </BiometricProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

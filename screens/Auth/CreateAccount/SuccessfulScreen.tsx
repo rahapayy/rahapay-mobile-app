@@ -9,11 +9,12 @@ import { MediumText, LightText } from "../../../components/common/Text";
 import { useAuth } from "@/services/AuthContext";
 import { services } from "@/services";
 import { handleShowFlash } from "@/components/FlashMessageComponent";
-import { removeItem, getItem } from "@/utils/storage";
+import { removeItem, getItem, setItem } from "@/utils/storage";
 
 const SuccessfulScreen: React.FC<{
   navigation: NativeStackNavigationProp<any, "">;
-}> = ({ navigation }) => {
+  route: any;
+}> = ({ navigation, route }) => {
   const {
     setIsAuthenticated,
     setUserInfo,
@@ -29,6 +30,7 @@ const SuccessfulScreen: React.FC<{
       // Clear lock-related storage to prevent lock screen
       await Promise.all([
         removeItem("IS_LOCKED"),
+        removeItem("SECURITY_LOCK"),
         removeItem("BACKGROUND_TIMESTAMP"),
         removeItem("WAS_TERMINATED"),
         removeItem("LOCK_TIMESTAMP"),
@@ -49,6 +51,12 @@ const SuccessfulScreen: React.FC<{
       console.log(
         "Signup completion successful, set isFreshLogin: true, isAuthenticated: true"
       );
+
+      // Store the user email and user info for future use
+      await Promise.all([
+        setItem("LAST_USER_EMAIL", userResponse.data.email, true),
+        setItem("USER_INFO", JSON.stringify(userResponse.data), true),
+      ]);
 
       handleShowFlash({
         message: "Account setup complete! Welcome to RahaPay!",

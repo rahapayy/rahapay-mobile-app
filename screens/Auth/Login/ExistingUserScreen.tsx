@@ -1,155 +1,403 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  Text,
-  TouchableOpacity,
   StyleSheet,
   SafeAreaView,
   StatusBar,
 } from "react-native";
 import { COLORS, SPACING } from "@/constants/ui";
-import Backspace from "@/assets/svg/backspace.svg";
 import { Loading } from "@/components/common/ui/loading";
-import { getItem, removeItem, StorageKeys } from "@/utils/storage";
+import { getItem, removeItem, setItem } from "@/utils/storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "@/services/AuthContext";
-import { MediumText } from "@/components/common/Text";
-
-const DEFAULT_SECURITY_PIN = "1234";
+import {
+  MediumText,
+  RegularText,
+} from "@/components/common/Text";
+import { FaceIdIcon } from "@/components/common/ui/icons";
+import { Spacer } from "@/components/Spacer";
+import Button from "@/components/common/ui/buttons/Button";
+import { BasicPasswordInput } from "@/components/common/ui/forms/BasicPasswordInput";
+import { useBiometrics } from "@/context/BiometricContext";
+import { services } from "@/services";
 
 const ExistingUserScreen: React.FC<any> = ({ navigation }) => {
-  const [pin, setPin] = useState("");
+  const [isPasswordMode, setIsPasswordMode] = useState(false);
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingUserInfo, setIsLoadingUserInfo] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { setIsAuthenticated, userInfo } = useAuth();
+  const { setIsAuthenticated, userInfo, setUserInfo, logOut, setIsFreshLogin, isAppReady } = useAuth();
+  const { 
+    isBiometricEnabled, 
+    isBiometricAvailable, 
+    biometricType, 
+    authenticateWithBiometrics 
+  } = useBiometrics();
 
   // Helper to get the best display name
   const getDisplayName = () => {
-    if (userInfo?.userName) return userInfo.userName;
-    // Only check firstName/lastName if they exist on userInfo
-    if ('firstName' in (userInfo || {}) && 'lastName' in (userInfo || {})) {
-      // @ts-ignore
-      if (userInfo.firstName && userInfo.lastName) return `${userInfo.firstName} ${userInfo.lastName}`;
-    }
-    if (userInfo?.fullName) return userInfo.fullName;
-    return "";
+    if (!userInfo) return "";
+    
+    if (userInfo.userName) return userInfo.userName;
+    if (userInfo.fullName) return userInfo.fullName;
+    if (userInfo.email) return userInfo.email.split('@')[0]; // Use email prefix as fallback
+    return ""; // Return empty string if no user info available
   };
 
+  // Determine initial mode based on biometric settings
   useEffect(() => {
-    // If SECURITY_LOCK is not set, immediately unlock
+    // If biometrics are not enabled or not available, show password mode
+    if (!isBiometricEnabled || !isBiometricAvailable) {
+      setIsPasswordMode(true);
+    } else {
+      setIsPasswordMode(false);
+    }
+  }, [isBiometricEnabled, isBiometricAvailable]);
+
+  useEffect(() => {
     (async () => {
       const lock = await getItem("SECURITY_LOCK");
       if (lock !== "true") {
         setIsAuthenticated(true);
-        // navigation.replace("AppStack"); // No need, handled by setIsAuthenticated
       }
     })();
   }, [navigation, setIsAuthenticated]);
 
-  const onUnlock = async (enteredPin: string) => {
+
+
+  // Load user info from storage for display purposes only
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      try {
+        setIsLoadingUserInfo(true);
+        const storedUserInfo = await getItem("USER_INFO", true);
+        if (storedUserInfo) {
+          const parsedUserInfo = JSON.parse(storedUserInfo);
+          setUserInfo(parsedUserInfo);
+        }
+      } catch (error) {
+        console.error("Failed to load user info from storage:", error);
+      } finally {
+        setIsLoadingUserInfo(false);
+      }
+    };
+
+    loadUserInfo();
+  }, []); // Run only once when component mounts
+
+  const handleBiometricAuth = async () => {
     setIsLoading(true);
     setError(null);
+    
     try {
-      console.log("Entered PIN:", enteredPin); // Debug log
-      if (enteredPin === DEFAULT_SECURITY_PIN) {
-        await removeItem("SECURITY_LOCK");
-        setIsAuthenticated(true);
-        setPin(""); // Clear pin after unlock
-        if (navigation && navigation.reset) {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "AppStack" }],
-          });
+      const isAuthenticated = await authenticateWithBiometrics(
+        `Authenticate with ${biometricType}`
+      );
+
+      if (isAuthenticated) {
+        // Get stored password and email for login
+        const storedPassword = await getItem("USER_PASSWORD", true);
+        const storedEmail = await getItem("LAST_USER_EMAIL", true);
+        
+        if (!storedPassword || !storedEmail) {
+          setError("Stored credentials not found. Please log in with password.");
+          setIsPasswordMode(true);
+          return;
         }
+
+        // Call login API with stored credentials to get fresh tokens
+        const response = await services.authService.login({
+          id: storedEmail,
+          password: storedPassword,
+        });
+
+        // Clear all lock-related state before setting new tokens
+        await Promise.all([
+          removeItem("IS_LOCKED"),
+          removeItem("BACKGROUND_TIMESTAMP"),
+          removeItem("WAS_TERMINATED"),
+          removeItem("LOCK_TIMESTAMP"),
+        ]);
+
+        // Store new tokens
+        if (response.data.accessToken && response.data.refreshToken) {
+          await Promise.all([
+            setItem("ACCESS_TOKEN", response.data.accessToken, true),
+            setItem("REFRESH_TOKEN", response.data.refreshToken, true),
+          ]);
+        }
+
+        // Get user details from API (same as LoginScreen)
+        const userResponse = await services.authServiceToken.getUserDetails();
+        setIsAuthenticated(true);
+        setUserInfo(userResponse.data);
+        setIsFreshLogin(true);
+
+        // Store the user email and user info for future use (same as LoginScreen)
+        await Promise.all([
+          setItem("LAST_USER_EMAIL", userResponse.data.email, true),
+          setItem("USER_INFO", JSON.stringify(userResponse.data), true),
+        ]);
+
+        // Clear all lock states
+        await Promise.all([
+          removeItem("SECURITY_LOCK"),
+          removeItem("IS_LOCKED"),
+          removeItem("WAS_TERMINATED"),
+          removeItem("BACKGROUND_TIMESTAMP"),
+          removeItem("LOCK_TIMESTAMP"),
+        ]);
+        
+        // Delay to ensure AuthContext state updates are processed before navigation
+        setTimeout(() => {
+          if (navigation && navigation.reset) {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "AppStack" }],
+            });
+          }
+        }, 300);
       } else {
-        setError("Incorrect security pin");
-        setPin("");
+        setError("Biometric authentication failed");
       }
+    } catch (error) {
+      setError("Biometric authentication error");
+      setIsPasswordMode(true);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDelete = () => {
-    setPin((prev) => prev.slice(0, -1));
-  };
-
-  const handleNumberPress = async (number: string) => {
-    if (pin.length < 4 && !isLoading) {
-      const newPin = pin + number;
-      setPin(newPin);
-      if (newPin.length === 4) {
-        await onUnlock(newPin);
+  const handlePasswordAuth = async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Try to get user email from multiple sources
+      let userEmail = userInfo?.email;
+      
+      // If userInfo is not available, try to get from secure storage
+      if (!userEmail) {
+        // Try to get the last logged in user email from secure storage
+        const lastUserEmail = await getItem("LAST_USER_EMAIL", true);
+        if (lastUserEmail) {
+          userEmail = lastUserEmail;
+        }
       }
+      
+      if (!userEmail) {
+        setError("User information not found. Please log in again.");
+        return;
+      }
+
+      // Call the login endpoint using the same pattern as LoginScreen
+      const response = await services.authService.login({
+        id: userEmail,
+        password: password,
+      });
+
+      // Clear all lock-related state before setting new tokens (same as LoginScreen)
+      await Promise.all([
+        removeItem("IS_LOCKED"),
+        removeItem("BACKGROUND_TIMESTAMP"),
+        removeItem("WAS_TERMINATED"),
+        removeItem("LOCK_TIMESTAMP"),
+      ]);
+
+      // Store tokens from response.data
+      if (response.data.accessToken && response.data.refreshToken) {
+        await Promise.all([
+          setItem("ACCESS_TOKEN", response.data.accessToken, true),
+          setItem("REFRESH_TOKEN", response.data.refreshToken, true),
+        ]);
+      }
+
+      // Get user details from API (same as LoginScreen)
+      const userResponse = await services.authServiceToken.getUserDetails();
+      setIsAuthenticated(true);
+      setUserInfo(userResponse.data);
+      setIsFreshLogin(true);
+
+      // Store the user email, user info, and password for future use (same as LoginScreen)
+      await Promise.all([
+        setItem("LAST_USER_EMAIL", userResponse.data.email, true),
+        setItem("USER_INFO", JSON.stringify(userResponse.data), true),
+        setItem("USER_PASSWORD", password, true), // Store password securely for biometric auth
+      ]);
+
+      // Unlock the app and ensure all lock states are cleared
+      await Promise.all([
+        removeItem("SECURITY_LOCK"),
+        removeItem("IS_LOCKED"),
+        removeItem("WAS_TERMINATED"),
+        removeItem("BACKGROUND_TIMESTAMP"),
+        removeItem("LOCK_TIMESTAMP"),
+      ]);
+      
+      // Set authentication state
+      setIsAuthenticated(true);
+      setPassword("");
+
+      // Force a small delay to ensure all state updates are processed
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+              // Delay to ensure AuthContext state updates are processed before navigation
+        setTimeout(() => {
+          if (navigation && navigation.reset) {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "AppStack" }],
+            });
+          }
+        }, 300);
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || "Login failed. Please try again.";
+      setError(errorMessage);
+      setPassword("");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const renderPinDots = () => {
-    return Array(4)
-      .fill(0)
-      .map((_, index) => (
-        <View
-          key={index}
-          style={[styles.pinDot, index < pin.length && styles.filledPinDot]}
-        />
-      ));
+  const switchToPasswordMode = () => {
+    setIsPasswordMode(true);
+    setError(null);
   };
+
+  const switchToBiometricMode = () => {
+    setIsPasswordMode(false);
+    setError(null);
+    setPassword("");
+  };
+
+  const renderBiometricMode = () => (
+    <View style={styles.content}>
+      <View style={styles.headerSection}>
+        <MediumText color="primary" size="xlarge" center marginBottom={8}>
+          {isLoadingUserInfo 
+            ? "Loading..." 
+            : `Welcome back${getDisplayName() ? ", " + getDisplayName() : ""}`
+          }
+        </MediumText>
+        <RegularText color="light" center>
+          Unlock your account to continue
+        </RegularText>
+      </View>
+      
+      <Spacer size={SPACING * 6} />
+
+      <View style={styles.biometricSection}>
+        <View style={styles.biometricCircle}>
+          <View style={styles.biometricIconWrapper}>
+            <FaceIdIcon width={40} height={40} fill={COLORS.brand.primary} />
+          </View>
+        </View>
+
+        <Spacer size={SPACING * 2} />
+
+        <RegularText color="black" size="base" center marginBottom={12}>
+          Click to authenticate with {biometricType}
+        </RegularText>
+
+        <Spacer size={SPACING * 2} />
+        
+        <Button
+          title={isLoading ? "Authenticating..." : `Use ${biometricType}`}
+          onPress={handleBiometricAuth}
+          isLoading={isLoading}
+          style={{
+            width: "70%",
+            paddingHorizontal: SPACING * 2,
+          }}
+        />
+      </View>
+    </View>
+  );
+
+  const renderPasswordMode = () => (
+    <View style={styles.content}>
+      <View style={styles.headerSection}>
+        <MediumText color="primary" size="xlarge" center marginBottom={8}>
+          {isLoadingUserInfo 
+            ? "Loading..." 
+            : `Welcome back${getDisplayName() ? ", " + getDisplayName() : ""}`
+          }
+        </MediumText>
+        <RegularText color="light" center>
+          Enter your password to continue
+        </RegularText>
+      </View>
+      
+      <View style={styles.formSection}>
+        <BasicPasswordInput
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Enter your password"
+          error={error || undefined}
+        />
+
+        {error && (
+          <View style={styles.errorContainer}>
+            <RegularText color="error" center>
+              {error}
+            </RegularText>
+          </View>
+        )}
+
+        <Spacer size={SPACING * 4} />
+
+        <Button
+          title={isLoading ? "Signing in..." : "Sign In"}
+          onPress={handlePasswordAuth}
+          isLoading={isLoading}
+          disabled={isLoading || !password.trim()}
+          style={styles.primaryButton}
+        />
+      </View>
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <View style={styles.contentWrapper}>
-        <View style={styles.content}>
-          {/* Welcome message */}
-          <MediumText color="primary" marginBottom={24}>
-            {`Welcome back${getDisplayName() ? ", " + getDisplayName() + "!" : "!"}`}
-          </MediumText>
-          <View style={styles.asterisksContainer}>
-            <Text style={styles.asterisks}>* * * *</Text>
-          </View>
-          <Text style={styles.title}>Enter Security Pin</Text>
-          <Text style={styles.subtitle}>
-            Please enter your 4-digit security pin
-          </Text>
-          <View style={styles.pinDotsContainer}>{renderPinDots()}</View>
-          {error && <Text style={{ color: 'red', marginBottom: 16 }}>{error}</Text>}
-          <View style={styles.keypad}>
-            {/* First 3 rows: 1-9 */}
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-              <TouchableOpacity
-                key={num}
-                style={styles.keypadButton}
-                onPress={() => handleNumberPress(num.toString())}
-                disabled={isLoading}
-              >
-                <View style={styles.keypadButtonCircle}>
-                  <Text style={styles.keypadButtonText}>{num}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-            {/* Last row: empty, 0, backspace */}
-            <View style={{ width: "33.33%" }} />
-            <TouchableOpacity
-              style={styles.keypadButton}
-              onPress={() => handleNumberPress("0")}
-              disabled={isLoading}
-            >
-              <View style={styles.keypadButtonCircle}>
-                <Text style={styles.keypadButtonText}>0</Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.keypadButton}
-              onPress={handleDelete}
-              disabled={isLoading}
-            >
-              <View style={styles.keypadButtonCircle}>
-                <Backspace />
-              </View>
-            </TouchableOpacity>
-          </View>
+        {isPasswordMode ? renderPasswordMode() : renderBiometricMode()}
+        
+        <View style={styles.footerSection}>
+          <Button
+            title="Switch account"
+            onPress={async () => {
+              try {
+                // Use the centralized logout function from AuthContext
+                await logOut();
+                
+                // Clear security lock to ensure user goes to auth stack
+                await removeItem("SECURITY_LOCK");
+                
+                // The AuthContext will automatically handle navigation to auth stack
+                // by setting isAuthenticated to false, which triggers Router to show AuthRoute
+              } catch (error) {
+                console.error("Error switching account:", error);
+              }
+            }}
+            style={{
+              width: isBiometricEnabled && isBiometricAvailable ? "50%" : "100%",
+            }}
+          />
+          {isBiometricEnabled && isBiometricAvailable && (
+            <Button
+              title={isPasswordMode ? `Use ${biometricType}` : "Login with password"}
+              onPress={isPasswordMode ? switchToBiometricMode : switchToPasswordMode}
+              borderOnly
+              style={{
+                width: "50%",
+              }}
+            />
+          )}
         </View>
       </View>
-      {isLoading && <Loading size="large" color={COLORS.brand.primary} />}
+      {(isLoading || (isLoadingUserInfo && !userInfo)) && <Loading size="large" color={COLORS.brand.primary} />}
     </SafeAreaView>
   );
 };
@@ -159,20 +407,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
-  loaderOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 0,
-  },
   contentWrapper: {
     flex: 1,
     zIndex: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
   },
   content: {
     flex: 1,
@@ -180,73 +417,77 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: SPACING * 6,
   },
-  asterisksContainer: {
-    backgroundColor: "#F0F0FF",
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginBottom: 20,
+  headerSection: {
+    alignItems: "center",
+    marginBottom: SPACING * 2,
+  },
+  biometricSection: {
+    alignItems: "center",
+    marginBottom: SPACING * 2,
+  },
+  biometricCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: COLORS.brand.primaryLight,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: SPACING * 1.5,
   },
-  asterisks: {
-    color: "#5D5FEF",
-    fontSize: 16,
-    letterSpacing: 4,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "600",
-    marginBottom: 10,
-    fontFamily: "Outfit-Medium",
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 30,
-    fontFamily: "Outfit-Regular",
-  },
-  pinDotsContainer: {
-    flexDirection: "row",
-    marginBottom: SPACING * 4,
-  },
-  pinDot: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: "#E0E0E0",
-    marginHorizontal: 10,
-  },
-  filledPinDot: {
-    backgroundColor: COLORS.brand.primary,
-  },
-  keypad: {
-    width: "100%",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    paddingHorizontal: 16,
-  },
-  keypadButton: {
-    width: "33.33%",
-    aspectRatio: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  keypadButtonText: {
-    fontSize: 24,
-    color: "#000",
-    fontFamily: "Outfit-Regular",
-  },
-  keypadButtonCircle: {
+  biometricIconWrapper: {
     width: 60,
     height: 60,
-    borderRadius: 30,
-    backgroundColor: "#F5F5F5",
     justifyContent: "center",
     alignItems: "center",
+  },
+  formSection: {
+    width: "100%",
+    marginBottom: SPACING * 2,
+  },
+  inputContainer: {
+    width: "100%",
+    height: 50,
     borderWidth: 1,
     borderColor: "#E0E0E0",
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    fontFamily: "Outfit-Regular",
+    marginBottom: SPACING * 1.5,
+  },
+  errorContainer: {
+    marginBottom: SPACING * 1.5,
+  },
+  primaryButton: {
+    width: "100%",
+    height: 50,
+    backgroundColor: COLORS.brand.primary,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  primaryButtonDisabled: {
+    opacity: 0.7,
+  },
+  secondaryButton: {
+    paddingVertical: 10,
+  },
+  footerSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingBottom: SPACING * 4,
+    paddingHorizontal: SPACING * 2,
+    gap: SPACING,
+  },
+  passwordInput: {
+    width: "100%",
+    height: 50,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    fontFamily: "Outfit-Regular",
   },
 });
 

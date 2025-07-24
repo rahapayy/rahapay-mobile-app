@@ -29,6 +29,7 @@ import { BoldText, RegularText, SemiBoldText } from "../common/Text";
 import { useAuth } from "../../services/AuthContext";
 import { PanResponder } from "react-native";
 import { Skeleton } from "@rneui/themed";
+import { Ionicons } from '@expo/vector-icons';
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 const isTablet = Platform.OS === "ios" && screenWidth >= 768;
@@ -44,11 +45,12 @@ const Card: React.FC<{
   const { refreshAll, balance, isLoading, error } = useWallet();
 
   const handleRefresh = React.useCallback(async () => {
+    if (isConnected === false) return; // Prevent refresh when offline
     setIsRefreshing(true); // Show the spinner
     await refreshAll(); // Refresh wallet data
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulated delay
     setIsRefreshing(false); // Hide the spinner
-  }, [refreshAll]);
+  }, [refreshAll, isConnected]);
 
   useEffect(() => {
     const getBalanceVisibility = async () => {
@@ -181,16 +183,17 @@ const Card: React.FC<{
                 skeletonStyle={{ backgroundColor: COLORS.violet50 }}
               />
             ) : isConnected === false ? (
-              <View style={styles.errorContainer}>
-                <RegularText color="white" size="xsmall">
-                  Please check your internet connection and try again.
+              <View style={[styles.errorContainer, { alignItems: 'center' }]}> 
+                <Ionicons name="cloud-offline-outline" size={32} color="#fff" style={{ marginBottom: 6 }} />
+                <RegularText color="white" size="small">
+                  No internet connection. Balance unavailable.
                 </RegularText>
               </View>
-            ) : error ? (
+            ) : error && isConnected === true ? (
               <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
+                <RegularText color="white">{error}</RegularText>
                 <TouchableOpacity onPress={handleRefresh}>
-                  <Text style={styles.retryText}>Retry</Text>
+                  <RegularText color="white" size="small">Retry</RegularText>
                 </TouchableOpacity>
               </View>
             ) : showBalance ? (
@@ -288,17 +291,6 @@ const styles = StyleSheet.create({
   errorContainer: {
     marginTop: SPACING,
     marginBottom: SPACING,
-  },
-  errorText: {
-    fontFamily: "Outfit-SemiBold",
-    color: "#fff",
-    fontSize: RFValue(14),
-  },
-  retryText: {
-    fontFamily: "Outfit-Medium",
-    fontSize: RFValue(14),
-    color: COLORS.violet400,
-    marginTop: 10,
   },
   spinnerContainer: {
     backgroundColor: "white",
