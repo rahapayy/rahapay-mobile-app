@@ -108,15 +108,17 @@ const Router = ({ showOnboarding }: { showOnboarding: boolean }) => {
     }
   }, [isAppReady]);
 
-  // Security lock check: navigate to auth route if locked
+  // Security lock check: only navigate if user is authenticated
   useEffect(() => {
     const checkSecurityLock = async () => {
       const lock = await getItem("SECURITY_LOCK");
-      if (lock === "true" && navigationRef.isReady()) {
-        navigationRef.reset({
-          index: 0,
-          routes: [{ name: "AuthRoute" }],
-        });
+      // Only handle security lock if user is authenticated and we're in AppStack
+      if (lock === "true" && navigationRef.isReady() && isAuthenticated) {
+        // Check if we're currently in AppStack before navigating
+        const currentRoute = navigationRef.getCurrentRoute();
+        if (currentRoute && currentRoute.name === "AppStack") {
+          navigationRef.navigate("ExistingUserScreen");
+        }
       }
     };
     if (isAppReady) {

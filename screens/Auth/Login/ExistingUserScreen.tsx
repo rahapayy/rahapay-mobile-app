@@ -55,14 +55,7 @@ const ExistingUserScreen: React.FC<any> = ({ navigation }) => {
     }
   }, [isBiometricEnabled, isBiometricAvailable]);
 
-  useEffect(() => {
-    (async () => {
-      const lock = await getItem("SECURITY_LOCK");
-      if (lock !== "true") {
-        setIsAuthenticated(true);
-      }
-    })();
-  }, [navigation, setIsAuthenticated]);
+
 
 
 
