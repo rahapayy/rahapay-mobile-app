@@ -3,7 +3,7 @@ import { AppState, AppStateStatus } from "react-native";
 import { setItem, getItem } from "@/utils/storage";
 import { useAuth } from "@/services/AuthContext";
 
-const INACTIVITY_TIMEOUT = 20 * 1000; // 20 seconds for testing
+const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // 3 minutes
 
 export const InactivityGuard = () => {
   const appState = useRef(AppState.currentState);
