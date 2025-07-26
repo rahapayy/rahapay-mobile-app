@@ -16,7 +16,8 @@
         "buildConfiguration": "Debug"
       },
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleDebug"
       }
     },
     "development-simulator": {
@@ -41,7 +42,8 @@
         "buildConfiguration": "Release"
       },
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
       }
     },
     "production": {
@@ -56,7 +58,9 @@
         "image": "macos-sequoia-15.3-xcode-16.2"
       },
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "gradleCommand": ":app:bundleRelease",
+        "image": "ubuntu-22.04-jdk-17-ndk-r21e"
       }
     }
   },
