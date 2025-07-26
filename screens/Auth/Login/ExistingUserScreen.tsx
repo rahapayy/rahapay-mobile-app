@@ -315,9 +315,8 @@ const ExistingUserScreen: React.FC<any> = ({ navigation }) => {
         <Spacer size={SPACING * 2} />
         
         <Button
-          title={isLoading ? "Authenticating..." : `Use ${getBiometricDisplayName()}`}
+          title={`Use ${getBiometricDisplayName()}`}
           onPress={handleBiometricAuth}
-          isLoading={isLoading}
           style={{
             width: "70%",
             paddingHorizontal: SPACING * 2,
@@ -361,9 +360,8 @@ const ExistingUserScreen: React.FC<any> = ({ navigation }) => {
         <Spacer size={SPACING * 4} />
 
         <Button
-          title={isLoading ? "Signing in..." : "Sign In"}
+          title={"Sign In"}
           onPress={handlePasswordAuth}
-          isLoading={isLoading}
           disabled={isLoading || !password.trim()}
           style={styles.primaryButton}
         />

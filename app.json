@@ -35,6 +35,8 @@
       },
       "package": "com.voltcore.rahapay",
       "googleServicesFile": "./google-services.json",
+      "targetSdkVersion": 35,
+      "compileSdkVersion": 35,
       "permissions": [
         "android.permission.USE_BIOMETRIC",
         "android.permission.USE_FINGERPRINT",
