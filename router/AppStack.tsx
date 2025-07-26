@@ -36,12 +36,14 @@ import ReviewSummaryScreen from "@/screens/ServiceReviewScreens";
 import TransactionPinScreen from "@/screens/ServiceReviewScreens/TransactionPinScreen";
 import VerifyOtpScreen from "@/screens/Profile/VerifyOtpScreen";
 import ExistingUserScreen from "@/screens/Auth/Login/ExistingUserScreen";
+import SecurityLockManager from "@/components/SecurityLockManager";
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
 const AppStack = () => {
   return (
-    <Stack.Navigator initialRouteName="HomeScreen">
+    <SecurityLockManager>
+      <Stack.Navigator initialRouteName="HomeScreen">
       <Stack.Screen
         name="HomeScreen"
         component={BottomTab}
@@ -217,9 +219,15 @@ const AppStack = () => {
       <Stack.Screen
         name="ExistingUserScreen"
         component={ExistingUserScreen}
-        options={{ headerShown: false, presentation: "containedModal" }}
-      />
-    </Stack.Navigator>
+        options={{ 
+          headerShown: false, 
+          presentation: "fullScreenModal",
+          gestureEnabled: false,
+          animation: "fade"
+        }}
+              />
+      </Stack.Navigator>
+    </SecurityLockManager>
   );
 };
 

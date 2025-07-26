@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { AppState, AppStateStatus } from "react-native";
 import { setItem, getItem } from "@/utils/storage";
-import { navigationRef } from "@/router/navigationService";
 import { useAuth } from "@/services/AuthContext";
 
 const INACTIVITY_TIMEOUT = 20 * 1000; // 20 seconds for testing
@@ -11,6 +10,43 @@ export const InactivityGuard = () => {
   const backgroundedAt = useRef<number | null>(null);
   const { setIsAuthenticated } = useAuth();
 
+  // Check for force-close scenario on app startup
+  useEffect(() => {
+    const checkForceClose = async () => {
+      try {
+        // Check if user is authenticated
+        const lastUserEmail = await getItem("LAST_USER_EMAIL", true);
+        const userPassword = await getItem("USER_PASSWORD", true);
+        const currentTime = Date.now();
+        
+        if (lastUserEmail && userPassword) {
+          // User is authenticated, check if app was force-closed
+          const lastActiveTime = await getItem("LAST_ACTIVE_TIMESTAMP");
+          
+          if (lastActiveTime) {
+            const timeSinceLastActive = currentTime - parseInt(lastActiveTime);
+            
+            // If more than 5 seconds have passed since last active, 
+            // the app was likely force-closed and reopened
+            if (timeSinceLastActive > 5000) {
+              console.log("App was force-closed, locking it immediately");
+              // Set security lock immediately to prevent flash
+              await setItem("SECURITY_LOCK", "true");
+            }
+          }
+        }
+        
+        // Set current timestamp as last active
+        await setItem("LAST_ACTIVE_TIMESTAMP", currentTime.toString());
+      } catch (error) {
+        console.error("Error checking force-close scenario:", error);
+      }
+    };
+
+    // Run immediately without delay to prevent flash
+    checkForceClose();
+  }, []);
+
   useEffect(() => {
     const handleAppStateChange = async (nextAppState: AppStateStatus) => {
       if (
@@ -18,6 +54,8 @@ export const InactivityGuard = () => {
         appState.current === "active"
       ) {
         backgroundedAt.current = Date.now();
+        // Update last active timestamp when going to background
+        await setItem("LAST_ACTIVE_TIMESTAMP", Date.now().toString());
       } else if (
         nextAppState === "active" &&
         (appState.current === "background" || appState.current === "inactive")
@@ -32,19 +70,12 @@ export const InactivityGuard = () => {
             if (lastUserEmail && userPassword) {
               // User is authenticated - lock the app
               await setItem("SECURITY_LOCK", "true");
-              
-              if (navigationRef.isReady()) {
-                // Navigate to ExistingUserScreen
-                navigationRef.reset({
-                  index: 0,
-                  routes: [{ name: "ExistingUserScreen" }],
-                });
-              }
             }
-            // If user is not authenticated, don't lock the app - they can continue in AuthStack
           }
         }
         backgroundedAt.current = null;
+        // Update last active timestamp when coming back to active
+        await setItem("LAST_ACTIVE_TIMESTAMP", Date.now().toString());
       }
       appState.current = nextAppState;
     };

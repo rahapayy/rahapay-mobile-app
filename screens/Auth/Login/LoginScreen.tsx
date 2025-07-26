@@ -94,6 +94,7 @@ const LoginScreen: React.FC<{
         setItem("LAST_USER_EMAIL", userResponse.data.email, true),
         setItem("USER_INFO", JSON.stringify(userResponse.data), true),
         setItem("USER_PASSWORD", values.password, true), // Store password securely for biometric auth
+        setItem("LAST_ACTIVE_TIMESTAMP", Date.now().toString()), // Set current timestamp as last active
       ]);
 
       console.log("USER_INFO", userResponse.data);

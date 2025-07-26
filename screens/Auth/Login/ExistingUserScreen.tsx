@@ -150,6 +150,9 @@ const ExistingUserScreen: React.FC<any> = ({ navigation }) => {
           removeItem("LOCK_TIMESTAMP"),
         ]);
         
+        // Set current timestamp as last active
+        await setItem("LAST_ACTIVE_TIMESTAMP", Date.now().toString());
+        
         // Delay to ensure AuthContext state updates are processed before navigation
         setTimeout(() => {
           if (navigation && navigation.reset) {
@@ -236,6 +239,9 @@ const ExistingUserScreen: React.FC<any> = ({ navigation }) => {
         removeItem("LOCK_TIMESTAMP"),
       ]);
       
+      // Set current timestamp as last active
+      await setItem("LAST_ACTIVE_TIMESTAMP", Date.now().toString());
+      
       // Set authentication state
       setIsAuthenticated(true);
       setPassword("");
@@ -243,15 +249,15 @@ const ExistingUserScreen: React.FC<any> = ({ navigation }) => {
       // Force a small delay to ensure all state updates are processed
       await new Promise(resolve => setTimeout(resolve, 100));
       
-              // Delay to ensure AuthContext state updates are processed before navigation
-        setTimeout(() => {
-          if (navigation && navigation.reset) {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "AppStack" }],
-            });
-          }
-        }, 300);
+      // Delay to ensure AuthContext state updates are processed before navigation
+      setTimeout(() => {
+        if (navigation && navigation.reset) {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "AppStack" }],
+          });
+        }
+      }, 300);
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || "Login failed. Please try again.";
       setError(errorMessage);
@@ -380,7 +386,10 @@ const ExistingUserScreen: React.FC<any> = ({ navigation }) => {
                 await logOut();
                 
                 // Clear security lock to ensure user goes to auth stack
-                await removeItem("SECURITY_LOCK");
+                await Promise.all([
+                  removeItem("SECURITY_LOCK"),
+                  removeItem("LAST_ACTIVE_TIMESTAMP"),
+                ]);
                 
                 // The AuthContext will automatically handle navigation to auth stack
                 // by setting isAuthenticated to false, which triggers Router to show AuthRoute

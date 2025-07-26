@@ -56,6 +56,7 @@ const SuccessfulScreen: React.FC<{
       await Promise.all([
         setItem("LAST_USER_EMAIL", userResponse.data.email, true),
         setItem("USER_INFO", JSON.stringify(userResponse.data), true),
+        setItem("LAST_ACTIVE_TIMESTAMP", Date.now().toString()), // Set current timestamp as last active
       ]);
 
       handleShowFlash({

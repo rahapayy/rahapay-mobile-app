@@ -173,6 +173,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         removeItem("LAST_USER_EMAIL", true),
         removeItem("USER_INFO", true),
         removeItem("USER_PASSWORD", true), // Remove stored password on logout
+        removeItem("LAST_ACTIVE_TIMESTAMP"), // Clear last active timestamp on logout
       ]);
       mutate(() => true, undefined, false);
       console.log("SWR cache cleared on logout");
