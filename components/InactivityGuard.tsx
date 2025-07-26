@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { AppState, AppStateStatus } from "react-native";
-import { setItem, getItem, removeItem } from "@/utils/storage";
+import { setItem, getItem } from "@/utils/storage";
 import { useAuth } from "@/services/AuthContext";
 
 const INACTIVITY_TIMEOUT = 20 * 1000; // 20 seconds for testing
@@ -29,7 +29,8 @@ export const InactivityGuard = () => {
             // If more than 5 seconds have passed since last active, 
             // the app was likely force-closed and reopened
             if (timeSinceLastActive > 5000) {
-              console.log("App was force-closed, locking it");
+              console.log("App was force-closed, locking it immediately");
+              // Set security lock immediately to prevent flash
               await setItem("SECURITY_LOCK", "true");
             }
           }
@@ -42,9 +43,8 @@ export const InactivityGuard = () => {
       }
     };
 
-    // Small delay to ensure AuthContext is ready
-    const timer = setTimeout(checkForceClose, 1000);
-    return () => clearTimeout(timer);
+    // Run immediately without delay to prevent flash
+    checkForceClose();
   }, []);
 
   useEffect(() => {

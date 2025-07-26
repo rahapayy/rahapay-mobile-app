@@ -3,7 +3,6 @@ import { Modal, View, StyleSheet } from "react-native";
 import { useAuth } from "@/services/AuthContext";
 import { getItem } from "@/utils/storage";
 import ExistingUserScreen from "@/screens/Auth/Login/ExistingUserScreen";
-import { navigationRef } from "@/router/navigationService";
 
 interface SecurityLockManagerProps {
   children: React.ReactNode;
