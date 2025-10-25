@@ -60,7 +60,7 @@
       "android": {
         "buildType": "app-bundle",
         "gradleCommand": ":app:bundleRelease",
-        "image": "ubuntu-22.04-jdk-17-ndk-r28",
+         "image": "ubuntu-22.04-jdk-17-ndk-r21e",
         "env": {
           "ANDROID_TARGET_SDK_VERSION": "35",
           "ANDROID_COMPILE_SDK_VERSION": "35"
