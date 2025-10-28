@@ -35,9 +35,6 @@
       },
       "package": "com.voltcore.rahapay",
       "googleServicesFile": "./google-services.json",
-      "targetSdkVersion": 35,
-      "compileSdkVersion": 35,
-      "supports16KbPageSize": true,
       "permissions": [
         "android.permission.USE_BIOMETRIC",
         "android.permission.USE_FINGERPRINT",
@@ -72,7 +69,8 @@
         {
           "contactsPermission": "Allow $(PRODUCT_NAME) to access your contacts."
         }
-      ]
+      ],
+      "./plugins/android-api35.js"
     ],
     "extra": {
       "eas": {
